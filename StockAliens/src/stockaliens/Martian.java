@@ -2,30 +2,45 @@
  * 
  */
 package stockaliens;
-
+import java.util.Random;
 import alieninterfaces.*;
-
 /**
  *
- * @author sfreisem-kirov
+ * @author guberti
  */
 public class Martian implements Alien {
-    int HorizontalMove; 
-    int VerticalMove; 
     Context ctx;
-    
-    public void init(Context ctx) {
-        HorizontalMove = 0; 
-        VerticalMove = 0; 
-        this.ctx = ctx;
-    }
-    
-    // Martians move left, right, left, right
-    public MoveDir getMove() {
-        return new MoveDir(ctx.getEnergy(), 0);
+    int HorizontalMove;
+    int VerticalMove;
+    int Remainder;
+    private static Random rnd = new Random();
+    public static boolean getRandomBoolean() {
+        return rnd.nextBoolean();
     }
 
+    public Martian() {
+    }
+
+    @Override
+    public void init(Context ctx) {
+        ctx = ctx;
+        Remainder = ctx.getTech() % 2;
+        HorizontalMove = (ctx.getTech()-Remainder)/2;
+        VerticalMove = ctx.getTech()- HorizontalMove;
+        if(getRandomBoolean() == true)
+        {
+            HorizontalMove *= -1;
+        }
+        if(getRandomBoolean() == true)
+        {
+            VerticalMove *= -1;
+        }
+    }
     
+    public MoveDir getMove() {
+        return new MoveDir(HorizontalMove, VerticalMove);
+    }
+
     public Action getAction() {
         try
         {
@@ -35,7 +50,7 @@ public class Martian implements Alien {
             }
         }catch (Exception e)
         {
-            
+        return new Action(ActionCode.Fight, ctx.getEnergy());
         }
         
         if(ctx.getEnergy()< 2)
@@ -50,67 +65,11 @@ public class Martian implements Alien {
         {
             return new Action(ActionCode.Spawn);
         }
-    }
-    
-    public void processResults() {
-        ctx.debugOut("Martian: processRsult not supported yet.");
-        return;
-        // GM: Sam, you don't really want to do this throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-
-    }
-}
-
-/* SFK code as checked into branch
-
-
-package consolealiensgame;
-
-
-public class Martian extends Alien {
-    int HorizontalMove;
-    int VerticalMove;
-    
-    public Martian() {
-        HorizontalMove = 0;
-        VerticalMove = 0;
-    }
-
-    // Martians move left, right, left, right
-    public MoveDir getMove(AlienAPI api) {
-        return new MoveDir(api.energy(), 0);
-    }
-
-    public Action getAction(AlienAPI api) {
-        try
-        {
-            if(api.view.isAlienAtPos(api.x(), api.y()))
-            {
-                return new Action(ActionCode.Fight, Math.max(api.energy() - 2, 2));
-            }
-        }catch (Exception e)
-        {
-            
-        }
-        
-        if(api.energy()< 2)
-        {
-            return new Action(ActionCode.Gain);
-        }
-        else if(api.energy() < 4)
-        {
-            return new Action(ActionCode.Research);
-        }
-        else
-        {
-            return new Action(ActionCode.Spawn);
-        }
         
     }
 
     @Override
-    public void processResults(AlienAPI api) {
+    public void processResults() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
-
-*/
