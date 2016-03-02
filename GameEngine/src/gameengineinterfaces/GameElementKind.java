@@ -5,16 +5,11 @@
  */
 package gameengineinterfaces;
 
-
-
 /**
  *
  * @author gmein
  */
-public interface GameEngine
+public enum GameElementKind
 {
-    void init(GameVisualizer v, GameElementSpec[] savedGame);
-    void queueCommand (GameCommand gc);
-    GameElementSpec[] saveGame ();
-    boolean isAlive();
+    STAR, PLANET, SPACESTATION, ALIEN
 }

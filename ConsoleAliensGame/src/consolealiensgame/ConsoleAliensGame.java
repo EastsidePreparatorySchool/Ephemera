@@ -7,7 +7,7 @@ package consolealiensgame;
 
 import java.lang.reflect.Constructor;
 import alieninterfaces.*;
-import stockaliens.*;
+
 
 /**
  *
@@ -23,7 +23,7 @@ public class ConsoleAliensGame {
         
         try
         {
-            Constructor<?> cs = JARLoader.Load("stockaliens", "Dalek");
+            Constructor<?> cs = JARLoader.Load("c:\\stockaliens", "Dalek");
             grid.addAlien(2, 2, "stockaliens", "Dalek", cs);
         } catch (Throwable t)
         {

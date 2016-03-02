@@ -5,16 +5,18 @@
  */
 package gameengineinterfaces;
 
-
-
 /**
  *
  * @author gmein
  */
-public interface GameEngine
+
+public class GameCommand
 {
-    void init(GameVisualizer v, GameElementSpec[] savedGame);
-    void queueCommand (GameCommand gc);
-    GameElementSpec[] saveGame ();
-    boolean isAlive();
+    public GameCommandCode code;
+    public Object parameters[];  
+    
+    public GameCommand (GameCommandCode newcode)
+    {
+        this.code = newcode;
+    }
 }
