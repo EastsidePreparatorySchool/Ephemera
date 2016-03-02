@@ -28,22 +28,42 @@ public class ConsoleShell
      */
     public static void main(String[] args) throws IOException
     {
+        // args[0] = jar path (optional)
+        // args[1] = config file (optional)
+        
+        //get some objects created (not initialized, nothing important happens here)
         GameEngineV1 engine = new GameEngineV1();
         GameElementSpec[] gameSpec = new GameElementSpec[1];
         ConsoleVisualizer convis = new ConsoleVisualizer();
         Scanner scan = new Scanner(System.in);
         
+        // make game spec with one stock alien, for now
         gameSpec[0] = new GameElementSpec("ALIEN", "stockaliens","Dalek", "", null);
         
-        engine.init(convis, gameSpec);
         
+        // can override the path for class jar files in arguments
+        String gameJarPath = null;
+        if (args.length > 0 && args[0] != null && !args[0].isEmpty())
+        {
+            gameJarPath = args[0];
+        }
+        
+        
+        // get engine up and running
+        engine.init(convis, gameJarPath, gameSpec);
+        
+        // give it a go
         engine.queueCommand(new GameCommand(GameCommandCode.Resume));
         
+        
+        // wait for things to happen, mostly sleep, detect when we received game over, shut it down
         do 
         {
             try
             {
                 sleep(50);
+                
+                // check whether anything catatrophic happened on the other thread
                 if (!engine.isAlive())
                 {
                     convis.debugErr("ConsoleShell: GameEngine died");
@@ -54,6 +74,7 @@ public class ConsoleShell
                 convis.debugOut(e.getMessage());
             }
             
+        // gameOver is also set by the ConsoleVisualizer
         } while (!gameOver);
 
         engine.queueCommand(new GameCommand(GameCommandCode.End));

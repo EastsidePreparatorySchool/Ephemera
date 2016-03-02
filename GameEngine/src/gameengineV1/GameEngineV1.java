@@ -26,6 +26,7 @@ public class GameEngineV1 implements GameEngine
     Queue<GameCommand> queue;
     GameEngineThread gameThread;
     GameState gameState;
+    String gameJarPath;
 
     @Override
     public boolean isAlive()
@@ -35,13 +36,22 @@ public class GameEngineV1 implements GameEngine
     
     
     @Override
-    public void init(GameVisualizer v, GameElementSpec[] savedGame)
+    public void init(GameVisualizer v, String gameJarPath, GameElementSpec[] savedGame)
     {
         // 
         // save the visualizer (how we report status)
         // create a new Spacegrid (the game board)
         // set up a transfer queue that we will use to post commands to the game thread
         //
+
+        if (gameJarPath != null && !gameJarPath.isEmpty())
+        {
+            this.gameJarPath = gameJarPath;
+        }
+        else
+        {
+            this.gameJarPath = "c:\\users\\public\\ephemera\\drop\\";
+        }
 
         this.vis = v;
         this.queue = new ConcurrentLinkedQueue<GameCommand>();

@@ -171,7 +171,7 @@ public class GameEngineThread extends Thread
      */
     private void addClassPathFile(String packageName) throws IOException
     {
-        String fullName = "c:\\users\\gmein\\github\\ephemera\\drop\\" + packageName + ".jar";
+        String fullName = engine.gameJarPath + packageName + ".jar";
         URL url = new File(fullName).toURI().toURL();
         URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class<?> sysclass = URLClassLoader.class;

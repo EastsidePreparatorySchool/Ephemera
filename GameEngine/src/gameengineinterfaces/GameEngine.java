@@ -13,7 +13,7 @@ package gameengineinterfaces;
  */
 public interface GameEngine
 {
-    void init(GameVisualizer v, GameElementSpec[] savedGame);
+    void init(GameVisualizer v, String gameJarPath, GameElementSpec[] savedGame);
     void queueCommand (GameCommand gc);
     GameElementSpec[] saveGame ();
     boolean isAlive();
