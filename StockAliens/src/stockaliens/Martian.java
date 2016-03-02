@@ -24,6 +24,7 @@ public class Martian implements Alien {
     @Override
     public void init(Context ctx) {
         ctx = ctx;
+
         Remainder = ctx.getTech() % 2;
         HorizontalMove = (ctx.getTech()-Remainder)/2;
         VerticalMove = ctx.getTech()- HorizontalMove;
@@ -35,6 +36,7 @@ public class Martian implements Alien {
         {
             VerticalMove *= -1;
         }
+        ctx.debugOut("Martian initialized");
     }
     
     public MoveDir getMove() {

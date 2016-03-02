@@ -37,20 +37,20 @@ public class ConsoleShell
         ConsoleVisualizer convis = new ConsoleVisualizer();
         Scanner scan = new Scanner(System.in);
         
-        // make game spec with one stock alien, for now
-        gameSpec[0] = new GameElementSpec("ALIEN", "stockaliens","Dalek", "", null);
-        
-        
         // can override the path for class jar files in arguments
-        String gameJarPath = null;
+        String gameJarPath;
         if (args.length > 0 && args[0] != null && !args[0].isEmpty())
         {
             gameJarPath = args[0];
+        } 
+        else
+        {
+            gameJarPath = "c:\\users\\public\\ephemera\\drop\\";
         }
         
-        
+        System.out.println("test:"+gameJarPath);
         // get engine up and running
-        engine.init(convis, gameJarPath, gameSpec);
+        engine.initFromFile(convis, gameJarPath, "ephemera_initial_setup.csv");
         
         // give it a go
         engine.queueCommand(new GameCommand(GameCommandCode.Resume));

@@ -34,6 +34,90 @@ public class GameEngineV1 implements GameEngine
         return gameThread.isAlive();
     }
     
+    @Override
+    public void initFromFile(GameVisualizer v, String gameJarPath, String savedGameFile)
+    {
+        GameElementSpec[] savedGame;
+        
+        this.vis = v;
+        this.gameJarPath = gameJarPath;
+
+        //
+        // read initial config from file
+        //
+        v.debugOut("GameEngineV1: read config file: " + savedGameFile);
+        
+        ArrayList<GameElementSpec> elements = new ArrayList<GameElementSpec>(50);
+        try
+        {
+            //
+            // Every line has kind, package, class, state in csv format
+            //
+            BufferedReader in = new BufferedReader(new FileReader(this.gameJarPath + savedGameFile));
+            String strLine;
+            while ((strLine = in.readLine()) != null)
+            {
+                vis.debugOut("GameEngineV1: read config line: " + strLine);
+                String[] strElement = strLine.split(",");
+
+                if (strElement.length == 0)
+                {
+                    continue;
+                }
+                // need at least the code
+                if (strElement.length == 0 || strElement[0] == null)
+                {
+                    throw new ParseException(strLine, 0);
+                }
+
+                GameElementSpec element = new GameElementSpec(strElement[0]);
+
+                // get package name
+                if (strElement.length > 1 && strElement[1] != null)
+                {
+                    element.packageName = strElement[1].trim();
+                } else
+                {
+                    element.packageName = "";
+                }
+
+                // get class name
+                if (strElement.length > 2 && strElement[2] != null)
+                {
+                    element.className = strElement[2].trim();
+                } else
+                {
+                    element.packageName = "";
+                }
+
+                // get state
+                if (strElement.length > 3 && strElement[3] != null)
+                {
+                    element.className = strElement[3].trim();
+                } else
+                {
+                    element.state = "<no state>";
+                }
+
+                // add to list
+                elements.add(element);
+                v.debugOut("GameEngineV1:init:Parsed element " + element.packageName + ":"
+                        + element.className + ", "
+                        + element.state);
+            }
+            in.close();
+        } catch (Exception e)
+        {
+            v.debugOut("GameEngineV1:init:File parse error");
+            v.debugOut("GameEngineV1:init:     " + e.getMessage());
+        }
+
+        // convert list into array to process as if it had been saved
+        savedGame = new GameElementSpec[1];
+        savedGame = elements.toArray(savedGame);
+        
+        this.init(v, gameJarPath, savedGame);
+        }
     
     @Override
     public void init(GameVisualizer v, String gameJarPath, GameElementSpec[] savedGame)
@@ -44,18 +128,10 @@ public class GameEngineV1 implements GameEngine
         // set up a transfer queue that we will use to post commands to the game thread
         //
 
-        if (gameJarPath != null && !gameJarPath.isEmpty())
-        {
-            this.gameJarPath = gameJarPath;
-        }
-        else
-        {
-            this.gameJarPath = "c:\\users\\public\\ephemera\\drop\\";
-        }
-
         this.vis = v;
         this.queue = new ConcurrentLinkedQueue<GameCommand>();
         gameState = GameState.Paused;
+        this.gameJarPath = gameJarPath;
 
        
         
@@ -73,13 +149,17 @@ public class GameEngineV1 implements GameEngine
                 //
                 // Every line has kind, package, class, state in csv format
                 //
-                BufferedReader in = new BufferedReader(new FileReader("ephemera_initial_setup.csv"));
+                BufferedReader in = new BufferedReader(new FileReader(this.gameJarPath + "ephemera_initial_setup.csv"));
                 String strLine;
-                strLine = in.readLine();
                 while ((strLine = in.readLine()) != null)
                 {
+                    vis.debugOut("GameEngineV1: read config line: " + strLine);
                     String[] strElement = strLine.split(",");
 
+                    if (strElement.length == 0)
+                    {
+                        continue;
+                    }
                     // need at least the code
                     if (strElement.length == 0 || strElement[0] == null)
                     {
@@ -112,7 +192,7 @@ public class GameEngineV1 implements GameEngine
                         element.className = strElement[3].trim();
                     } else
                     {
-                        element.state = "";
+                        element.state = "<no state>";
                     }
 
                     // add to list
@@ -129,7 +209,7 @@ public class GameEngineV1 implements GameEngine
             }
 
             // convert list into array to process as if it had been saved
-            savedGame = new GameElementSpec[50];
+            savedGame = new GameElementSpec[1];
             savedGame = elements.toArray(savedGame);
         }
 
@@ -145,6 +225,7 @@ public class GameEngineV1 implements GameEngine
         //
         // queue every game element
         //
+        vis.debugOut("GameEngineV1: size of config: " + Integer.toString(savedGame.length));
         for (GameElementSpec element : savedGame)
         {
             GameCommand gc = new GameCommand(GameCommandCode.AddElement);
