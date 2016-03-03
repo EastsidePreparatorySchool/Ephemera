@@ -77,7 +77,7 @@ public class GameEngineThread extends Thread
                 {
                     if (engine.gameState == GameState.Paused)
                     {
-                        engine.vis.debugOut("GameEngineThread: About to wait for msgs");
+                        //engine.vis.debugOut("GameEngineThread: About to wait for msgs");
                         synchronized (engine.queue)
                         {
                             engine.queue.wait();
@@ -87,12 +87,12 @@ public class GameEngineThread extends Thread
                 // do we have work requests?
                 while (!engine.queue.isEmpty())
                 {
-                    engine.vis.debugOut("GameEngineThread: Dequeueing msg");
+                    //engine.vis.debugOut("GameEngineThread: Dequeueing msg");
 
                     gc = (GameCommand) engine.queue.remove();
 
                     // Process the work item
-                    engine.vis.debugOut("GameEngineThread: Processing command");
+                    //engine.vis.debugOut("GameEngineThread: Processing command");
                     endGame = processCommand(gc);
                     // endGame signifies that an "End" requeat has come through
                 }
@@ -115,9 +115,9 @@ public class GameEngineThread extends Thread
                 engine.vis.debugOut("GameEngineThread: Processing GameElement");
 
                 GameElementSpec element = (GameElementSpec) gc.parameters[0];
-                engine.vis.debugOut("GameEngineThread:     package " + element.packageName);
-                engine.vis.debugOut("GameEngineThread:     class   " + element.className);
-                engine.vis.debugOut("GameEngineThread:     state   " + element.state);
+                //engine.vis.debugOut("GameEngineThread:     package " + element.packageName);
+                //engine.vis.debugOut("GameEngineThread:     class   " + element.className);
+                //engine.vis.debugOut("GameEngineThread:     state   " + element.state);
                 
                 try
                 {
@@ -185,7 +185,7 @@ public class GameEngineThread extends Thread
             e.printStackTrace();
             throw new IOException("GameElementThread: Error, could not add URL to system classloader");
         }
-        engine.vis.debugOut("GameElementThread: package " + packageName + " added as " + fullName);
+        //engine.vis.debugOut("GameElementThread: package " + packageName + " added as " + fullName);
     }
 
     public Constructor<?> Load(String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException
