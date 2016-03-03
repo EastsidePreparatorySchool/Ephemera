@@ -9,21 +9,26 @@ import alieninterfaces.*;
  * @author guberti
  */
 public class Martian implements Alien {
+    //declaring everything that will need to be used later
     Context ctx;
     int HorizontalMove;
     int VerticalMove;
     int Remainder;
+    int fightStrength;
+    //gets a random boolean to determine positive or negative move function.
     private static Random rnd = new Random();
     public static boolean getRandomBoolean() {
         return rnd.nextBoolean();
     }
-
-    public Martian() {
+//empty constructor
+    public Martian() 
+    {
     }
-
+    
     @Override
     public void init(Context ctx) {
         ctx = ctx;
+        //splits in two whole numbers
         Remainder = ctx.getTech() % 2;
         HorizontalMove = (ctx.getTech()-Remainder)/2;
         VerticalMove = ctx.getTech()- HorizontalMove;
@@ -35,6 +40,41 @@ public class Martian implements Alien {
         {
             VerticalMove *= -1;
         }
+        
+        //gets the coordinates of the closest alien.
+        int ClosestAlienXCoordinate;
+        int ClosestAlienYCoordinate;
+        ClosestAlienXCoordinate = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY())[0];
+        ClosestAlienYCoordinate = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY())[1];        
+        
+        
+        //Checks to see if the closest alien is withen moving capability.
+        if(ClosestAlienXCoordinate + ClosestAlienYCoordinate <= ctx.getEnergy())
+        {
+            if(ClosestAlienXCoordinate + ClosestAlienYCoordinate >= -1 * ctx.getEnergy())
+            {
+                HorizontalMove = ClosestAlienXCoordinate;
+                VerticalMove = ClosestAlienYCoordinate;
+                
+            }
+
+        }
+
+        
+        
+        
+        //sets the amount of energy to fight with by how much energy, and how muc technology
+        fightStrength = 1;
+        if(ctx.getEnergy()> 3)
+        {
+            fightStrength = ctx.getEnergy() - 2;
+            if(ctx.getEnergy() > ctx.getTech())
+            {
+                fightStrength = ctx.getTech();
+            }
+            
+        }
+                
     }
     
     public MoveDir getMove() {
@@ -42,22 +82,23 @@ public class Martian implements Alien {
     }
 
     public Action getAction() {
+        //checks if alien is on the same position, if so, then fights with the priorly designated amount of energy
         try
         {
             if(ctx.getView().isAlienAtPos(ctx.getX(), ctx.getY()))
             {
-                return new Action(ActionCode.Fight, Math.max(ctx.getEnergy() - 2, 2));
+                return new Action(ActionCode.Fight, (fightStrength));
             }
         }catch (Exception e)
         {
         return new Action(ActionCode.Fight, ctx.getEnergy());
         }
-        
+        //if it doesnt fight, it chooses a item to do depending on how much energy it has.
         if(ctx.getEnergy()< 2)
         {
             return new Action(ActionCode.Gain);
         }
-        else if(ctx.getEnergy() < 4)
+        else if(ctx.getEnergy() < 3)
         {
             return new Action(ActionCode.Research);
         }
@@ -69,7 +110,9 @@ public class Martian implements Alien {
     }
 
     @Override
-    public void processResults() {
+    public void processResults() 
+    {
        // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
 }
