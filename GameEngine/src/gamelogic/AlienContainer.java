@@ -18,7 +18,7 @@ public class AlienContainer {
     public final String alienPackageName;
     public final String alienClassName;
     public final Constructor<?> alienConstructor;
-    private final Alien alien;
+    public Alien alien;
     private final ContextImplementation api;
     
     int tech;
@@ -49,14 +49,14 @@ public class AlienContainer {
         try
         {
             a = (Alien) cns.newInstance();
+            this.alien = a;
             a.init(this.api);
         } catch (Throwable t)
         {
-            a = null;
+            this.alien = null;
             t.printStackTrace();
         }
         
-        this.alien = a;
     }
     
     public void move(ViewImplementation view) throws NotEnoughTechException {

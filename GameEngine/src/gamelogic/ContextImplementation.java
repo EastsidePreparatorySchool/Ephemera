@@ -45,7 +45,7 @@ public class ContextImplementation implements Context {
     
     public void debugOut(String s) {
         if (debug) {
-            vis.debugOut("Alien:Context:DEBUG: " + s);
+            vis.debugOut("Alien("+Integer.toHexString(aC.alien.hashCode()).toUpperCase()+"): " + s);
         }
     }
 }
