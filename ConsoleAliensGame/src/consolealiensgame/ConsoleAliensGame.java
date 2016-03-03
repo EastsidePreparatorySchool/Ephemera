@@ -23,8 +23,8 @@ public class ConsoleAliensGame {
         
         try
         {
-            Constructor<?> cs = JARLoader.Load("stockaliens", "Dalek");
-            grid.addAlien(2, 2, "stockaliens", "Dalek", cs);
+            Constructor<?> cs = JARLoader.Load("stockaliens", "Martian");
+            grid.addAlien(2, 2, "stockaliens", "Martian", cs);
         } catch (Throwable t)
         {
             t.printStackTrace();

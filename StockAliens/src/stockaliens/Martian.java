@@ -23,12 +23,17 @@ public class Martian implements Alien {
 //empty constructor
     public Martian() 
     {
+        System.out.println("I like waffles");
     }
     
     @Override
     public void init(Context ctx) {
-        ctx = ctx;
-        //splits in two whole numbers
+        System.out.println("Pancakes taste like styrofoam");
+        this.ctx = ctx;                
+    }
+    
+    public MoveDir getMove() {
+         //splits in two whole numbers
         Remainder = ctx.getTech() % 2;
         HorizontalMove = (ctx.getTech()-Remainder)/2;
         VerticalMove = ctx.getTech()- HorizontalMove;
@@ -40,8 +45,6 @@ public class Martian implements Alien {
         {
             VerticalMove *= -1;
         }
-        
-        //gets the coordinates of the closest alien.
         int ClosestAlienXCoordinate;
         int ClosestAlienYCoordinate;
         ClosestAlienXCoordinate = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY())[0];
@@ -49,35 +52,12 @@ public class Martian implements Alien {
         
         
         //Checks to see if the closest alien is withen moving capability.
-        if((ClosestAlienXCoordinate - ctx.getX()) + (ClosestAlienYCoordinate - ctx.getY()) <= ctx.getEnergy())
+        if(Math.abs(ClosestAlienXCoordinate - ctx.getX()) + Math.abs(ClosestAlienYCoordinate - ctx.getY()) <= ctx.getEnergy())
         {
-            if((ClosestAlienXCoordinate - ctx.getX()) + (ClosestAlienYCoordinate - ctx.getY()) >= -1 * ctx.getEnergy())
-            {
-                HorizontalMove = ClosestAlienXCoordinate - ctx.getX();
-                VerticalMove = ClosestAlienYCoordinate - ctx.getY();
-                
-            }
 
+            HorizontalMove = ClosestAlienXCoordinate - ctx.getX();
+            VerticalMove = ClosestAlienYCoordinate - ctx.getY();
         }
-
-        
-        
-        
-        //sets the amount of energy to fight with by how much energy, and how muc technology
-        fightStrength = 1;
-        if(ctx.getEnergy()> 3)
-        {
-            fightStrength = ctx.getEnergy() - 2;
-            if(ctx.getEnergy() > ctx.getTech())
-            {
-                fightStrength = ctx.getTech();
-            }
-            
-        }
-                
-    }
-    
-    public MoveDir getMove() {
         return new MoveDir(HorizontalMove, VerticalMove);
     }
 
