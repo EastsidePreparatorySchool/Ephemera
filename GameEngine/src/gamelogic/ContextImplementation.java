@@ -14,13 +14,13 @@ import gameengineinterfaces.GameVisualizer;
  */
 public class ContextImplementation implements Context {
     private AlienContainer aC;
-    ViewImplementation view;
-    final boolean debug = true;
     GameVisualizer vis;
+    public ViewImplementation view;
     
     ContextImplementation(AlienContainer aC, GameVisualizer vis) {
         this.aC = aC;
         this.vis = vis;
+        view = new ViewImplementation ();
     }
     
     public int getEnergy() {
@@ -40,12 +40,10 @@ public class ContextImplementation implements Context {
     }
     
     public View getView() {
-        return view;
+        return this.view;
     }
     
     public void debugOut(String s) {
-        if (debug) {
-            vis.debugOut("Alien("+Integer.toHexString(aC.alien.hashCode()).toUpperCase()+"): " + s);
-        }
+        vis.debugOut("Alien("+Integer.toHexString(aC.alien.hashCode()).toUpperCase()+"): " + s);
     }
 }
