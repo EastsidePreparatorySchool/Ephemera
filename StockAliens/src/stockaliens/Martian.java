@@ -49,12 +49,12 @@ public class Martian implements Alien {
         
         
         //Checks to see if the closest alien is withen moving capability.
-        if(ClosestAlienXCoordinate + ClosestAlienYCoordinate <= ctx.getEnergy())
+        if((ClosestAlienXCoordinate - ctx.getX()) + (ClosestAlienYCoordinate - ctx.getY()) <= ctx.getEnergy())
         {
-            if(ClosestAlienXCoordinate + ClosestAlienYCoordinate >= -1 * ctx.getEnergy())
+            if((ClosestAlienXCoordinate - ctx.getX()) + (ClosestAlienYCoordinate - ctx.getY()) >= -1 * ctx.getEnergy())
             {
-                HorizontalMove = ClosestAlienXCoordinate;
-                VerticalMove = ClosestAlienYCoordinate;
+                HorizontalMove = ClosestAlienXCoordinate - ctx.getX();
+                VerticalMove = ClosestAlienYCoordinate - ctx.getY();
                 
             }
 
