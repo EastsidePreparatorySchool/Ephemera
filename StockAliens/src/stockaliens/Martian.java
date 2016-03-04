@@ -20,7 +20,7 @@ public class Martian implements Alien {
     public static boolean getRandomBoolean() {
         return rnd.nextBoolean();
     }
-//empty constructor
+    //empty constructor
     public Martian() 
     {
     }
@@ -40,6 +40,7 @@ public class Martian implements Alien {
         {
             VerticalMove *= -1;
         }
+        ctx.debugOut("Martian initialized");
         
         //gets the coordinates of the closest alien.
         int ClosestAlienXCoordinate;
@@ -74,7 +75,6 @@ public class Martian implements Alien {
             }
             
         }
-                
     }
     
     public MoveDir getMove() {

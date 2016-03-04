@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gameengine;
+package gameengineinterfaces;
 
 /**
  *
  * @author gmein
  */
-public class GameEngineV1
+public enum GameCommandCode
 {
-    
+    AddElement, Pause, Resume, End
 }

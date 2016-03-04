@@ -18,6 +18,8 @@ public class Venusian implements Alien {
         currentDirX = 0;
         currentDirY = 0;
         this.ctx = ctx;
+        ctx.debugOut("Venusian initialized");
+
     }
     
     // Move Function
