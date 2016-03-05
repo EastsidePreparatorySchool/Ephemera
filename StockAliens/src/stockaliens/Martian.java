@@ -6,7 +6,7 @@ import java.util.Random;
 import alieninterfaces.*;
 /**
  *
- * @author guberti
+ * @author Sam Freisem-Kirov
  */
 public class Martian implements Alien {
     //declaring everything that will need to be used later
@@ -20,7 +20,7 @@ public class Martian implements Alien {
     public static boolean getRandomBoolean() {
         return rnd.nextBoolean();
     }
-//empty constructor
+    //empty constructor
     public Martian() 
     {
         System.out.println("I like waffles");
@@ -45,6 +45,9 @@ public class Martian implements Alien {
         {
             VerticalMove *= -1;
         }
+        ctx.debugOut("Martian initialized");
+        
+        //gets the coordinates of the closest alien.
         int ClosestAlienXCoordinate;
         int ClosestAlienYCoordinate;
         ClosestAlienXCoordinate = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY())[0];
@@ -57,10 +60,23 @@ public class Martian implements Alien {
 
             HorizontalMove = ClosestAlienXCoordinate - ctx.getX();
             VerticalMove = ClosestAlienYCoordinate - ctx.getY();
+        }    
+        
+        //sets the amount of energy to fight with by how much energy, and how muc technology
+        fightStrength = 1;
+        if(ctx.getEnergy()> 3)
+        {
+            fightStrength = ctx.getEnergy() - 2;
+            if(ctx.getEnergy() > ctx.getTech())
+            {
+                fightStrength = ctx.getTech();
+            }
+            
         }
+        
         return new MoveDir(HorizontalMove, VerticalMove);
     }
-
+    
     public Action getAction() {
         //checks if alien is on the same position, if so, then fights with the priorly designated amount of energy
         try
