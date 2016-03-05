@@ -6,7 +6,7 @@ import java.util.Random;
 import alieninterfaces.*;
 /**
  *
- * @author guberti
+ * @author Sam Freisem-Kirov
  */
 public class Martian implements Alien {
     //declaring everything that will need to be used later
