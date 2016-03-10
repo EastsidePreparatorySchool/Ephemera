@@ -23,13 +23,13 @@ public class Martian implements Alien {
     //empty constructor
     public Martian() 
     {
-        System.out.println("I like waffles");
     }
     
     @Override
     public void init(Context ctx) {
-        System.out.println("Pancakes taste like styrofoam");
-        this.ctx = ctx;                
+        this.ctx = ctx;
+        ctx.debugOut("Pancakes taste like styrofoam");
+        
     }
     
     public MoveDir getMove() {

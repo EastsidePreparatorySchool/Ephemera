@@ -119,13 +119,20 @@ public class GameEngineThread extends Thread
                 //engine.vis.debugOut("GameEngineThread:     class   " + element.className);
                 //engine.vis.debugOut("GameEngineThread:     state   " + element.state);
                 
-                try
-                {
-                    element.cns = Load(element.packageName, element.className);
-                } catch (Exception e)
-                {
-                    engine.vis.debugErr("GameEngineThread: Error loading game element");
-                    throw(e);
+                if (element.kind != GameElementKind.INVALID) {
+                    // temporary copout while I don't know how to handl stars, planets, residents
+                    if (element.kind != GameElementKind.STAR &&
+                            element.kind != GameElementKind.PLANET &&
+                            element.kind != GameElementKind.RESIDENT) {
+                        try
+                        {
+                            element.cns = Load(element.packageName, element.className);
+                        } catch (Exception e)
+                        {
+                            engine.vis.debugErr("GameEngineThread: Error loading game element");
+                            throw(e);
+                        }
+                    }
                 }
 
 
@@ -158,6 +165,7 @@ public class GameEngineThread extends Thread
     
     //
     // Dynamic class loader (.jar files)
+    // stolen from StackOverflow, considered dark voodoo magic
     //
     
     /**

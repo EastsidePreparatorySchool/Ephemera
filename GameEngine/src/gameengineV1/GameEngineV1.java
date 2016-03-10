@@ -18,9 +18,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author gmein
  */
-public class GameEngineV1 implements GameEngine
-{
-
+public class GameEngineV1 implements GameEngine {
     SpaceGrid grid;
     GameVisualizer vis;
     Queue<GameCommand> queue;
@@ -29,16 +27,14 @@ public class GameEngineV1 implements GameEngine
     String gameJarPath;
 
     @Override
-    public boolean isAlive()
-    {
+    public boolean isAlive() {
         return gameThread.isAlive();
     }
-    
+
     @Override
-    public void initFromFile(GameVisualizer v, String gameJarPath, String savedGameFile)
-    {
+    public void initFromFile(GameVisualizer v, String gameJarPath, String savedGameFile) {
         GameElementSpec[] savedGame;
-        
+
         this.vis = v;
         this.gameJarPath = gameJarPath;
 
@@ -46,56 +42,53 @@ public class GameEngineV1 implements GameEngine
         // read initial config from file
         //
         v.debugOut("GameEngineV1: read config file: " + savedGameFile);
-        
+
         ArrayList<GameElementSpec> elements = new ArrayList<GameElementSpec>(50);
-        try
-        {
+        try {
             //
             // Every line has kind, package, class, state in csv format
             //
             BufferedReader in = new BufferedReader(new FileReader(this.gameJarPath + savedGameFile));
             String strLine;
-            while ((strLine = in.readLine()) != null)
-            {
+            while ((strLine = in.readLine()) != null) {
                 //vis.debugOut("GameEngineV1: read config line: " + strLine);
                 String[] strElement = strLine.split(",");
 
-                if (strElement.length == 0)
-                {
+                // ignore empty lines
+                if (strElement.length == 0) {
                     continue;
                 }
                 // need at least the code
-                if (strElement.length == 0 || strElement[0] == null)
-                {
+                if (strElement[0] == null) {
                     throw new ParseException(strLine, 0);
                 }
 
+                // ignore comments
+                if (strElement[0].startsWith("!")) {
+                    continue;
+                }
+                
+                // make new GameElement from code and next few fields
                 GameElementSpec element = new GameElementSpec(strElement[0]);
 
                 // get package name
-                if (strElement.length > 1 && strElement[1] != null)
-                {
+                if (strElement.length > 1 && strElement[1] != null) {
                     element.packageName = strElement[1].trim();
-                } else
-                {
+                } else {
                     element.packageName = "";
                 }
 
                 // get class name
-                if (strElement.length > 2 && strElement[2] != null)
-                {
+                if (strElement.length > 2 && strElement[2] != null) {
                     element.className = strElement[2].trim();
-                } else
-                {
+                } else {
                     element.packageName = "";
                 }
 
                 // get state
-                if (strElement.length > 3 && strElement[3] != null)
-                {
+                if (strElement.length > 3 && strElement[3] != null) {
                     element.className = strElement[3].trim();
-                } else
-                {
+                } else {
                     element.state = "<no state>";
                 }
 
@@ -106,22 +99,20 @@ public class GameEngineV1 implements GameEngine
                 //        + element.state);
             }
             in.close();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             v.debugOut("GameEngineV1:init:File parse error");
             v.debugOut("GameEngineV1:init:     " + e.getMessage());
         }
 
         // convert list into array to process as if it had been saved
-        savedGame = new GameElementSpec[1];
+        savedGame = new GameElementSpec[1]; // this array will be grown automatically by "toArray" below
         savedGame = elements.toArray(savedGame);
-        
+
         this.init(v, gameJarPath, savedGame);
-        }
-    
+    }
+
     @Override
-    public void init(GameVisualizer v, String gameJarPath, GameElementSpec[] savedGame)
-    {
+    public void init(GameVisualizer v, String gameJarPath, GameElementSpec[] savedGame) {
         // 
         // save the visualizer (how we report status)
         // create a new Spacegrid (the game board)
@@ -132,7 +123,7 @@ public class GameEngineV1 implements GameEngine
         this.queue = new ConcurrentLinkedQueue<GameCommand>();
         gameState = GameState.Paused;
         this.gameJarPath = gameJarPath;
-        
+
         vis.debugOut("GameEngine: Creating thread");
         this.gameThread = new GameEngineThread(this);
         vis.debugOut("GameEngine: Starting thread");
@@ -142,8 +133,7 @@ public class GameEngineV1 implements GameEngine
         // queue every game element
         //
         vis.debugOut("GameEngineV1: Elements in config: " + Integer.toString(savedGame.length));
-        for (GameElementSpec element : savedGame)
-        {
+        for (GameElementSpec element : savedGame) {
             GameCommand gc = new GameCommand(GameCommandCode.AddElement);
             GameElementSpec[] elements = new GameElementSpec[1];
             elements[0] = element;
@@ -159,26 +149,21 @@ public class GameEngineV1 implements GameEngine
     }
 
     @Override
-    public void queueCommand(GameCommand gc)
-    {
+    public void queueCommand(GameCommand gc) {
         //
         // queue alien info to synchronized queue
         //
-        
-        vis.debugOut("GameEngineV1: Queueing command "+gc.code.toString());
 
-        synchronized (this.queue)
-        {
+        vis.debugOut("GameEngineV1: Queueing command " + gc.code.toString());
+
+        synchronized (this.queue) {
             this.queue.add(gc);
             this.queue.notify();
         }
     }
 
     @Override
-    public GameElementSpec[] saveGame()
-    {
+    public GameElementSpec[] saveGame() {
         return new GameElementSpec[1];
     }
-
-    
 }

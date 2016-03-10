@@ -22,16 +22,23 @@ public class GameElementSpec
     
     public GameElementSpec(String kindString)
     {
-        this.kind = GameElementKind.valueOf(kindString.trim().toUpperCase());
+        try {
+            this.kind = GameElementKind.valueOf(kindString.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            this.kind = GameElementKind.INVALID;
+        }
     }
     
     public GameElementSpec (String kindString, String packageName, String className, String state, Constructor<?> cns)
     {
-        this.kind = GameElementKind.valueOf(kindString.trim().toUpperCase());
-        this.packageName = packageName;
-        this.className = className;
-        this.state = state;
-        this.cns = cns;
-
+        try {
+            this.kind = GameElementKind.valueOf(kindString.trim().toUpperCase());
+            this.packageName = packageName;
+            this.className = className;
+            this.state = state;
+            this.cns = cns;
+        } catch (IllegalArgumentException e) {
+            this.kind = GameElementKind.INVALID;
+        }
     }
 }

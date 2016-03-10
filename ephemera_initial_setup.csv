@@ -1,3 +1,8 @@
-ALIEN,stockaliens,Dalek
-ALIEN,stockaliens,Martian
-ALIEN,stockaliens,Venusian
+!GameElementKind,Package,Class,Parent,State
+ALIEN,stockaliens,Dalek,,
+ALIEN,stockaliens,Martian,,
+ALIEN,stockaliens,Venusian,,
+STAR,stockelements,ProximaCentauri,,x:-34;y:-20;mag:15.45;class:M5.5
+PLANET,stockelements,Slathri,stockelements:ProximaCentauri,"energy:low;tech:medium;notes:""Gravity on planet is strong. Takes a bunch of energy when you first go to planet"""
+PLANET,stockelements,Kukaro,stockelements:ProximaCentauri,"energy:high; tech:low;notes:""Very peaceful. Energy refreshes twice as fast"""
+RESIDENT,stockelements,Elbubbians,stockelements:Kukaro,"notes:""Elbbubians: low tech. Planet bound but spread throughout multiple planets. Always willing to trade but will fight if technology is over 10."""
