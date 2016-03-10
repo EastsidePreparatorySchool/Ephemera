@@ -12,66 +12,48 @@ import java.util.Scanner;
  *
  * @author gmein
  */
-public class ConsoleVisualizer implements GameVisualizer
-{
+public class ConsoleVisualizer implements GameVisualizer {
     @Override
-    public void showCompletedTurn()
-    {
-        
+    public void showCompletedTurn() {
     }
-    
+
     @Override
-    public void showFightBefore()
-    {
-        
+    public void showFightBefore() {
+
     }
-    
-    
+
     @Override
-    public void showFightAfter()
-    {
-        
+    public void showFightAfter() {
     }
-    
+
     @Override
-    public void showSection()
-    {
-        
+    public void showSection() {
     }
-    
-    
+
     @Override
-    public void highlightPositions()
-    {
-        
+    public void highlightPositions() {
     }
-    
+
     @Override
-    public void showGameOver()
-    {
+    public void showGameOver() {
         ConsoleShell.gameOver = true;
     }
-    
- 
-    
+
     @Override
-    public void debugErr(String s)
-    {
+    public void debugErr(String s) {
         System.err.println(s);
     }
-    
+
     @Override
-    public void debugOut(String s)
-    {
+    public void debugOut(String s) {
         System.out.println(s);
     }
 
-    @Override 
-    public boolean showModalConfirmation (String prompt, String match)
-    {
-        Scanner scan = new Scanner (System.in);
+    @Override
+    public boolean showModalConfirmation(String prompt, String match) {
+        Scanner scan = new Scanner(System.in);
         System.out.print(prompt);
-        String answer = scan.nextLine().trim(); 
+        String answer = scan.nextLine().trim();
         return (answer.compareToIgnoreCase(match) == 0);
     }
 }

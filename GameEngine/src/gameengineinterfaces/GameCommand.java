@@ -9,14 +9,11 @@ package gameengineinterfaces;
  *
  * @author gmein
  */
-
-public class GameCommand
-{
+public class GameCommand {
     public GameCommandCode code;
-    public Object parameters[];  
-    
-    public GameCommand (GameCommandCode newcode)
-    {
+    public Object parameters[];
+
+    public GameCommand(GameCommandCode newcode) {
         this.code = newcode;
     }
 }

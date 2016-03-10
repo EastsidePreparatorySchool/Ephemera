@@ -11,26 +11,23 @@ import java.lang.reflect.Constructor;
  *
  * @author gmein
  */
-public class GameElementSpec
-{
+public class GameElementSpec {
+
     public GameElementKind kind;
     public String packageName;
     public String className;
     public String state;
     public Constructor<?> cns;
 
-    
-    public GameElementSpec(String kindString)
-    {
+    public GameElementSpec(String kindString) {
         try {
             this.kind = GameElementKind.valueOf(kindString.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
             this.kind = GameElementKind.INVALID;
         }
     }
-    
-    public GameElementSpec (String kindString, String packageName, String className, String state, Constructor<?> cns)
-    {
+
+    public GameElementSpec(String kindString, String packageName, String className, String state, Constructor<?> cns) {
         try {
             this.kind = GameElementKind.valueOf(kindString.trim().toUpperCase());
             this.packageName = packageName;

@@ -9,15 +9,22 @@ package gameengineinterfaces;
  *
  * @author gmein
  */
-public interface GameVisualizer
-{
+public interface GameVisualizer {
     void showCompletedTurn();
+
     void showFightBefore();
+
     void showFightAfter();
+
     void showSection();
+
     void highlightPositions();
+
     void showGameOver();
+
     void debugOut(String s);
+
     void debugErr(String s);
+
     boolean showModalConfirmation(String prompt, String match);
 }

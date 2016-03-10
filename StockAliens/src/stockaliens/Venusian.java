@@ -13,24 +13,20 @@ import java.util.Random;
 public class Venusian implements Alien {
 
     Context ctx;
-    
+
     final boolean debug = true;
-    
-    
-    
 
     public Venusian() {
     }
-    
+
     public void init(Context game_ctx) {
         ctx = game_ctx;
         ctx.debugOut("Venusian initialized");
 
-        
     }
 
     public MoveDir getMove() {
-        
+
         ctx.debugOut("Venusian Move requested");
 
         // Venusians run away from the nearest alien
@@ -38,7 +34,7 @@ public class Venusian implements Alien {
 
         int x = 0;
         int y = 0;
-        
+
         //always moves away from other aliens
         if (nearestAlienPos[0] > ctx.getX()) {
             x = -1;
@@ -59,9 +55,9 @@ public class Venusian implements Alien {
     }
 
     public Action getAction() {
-        
+
         ctx.debugOut("Venusian Action requested");
-        
+
         View view = ctx.getView();
 
         //goal is to make a ton of Venusians fast and be good at hiding
@@ -86,10 +82,10 @@ public class Venusian implements Alien {
         // if we have spare energy, research tech
         //tech is not a priority
         if (ctx.getEnergy() > (ctx.getTech() + 5)) {
-            
+
             if (ctx.getEnergy() > 20) {
                 //should spawn fast at the beggining,
-                return new Action (ActionCode.Spawn);
+                return new Action(ActionCode.Spawn);
             }
             return new Action(ActionCode.Research);
         }

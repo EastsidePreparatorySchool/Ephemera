@@ -9,7 +9,6 @@ package gameengineV1;
  *
  * @author gmein
  */
-public enum GameState
-{
+public enum GameState {
     Running, Paused
 }
