@@ -23,12 +23,17 @@ public class Martian implements Alien {
     //empty constructor
     public Martian() 
     {
+        System.out.println("I like waffles");
     }
     
     @Override
     public void init(Context ctx) {
-        ctx = ctx;
-        //splits in two whole numbers
+        System.out.println("Pancakes taste like styrofoam");
+        this.ctx = ctx;                
+    }
+    
+    public MoveDir getMove() {
+         //splits in two whole numbers
         Remainder = ctx.getTech() % 2;
         HorizontalMove = (ctx.getTech()-Remainder)/2;
         VerticalMove = ctx.getTech()- HorizontalMove;
@@ -50,19 +55,12 @@ public class Martian implements Alien {
         
         
         //Checks to see if the closest alien is withen moving capability.
-        if(ClosestAlienXCoordinate + ClosestAlienYCoordinate <= ctx.getEnergy())
+        if(Math.abs(ClosestAlienXCoordinate - ctx.getX()) + Math.abs(ClosestAlienYCoordinate - ctx.getY()) <= ctx.getEnergy())
         {
-            if(ClosestAlienXCoordinate + ClosestAlienYCoordinate >= -1 * ctx.getEnergy())
-            {
-                HorizontalMove = ClosestAlienXCoordinate;
-                VerticalMove = ClosestAlienYCoordinate;
-                
-            }
 
-        }
-
-        
-        
+            HorizontalMove = ClosestAlienXCoordinate - ctx.getX();
+            VerticalMove = ClosestAlienYCoordinate - ctx.getY();
+        }    
         
         //sets the amount of energy to fight with by how much energy, and how muc technology
         fightStrength = 1;
@@ -75,12 +73,10 @@ public class Martian implements Alien {
             }
             
         }
-    }
-    
-    public MoveDir getMove() {
+        
         return new MoveDir(HorizontalMove, VerticalMove);
     }
-
+    
     public Action getAction() {
         //checks if alien is on the same position, if so, then fights with the priorly designated amount of energy
         try

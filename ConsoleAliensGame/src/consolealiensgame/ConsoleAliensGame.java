@@ -25,6 +25,7 @@ public class ConsoleAliensGame {
         {
             Constructor<?> cs = JARLoader.Load("c:\\stockaliens", "Dalek");
             grid.addAlien(2, 2, "stockaliens", "Dalek", cs);
+            
         } catch (Throwable t)
         {
             t.printStackTrace();
