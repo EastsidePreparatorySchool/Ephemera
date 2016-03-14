@@ -17,6 +17,7 @@ public class GameElementSpec {
     public String packageName;
     public String className;
     public String state;
+    public String parent;
     public int x;
     public int y;
     public int energy;

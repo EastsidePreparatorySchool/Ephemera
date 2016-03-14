@@ -369,12 +369,12 @@ public class SpaceGrid
         } else if (element.kind == GameElementKind.PLANET) {
             debugMessage += "planet";
 
-            addPlanet(-1, 1, residents);
+            addPlanet(element);
             
         } else if (element.kind == GameElementKind.STAR) {
             debugMessage += "star";
             
-            addStar(0, 0, residents);
+            addStar(element);
         }
         
         debugMessage += " " + element.packageName + ":" + element.className;
