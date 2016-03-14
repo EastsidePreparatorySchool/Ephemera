@@ -7,6 +7,8 @@ package gamelogic;
 
 import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
+import java.util.*;
+
 
 /**
  *
@@ -19,8 +21,9 @@ public abstract class SpaceObject {
     public final String packageName;
     public final String className;
     public final Constructor<?> constructor;
+    public List<Resident> residents;
     
-    public SpaceObject (GameVisualizer vis, int x, int y, String packageName, String className, Constructor<?> cns) {
+    public SpaceObject (GameVisualizer vis, int x, int y, String packageName, String className, Constructor<?> cns, List<Resident> residents) {
         this.x = x;
         this.y = y;
         this.packageName = packageName;

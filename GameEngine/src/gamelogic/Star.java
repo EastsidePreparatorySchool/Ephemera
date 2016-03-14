@@ -7,6 +7,7 @@ package gamelogic;
 
 import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
+import java.util.List;
 
 /**
  *
@@ -14,8 +15,8 @@ import java.lang.reflect.Constructor;
  */
 public class Star extends SpaceObject{
     
-    public Star(GameVisualizer vis, int x, int y, String packageName, String className, Constructor<?> cns) {
-        super(vis, x, y, packageName, className, cns);
+    public Star(GameVisualizer vis, int x, int y, String packageName, String className, Constructor<?> cns, List<Resident> residents) {
+        super(vis, x, y, packageName, className, cns, residents);
     }
     
     // Add code here to detail the working of stars

@@ -30,7 +30,7 @@ public class SpaceGrid
     public SpaceGrid(GameVisualizer vis)
     {
         this.vis = vis;
-        aliens = new ArrayList<>(); // AlienContainer type is inferred    
+        aliens = new ArrayList<>(); // AlienContainer type is inferred
     }
 
     public void moveAliens()
@@ -340,13 +340,13 @@ public class SpaceGrid
     // as there is already a large if statement in addElement and the code in
     // addPlanet and addStar is nearly identical
     
-    void addPlanet(int x, int y, String planetPackageName, String planetClassName, Constructor<?> cns) {
-        Planet p = new Planet(this.vis, x, y, planetPackageName, planetClassName, cns);
+    void addPlanet(int x, int y, String planetPackageName, String planetClassName, Constructor<?> cns, ArrayList<Resident> residents) {
+        Planet p = new Planet(this.vis, x, y, planetPackageName, planetClassName, cns, residents);
         objects.add(p);
     }
     
-    void addStar(int x, int y, String starPackageName, String starClassName, Constructor<?> cns) {
-        Star s = new Star(this.vis, x, y, starPackageName, starClassName, cns);
+    void addStar(int x, int y, String starPackageName, String starClassName, Constructor<?> cns, ArrayList<Resident> residents) {
+        Star s = new Star(this.vis, x, y, starPackageName, starClassName, cns, residents);
         objects.add(s);
     }
     
@@ -361,13 +361,26 @@ public class SpaceGrid
         if (element.kind == GameElementKind.ALIEN) {
             debugMessage += "alien";
             addAlien(2, 2, element.packageName, element.className, element.cns);
+        
             
+        // The code for adding SpaceObjects seems fairly repetitive, once more
+        // is known about it it can be cleaned up
+        
         } else if (element.kind == GameElementKind.PLANET) {
             debugMessage += "planet";
-            addPlanet(-1, 1, element.packageName, element.className, element.cns);
+            
+            // Add code for adding residents here
+            ArrayList<Resident> residents = new ArrayList<>();
+            
+            addPlanet(-1, 1, element.packageName, element.className, element.cns, residents);
+            
         } else if (element.kind == GameElementKind.STAR) {
             debugMessage += "star";
-            addStar(0, 0, element.packageName, element.className, element.cns);
+            
+            // Add code for adding new residents here
+            ArrayList<Resident> residents = new ArrayList<>();
+            
+            addStar(0, 0, element.packageName, element.className, element.cns, residents);
         }
         
         debugMessage += " " + element.packageName + ":" + element.className;
