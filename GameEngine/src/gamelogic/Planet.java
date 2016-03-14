@@ -15,8 +15,11 @@ import java.util.List;
  */
 public class Planet extends SpaceObject {
     
-    public Planet(GameVisualizer vis, int x, int y, String packageName, String className, Constructor<?> cns, List<Resident> residents) {
-        super(vis, x, y, packageName, className, cns, residents);
+    final String parent;
+    
+    public Planet (GameVisualizer vis, int x, int y, String packageName, String className, int energy, int tech, String parent) {
+        super(vis, x, y, packageName, className, energy, tech);
+        this.parent = parent;
     }
     
     // Add code here to detail the working of planets

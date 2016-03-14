@@ -340,13 +340,13 @@ public class SpaceGrid
     // as there is already a large if statement in addElement and the code in
     // addPlanet and addStar is nearly identical
     
-    void addPlanet(int x, int y, String planetPackageName, String planetClassName, Constructor<?> cns, ArrayList<Resident> residents) {
-        Planet p = new Planet(this.vis, x, y, planetPackageName, planetClassName, cns, residents);
+    void addPlanet(int x, int y, String packageName, String className, int energy, int tech, String parentStarName) {
+        Planet p = new Planet(this.vis, x, y, packageName, className, energy, tech, parentStarName);
         objects.add(p);
     }
     
-    void addStar(int x, int y, String starPackageName, String starClassName, Constructor<?> cns, ArrayList<Resident> residents) {
-        Star s = new Star(this.vis, x, y, starPackageName, starClassName, cns, residents);
+    void addStar(int x, int y, String packageName, String className, int energy, int tech) {
+        Star s = new Star(this.vis, x, y, packageName, className, energy, tech);
         objects.add(s);
     }
     
@@ -368,19 +368,13 @@ public class SpaceGrid
         
         } else if (element.kind == GameElementKind.PLANET) {
             debugMessage += "planet";
-            
-            // Add code for adding residents here
-            ArrayList<Resident> residents = new ArrayList<>();
-            
-            addPlanet(-1, 1, element.packageName, element.className, element.cns, residents);
+
+            addPlanet(-1, 1, residents);
             
         } else if (element.kind == GameElementKind.STAR) {
             debugMessage += "star";
             
-            // Add code for adding new residents here
-            ArrayList<Resident> residents = new ArrayList<>();
-            
-            addStar(0, 0, element.packageName, element.className, element.cns, residents);
+            addStar(0, 0, residents);
         }
         
         debugMessage += " " + element.packageName + ":" + element.className;

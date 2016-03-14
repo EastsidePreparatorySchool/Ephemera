@@ -20,14 +20,16 @@ public abstract class SpaceObject {
     public int y;
     public final String packageName;
     public final String className;
-    public final Constructor<?> constructor;
-    public List<Resident> residents;
     
-    public SpaceObject (GameVisualizer vis, int x, int y, String packageName, String className, Constructor<?> cns, List<Resident> residents) {
+    public int energy; // Energy that aliens gain every turn from the planet
+    public int tech; // Tech boost for the planet
+    
+    public SpaceObject (GameVisualizer vis, int x, int y, String packageName, String className, int energy, int tech) {
         this.x = x;
         this.y = y;
+        this.energy = energy;
+        this.tech = tech;
         this.packageName = packageName;
         this.className = className;
-        this.constructor = cns;
     }
 }

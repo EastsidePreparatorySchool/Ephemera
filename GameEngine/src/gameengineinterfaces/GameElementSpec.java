@@ -17,6 +17,10 @@ public class GameElementSpec {
     public String packageName;
     public String className;
     public String state;
+    public int x;
+    public int y;
+    public int energy;
+    public int tech;
     public Constructor<?> cns;
 
     public GameElementSpec(String kindString) {

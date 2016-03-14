@@ -104,9 +104,7 @@ public class GameEngineThread extends Thread {
 
                 if (element.kind != GameElementKind.INVALID) {
                     // temporary copout while I don't know how to handl stars, planets, residents
-                    if (element.kind != GameElementKind.STAR
-                            && element.kind != GameElementKind.PLANET
-                            && element.kind != GameElementKind.RESIDENT) {
+                    if (element.kind == GameElementKind.ALIEN) {
                         try {
                             element.cns = Load(element.packageName, element.className);
                         } catch (Exception e) {
@@ -114,8 +112,15 @@ public class GameEngineThread extends Thread {
                             throw (e);
                         }
                     }
+                    
+                    // If it is a SpaceObject (there could be a cleaner way to do this)
+                    if (element.kind == GameElementKind.STAR || 
+                        element.kind == GameElementKind.PLANET) {
+                        
+                        System.out.println(element);
+                    }
                 }
-
+                
                 engine.grid.addElement(element);
                 break;
 
