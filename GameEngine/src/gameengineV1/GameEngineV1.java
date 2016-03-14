@@ -82,12 +82,47 @@ public class GameEngineV1 implements GameEngine {
                 if (strElement.length > 2 && strElement[2] != null) {
                     element.className = strElement[2].trim();
                 } else {
-                    element.packageName = "";
+                    element.className = "";
+                }
+
+                // get parent
+                if (strElement.length > 3 && strElement[3] != null) {
+                    element.parent = strElement[3].trim();
+                } else {
+                    element.parent = "";
+                }
+
+                // get pos x
+                if (strElement.length > 4 && strElement[4] != null) {
+                    element.x = Integer.parseInt(strElement[4].trim());
+                } else {
+                    element.x = 0;
+                }
+
+                // get pos Y
+                if (strElement.length > 5 && strElement[5] != null) {
+                    element.y = Integer.parseInt(strElement[5].trim());
+                } else {
+                    element.y = 0;
+                }
+
+                // get energy
+                if (strElement.length > 6 && strElement[6] != null) {
+                    element.energy = Integer.parseInt(strElement[6].trim());
+                } else {
+                    element.energy = 0;
+                }
+
+                // get tech
+                if (strElement.length > 7 && strElement[7] != null) {
+                    element.tech = Integer.parseInt(strElement[7].trim());
+                } else {
+                    element.tech = 0;
                 }
 
                 // get state
-                if (strElement.length > 3 && strElement[3] != null) {
-                    element.className = strElement[3].trim();
+                if (strElement.length > 8 && strElement[8] != null) {
+                    element.state = strElement[8].trim();
                 } else {
                     element.state = "<no state>";
                 }
