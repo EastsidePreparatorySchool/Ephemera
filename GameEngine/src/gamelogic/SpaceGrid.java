@@ -25,6 +25,8 @@ public class SpaceGrid
     GameVisualizer vis;
     List<AlienContainer> aliens;    // Aliens are born and die, so
                                     // our list needs to be able to grow and shrink
+    
+    List<SpaceObject> objects; // Stars, planets, space stations, etc.
 
     public SpaceGrid(GameVisualizer vis)
     {
@@ -330,31 +332,47 @@ public class SpaceGrid
         return max;
     }
 
-    void addAlien(int x, int y, String alienPackageName, String alienClassName, Constructor<?> cns)
-    {
+    void addAlien(int x, int y, String alienPackageName, String alienClassName, Constructor<?> cns) {
         AlienContainer aC = new AlienContainer(this.vis,x, y, alienPackageName, alienClassName, cns, 1, 1);
         aliens.add(aC);
     }
-
+    
+    // Note: Having a seperate method for each SpaceObject seems a little gross,
+    // as there is already a large if statement in addElement and the code in
+    // addPlanet and addStar is nearly identical
+    
+    void addPlanet(int x, int y, String planetPackageName, String planetClassName, Constructor<?> cns) {
+        Planet p = new Planet(this.vis, x, y, planetPackageName, planetClassName, cns);
+        objects.add(p);
+    }
+    
+    void addStar(int x, int y, String starPackageName, String starClassName, Constructor<?> cns) {
+        Star s = new Star(this.vis, x, y, starPackageName, starClassName, cns);
+        objects.add(s);
+    }
     
     public void addElement(GameElementSpec element) throws IOException
-    {
-        // todo: code here to add stars, planets, spacestation
-        
+    {        
         // can't use switch here because switch on enum causes weird error
         // if you doubt that, uncomment this line:
         // switch (element.kind) {}
         //
+        String debugMessage = "SpaceGrid: Loading and constructing ";
         
-        if(element.kind == GameElementKind.ALIEN)
-        {
-            vis.debugOut("SpaceGrid: Loading and constructing alien " +
-                    element.packageName + ":" +
-                    element.className);
+        if (element.kind == GameElementKind.ALIEN) {
+            debugMessage += "alien";
             addAlien(2, 2, element.packageName, element.className, element.cns);
-
+            
+        } else if (element.kind == GameElementKind.PLANET) {
+            debugMessage += "planet";
+            addPlanet(-1, 1, element.packageName, element.className, element.cns);
+        } else if (element.kind == GameElementKind.STAR) {
+            debugMessage += "star";
+            addStar(0, 0, element.packageName, element.className, element.cns);
         }
         
+        debugMessage += " " + element.packageName + ":" + element.className;
+        vis.debugOut(debugMessage);
     }
     
     // returns gameOver
