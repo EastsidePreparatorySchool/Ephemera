@@ -340,13 +340,13 @@ public class SpaceGrid
     // as there is already a large if statement in addElement and the code in
     // addPlanet and addStar is nearly identical
     
-    void addPlanet(int x, int y, String packageName, String className, int energy, int tech, String parentStarName) {
-        Planet p = new Planet(this.vis, x, y, packageName, className, energy, tech, parentStarName);
+    void addPlanet(GameElementSpec element) {
+        Planet p = new Planet(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech, element.parent);
         objects.add(p);
     }
     
-    void addStar(int x, int y, String packageName, String className, int energy, int tech) {
-        Star s = new Star(this.vis, x, y, packageName, className, energy, tech);
+    void addStar(GameElementSpec element) {
+        Star s = new Star(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech);
         objects.add(s);
     }
     
@@ -361,10 +361,6 @@ public class SpaceGrid
         if (element.kind == GameElementKind.ALIEN) {
             debugMessage += "alien";
             addAlien(2, 2, element.packageName, element.className, element.cns);
-        
-            
-        // The code for adding SpaceObjects seems fairly repetitive, once more
-        // is known about it it can be cleaned up
         
         } else if (element.kind == GameElementKind.PLANET) {
             debugMessage += "planet";
