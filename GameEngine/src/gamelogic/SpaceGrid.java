@@ -355,7 +355,7 @@ public class SpaceGrid
         // can't use switch here because switch on enum causes weird error
         // if you doubt that, uncomment this line:
         // switch (element.kind) {}
-        //
+
         String debugMessage = "SpaceGrid: Loading and constructing ";
         
         if (element.kind == GameElementKind.ALIEN) {
