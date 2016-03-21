@@ -56,16 +56,7 @@ public class ViewImplementation implements View {
     }
     
     @Override
-    public int[] getClosestAlienPos(int x, int y) {
-        if (aCs == null)
-        {
-            // todo: get rid of this
-            // this is a stand-in view until we have a real one. 
-            // for now, NO VISIBLE ALIENS FOR YOU!!!
-            int [] invalid_pos = {Integer.MAX_VALUE, Integer.MAX_VALUE};
-            return invalid_pos;
-        }
-        
+    public int[] getClosestAlienPos(int x, int y) {       
         
         if (aCs.isEmpty()) { // If there are no visible aliens
             //throw new NoVisibleAliensException();
