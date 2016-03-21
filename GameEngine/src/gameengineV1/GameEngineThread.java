@@ -98,9 +98,9 @@ public class GameEngineThread extends Thread {
                 engine.vis.debugOut("GameEngineThread: Processing GameElement");
 
                 GameElementSpec element = (GameElementSpec) gc.parameters[0];
-                //engine.vis.debugOut("GameEngineThread:     package " + element.packageName);
-                //engine.vis.debugOut("GameEngineThread:     class   " + element.className);
-                //engine.vis.debugOut("GameEngineThread:     state   " + element.state);
+                engine.vis.debugOut("GameEngineThread:     package " + element.packageName);
+                engine.vis.debugOut("GameEngineThread:     class   " + element.className);
+                engine.vis.debugOut("GameEngineThread:     state   " + element.state);
 
                 if (element.kind != GameElementKind.INVALID) {
                     // temporary copout while I don't know how to handl stars, planets, residents
