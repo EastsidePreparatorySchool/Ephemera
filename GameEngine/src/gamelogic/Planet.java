@@ -7,6 +7,7 @@ package gamelogic;
 
 import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
+import java.util.List;
 
 /**
  *
@@ -14,8 +15,11 @@ import java.lang.reflect.Constructor;
  */
 public class Planet extends SpaceObject {
     
-    public Planet(GameVisualizer vis, int x, int y, String packageName, String className, Constructor<?> cns) {
-        super(vis, x, y, packageName, className, cns);
+    final String parent;
+    
+    public Planet (GameVisualizer vis, int x, int y, String packageName, String className, int energy, int tech, String parent) {
+        super(vis, x, y, packageName, className, energy, tech);
+        this.parent = parent;
     }
     
     // Add code here to detail the working of planets

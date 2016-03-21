@@ -10,7 +10,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.lang.reflect.Constructor;
 import alieninterfaces.*;
-import gameengineV1.*;
 import gameengineinterfaces.*;
 import java.io.IOException;
 
@@ -31,7 +30,7 @@ public class SpaceGrid
     public SpaceGrid(GameVisualizer vis)
     {
         this.vis = vis;
-        aliens = new ArrayList<>(); // AlienContainer type is inferred    
+        aliens = new ArrayList<>(); // AlienContainer type is inferred
     }
 
     public void moveAliens()
@@ -341,14 +340,18 @@ public class SpaceGrid
     // as there is already a large if statement in addElement and the code in
     // addPlanet and addStar is nearly identical
     
-    void addPlanet(int x, int y, String planetPackageName, String planetClassName, Constructor<?> cns) {
-        Planet p = new Planet(this.vis, x, y, planetPackageName, planetClassName, cns);
+    void addPlanet(GameElementSpec element) {
+        Planet p = new Planet(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech, element.parent);
         objects.add(p);
     }
     
-    void addStar(int x, int y, String starPackageName, String starClassName, Constructor<?> cns) {
-        Star s = new Star(this.vis, x, y, starPackageName, starClassName, cns);
+    void addStar(GameElementSpec element) {
+        Star s = new Star(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech);
         objects.add(s);
+    }
+    
+    void addResident(GameElementSpec element) {
+        Resident r = new Resident(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech, element.parent);
     }
     
     public void addElement(GameElementSpec element) throws IOException
@@ -356,19 +359,26 @@ public class SpaceGrid
         // can't use switch here because switch on enum causes weird error
         // if you doubt that, uncomment this line:
         // switch (element.kind) {}
-        //
+
         String debugMessage = "SpaceGrid: Loading and constructing ";
         
         if (element.kind == GameElementKind.ALIEN) {
             debugMessage += "alien";
             addAlien(2, 2, element.packageName, element.className, element.cns);
-            
+        
         } else if (element.kind == GameElementKind.PLANET) {
             debugMessage += "planet";
-            addPlanet(-1, 1, element.packageName, element.className, element.cns);
+
+            addPlanet(element);
+            
         } else if (element.kind == GameElementKind.STAR) {
             debugMessage += "star";
-            addStar(0, 0, element.packageName, element.className, element.cns);
+            
+            addStar(element);
+        } else if (element.kind == GameElementKind.RESIDENT) {
+            debugMessage += "resident";
+            
+            addResident(element);
         }
         
         debugMessage += " " + element.packageName + ":" + element.className;

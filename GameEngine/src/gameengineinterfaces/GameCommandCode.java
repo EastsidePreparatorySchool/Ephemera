@@ -9,7 +9,6 @@ package gameengineinterfaces;
  *
  * @author gmein
  */
-public enum GameCommandCode
-{
+public enum GameCommandCode {
     AddElement, Pause, Resume, End
 }
