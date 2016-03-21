@@ -350,6 +350,10 @@ public class SpaceGrid
         objects.add(s);
     }
     
+    void addResident(GameElementSpec element) {
+        Resident r = new Resident(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech, element.parent);
+    }
+    
     public void addElement(GameElementSpec element) throws IOException
     {        
         // can't use switch here because switch on enum causes weird error
@@ -371,6 +375,10 @@ public class SpaceGrid
             debugMessage += "star";
             
             addStar(element);
+        } else if (element.kind == GameElementKind.RESIDENT) {
+            debugMessage += "resident";
+            
+            addResident(element);
         }
         
         debugMessage += " " + element.packageName + ":" + element.className;
