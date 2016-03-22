@@ -5,7 +5,6 @@
  */
 package gamelogic;
 
-import gameengineinterfaces.GameElementKind;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;

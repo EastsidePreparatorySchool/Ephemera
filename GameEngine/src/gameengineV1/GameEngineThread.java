@@ -6,6 +6,7 @@
 package gameengineV1;
 
 import gamelogic.*;
+import alieninterfaces.*;
 import gameengineinterfaces.*;
 import java.io.File;
 import java.io.IOException;

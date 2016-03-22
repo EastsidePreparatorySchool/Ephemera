@@ -5,7 +5,9 @@
  */
 package gameengineinterfaces;
 
+import alieninterfaces.*;
 import java.lang.reflect.Constructor;
+
 
 /**
  *
