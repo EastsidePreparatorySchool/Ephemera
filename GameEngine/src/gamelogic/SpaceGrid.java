@@ -31,6 +31,7 @@ public class SpaceGrid
     {
         this.vis = vis;
         aliens = new ArrayList<>(); // AlienContainer type is inferred
+        objects = new ArrayList<>(); 
     }
 
     public void moveAliens()
