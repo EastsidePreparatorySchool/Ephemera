@@ -12,11 +12,11 @@ package gameengineinterfaces;
 public interface GameVisualizer {
     void showCompletedTurn();
 
-    void showFightBefore();
+    void showFightBefore(int x, int y, String[] participants, int[] fightPower);
 
-    void showFightAfter();
+    void showFightAfter(int x, int y, String[] participants, int[] newEnergyLevels, int[] newTechLevels);
 
-    void showSection();
+    void showSection(int x, int y, int width);
 
     void highlightPositions();
 
