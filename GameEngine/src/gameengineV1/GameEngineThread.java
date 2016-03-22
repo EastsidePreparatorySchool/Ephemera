@@ -118,7 +118,7 @@ public class GameEngineThread extends Thread {
                     if (element.kind == GameElementKind.STAR || 
                         element.kind == GameElementKind.PLANET) {
                         
-                        engine.vis.debugErr(element.toString());
+                        //engine.vis.debugErr(element.toString());
                     }
                 }
                 

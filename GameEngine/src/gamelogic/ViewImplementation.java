@@ -7,6 +7,7 @@ package gamelogic;
 
 import java.util.List;
 import alieninterfaces.*;
+import java.util.ArrayList;
 
 /**
  *
@@ -22,8 +23,8 @@ public class ViewImplementation implements View {
     
     public ViewImplementation ()
     {
-        this.aCs = null;
-        this.sOs = null;
+        this.aCs = new ArrayList<>();
+        this.sOs = new ArrayList<>();
         this.bottomX = 0;
         this.bottomY = 0;
         this.size = 0;
