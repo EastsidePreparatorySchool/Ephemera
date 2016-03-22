@@ -41,7 +41,8 @@ public class SpaceGrid
             ViewImplementation view = getAlienView(i);
             try
             {
-                aliens.get(i).move(view);
+                aliens.get(i).move(view, vis);
+                
             } catch (Exception ex)
             {
                 Logger.getLogger(SpaceGrid.class.getName()).log(Level.SEVERE, null, ex);
@@ -78,11 +79,17 @@ public class SpaceGrid
 
                 if (alienIndices.size() > 0)
                 { // If a battle will happen
+                    
+                    int fightX = aliens.get(i).x;
+                    int fightY = aliens.get(i).y;
+                    
                     // Add the initial alien to the fight
                     alienIndices.add(i);
 
                     // For each alien, ask it how much it wants to fight
+                    // Also, get its object information to log
                     int[] fightPowers = new int[alienIndices.size()];
+                    String[] debugStrs = new String[alienIndices.size()];
 
                     for (int k = 0; k < alienIndices.size(); k++)
                     {
@@ -95,8 +102,21 @@ public class SpaceGrid
                             aliens.get(alienIndices.get(k)).kill();
                             Logger.getLogger(SpaceGrid.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        
+                        // Package and class
+                        debugStrs[k] = aliens.get(k).alienClassName + ":" + 
+                                aliens.get(k).alienPackageName;
+                        
+                        // Unique object hash
+                        debugStrs[k] += "("+Integer.toHexString(aliens.get(k)
+                                .alien.hashCode()).toUpperCase()+")";
+                        
                     }
 
+                    // All fighting prerequisites have been taken care of
+
+                    vis.showFightBefore(fightX, fightY, debugStrs, fightPowers);
+                    
                     int winningEnergy = maxValue(fightPowers);
 
                     for (int power : fightPowers)

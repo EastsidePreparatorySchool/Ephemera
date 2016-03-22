@@ -59,13 +59,14 @@ public class AlienContainer {
         
     }
     
-    public void move(ViewImplementation view) throws NotEnoughTechException {
+    public void move(ViewImplementation view, GameVisualizer vis) throws NotEnoughTechException {
         // Whether the move goes off the board will be determined by the grid
         api.view = view;
         MoveDir direction = alien.getMove();
         checkMove(direction); // Throws an exception if illegal
         x += direction.x();
         y += direction.y();
+        vis.showMove(alienPackageName, alienClassName, x, y, energy, tech);
     }
     
     public void kill() {
