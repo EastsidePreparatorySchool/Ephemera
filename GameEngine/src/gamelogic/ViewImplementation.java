@@ -15,6 +15,7 @@ import alieninterfaces.*;
 public class ViewImplementation implements View {
     
     private final List<AlienContainer> aCs;
+    private final List<SpaceObject> sOs;
     private final int bottomX;
     private final int bottomY;
     private final int size;
@@ -22,13 +23,15 @@ public class ViewImplementation implements View {
     public ViewImplementation ()
     {
         this.aCs = null;
+        this.sOs = null;
         this.bottomX = 0;
         this.bottomY = 0;
         this.size = 0;
     }
     
-    public ViewImplementation (List<AlienContainer> aCs, int bottomX, int bottomY, int size) {
+    public ViewImplementation (List<AlienContainer> aCs, List<SpaceObject> sOs, int bottomX, int bottomY, int size) {
         this.aCs = aCs;
+        this.sOs = sOs;
         this.bottomX = bottomX;
         this.bottomY = bottomY;
         this.size = size;

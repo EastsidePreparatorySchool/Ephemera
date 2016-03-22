@@ -5,6 +5,7 @@
  */
 package gamelogic;
 
+import gameengineinterfaces.GameElementKind;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -285,7 +286,8 @@ public class SpaceGrid
         int cornerX = aliens.get(index).x - size;
         int cornerY = aliens.get(index).y - size;
         // Bottom left corner
-        List<AlienContainer> view = new ArrayList<>();
+        List<AlienContainer> visibleAliens = new ArrayList<>();
+        List<SpaceObject> visibleObjects = new ArrayList<>();
 
         for (int k = 0; k < aliens.size(); k++)
         {
@@ -298,12 +300,24 @@ public class SpaceGrid
                         && alien.y >= cornerY
                         && alien.y <= cornerY + size * 2)
                 {
-                    view.add(alien);
+                    visibleAliens.add(alien);
                 }
             }
         }
+        for (int k = 0; k < objects.size(); k++)
+        {
+            SpaceObject obj = objects.get(k);
+            if ( // If the alien can be seen
+                    obj.x >= cornerX
+                    && obj.x <= cornerX + size * 2
+                    && obj.y >= cornerY
+                    && obj.y <= cornerY + size * 2)
+            {
+                visibleObjects.add(obj);
+            }
+        }
 
-        return new ViewImplementation(view, cornerX, cornerY, size);
+        return new ViewImplementation(visibleAliens, visibleObjects, cornerX, cornerY, size);
     }
 
     private int maxValueIndex(List<Integer> array)
