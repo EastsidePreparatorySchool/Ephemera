@@ -5,12 +5,16 @@
  */
 package gameengineinterfaces;
 
+import alieninterfaces.*;
+
 /**
  *
  * @author gmein
  */
 public interface GameVisualizer {
     void showCompletedTurn();
+    
+    void showMove(String packageName, String className, int newX, int newY, int energy, int tech);
 
     void showFightBefore(int x, int y, String[] participants, int[] fightPower);
 

@@ -18,16 +18,16 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showFightBefore() {
+    public void showFightBefore(int x, int y, String[] participants, int[] fightPowers) {
 
     }
 
     @Override
-    public void showFightAfter() {
+    public void showFightAfter(int x, int y, String[] participants, int[] newEnergy, int[] newTech) {
     }
 
     @Override
-    public void showSection() {
+    public void showSection(int x, int y, int width) {
     }
 
     @Override
