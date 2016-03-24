@@ -65,7 +65,7 @@ public class ConsoleVisualizer implements GameVisualizer {
 
     @Override
     public void debugErr(String s) {
-        System.err.println(s);
+        System.out.println((char) 27 + "[31;1m" + s);
     }
 
     @Override

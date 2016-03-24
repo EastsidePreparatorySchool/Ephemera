@@ -51,13 +51,27 @@ public class GameEngineThread extends Thread {
             try {
                 if (engine.gameState == GameState.Running) {
                     //
-                    // TODO: Execute game turn here
+                    // Execute game turn
                     //
-
+                    engine.vis.debugOut("-------------------------------------");
                     engine.vis.debugOut("GameEngineThread: Executing game turn");
-                    if (engine.grid.executeTurn()) {
-                        //game over
+
+                    try {
+                        engine.grid.executeGameTurn();
+                    } catch (Exception e) {
+                        engine.vis.debugErr("GameEngineThread: Unhandled exception during turn: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                    
+                    // TODO: this is clunky, but it will do for the current time.
+                    // asking for confirmation for another turn here, this is some
+                    // kind of debug mode.
+
+                    if(engine.vis.showModalConfirmation("GameLogic: Game turn complete, \"exit\" to end: ", "exit"))
+                    {
+                        // game aborted
                         engine.gameState = GameState.Paused;
+                        engine.vis.showGameOver();
                     }
                 }
 
@@ -96,15 +110,11 @@ public class GameEngineThread extends Thread {
         boolean gameOver = false;
         switch (gc.code) {
             case AddElement:
-                engine.vis.debugOut("GameEngineThread: Processing GameElement");
-
                 GameElementSpec element = (GameElementSpec) gc.parameters[0];
-                engine.vis.debugOut("GameEngineThread:     package " + element.packageName);
-                engine.vis.debugOut("GameEngineThread:     class   " + element.className);
-                engine.vis.debugOut("GameEngineThread:     state   " + element.state);
+
+                engine.vis.debugOut("GameEngineThread: Processing GameElement " + element.packageName + ":" + element.className + ", " + element.state);
 
                 if (element.kind != GameElementKind.INVALID) {
-                    // temporary copout while I don't know how to handl stars, planets, residents
                     if (element.kind == GameElementKind.ALIEN) {
                         try {
                             element.cns = Load(element.packageName, element.className);
@@ -113,15 +123,15 @@ public class GameEngineThread extends Thread {
                             throw (e);
                         }
                     }
-                    
+
                     // If it is a SpaceObject (there could be a cleaner way to do this)
-                    if (element.kind == GameElementKind.STAR || 
-                        element.kind == GameElementKind.PLANET) {
-                        
+                    if (element.kind == GameElementKind.STAR
+                            || element.kind == GameElementKind.PLANET
+                            || element.kind == GameElementKind.RESIDENT) {
                         //engine.vis.debugErr(element.toString());
                     }
                 }
-                
+
                 engine.grid.addElement(element);
                 break;
 
@@ -132,6 +142,7 @@ public class GameEngineThread extends Thread {
 
             case Resume:
                 engine.vis.debugOut("GameEngineThread: Resuming");
+                engine.vis.debugOut("---------------------------------- Game segment starts here:");
                 engine.gameState = GameState.Running;
                 break;
 
@@ -145,8 +156,7 @@ public class GameEngineThread extends Thread {
         }
         return gameOver;
     }
-
-    //
+        //
     // Dynamic class loader (.jar files)
     // stolen from StackOverflow, considered dark voodoo magic
     //

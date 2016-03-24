@@ -13,7 +13,6 @@ import alieninterfaces.*;
 public class Martian implements Alien {
 
     //declaring everything that will need to be used later
-
     Context ctx;
     int HorizontalMove;
     int VerticalMove;
@@ -27,18 +26,23 @@ public class Martian implements Alien {
     }
 
     //empty constructor
-
     public Martian() {
     }
 
     @Override
     public void init(Context ctx) {
         this.ctx = ctx;
-        ctx.debugOut("Pancakes taste like styrofoam");
+        ctx.debugOut("Martian: Pancakes taste like styrofoam");
+        ctx.debugOut("Martian: initialized");
 
     }
 
     public MoveDir getMove() {
+        ctx.debugOut("Martian: Move requested,"
+                + " E:" + Integer.toString(ctx.getEnergy())
+                + " T:" + Integer.toString(ctx.getTech()));
+
+
         //splits in two whole numbers
         Remainder = ctx.getTech() % 2;
         HorizontalMove = (ctx.getTech() - Remainder) / 2;
@@ -49,7 +53,6 @@ public class Martian implements Alien {
         if (getRandomBoolean() == true) {
             VerticalMove *= -1;
         }
-        ctx.debugOut("Martian initialized");
 
         //gets the coordinates of the closest alien.
         int ClosestAlienXCoordinate;
@@ -74,10 +77,16 @@ public class Martian implements Alien {
 
         }
 
+        ctx.debugOut("Martian: Moving ("+ Integer.toString(HorizontalMove) + "," + Integer.toString(VerticalMove));
+
         return new MoveDir(HorizontalMove, VerticalMove);
     }
 
     public Action getAction() {
+        ctx.debugOut("Martian: Action requested,"
+                + " E:" + Integer.toString(ctx.getEnergy())
+                + " T:" + Integer.toString(ctx.getTech()));
+
         //checks if alien is on the same position, if so, then fights with the priorly designated amount of energy
         try {
             if (ctx.getView().isAlienAtPos(ctx.getX(), ctx.getY())) {

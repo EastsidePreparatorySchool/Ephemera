@@ -14,7 +14,7 @@ import gameengineinterfaces.GameVisualizer;
  */
 public class ContextImplementation implements Context {
     private AlienContainer aC;
-    GameVisualizer vis;
+    public GameVisualizer vis;
     public ViewImplementation view;
     
     ContextImplementation(AlienContainer aC, GameVisualizer vis) {
@@ -44,6 +44,7 @@ public class ContextImplementation implements Context {
     }
     
     public void debugOut(String s) {
-        vis.debugOut("Alien("+Integer.toHexString(aC.alien.hashCode()).toUpperCase()+"): " + s);
+        vis.debugOut("Alien "+aC.alienPackageName + ":" + aC.alienClassName + "(" 
+                +Integer.toHexString(aC.alien.hashCode()).toUpperCase()+"): " + s);
     }
 }

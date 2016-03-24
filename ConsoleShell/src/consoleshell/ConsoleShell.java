@@ -16,6 +16,7 @@ import java.util.Scanner;
  * @author gmein
  */
 public class ConsoleShell {
+
     public static boolean gameOver = false;
 
     /**

@@ -26,6 +26,15 @@ public class SpaceGrid
                                     // our list needs to be able to grow and shrink
     
     List<SpaceObject> objects; // Stars, planets, space stations, etc.
+    
+    
+    public void executeGameTurn() {
+        moveAliens();
+        removeDeadAliens();
+        performAlienActions();
+        removeDeadAliens();
+        resetMoves();
+    }
 
     public SpaceGrid(GameVisualizer vis)
     {
@@ -41,14 +50,21 @@ public class SpaceGrid
             ViewImplementation view = getAlienView(i);
             try
             {
-                aliens.get(i).move(view, vis);
+                aliens.get(i).move(view);
                 
             } catch (Exception ex)
             {
-                Logger.getLogger(SpaceGrid.class.getName()).log(Level.SEVERE, null, ex);
+                //Logger.getLogger(SpaceGrid.class.getName()).log(Level.SEVERE, null, ex);
+                vis.debugErr("Alien " + Integer.toHexString(aliens.get(i).alien.hashCode()) + ": unhandled exception in move: ");
+                vis.debugErr(ex.getMessage());
+                ex.printStackTrace();
                 aliens.remove(i);
             }
         }
+        
+        
+        /* GM: TODO: I believe this is obsolete code. Gavin?
+        
         // Once the aliens have moved, have them fight each other if they are in
         // the same game space
 
@@ -135,6 +151,7 @@ public class SpaceGrid
                 }
             }
         }
+        */
     }
 
     public void removeDeadAliens()
@@ -174,9 +191,11 @@ public class SpaceGrid
 
             } catch (Exception ex)
             {
+                // if an alien blows up here, we'll kill it. 
                 actions[i] = new Action(ActionCode.None);
                 aliens.get(i).kill();
-                Logger.getLogger(SpaceGrid.class.getName()).log(Level.SEVERE, null, ex);
+                //Logger.getLogger(SpaceGrid.class.getName()).log(Level.SEVERE, null, ex);
+                vis.debugErr("Alien " + Integer.toHexString(aliens.get(i).alien.hashCode()) + " blew up on getAction()");
             }
         }
 
@@ -196,7 +215,7 @@ public class SpaceGrid
                     int energyForWinner = 0;
                     aliens.get(i).fought = true;
 
-                    for (int k = i + 1; k < aliens.size(); i++)
+                    for (int k = i + 1; k < aliens.size(); k++)
                     {
                         if (aliens.get(k).x == aliens.get(i).x
                                 && aliens.get(k).y == aliens.get(i).y)
@@ -398,7 +417,9 @@ public class SpaceGrid
         
         if (element.kind == GameElementKind.ALIEN) {
             debugMessage += "alien";
-            addAlien(2, 2, element.packageName, element.className, element.cns);
+            // position (0,0) leads to random assignment
+            
+            addAlien(0, 0, element.packageName, element.className, element.cns);
         
         } else if (element.kind == GameElementKind.PLANET) {
             debugMessage += "planet";
@@ -418,20 +439,4 @@ public class SpaceGrid
         debugMessage += " " + element.packageName + ":" + element.className;
         vis.debugOut(debugMessage);
     }
-    
-    // returns gameOver
-    public boolean executeTurn()
-    {
-        boolean gameOver; 
-        
-        gameOver = vis.showModalConfirmation("GameLogic: Game turn complete, \"exit\" to end: ", "exit");
-        
-        if (gameOver)
-        {
-            vis.showGameOver();
-        }
-        
-        return gameOver;
-    }
- 
 }

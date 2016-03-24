@@ -27,7 +27,9 @@ public class Venusian implements Alien {
 
     public MoveDir getMove() {
 
-        ctx.debugOut("Venusian Move requested");
+        ctx.debugOut("Venusian: Move requested,"
+                + " E:" + Integer.toString(ctx.getEnergy())
+                + " T:" + Integer.toString(ctx.getTech()));
 
         // Venusians run away from the nearest alien
         int[] nearestAlienPos = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY());
@@ -47,16 +49,16 @@ public class Venusian implements Alien {
         } else if (nearestAlienPos[1] < ctx.getY()) {
             y = 1;
         }
-        // don't move off the board
-        x = Math.min(ctx.getX(), x);
-        y = Math.min(ctx.getY(), y);
-
+        ctx.debugOut("Venusian: Moving ("+ Integer.toString(x) + "," + Integer.toString(y));
+       
         return new MoveDir(x, y);
     }
 
     public Action getAction() {
 
-        ctx.debugOut("Venusian Action requested");
+        ctx.debugOut("Venusian: Action requested,"
+                + " E:" + Integer.toString(ctx.getEnergy())
+                + " T:" + Integer.toString(ctx.getTech()));
 
         View view = ctx.getView();
 
