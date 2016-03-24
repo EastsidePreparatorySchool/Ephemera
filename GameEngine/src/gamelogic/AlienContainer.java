@@ -20,7 +20,7 @@ public class AlienContainer {
     public final String alienClassName;
     public final Constructor<?> alienConstructor;
     public Alien alien;
-    private final ContextImplementation api;
+    public final ContextImplementation api;
 
     int tech;
     int energy;

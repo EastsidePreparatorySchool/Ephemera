@@ -6,6 +6,11 @@
 package consoleshell;
 
 import gameengineinterfaces.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 /**
@@ -16,45 +21,77 @@ public class ConsoleVisualizer implements GameVisualizer {
 
     int turnCounter = 1;
     int numTurns = 1;
-    
+    BufferedWriter logFile;
+
+    public ConsoleVisualizer(String path) {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+
+        try {
+            logFile = new BufferedWriter(new FileWriter(path + "game" + dateFormat.format(date) + ".txt"));
+        } catch (Exception e) {
+            System.err.println("Convis: Cannot create log file");
+        }
+
+    }
+
+    private void print(String s) {
+        System.out.print(s);
+        try {
+            logFile.write(s);
+            logFile.flush();
+        } catch (Exception e) {
+        }
+    }
+
+    private void println(String s) {
+        System.out.println(s);
+        try {
+            logFile.write(s);
+            logFile.newLine();
+            logFile.flush();
+        } catch (Exception e) {
+        }
+    }
+
     @Override
     public void showCompletedTurn() {
-        System.out.println("Turn complete.");
+        println("Turn complete.");
     }
 
     @Override
     public void showMove(String packageName, String className, int newX, int newY, int energy, int tech) {
-        System.out.print("Vis.ShowMove: " + packageName + ":" + className + " moved to (");
-        System.out.print(Integer.toString(newX) + "," + Integer.toString(newY));
-        System.out.println("), E:" + Integer.toString(energy) + ", T:" + Integer.toString(tech));
+        print("Vis.ShowMove: " + packageName + ":" + className + " moved to (");
+        print(Integer.toString(newX) + "," + Integer.toString(newY));
+        println("), E:" + Integer.toString(energy) + ", T:" + Integer.toString(tech));
     }
 
     @Override
     public void showFightBefore(int x, int y, String[] participants, int[] fightPowers) {
-        System.out.println();
-        System.out.println("Them aliens is fightin' again:");
+        println("");
+        println("Them aliens is fightin' again:");
         for (int i = 0; i < participants.length; i++) {
-            System.out.print("Alien \"" + participants[i] + "\" ");
-            System.out.println("is fighting with energy " + Integer.toString(fightPowers[i]));
+            print("Alien \"" + participants[i] + "\" ");
+            println("is fighting with energy " + Integer.toString(fightPowers[i]));
         }
-        System.out.println();
+        println("");
     }
 
     @Override
     public void showFightAfter(int x, int y, String[] participants, int[] newEnergy, int[] newTech) {
-        System.out.println();
-        System.out.println("Here is what is left from that fight:");
+        println("");
+        println("Here is what is left from that fight:");
         for (int i = 0; i < participants.length; i++) {
-            System.out.print("Alien \"" + participants[i] + "\" ");
-            System.out.print(" now has energy " + Integer.toString(newEnergy[i]));
-            System.out.print(" and new tech level " + Integer.toString(newTech[i]));
+            print("Alien \"" + participants[i] + "\" ");
+            print(" now has energy " + Integer.toString(newEnergy[i]));
+            print(" and new tech level " + Integer.toString(newTech[i]));
         }
-        System.out.println();
+        println("");
     }
 
     @Override
     public void showSection(int x, int y, int width) {
-        System.out.println("Showing sections costs extra");
+        println("Showing sections costs extra");
     }
 
     @Override
@@ -64,43 +101,45 @@ public class ConsoleVisualizer implements GameVisualizer {
     @Override
     public void showGameOver() {
         ConsoleShell.gameOver = true;
+        try {
+            logFile.close();
+        } catch (Exception e) {
+        }
     }
 
     @Override
     public void debugErr(String s) {
-        System.out.println((char) 27 + "[31;1m" + s);
+        println((char) 27 + "[31;1m" + s);
     }
 
     @Override
     public void debugOut(String s) {
-        System.out.println(s);
+        println(s);
     }
 
     @Override
     public boolean showContinuePrompt() {
         --turnCounter;
-        
+
         // every numTurns, display prompt, wait for exit phrase or new number of turns
         if (turnCounter == 0) {
             Scanner scan = new Scanner(System.in);
-            System.out.print("<Enter> to continue, \"exit\" to exit, <number> to set number of turns: ");
+            print("<Enter> to continue, \"exit\" to exit, <number> to set number of turns: ");
             String answer = scan.nextLine().trim();
-            if (answer.compareToIgnoreCase("exit") == 0)
-            {
+            if (answer.compareToIgnoreCase("exit") == 0) {
                 // game over
                 return true;
             }
-            
-            
+
             try {
                 // got new numTurns from user
                 numTurns = Integer.parseInt(answer);
-                }
-            catch (Exception e) {
+            } catch (Exception e) {
                 // leave numTurns alone
             }
-            
+
             turnCounter = numTurns;
+            print("Number of turns: " + Integer.toString(numTurns));
         }
 
         // no done with number of turns, return "game not over"

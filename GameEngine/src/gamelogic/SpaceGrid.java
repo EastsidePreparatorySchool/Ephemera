@@ -160,7 +160,7 @@ public class SpaceGrid
         {
             if (aliens.get(i).energy <= 0)
             {
-                System.out.println("An alien ran out of energy and died");
+                aliens.get(i).api.debugOut("Ran out of energy and died.");
                 aliens.remove(i);
             }
         }

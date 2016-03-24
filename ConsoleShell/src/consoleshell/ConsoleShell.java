@@ -29,7 +29,6 @@ public class ConsoleShell {
         //get some objects created (not initialized, nothing important happens here)
         GameEngineV1 engine = new GameEngineV1();
         GameElementSpec[] gameSpec = new GameElementSpec[1];
-        ConsoleVisualizer convis = new ConsoleVisualizer();
         Scanner scan = new Scanner(System.in);
 
         // can override the path for class jar files in arguments
@@ -40,7 +39,8 @@ public class ConsoleShell {
             gameJarPath = "c:\\users\\public\\ephemera\\drop\\";
         }
 
-        System.out.println("test:" + gameJarPath);
+        ConsoleVisualizer convis = new ConsoleVisualizer(gameJarPath);
+
         // get engine up and running
         engine.initFromFile(convis, gameJarPath, "ephemera_initial_setup.csv");
 
