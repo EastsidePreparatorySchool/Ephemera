@@ -32,13 +32,17 @@ public class Martian implements Alien {
     @Override
     public void init(Context ctx) {
         this.ctx = ctx;
-        ctx.debugOut("Martian: Pancakes taste like styrofoam");
-        ctx.debugOut("Martian: initialized");
-
+        ctx.debugOut("Initialized at "
+                + "(" + Integer.toString(ctx.getX())
+                + "," + Integer.toString(ctx.getY()) + ") "
+                + "E: " + Integer.toString(ctx.getEnergy())
+                + "T: " + Integer.toString(ctx.getTech()));
+        ctx.debugOut("Pancakes taste like styrofoam");
+        
     }
 
     public MoveDir getMove() {
-        ctx.debugOut("Martian: Move requested,"
+        ctx.debugOut("Move requested,"
                 + " E:" + Integer.toString(ctx.getEnergy())
                 + " T:" + Integer.toString(ctx.getTech()));
 
@@ -77,13 +81,13 @@ public class Martian implements Alien {
 
         }
 
-        ctx.debugOut("Martian: Moving ("+ Integer.toString(HorizontalMove) + "," + Integer.toString(VerticalMove));
+        ctx.debugOut("Moving ("+ Integer.toString(HorizontalMove) + "," + Integer.toString(VerticalMove));
 
         return new MoveDir(HorizontalMove, VerticalMove);
     }
 
     public Action getAction() {
-        ctx.debugOut("Martian: Action requested,"
+        ctx.debugOut("Action requested,"
                 + " E:" + Integer.toString(ctx.getEnergy())
                 + " T:" + Integer.toString(ctx.getTech()));
 

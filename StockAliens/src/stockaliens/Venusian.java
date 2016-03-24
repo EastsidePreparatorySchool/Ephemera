@@ -21,13 +21,17 @@ public class Venusian implements Alien {
 
     public void init(Context game_ctx) {
         ctx = game_ctx;
-        ctx.debugOut("Venusian initialized");
+        ctx.debugOut("Initialized at "
+                + "(" + Integer.toString(ctx.getX())
+                + "," + Integer.toString(ctx.getY()) + ") "
+                + "E: " + Integer.toString(ctx.getEnergy())
+                + "T: " + Integer.toString(ctx.getTech()));
 
     }
 
     public MoveDir getMove() {
 
-        ctx.debugOut("Venusian: Move requested,"
+        ctx.debugOut("Move requested,"
                 + " E:" + Integer.toString(ctx.getEnergy())
                 + " T:" + Integer.toString(ctx.getTech()));
 
@@ -49,14 +53,14 @@ public class Venusian implements Alien {
         } else if (nearestAlienPos[1] < ctx.getY()) {
             y = 1;
         }
-        ctx.debugOut("Venusian: Moving ("+ Integer.toString(x) + "," + Integer.toString(y));
+        ctx.debugOut("Moving ("+ Integer.toString(x) + "," + Integer.toString(y));
        
         return new MoveDir(x, y);
     }
 
     public Action getAction() {
 
-        ctx.debugOut("Venusian: Action requested,"
+        ctx.debugOut("Action requested,"
                 + " E:" + Integer.toString(ctx.getEnergy())
                 + " T:" + Integer.toString(ctx.getTech()));
 
@@ -95,7 +99,7 @@ public class Venusian implements Alien {
     }
 
     public void processResults() {
-        ctx.debugOut("Venusian processing results");
+        ctx.debugOut("Processing results");
         return;
     }
 }

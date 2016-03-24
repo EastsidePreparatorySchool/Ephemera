@@ -20,7 +20,7 @@ public class ConsoleVisualizer implements GameVisualizer {
     
     @Override
     public void showMove(String packageName, String className, int newX, int newY, int energy, int tech) {
-        System.out.print(packageName + ":" + className + " moved to (");
+        System.out.print("Vis.ShowMove: " + packageName + ":" + className + " moved to (");
         System.out.print(Integer.toString(newX) + "," + Integer.toString(newY));
         System.out.println ("), E:" + Integer.toString(energy) + ", T:" + Integer.toString(tech));
     }
