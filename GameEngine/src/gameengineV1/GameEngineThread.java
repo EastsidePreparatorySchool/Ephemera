@@ -67,7 +67,7 @@ public class GameEngineThread extends Thread {
                     // asking for confirmation for another turn here, this is some
                     // kind of debug mode.
 
-                    if(engine.vis.showModalConfirmation("GameLogic: Game turn complete, \"exit\" to end: ", "exit"))
+                    if(engine.vis.showContinuePrompt())
                     {
                         // game aborted
                         engine.gameState = GameState.Paused;

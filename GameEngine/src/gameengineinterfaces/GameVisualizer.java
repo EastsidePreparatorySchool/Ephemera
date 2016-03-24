@@ -30,5 +30,5 @@ public interface GameVisualizer {
 
     void debugErr(String s);
 
-    boolean showModalConfirmation(String prompt, String match);
+    boolean showContinuePrompt();
 }

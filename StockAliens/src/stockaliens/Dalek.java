@@ -13,15 +13,15 @@ import java.util.Random;
  * @author gmein
  */
 public class Dalek implements Alien {
-    
+
     Random rand;
     Context ctx;
-    
+
     final boolean debug = true;
-    
+
     public Dalek() {
     }
-    
+
     public void init(Context game_ctx) {
         rand = new Random();
         ctx = game_ctx;
@@ -30,16 +30,16 @@ public class Dalek implements Alien {
                 + "," + Integer.toString(ctx.getY()) + ") "
                 + "E: " + Integer.toString(ctx.getEnergy())
                 + "T: " + Integer.toString(ctx.getTech()));
-        
+
     }
 
     // Martians move left, right, left, right
     public MoveDir getMove() {
-        
+
         ctx.debugOut("Move requested,"
                 + " E:" + Integer.toString(ctx.getEnergy())
                 + " T:" + Integer.toString(ctx.getTech()));
-        
+
         int move_energy;
 
         // don't move more than you have tech
@@ -52,42 +52,57 @@ public class Dalek implements Alien {
         move_energy -= Math.abs(x);
         // and y takes the rest
         int y = move_energy;
-        
+
         ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
-        
+
         return new MoveDir(x, y);
     }
-    
+
     public Action getAction() {
-        
+
         ctx.debugOut("Action requested,"
                 + " E:" + Integer.toString(ctx.getEnergy())
                 + " T:" + Integer.toString(ctx.getTech()));
-        
+
         View view = ctx.getView();
 
         // catch and shenanigans
         try {
-            // is there another alien on our position?
-            if (view.isAlienAtPos(ctx.getX(), ctx.getY())) {
-                // if so, do we have any energy?
-                if (ctx.getEnergy() < 3) {
-                    // no, lie still and start praying
-                    ctx.debugOut("Choosing to gain energy,"
-                            + " E:" + Integer.toString(ctx.getEnergy())
-                            + " T:" + Integer.toString(ctx.getTech()));
-                    return new Action(ActionCode.Gain);
-                }
-
-                // or, spend our energy on fighting
-                ctx.debugOut("Choosing to fight,"
+            // do we have enough energy?
+            if (ctx.getEnergy() < 10) {
+                // no, charge
+                ctx.debugOut("Choosing to gain energy,"
                         + " E:" + Integer.toString(ctx.getEnergy())
                         + " T:" + Integer.toString(ctx.getTech()));
-                
+                return new Action(ActionCode.Gain);
+            }
+
+            // do we have enough tech?
+            if (ctx.getTech() < 10) {
+                // no, research
+                ctx.debugOut("Choosing to research"
+                        + " E:" + Integer.toString(ctx.getEnergy())
+                        + " T:" + Integer.toString(ctx.getTech()));
+                return new Action(ActionCode.Research);
+            }
+
+            // is there another alien on our position?
+            if (view.isAlienAtPos(ctx.getX(), ctx.getY())) {
+                ctx.debugOut("EXTERMINATE!!!!!"
+                        + " E:" + Integer.toString(ctx.getEnergy())
+                        + " T:" + Integer.toString(ctx.getTech()));
+
                 return new Action(ActionCode.Fight, ctx.getEnergy() - 2);
             }
+            // no other aliens here, have enough stuff, spawn!
+            ctx.debugOut("DALEKS RULE SUPREME! SPAWNING!"
+                    + " E:" + Integer.toString(ctx.getEnergy())
+                    + " T:" + Integer.toString(ctx.getTech()));
+
+            return new Action(ActionCode.Spawn, 5);
         } catch (Exception e) {
             // do something here to deal with errors
+            ctx.debugOut("EXPLAIN??????");
         }
 
         //
@@ -96,16 +111,16 @@ public class Dalek implements Alien {
         ctx.debugOut("Dalek: No aliens around, researching tech,"
                 + " E:" + Integer.toString(ctx.getEnergy())
                 + " T:" + Integer.toString(ctx.getTech()));
-        
+
         if (ctx.getEnergy() > (ctx.getTech() + 2)) {
             return new Action(ActionCode.Research);
         }
         return new Action(ActionCode.Gain);
     }
-    
+
     public void processResults() {
         ctx.debugOut("Processing results");
         return;
     }
-    
+
 }

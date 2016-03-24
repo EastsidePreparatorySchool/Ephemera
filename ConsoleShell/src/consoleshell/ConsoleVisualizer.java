@@ -13,26 +13,29 @@ import java.util.Scanner;
  * @author gmein
  */
 public class ConsoleVisualizer implements GameVisualizer {
+
+    int turnCounter = 1;
+    int numTurns = 1;
+    
     @Override
     public void showCompletedTurn() {
         System.out.println("Turn complete.");
     }
-    
+
     @Override
     public void showMove(String packageName, String className, int newX, int newY, int energy, int tech) {
         System.out.print("Vis.ShowMove: " + packageName + ":" + className + " moved to (");
         System.out.print(Integer.toString(newX) + "," + Integer.toString(newY));
-        System.out.println ("), E:" + Integer.toString(energy) + ", T:" + Integer.toString(tech));
+        System.out.println("), E:" + Integer.toString(energy) + ", T:" + Integer.toString(tech));
     }
-
 
     @Override
     public void showFightBefore(int x, int y, String[] participants, int[] fightPowers) {
         System.out.println();
         System.out.println("Them aliens is fightin' again:");
-        for (int i=0; i < participants.length; i++) {
+        for (int i = 0; i < participants.length; i++) {
             System.out.print("Alien \"" + participants[i] + "\" ");
-            System.out.println ("is fighting with energy " + Integer.toString(fightPowers[i]));
+            System.out.println("is fighting with energy " + Integer.toString(fightPowers[i]));
         }
         System.out.println();
     }
@@ -41,7 +44,7 @@ public class ConsoleVisualizer implements GameVisualizer {
     public void showFightAfter(int x, int y, String[] participants, int[] newEnergy, int[] newTech) {
         System.out.println();
         System.out.println("Here is what is left from that fight:");
-        for (int i=0; i < participants.length; i++) {
+        for (int i = 0; i < participants.length; i++) {
             System.out.print("Alien \"" + participants[i] + "\" ");
             System.out.print(" now has energy " + Integer.toString(newEnergy[i]));
             System.out.print(" and new tech level " + Integer.toString(newTech[i]));
@@ -74,10 +77,33 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public boolean showModalConfirmation(String prompt, String match) {
-        Scanner scan = new Scanner(System.in);
-        System.out.print(prompt);
-        String answer = scan.nextLine().trim();
-        return (answer.compareToIgnoreCase(match) == 0);
+    public boolean showContinuePrompt() {
+        --turnCounter;
+        
+        // every numTurns, display prompt, wait for exit phrase or new number of turns
+        if (turnCounter == 0) {
+            Scanner scan = new Scanner(System.in);
+            System.out.print("<Enter> to continue, \"exit\" to exit, <number> to set number of turns: ");
+            String answer = scan.nextLine().trim();
+            if (answer.compareToIgnoreCase("exit") == 0)
+            {
+                // game over
+                return true;
+            }
+            
+            
+            try {
+                // got new numTurns from user
+                numTurns = Integer.parseInt(answer);
+                }
+            catch (Exception e) {
+                // leave numTurns alone
+            }
+            
+            turnCounter = numTurns;
+        }
+
+        // no done with number of turns, return "game not over"
+        return false;
     }
 }
