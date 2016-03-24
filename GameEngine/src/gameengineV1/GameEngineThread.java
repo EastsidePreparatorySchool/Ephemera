@@ -57,25 +57,30 @@ public class GameEngineThread extends Thread {
                     engine.vis.debugOut("GameEngineThread: Executing game turn");
 
                     try {
-                        engine.grid.executeGameTurn();
+                        if (engine.grid.executeGameTurn()) {
+                            // game over because at most one species left
+                            engine.gameState = GameState.Paused;
+                            engine.vis.showGameOver();
+                        }
                     } catch (Exception e) {
                         engine.vis.debugErr("GameEngineThread: Unhandled exception during turn: " + e.getMessage());
                         e.printStackTrace();
                     }
-                    
+
                     // TODO: this is clunky, but it will do for the current time.
                     // asking for confirmation for another turn here, this is some
                     // kind of debug mode.
-
-                    if(engine.vis.showContinuePrompt())
-                    {
-                        // game aborted
-                        engine.gameState = GameState.Paused;
-                        engine.vis.showGameOver();
+                    if (engine.gameState != GameState.Paused) {
+                        if (!engine.vis.showContinuePrompt()) {
+                        } else {
+                            // game aborted
+                            engine.gameState = GameState.Paused;
+                            engine.vis.showGameOver();
+                        }
                     }
                 }
 
-                //
+                    //
                 // between turns, process commands
                 //
                 if (engine.queue.isEmpty()) {
@@ -92,7 +97,7 @@ public class GameEngineThread extends Thread {
 
                     gc = (GameCommand) engine.queue.remove();
 
-                    // Process the work item
+                        // Process the work item
                     //engine.vis.debugOut("GameEngineThread: Processing command");
                     endGame = processCommand(gc);
                     // endGame signifies that an "End" requeat has come through
@@ -156,7 +161,7 @@ public class GameEngineThread extends Thread {
         }
         return gameOver;
     }
-        //
+    //
     // Dynamic class loader (.jar files)
     // stolen from StackOverflow, considered dark voodoo magic
     //
