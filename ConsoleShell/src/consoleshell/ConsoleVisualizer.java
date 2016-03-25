@@ -128,7 +128,7 @@ public class ConsoleVisualizer implements GameVisualizer {
         if (turnCounter == 0) {
             turnCounter = numTurns;
             Scanner scan = new Scanner(System.in);
-            print("<Enter> to continue, \"exit\" to exit, <number> to set number of turns: ");
+            print("<Enter> to continue, \"exit\" to exit, \"dump\" to list aliens, <number> to set number of turns: ");
             String answer = scan.nextLine().trim();
             if (answer.compareToIgnoreCase("exit") == 0) {
                 // game over
