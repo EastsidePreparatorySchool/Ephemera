@@ -23,6 +23,9 @@ public class SpaceGrid {
     // our list needs to be able to grow and shrink
 
     List<SpaceObject> objects; // Stars, planets, space stations, etc.
+    
+    static Random rand = new Random(System.currentTimeMillis());
+
 
     public boolean executeGameTurn() {
         moveAliens();
@@ -329,7 +332,6 @@ public class SpaceGrid {
                     // are not executed on it this turn
                     // TODO add code to spawn species relevant offspring here
                     // e.g. Alien alien = new Martian();
-                    Random rand = new Random(System.currentTimeMillis());
                     aliens.add(new AlienContainer(
                             this.vis,
                             aliens.get(i).x + rand.nextInt(6) - 3, // TODO: hard-coded constant  
@@ -337,7 +339,7 @@ public class SpaceGrid {
                             aliens.get(i).alienPackageName,
                             aliens.get(i).alienClassName,
                             aliens.get(i).alienConstructor,
-                            actions[i].power, 1));
+                            actions[i].power, 1)); // initial tech = 1;
             }
         }
     }
