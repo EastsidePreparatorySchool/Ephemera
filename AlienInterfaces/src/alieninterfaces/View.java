@@ -12,7 +12,7 @@ package alieninterfaces;
 public interface View {
     
     int getEnergyAtPos(int x, int y) throws CantSeeSquareException;
-    boolean isAlienAtPos(int x, int y) throws CantSeeSquareException;
+    int getAlienCountAtPos(int x, int y) throws CantSeeSquareException;
     int[] getClosestAlienPos(int x, int y);
  }
 

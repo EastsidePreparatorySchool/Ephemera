@@ -70,7 +70,7 @@ public class Venusian implements Alien {
         // catch and shenanigans
         try {
             // is there another alien on our position?
-            if (view.isAlienAtPos(ctx.getX(), ctx.getY())) {
+            if (view.getAlienCountAtPos(ctx.getX(), ctx.getY()) > 1) {
                 // if so, do we have any energy?
                 if (ctx.getEnergy() < 10) {
                     // no, keep moving.

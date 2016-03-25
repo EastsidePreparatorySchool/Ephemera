@@ -207,9 +207,8 @@ public class SpaceGrid {
             } catch (Exception ex) {
                 // if an alien blows up here, we'll kill it. 
                 actions[i] = new Action(ActionCode.None);
+                aliens.get(i).api.debugOut("Blew up on getAction()");
                 aliens.get(i).kill();
-                //Logger.getLogger(SpaceGrid.class.getName()).log(Level.SEVERE, null, ex);
-                vis.debugErr("Alien " + Integer.toHexString(aliens.get(i).alien.hashCode()) + " blew up on getAction()");
             }
         }
 
@@ -222,7 +221,15 @@ public class SpaceGrid {
                     }
 
                     List<Integer> fightingAliens = new ArrayList<>(); // Stores indexes
+                    List<String> fightingRaces = new ArrayList<String>();
+                    List<Integer> fightingPowers = new ArrayList<Integer>();
+
                     fightingAliens.add(i);
+                    fightingRaces.add(aliens.get(i).alienPackageName + ":"
+                            + aliens.get(i).alienClassName
+                            + "(" + Integer.toHexString(aliens.get(i).hashCode()).toUpperCase() + ")");
+                    fightingPowers.add(actions[i].power);
+
                     int energyForWinner = 0;
                     aliens.get(i).fought = true;
 
@@ -234,9 +241,17 @@ public class SpaceGrid {
                             // (even if they fought with zero power)
                             // they will get blown off the board and the alien
                             // that won the fight will take their energy
+                            // TODO: consider whether they should be killed or just lose
                             aliens.get(k).fought = true;
+                            fightingAliens.add(k);
+                            fightingRaces.add(aliens.get(k).alienPackageName + ":"
+                                    + aliens.get(k).alienClassName
+                                    + "(" + Integer.toHexString(aliens.get(k).hashCode()).toUpperCase() + ")");
+                            fightingPowers.add(actions[k].power);
 
                             if (actions[k].code != ActionCode.Fight) {
+                                aliens.get(k).api.debugOut("Was a pacifist at the wrong time and place.");
+
                                 energyForWinner += aliens.get(k).energy;
                                 aliens.get(k).kill();
                             } else {
@@ -244,6 +259,11 @@ public class SpaceGrid {
                             }
                         }
                     }
+
+                    String[] fRs = new String[fightingRaces.size()];
+                    Integer[] fPs = new Integer[fightingPowers.size()];
+
+                    vis.showFightBefore(aliens.get(i).x, aliens.get(i).y, fightingRaces.toArray(fRs), fightingPowers.toArray(fPs));
 
                     // Determine the winner and maximum tech in the fight
                     int winner = 0;
@@ -278,6 +298,7 @@ public class SpaceGrid {
                                 energyForWinner += aliens.get(fightingAliens.get(k)).energy;
 
                                 // The alien will then be killed
+                                aliens.get(k).api.debugOut("Lost and died of its wounds.");
                                 aliens.get(fightingAliens.get(k)).kill();
 
                             } else { // If the alien was beaten by less than 5 points
@@ -289,6 +310,7 @@ public class SpaceGrid {
                                                 1);
                             }
                         }
+                        // TODO: Write showFightAfter here
                     }
 
                 case Gain:

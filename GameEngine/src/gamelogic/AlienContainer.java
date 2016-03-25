@@ -103,7 +103,7 @@ public class AlienContainer {
                 return action;
             case Fight:
                 //TODO: Perform necessary checks
-                return new Action(action.code);
+                return action;
 
             default:
                 api.vis.debugErr("AC: Checking action, unknown: " + action.code.toString());

@@ -16,7 +16,7 @@ public interface GameVisualizer {
     
     void showMove(String packageName, String className, int newX, int newY, int energy, int tech);
 
-    void showFightBefore(int x, int y, String[] participants, int[] fightPower);
+    void showFightBefore(int x, int y, String[] participants, Integer[] fightPower);
 
     void showFightAfter(int x, int y, String[] participants, int[] newEnergyLevels, int[] newTechLevels);
 

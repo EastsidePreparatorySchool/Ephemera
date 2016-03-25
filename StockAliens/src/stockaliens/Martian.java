@@ -93,7 +93,7 @@ public class Martian implements Alien {
 
         //checks if alien is on the same position, if so, then fights with the priorly designated amount of energy
         try {
-            if (ctx.getView().isAlienAtPos(ctx.getX(), ctx.getY())) {
+            if (ctx.getView().getAlienCountAtPos(ctx.getX(), ctx.getY()) > 1) {
                 ctx.debugOut("Fighting");
                 return new Action(ActionCode.Fight, (fightStrength));
             }

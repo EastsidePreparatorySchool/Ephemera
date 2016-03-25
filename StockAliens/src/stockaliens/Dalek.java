@@ -87,7 +87,7 @@ public class Dalek implements Alien {
             }
 
             // is there another alien on our position?
-            if (view.isAlienAtPos(ctx.getX(), ctx.getY())) {
+            if (view.getAlienCountAtPos(ctx.getX(), ctx.getY()) > 1) {
                 ctx.debugOut("EXTERMINATE!!!!!"
                         + " E:" + Integer.toString(ctx.getEnergy())
                         + " T:" + Integer.toString(ctx.getTech()));

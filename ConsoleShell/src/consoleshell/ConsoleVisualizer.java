@@ -70,11 +70,11 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showFightBefore(int x, int y, String[] participants, int[] fightPowers) {
+    public void showFightBefore(int x, int y, String[] participants, Integer[] fightPowers) {
         println("");
         println("Them aliens is fightin' again:");
         for (int i = 0; i < participants.length; i++) {
-            print("Alien \"" + participants[i] + "\" ");
+            print("Alien " + participants[i] + " ");
             println("is fighting with energy " + Integer.toString(fightPowers[i]));
         }
         println("");
