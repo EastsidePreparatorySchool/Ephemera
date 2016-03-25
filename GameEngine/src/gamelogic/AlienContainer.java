@@ -29,6 +29,8 @@ public class AlienContainer {
     public int x;
     public int y;
     public boolean action; // Whether the alien has performed an action this turn
+    
+    static Random rand = new Random(System.currentTimeMillis());
 
     // Declare stats here
     //
@@ -46,9 +48,9 @@ public class AlienContainer {
 
         // if position = (0,0) assign random position
         if (x == 0 && y == 0) {
-            Random rand = new Random(System.currentTimeMillis());
-            this.x = rand.nextInt(10) - 5; // TODO: get these hardcoded constants from spacegrid instead
-            this.y = rand.nextInt(10) - 5;
+            
+            this.x = rand.nextInt(20) - 10; // TODO: get these hardcoded constants from spacegrid instead
+            this.y = rand.nextInt(20) - 10;
         } else {
             this.x = x;
             this.y = y;
