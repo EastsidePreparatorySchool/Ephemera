@@ -53,7 +53,6 @@ public class GameEngineThread extends Thread {
                     //
                     // Execute game turn
                     //
-                    engine.vis.showCompletedTurn();
 
                     try {
                         if (engine.grid.executeGameTurn()) {
@@ -65,6 +64,8 @@ public class GameEngineThread extends Thread {
                         engine.vis.debugErr("GameEngineThread: Unhandled exception during turn: " + e.getMessage());
                         e.printStackTrace();
                     }
+
+                    engine.vis.showCompletedTurn();
 
                     // TODO: this is clunky, but it will do for the current time.
                     // asking for confirmation for another turn here, this is some

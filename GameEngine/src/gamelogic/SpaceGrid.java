@@ -216,7 +216,7 @@ public class SpaceGrid {
         for (int i = 0; i < actions.length; i++) {
             switch (actions[i].code) {
                 case Fight:
-                    vis.debugOut("SpaceGrid: Processing Fight");
+                    //vis.debugOut("SpaceGrid: Processing Fight");
                     // Note: You can fight with aliens of your own species
                     if (aliens.get(i).fought) {
                         break;
@@ -229,7 +229,7 @@ public class SpaceGrid {
                     fightingAliens.add(i);
                     fightingRaces.add(aliens.get(i).alienPackageName + ":"
                             + aliens.get(i).alienClassName
-                            + "(" + Integer.toHexString(aliens.get(i).hashCode()).toUpperCase() + ")");
+                            + "(" + Integer.toHexString(aliens.get(i).alien.hashCode()).toUpperCase() + ")");
                     fightingPowers.add(actions[i].power);
 
                     int energyForWinner = 0;
@@ -248,7 +248,7 @@ public class SpaceGrid {
                             fightingAliens.add(k);
                             fightingRaces.add(aliens.get(k).alienPackageName + ":"
                                     + aliens.get(k).alienClassName
-                                    + "(" + Integer.toHexString(aliens.get(k).hashCode()).toUpperCase() + ")");
+                                    + "(" + Integer.toHexString(aliens.get(k).alien.hashCode()).toUpperCase() + ")");
                             fightingPowers.add(actions[k].power);
 
                             if (actions[k].code != ActionCode.Fight) {
