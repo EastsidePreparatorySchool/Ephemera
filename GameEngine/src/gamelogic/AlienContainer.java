@@ -76,11 +76,19 @@ public class AlienContainer {
         checkMove(direction); // Throws an exception if illegal
         x += direction.x();
         y += direction.y();
+        
+        // debug code following
+        if (x > 1000 || y > 1000 || x < -1000 || y < -1000) {
+            api.vis.debugErr("Moving out of control");
+        }
+        
         api.vis.showMove(alienPackageName, alienClassName, x, y, energy, tech);
     }
 
     public void kill() {
-        energy = Integer.MIN_VALUE;
+        //energy = Integer.MIN_VALUE; // GM: Gavin, this strikes me as a bug ...
+        energy = 0;
+
     }
 
     public Action getAction(ViewImplementation view) throws NotEnoughEnergyException, UnknownActionException {
@@ -125,6 +133,7 @@ public class AlienContainer {
 
         // If the move is valid, subtract the energy expended
         energy -= fightPower;
+        energy = Integer.max(energy, 0); // let's not drop below zero.
 
         // Return how much power the alien will fight with
         return fightPower;

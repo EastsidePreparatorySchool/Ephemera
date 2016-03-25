@@ -49,7 +49,7 @@ public class SpaceGrid {
         return true;
     }
 
-    public void dumpStatus() {
+    public void listStatus() {
         vis.debugOut("");
         vis.debugOut("Current Aliens:");
 
@@ -252,7 +252,7 @@ public class SpaceGrid {
                             fightingPowers.add(actions[k].power);
 
                             if (actions[k].code != ActionCode.Fight) {
-                                aliens.get(k).api.debugOut("Was a pacifist at the wrong time and place.");
+                                //aliens.get(k).api.debugOut("Was a pacifist at the wrong time and place.");
 
                                 energyForWinner += aliens.get(k).energy;
                                 aliens.get(k).kill();
@@ -300,7 +300,7 @@ public class SpaceGrid {
                                 energyForWinner += aliens.get(fightingAliens.get(k)).energy;
 
                                 // The alien will then be killed
-                                aliens.get(k).api.debugOut("Lost and died of its wounds.");
+                                //aliens.get(k).api.debugOut("Lost and died of its wounds.");
                                 aliens.get(fightingAliens.get(k)).kill();
 
                             } else { // If the alien was beaten by less than 5 points

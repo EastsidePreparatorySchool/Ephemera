@@ -128,16 +128,16 @@ public class ConsoleVisualizer implements GameVisualizer {
         if (turnCounter == 0) {
             turnCounter = numTurns;
             Scanner scan = new Scanner(System.in);
-            print("<Enter> to continue, \"exit\" to exit, \"dump\" to list aliens, <number> to set number of turns: ");
+            print("<Enter> to continue, \"exit\" to exit, \"list\" to list aliens, <number> to set number of turns: ");
             String answer = scan.nextLine().trim();
             if (answer.compareToIgnoreCase("exit") == 0) {
                 // game over
                 return "exit";
-            } else if (answer.compareToIgnoreCase("dump") == 0) {
-                // dump current aliens
+            } else if (answer.compareToIgnoreCase("list") == 0) {
+                // list current aliens
                 // set turn counter to 1 so we end up in here again next time
                 turnCounter = 1;
-                return "dump";
+                return "list";
             }
 
             try {

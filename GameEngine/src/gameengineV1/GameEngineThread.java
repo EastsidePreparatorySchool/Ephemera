@@ -79,9 +79,9 @@ public class GameEngineThread extends Thread {
                                 engine.gameState = GameState.Paused;
                                 engine.vis.showGameOver();
                                 answer = "continue";
-                            } else if (answer.compareToIgnoreCase("dump") == 0) {
+                            } else if (answer.compareToIgnoreCase("list") == 0) {
                                 // list aliens
-                                engine.grid.dumpStatus();
+                                engine.grid.listStatus();
                             }
                         } while (answer.compareToIgnoreCase("continue") != 0);
                     }
