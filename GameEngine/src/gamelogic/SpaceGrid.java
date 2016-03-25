@@ -29,7 +29,7 @@ public class SpaceGrid {
         removeDeadAliens();
         performAlienActions();
         removeDeadAliens();
-        resetMoves();
+        resetMovesAndFights();
 
         AlienContainer aUniqueAlien = null;
         for (AlienContainer a : aliens) {
@@ -186,9 +186,10 @@ public class SpaceGrid {
         }
     }
 
-    public void resetMoves() {
+    public void resetMovesAndFights() {
         aliens.stream().forEach((alien) -> {
             alien.action = false;
+            alien.fought = false;
         });
     }
 
@@ -215,6 +216,7 @@ public class SpaceGrid {
         for (int i = 0; i < actions.length; i++) {
             switch (actions[i].code) {
                 case Fight:
+                    vis.debugOut("SpaceGrid: Processing Fight");
                     // Note: You can fight with aliens of your own species
                     if (aliens.get(i).fought) {
                         break;
