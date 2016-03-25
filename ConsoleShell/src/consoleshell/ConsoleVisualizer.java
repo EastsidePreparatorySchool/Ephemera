@@ -63,8 +63,9 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showMove(String packageName, String className, int newX, int newY, int energy, int tech) {
-        print("Vis.ShowMove: " + packageName + ":" + className + " moved to (");
+    public void showMove(String packageName, String className, int oldx, int oldy, int newX, int newY, int energy, int tech) {
+        print("Vis.ShowMove: " + packageName + ":" + className + " moved from (");
+        print(Integer.toString(oldx) + "," + Integer.toString(oldy) + ") to (");
         print(Integer.toString(newX) + "," + Integer.toString(newY));
         println("), E:" + Integer.toString(energy) + ", T:" + Integer.toString(tech));
     }
@@ -72,7 +73,7 @@ public class ConsoleVisualizer implements GameVisualizer {
     @Override
     public void showFightBefore(int x, int y, String[] participants, Integer[] fightPowers) {
         println("");
-        println("Them aliens is fightin' again:");
+        println("Them aliens is fightin' again at (" + Integer.toString(x) + "," + Integer.toString(y) + "):");
         for (int i = 0; i < participants.length; i++) {
             print("Alien " + participants[i] + " ");
             println("is fighting with energy " + Integer.toString(fightPowers[i]));

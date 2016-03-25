@@ -74,6 +74,8 @@ public class AlienContainer {
         api.view = view;
         MoveDir direction = alien.getMove();
         checkMove(direction); // Throws an exception if illegal
+        int oldx = x;
+        int oldy = y;
         x += direction.x();
         y += direction.y();
         
@@ -82,7 +84,7 @@ public class AlienContainer {
             api.vis.debugErr("Moving out of control");
         }
         
-        api.vis.showMove(alienPackageName, alienClassName, x, y, energy, tech);
+        api.vis.showMove(alienPackageName, alienClassName, oldx, oldy, x, y, energy, tech);
     }
 
     public void kill() {

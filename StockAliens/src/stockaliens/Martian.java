@@ -81,7 +81,7 @@ public class Martian implements Alien {
 
         }
 
-        ctx.debugOut("Moving ("+ Integer.toString(HorizontalMove) + "," + Integer.toString(VerticalMove) + ")");
+        //ctx.debugOut("Moving ("+ Integer.toString(HorizontalMove) + "," + Integer.toString(VerticalMove) + ")");
 
         return new MoveDir(HorizontalMove, VerticalMove);
     }

@@ -53,7 +53,7 @@ public class Dalek implements Alien {
         // and y takes the rest
         int y = move_energy;
 
-        ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
+        //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
 
         return new MoveDir(x, y);
     }
