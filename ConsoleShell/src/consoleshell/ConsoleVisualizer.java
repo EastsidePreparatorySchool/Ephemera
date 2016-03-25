@@ -20,6 +20,7 @@ import java.util.Scanner;
 public class ConsoleVisualizer implements GameVisualizer {
 
     int turnCounter = 1;
+    int totalTurnCounter = 0;
     int numTurns = 1;
     BufferedWriter logFile;
 
@@ -56,7 +57,9 @@ public class ConsoleVisualizer implements GameVisualizer {
 
     @Override
     public void showCompletedTurn() {
-        println("Turn complete.");
+        ++totalTurnCounter;
+        println("Turn #" + Integer.toString(totalTurnCounter) + " complete.");
+        println("--------------------------------------------");
     }
 
     @Override
@@ -118,17 +121,23 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public boolean showContinuePrompt() {
+    public String showContinuePrompt() {
         --turnCounter;
 
         // every numTurns, display prompt, wait for exit phrase or new number of turns
         if (turnCounter == 0) {
+            turnCounter = numTurns;
             Scanner scan = new Scanner(System.in);
             print("<Enter> to continue, \"exit\" to exit, <number> to set number of turns: ");
             String answer = scan.nextLine().trim();
             if (answer.compareToIgnoreCase("exit") == 0) {
                 // game over
-                return true;
+                return "exit";
+            } else if (answer.compareToIgnoreCase("dump") == 0) {
+                // dump current aliens
+                // set turn counter to 1 so we end up in here again next time
+                turnCounter = 1;
+                return "dump";
             }
 
             try {
@@ -139,10 +148,10 @@ public class ConsoleVisualizer implements GameVisualizer {
             }
 
             turnCounter = numTurns;
-            print("Number of turns: " + Integer.toString(numTurns));
+            println("Number of turns before pause: " + Integer.toString(numTurns));
         }
 
-        // no done with number of turns, return "game not over"
-        return false;
+        // not done with number of turns, return "game not over"
+        return "continue";
     }
 }

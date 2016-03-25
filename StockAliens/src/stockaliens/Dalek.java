@@ -27,18 +27,18 @@ public class Dalek implements Alien {
         ctx = game_ctx;
         ctx.debugOut("Initialized at "
                 + "(" + Integer.toString(ctx.getX())
-                + "," + Integer.toString(ctx.getY()) + ") "
-                + "E: " + Integer.toString(ctx.getEnergy())
-                + "T: " + Integer.toString(ctx.getTech()));
+                + "," + Integer.toString(ctx.getY()) + ")"
+                + " E: " + Integer.toString(ctx.getEnergy())
+                + " T: " + Integer.toString(ctx.getTech()));
 
     }
 
     // Martians move left, right, left, right
     public MoveDir getMove() {
 
-        ctx.debugOut("Move requested,"
-                + " E:" + Integer.toString(ctx.getEnergy())
-                + " T:" + Integer.toString(ctx.getTech()));
+        //ctx.debugOut("Move requested,"
+        //        + " E:" + Integer.toString(ctx.getEnergy())
+        //        + " T:" + Integer.toString(ctx.getTech()));
 
         int move_energy;
 
@@ -60,9 +60,9 @@ public class Dalek implements Alien {
 
     public Action getAction() {
 
-        ctx.debugOut("Action requested,"
-                + " E:" + Integer.toString(ctx.getEnergy())
-                + " T:" + Integer.toString(ctx.getTech()));
+        //ctx.debugOut("Action requested,"
+        //        + " E:" + Integer.toString(ctx.getEnergy())
+        //        + " T:" + Integer.toString(ctx.getTech()));
 
         View view = ctx.getView();
 

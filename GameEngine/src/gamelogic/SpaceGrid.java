@@ -49,6 +49,21 @@ public class SpaceGrid {
         return true;
     }
 
+    public void dumpStatus() {
+        vis.debugOut("");
+        vis.debugOut("Current Aliens:");
+
+        for (AlienContainer a : aliens) {
+            if (a != null) {
+                a.api.debugOut("X:" + Integer.toString(a.x)
+                        + " Y:" + Integer.toString(a.y)
+                        + " E:" + Integer.toString(a.energy)
+                        + " T:" + Integer.toString(a.tech));
+            }
+        }
+        vis.debugOut("");
+    }
+
     public SpaceGrid(GameVisualizer vis) {
         this.vis = vis;
         aliens = new ArrayList<>(); // AlienContainer type is inferred

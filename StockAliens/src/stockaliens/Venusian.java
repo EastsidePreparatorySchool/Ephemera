@@ -23,17 +23,17 @@ public class Venusian implements Alien {
         ctx = game_ctx;
         ctx.debugOut("Initialized at "
                 + "(" + Integer.toString(ctx.getX())
-                + "," + Integer.toString(ctx.getY()) + ") "
-                + "E: " + Integer.toString(ctx.getEnergy())
-                + "T: " + Integer.toString(ctx.getTech()));
+                + "," + Integer.toString(ctx.getY()) + ")"
+                + " E: " + Integer.toString(ctx.getEnergy())
+                + " T: " + Integer.toString(ctx.getTech()));
 
     }
 
     public MoveDir getMove() {
 
-        ctx.debugOut("Move requested,"
-                + " E:" + Integer.toString(ctx.getEnergy())
-                + " T:" + Integer.toString(ctx.getTech()));
+        //ctx.debugOut("Move requested,"
+        //        + " E:" + Integer.toString(ctx.getEnergy())
+        //        + " T:" + Integer.toString(ctx.getTech()));
 
         // Venusians run away from the nearest alien
         int[] nearestAlienPos = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY());
@@ -53,16 +53,16 @@ public class Venusian implements Alien {
         } else if (nearestAlienPos[1] < ctx.getY()) {
             y = 1;
         }
-        ctx.debugOut("Moving ("+ Integer.toString(x) + "," + Integer.toString(y) + ")");
-       
+        ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
+
         return new MoveDir(x, y);
     }
 
     public Action getAction() {
 
-        ctx.debugOut("Action requested,"
-                + " E:" + Integer.toString(ctx.getEnergy())
-                + " T:" + Integer.toString(ctx.getTech()));
+        //ctx.debugOut("Action requested,"
+        //        + " E:" + Integer.toString(ctx.getEnergy())
+        //        + " T:" + Integer.toString(ctx.getTech()));
 
         View view = ctx.getView();
 
@@ -78,6 +78,7 @@ public class Venusian implements Alien {
                 }
 
                 // or, hit really hard then run again
+                ctx.debugOut("Fighting");
                 return new Action(ActionCode.Fight, ctx.getEnergy() - 10);
             }
         } catch (Exception e) {
@@ -91,10 +92,14 @@ public class Venusian implements Alien {
 
             if (ctx.getEnergy() > 20) {
                 //should spawn fast at the beggining,
+                ctx.debugOut("Spawning");
                 return new Action(ActionCode.Spawn);
             }
+            ctx.debugOut("Researching");
             return new Action(ActionCode.Research);
         }
+        ctx.debugOut("Gaining");
+
         return new Action(ActionCode.Gain);
     }
 

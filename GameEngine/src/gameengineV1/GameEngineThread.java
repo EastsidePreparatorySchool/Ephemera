@@ -53,8 +53,7 @@ public class GameEngineThread extends Thread {
                     //
                     // Execute game turn
                     //
-                    engine.vis.debugOut("-------------------------------------");
-                    engine.vis.debugOut("GameEngineThread: Executing game turn");
+                    engine.vis.showCompletedTurn();
 
                     try {
                         if (engine.grid.executeGameTurn()) {
@@ -71,16 +70,23 @@ public class GameEngineThread extends Thread {
                     // asking for confirmation for another turn here, this is some
                     // kind of debug mode.
                     if (engine.gameState != GameState.Paused) {
-                        if (!engine.vis.showContinuePrompt()) {
-                        } else {
-                            // game aborted
-                            engine.gameState = GameState.Paused;
-                            engine.vis.showGameOver();
-                        }
+                        String answer;
+                        do {
+                            answer = engine.vis.showContinuePrompt();
+                            if (answer.compareToIgnoreCase("exit") == 0) {
+                                // game aborted
+                                engine.gameState = GameState.Paused;
+                                engine.vis.showGameOver();
+                                answer = "continue";
+                            } else if (answer.compareToIgnoreCase("dump") == 0) {
+                                // list aliens
+                                engine.grid.dumpStatus();
+                            }
+                        } while (answer.compareToIgnoreCase("continue") != 0);
                     }
                 }
 
-                    //
+                //
                 // between turns, process commands
                 //
                 if (engine.queue.isEmpty()) {
@@ -97,7 +103,7 @@ public class GameEngineThread extends Thread {
 
                     gc = (GameCommand) engine.queue.remove();
 
-                        // Process the work item
+                    // Process the work item
                     //engine.vis.debugOut("GameEngineThread: Processing command");
                     endGame = processCommand(gc);
                     // endGame signifies that an "End" requeat has come through
