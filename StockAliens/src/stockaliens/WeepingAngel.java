@@ -60,16 +60,16 @@ public class WeepingAngel implements Alien {
         }
 
         //gets the coordinates of the closest alien.
-        int ClosestAlienXCoordinate;
-        int ClosestAlienYCoordinate;
+        long ClosestAlienXCoordinate;
+        long ClosestAlienYCoordinate;
         ClosestAlienXCoordinate = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY())[0];
         ClosestAlienYCoordinate = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY())[1];
 
         //Checks to see if the closest alien is withen moving capability.
         if ((long)Math.abs(ClosestAlienXCoordinate - ctx.getX()) + (long)Math.abs(ClosestAlienYCoordinate - ctx.getY()) <= (long)ctx.getEnergy()) {
 
-            HorizontalMove = ClosestAlienXCoordinate - ctx.getX();
-            VerticalMove = ClosestAlienYCoordinate - ctx.getY();
+            HorizontalMove  = (int) (ClosestAlienXCoordinate - ctx.getX());
+            VerticalMove = (int) (ClosestAlienYCoordinate - ctx.getY());
         }
 
         //sets the amount of energy to fight with by how much energy, and how muc technology
