@@ -63,8 +63,9 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showMove(String packageName, String className, int oldx, int oldy, int newX, int newY, int energy, int tech) {
-        print("Vis.ShowMove: " + packageName + ":" + className + " moved from (");
+    public void showMove(String packageName, String className, int id, int oldx, int oldy, int newX, int newY, int energy, int tech) {
+        print("Vis.ShowMove: " + packageName + ":" + className);
+        print("(" + Integer.toHexString(id).toUpperCase() + ") moved from (");
         print(Integer.toString(oldx) + "," + Integer.toString(oldy) + ") to (");
         print(Integer.toString(newX) + "," + Integer.toString(newY));
         println("), E:" + Integer.toString(energy) + ", T:" + Integer.toString(tech));
@@ -139,6 +140,10 @@ public class ConsoleVisualizer implements GameVisualizer {
                 // set turn counter to 1 so we end up in here again next time
                 turnCounter = 1;
                 return "list";
+            } else if (answer.compareToIgnoreCase("") == 0) {
+                // list current aliens
+                // set turn counter to 1 so we end up in here again next time
+                return "continue";
             }
 
             try {
@@ -146,6 +151,9 @@ public class ConsoleVisualizer implements GameVisualizer {
                 numTurns = Integer.parseInt(answer);
             } catch (Exception e) {
                 // leave numTurns alone
+                turnCounter = 1;
+                println("Invalid command");
+                return ("invalid");
             }
 
             turnCounter = numTurns;

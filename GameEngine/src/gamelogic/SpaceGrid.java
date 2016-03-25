@@ -319,8 +319,8 @@ public class SpaceGrid {
                     aliens.get(i).energy += Math.floor(aliens.get(i).tech / 10) + 1;
                     continue;
                 case Research:
-                    aliens.get(i).energy -= aliens.get(i).tech;
-                    aliens.get(i).tech++;
+                    aliens.get(i).energy -= aliens.get(i).tech; //TODO: This doesn't make much sense
+                    aliens.get(i).tech++; // you only gain 1 tech regardless of energy invested
                     continue;
                 case Spawn:
                     aliens.get(i).energy -= 3 + actions[i].power;
@@ -329,10 +329,11 @@ public class SpaceGrid {
                     // are not executed on it this turn
                     // TODO add code to spawn species relevant offspring here
                     // e.g. Alien alien = new Martian();
+                    Random rand = new Random(System.currentTimeMillis());
                     aliens.add(new AlienContainer(
                             this.vis,
-                            aliens.get(i).x,
-                            aliens.get(i).y,
+                            aliens.get(i).x + rand.nextInt(6) - 3, // TODO: hard-coded constant  
+                            aliens.get(i).y + rand.nextInt(6) - 3, // need to be justified or moved somewhere central
                             aliens.get(i).alienPackageName,
                             aliens.get(i).alienClassName,
                             aliens.get(i).alienConstructor,

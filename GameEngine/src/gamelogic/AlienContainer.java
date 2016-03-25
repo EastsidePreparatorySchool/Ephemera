@@ -84,7 +84,7 @@ public class AlienContainer {
             api.vis.debugErr("Moving out of control");
         }
         
-        api.vis.showMove(alienPackageName, alienClassName, oldx, oldy, x, y, energy, tech);
+        api.vis.showMove(alienPackageName, alienClassName, this.hashCode(), oldx, oldy, x, y, energy, tech);
     }
 
     public void kill() {

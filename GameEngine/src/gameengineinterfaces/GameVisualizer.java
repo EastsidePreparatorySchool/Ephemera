@@ -14,7 +14,7 @@ import alieninterfaces.*;
 public interface GameVisualizer {
     void showCompletedTurn();
     
-    void showMove(String packageName, String className, int oldX, int oldY, int newX, int newY, int energy, int tech);
+    void showMove(String packageName, String className, int id, int oldX, int oldY, int newX, int newY, int energy, int tech);
 
     void showFightBefore(int x, int y, String[] participants, Integer[] fightPower);
 

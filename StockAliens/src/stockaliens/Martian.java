@@ -38,14 +38,13 @@ public class Martian implements Alien {
                 + " E: " + Integer.toString(ctx.getEnergy())
                 + " T: " + Integer.toString(ctx.getTech()));
         ctx.debugOut("Pancakes taste like styrofoam");
-        
+
     }
 
     public MoveDir getMove() {
     //    ctx.debugOut("Move requested,"
-    //            + " E:" + Integer.toString(ctx.getEnergy())
-    //            + " T:" + Integer.toString(ctx.getTech()));
-
+        //            + " E:" + Integer.toString(ctx.getEnergy())
+        //            + " T:" + Integer.toString(ctx.getTech()));
 
         //splits in two whole numbers
         Remainder = ctx.getTech() % 2;
@@ -65,7 +64,7 @@ public class Martian implements Alien {
         ClosestAlienYCoordinate = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY())[1];
 
         //Checks to see if the closest alien is withen moving capability.
-        if ((long)Math.abs(ClosestAlienXCoordinate - ctx.getX()) + (long)Math.abs(ClosestAlienYCoordinate - ctx.getY()) <= (long)ctx.getEnergy()) {
+        if ((long) Math.abs(ClosestAlienXCoordinate - ctx.getX()) + (long) Math.abs(ClosestAlienYCoordinate - ctx.getY()) <= (long) ctx.getEnergy()) {
 
             HorizontalMove = ClosestAlienXCoordinate - ctx.getX();
             VerticalMove = ClosestAlienYCoordinate - ctx.getY();
@@ -82,7 +81,6 @@ public class Martian implements Alien {
         }
 
         //ctx.debugOut("Moving ("+ Integer.toString(HorizontalMove) + "," + Integer.toString(VerticalMove) + ")");
-
         return new MoveDir(HorizontalMove, VerticalMove);
     }
 
@@ -106,7 +104,9 @@ public class Martian implements Alien {
             ctx.debugOut("Gaining");
             return new Action(ActionCode.Gain);
         } else if (ctx.getEnergy() < 3) {
-            ctx.debugOut("Researching");
+            if (ctx.getEnergy() > ctx.getTech()) {
+                ctx.debugOut("Researching");
+            }
             return new Action(ActionCode.Research);
         } else {
             ctx.debugOut("Spawning");
