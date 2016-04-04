@@ -13,50 +13,49 @@ import gameengineinterfaces.GameVisualizer;
  * @author guberti
  */
 public class ContextImplementation implements Context {
+
     private AlienContainer aC;
     public GameVisualizer vis;
     public ViewImplementation view;
     public boolean chatter;
-    
+
     ContextImplementation(AlienContainer aC, GameVisualizer vis) {
         this.aC = aC;
         this.vis = vis;
         chatter = false;
-        view = new ViewImplementation ();
+        view = new ViewImplementation();
     }
-    
+
     public int getEnergy() {
         return aC.energy;
     }
-    
+
     public int getTech() {
         return aC.tech;
     }
-    
+
     public int getX() {
         return aC.x;
     }
-    
+
     public int getY() {
         return aC.y;
     }
-    
+
     public View getView() {
         return this.view;
     }
-    
-    public int getSpawningCost () {
+
+    public int getSpawningCost() {
         return 100;
     }
-    
-    public int getFightingCost () {
+
+    public int getFightingCost() {
         return 0;
     }
-    
+
     public void debugOut(String s) {
-        if (chatter) {
-            vis.debugOut("Alien "+aC.alienPackageName + ":" + aC.alienClassName + "(" 
-                    +Integer.toHexString(aC.alien.hashCode()).toUpperCase()+"): " + s);
-        }
+        vis.debugOut("Alien " + aC.alienPackageName + ":" + aC.alienClassName + "("
+                + Integer.toHexString(aC.alien.hashCode()).toUpperCase() + "): " + s);
     }
 }

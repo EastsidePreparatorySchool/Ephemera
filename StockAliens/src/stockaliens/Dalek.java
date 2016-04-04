@@ -58,9 +58,9 @@ public class Dalek implements Alien {
 
     public Action getAction() {
 
-        //ctx.debugOut("Action requested,"
-        //        + " E:" + Integer.toString(ctx.getEnergy())
-        //        + " T:" + Integer.toString(ctx.getTech()));
+        ctx.debugOut("Action requested,"
+                + " E:" + Integer.toString(ctx.getEnergy())
+                + " T:" + Integer.toString(ctx.getTech()));
         View view = ctx.getView();
 
         // catch and shenanigans
@@ -115,16 +115,6 @@ public class Dalek implements Alien {
             ctx.debugOut("EXPLAIN??????");
         }
 
-        //
-        // if we have spare energy, research tech
-        //
-        ctx.debugOut("Dalek: No aliens around, researching tech,"
-                + " E:" + Integer.toString(ctx.getEnergy())
-                + " T:" + Integer.toString(ctx.getTech()));
-
-        if (ctx.getEnergy() > (ctx.getTech() + 2)) {
-            return new Action(ActionCode.Research, ctx.getTech());
-        }
         return new Action(ActionCode.Gain);
     }
 

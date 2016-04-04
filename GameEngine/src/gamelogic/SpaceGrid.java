@@ -52,20 +52,22 @@ public class SpaceGrid {
     }
 
     public void listStatus() {
-        vis.debugOut("");
-        vis.debugOut("Current Aliens:");
+        vis.debugErr("");
+        vis.debugErr("Current Aliens:");
 
         for (AlienContainer a : aliens) {
             if (a != null) {
-                vis.debugOut("Alien " + a.alienPackageName + ":" + a.alienClassName + "("
+                vis.debugErr("Alien " + a.alienPackageName + ":" + a.alienClassName + "("
                         + Integer.toHexString(a.alien.hashCode()).toUpperCase() + "): "
                         + "X:" + Integer.toString(a.x)
                         + " Y:" + Integer.toString(a.y)
                         + " E:" + Integer.toString(a.energy)
-                        + " T:" + Integer.toString(a.tech));
+                        + " T:" + Integer.toString(a.tech)
+                        + " r:" + Integer.toString((int) Math.floor(Math.sqrt(Math.pow((double) a.x, 2) + Math.pow((double) a.y, 2)))));
+
             }
         }
-        vis.debugOut("");
+        vis.debugErr("");
     }
 
     public SpaceGrid(GameVisualizer vis) {
@@ -75,7 +77,7 @@ public class SpaceGrid {
     }
 
     public void moveAliens() {
-        vis.debugOut ("Moving " + Integer.toString(aliens.size()) + " aliens");
+        vis.debugOut("Moving " + Integer.toString(aliens.size()) + " aliens");
         for (int i = 0; i < aliens.size(); i++) {
             ViewImplementation view = getAlienView(i);
             try {
@@ -182,10 +184,10 @@ public class SpaceGrid {
 
     public void removeDeadAliens() {
         int number = aliens.size();
-        for (int i = number - 1; i >=0; i--) {
+        for (int i = number - 1; i >= 0; i--) {
             if (aliens.get(i).energy <= 0) {
-                // running this through the API automatically logs alien info
-                aliens.get(i).debugOut("Died.");
+                vis.showDeath(aliens.get(i).alienPackageName, aliens.get(i).alienClassName, aliens.get(i).alien.hashCode(),
+                        aliens.get(i).x, aliens.get(i).y);
                 aliens.remove(i);
             }
         }
@@ -200,9 +202,9 @@ public class SpaceGrid {
 
     public void performAlienActions() {
         int number = aliens.size();
-        
-        vis.debugOut ("Processing actions for " + Integer.toString(number) + " aliens");
-        
+
+        vis.debugOut("Processing actions for " + Integer.toString(number) + " aliens");
+
         // Obtain all actions before enacting any of them
         Action[] actions = new Action[number];
 
@@ -224,9 +226,8 @@ public class SpaceGrid {
                 thisAlien.kill();
             }
         }
-        
-        // now process all actions
 
+        // now process all actions
         for (int i = 0; i < actions.length; i++) {
             Action thisAction = actions[i];
             AlienContainer thisAlien = aliens.get(i);
@@ -340,12 +341,12 @@ public class SpaceGrid {
                 case Gain:
                     thisAlien.energy += Math.floor(thisAlien.tech / 10) + 1;
                     break;
-                    
+
                 case Research:
                     thisAlien.energy -= thisAlien.tech;
                     thisAlien.tech++; // you only gain 1 tech regardless of energy invested
                     break;
-                    
+
                 case Spawn:
                     thisAlien.energy -= thisAlien.api.getSpawningCost() + thisAction.power;
 
@@ -353,14 +354,21 @@ public class SpaceGrid {
                     // are not executed on it this turn
                     // TODO add code to spawn species relevant offspring here
                     // e.g. Alien alien = new Martian();
-                    aliens.add(new AlienContainer(
+                    // construct a random move for the new alien depending on power and send that move through drift correction
+                    MoveDir dir = new MoveDir(rand.nextInt(thisAction.power) - thisAction.power, rand.nextInt(thisAction.power) - thisAction.power);
+                    dir = thisAlien.applyDrift(thisAlien.x, thisAlien.y, dir);
+
+                    AlienContainer aC = new AlienContainer(
                             this.vis,
-                            thisAlien.x + rand.nextInt(thisAction.power) - thisAction.power, // TODO: using thisAction.power  
-                            thisAlien.y + rand.nextInt(thisAction.power) - thisAction.power, // needs to be justified or changed
+                            thisAlien.x + dir.x(), // TODO: using thisAction.power  
+                            thisAlien.y + dir.y(), // needs to be justified or changed
                             thisAlien.alienPackageName,
                             thisAlien.alienClassName,
                             thisAlien.alienConstructor,
-                            thisAction.power, 1)); // initial tech = 1;
+                            thisAction.power, 1); // initial tech = 1;
+                    aliens.add(aC);
+                    vis.showSpawn(aC.alienPackageName, aC.alienClassName, aC.alien.hashCode(),
+                            aC.x, aC.y, aC.energy, aC.tech);
                     break;
             }
             // this ends our big switch statement

@@ -7,7 +7,6 @@ package consoleshell;
 
 import gameengineinterfaces.*;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,14 +21,20 @@ public class ConsoleVisualizer implements GameVisualizer {
     int turnCounter = 1;
     int totalTurnCounter = 0;
     int numTurns = 1;
+    boolean showMove = false;
+    boolean showFights = true;
+    boolean showSpawn = true;
+    boolean showDeath = true;
+    String filter = "Drift";
+    
     BufferedWriter logFile;
     GameEngine engine;
 
     public ConsoleVisualizer(GameEngine eng, String path) {
         Date date = new Date();
         engine = eng;
-        
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
         try {
             logFile = new BufferedWriter(new FileWriter(path + "game" + dateFormat.format(date) + ".txt"));
@@ -67,24 +72,24 @@ public class ConsoleVisualizer implements GameVisualizer {
 
     @Override
     public void showMove(String packageName, String className, int id, int oldx, int oldy, int newX, int newY, int energy, int tech) {
-        
-        print("Vis.ShowMove: " + packageName + ":" + className);
-        print("(" + Integer.toHexString(id).toUpperCase() + ") moved from (");
-        print(Integer.toString(oldx) + "," + Integer.toString(oldy) + ") to (");
-        print(Integer.toString(newX) + "," + Integer.toString(newY));
-        println("), E:" + Integer.toString(energy) + ", T:" + Integer.toString(tech));
-        
+        if (showMove) {
+            print("Vis.ShowMove: " + packageName + ":" + className);
+            print("(" + Integer.toHexString(id).toUpperCase() + ") moved from (");
+            print(Integer.toString(oldx) + "," + Integer.toString(oldy) + ") to (");
+            print(Integer.toString(newX) + "," + Integer.toString(newY));
+            println("), E:" + Integer.toString(energy) + ", T:" + Integer.toString(tech));
+        }
     }
 
     @Override
     public void showFightBefore(int x, int y, String[] participants, Integer[] fightPowers) {
-        println("");
-        println("Them aliens is fightin' again at (" + Integer.toString(x) + "," + Integer.toString(y) + "):");
-        for (int i = 0; i < participants.length; i++) {
-            print("Alien " + participants[i] + " ");
-            println("is fighting with energy " + Integer.toString(fightPowers[i]));
+        if (showFights) {
+            println("Fight at (" + Integer.toString(x) + "," + Integer.toString(y) + "):");
+            for (int i = 0; i < participants.length; i++) {
+                print("Alien " + participants[i] + " ");
+                println("is fighting with energy " + Integer.toString(fightPowers[i]));
+            }
         }
-        println("");
     }
 
     @Override
@@ -97,6 +102,23 @@ public class ConsoleVisualizer implements GameVisualizer {
             print(" and new tech level " + Integer.toString(newTech[i]));
         }
         println("");
+    }
+
+    public void showSpawn(String packageName, String className, int id, int newX, int newY, int energy, int tech) {
+        if (showSpawn) {
+            print("Spawn: " + packageName + ":" + className);
+            print("(" + Integer.toHexString(id).toUpperCase() + ") at (");
+            print(Integer.toString(newX) + "," + Integer.toString(newY));
+            println("), E:" + Integer.toString(energy) + ", T:" + Integer.toString(tech));
+        }
+    }
+
+    public void showDeath(String packageName, String className, int id, int oldX, int oldY) {
+        if (showDeath) {
+            print("Death: " + packageName + ":" + className);
+            print("(" + Integer.toHexString(id).toUpperCase() + ") at (");
+            println(Integer.toString(oldX) + "," + Integer.toString(oldY));
+        }
     }
 
     @Override
@@ -124,13 +146,17 @@ public class ConsoleVisualizer implements GameVisualizer {
 
     @Override
     public void debugOut(String s) {
-        println(s);
+        if (filter != null) {
+            if (s.toLowerCase().contains(filter.toLowerCase())) {
+                println(s);
+            }
+        }
     }
 
     @Override
     public boolean showContinuePrompt() {
         --turnCounter;
-        
+
         try {
             if (System.in.available() > 0) {
                 // pause here
@@ -138,13 +164,16 @@ public class ConsoleVisualizer implements GameVisualizer {
             }
         } catch (Exception e) {
         }
-        
 
         // every numTurns, display prompt, wait for exit phrase or new number of turns
         if (turnCounter == 0) {
             turnCounter = numTurns;
             Scanner scan = new Scanner(System.in);
-            print("<Enter> to continue, \"exit\" to exit, \"list\" to list aliens, <number> to set number of turns: ");
+            print("Debug filter ");
+            println(filter == null? "off":"\""+filter+"\"");
+            print("<Enter> to continue with ");
+            print(Integer.toString(numTurns));
+            print(" turns, \"exit\" to exit, \"list\" to list aliens, <number> to set number of turns: ");
             String answer = scan.nextLine().trim();
             if (answer.compareToIgnoreCase("exit") == 0) {
                 // game over
@@ -157,19 +186,17 @@ public class ConsoleVisualizer implements GameVisualizer {
                 turnCounter = 1;
                 engine.queueCommand(new GameCommand(GameCommandCode.List));
                 return false;
-            } else if (answer.compareToIgnoreCase("chatter on") == 0) {
-                // set turn counter to 1 so we end up in here again next time
+            } else if (answer.startsWith("debug ")) {
+                if (answer.substring(6).trim().equalsIgnoreCase("off")) {
+                    filter = null;
+                } else {
+                    filter = answer.substring(6).trim();
+                }
+                // next prompt
                 turnCounter = 1;
-                engine.queueCommand(new GameCommand(GameCommandCode.SetVariable, "chatter", "on"));
-                return false;
-            } else if (answer.compareToIgnoreCase("chatter off") == 0) {
-                // set turn counter to 1 so we end up in here again next time
-                turnCounter = 1;
-                engine.queueCommand(new GameCommand(GameCommandCode.SetVariable, "chatter", "off"));
                 return false;
             } else if (answer.compareToIgnoreCase("") == 0) {
-                // list current aliens
-                // set turn counter to 1 so we end up in here again next time
+                // continue with default turns
                 return true;
             }
 

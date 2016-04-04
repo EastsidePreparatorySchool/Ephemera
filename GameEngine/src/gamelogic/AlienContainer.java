@@ -74,9 +74,9 @@ public class AlienContainer {
         // Whether the move goes off the board will be determined by the grid
 
         MoveDir direction = alien.getMove();
-        checkMove(direction); // Throws an exception if illegal
+        this.checkMove(direction); // Throws an exception if illegal
 
-        direction = applyDrift(x, y, direction);
+        direction = this.applyDrift(x, y, direction);
 
         int oldx = x;
         int oldy = y;
@@ -96,42 +96,88 @@ public class AlienContainer {
         double dx;
         double dy;
         double reduction;
+        int oldx, oldy;
+
+        oldx = dir.x();
+        oldy = dir.y();
 
         //distance from Earth
-        r = Math.sqrt(Math.pow((double)x, 2) + Math.pow((double)y, 2));
+        r = Math.sqrt(Math.pow((double) x, 2) + Math.pow((double) y, 2));
         alpha = Math.atan2(x, y);
+
+        // no action under r = 10
+        if (r < 20) {
+            return dir;
+        }
 
         // wormhole for escapees
         if (r > 250) {
             // return these people to Earth
+            this.debugOut("Tunneled back to Earth");
             return new MoveDir(0 - x, 0 - y);
         }
 
         // get angle of proposed move
         deltaAlpha = Math.atan2(dir.x(), dir.y());
         // no action if inward
-        if (Math.abs(deltaAlpha - alpha) >= Math.PI / 2) {
+        if (getAngleDiff(deltaAlpha, alpha) >= Math.PI / 2 && getAngleDiff(deltaAlpha, alpha) <= 3 * Math.PI / 2) {
             return dir;
         }
+
         // and magnitude
         deltaR = Math.sqrt(Math.pow(dir.x(), 2) + Math.pow(dir.y(), 2)) + 1;
 
-        // Apply gentle inward force
-        // cubic function of how close to border, modulated by angle
-        reduction = (1/Math.pow((250 - r), 3)) * (Math.abs(Math.abs(alpha - deltaAlpha) / Math.PI - 1)) + 1;
+        /* 
+         //Approach 1:
+         // Apply gentle inward force
+         // cubic function of how close to border, modulated by angle
+         reduction = (1/Math.pow((250 - r), 3)) * (Math.abs(Math.abs(alpha - deltaAlpha) / Math.PI - 1)) + 1;
 
-        if (reduction > 5) {
-            //api.vis.debugOut("r: " + Double.toString(r));
-            //api.vis.debugOut(Double.toString(Math.abs(Math.abs(alpha - deltaAlpha) / Math.PI - 1)));
-            //api.vis.debugOut("Reduction: " + Double.toString(reduction));
+         if (reduction > 5) {
+         //api.vis.debugOut("r: " + Double.toString(r));
+         //api.vis.debugOut(Double.toString(Math.abs(Math.abs(alpha - deltaAlpha) / Math.PI - 1)));
+         //api.vis.debugOut("Reduction: " + Double.toString(reduction));
+         }
+         deltaR /= reduction;
+         */
+        // Approach 2:
+        // Make the new move ever more tangential as the alien gets closer to the rim
+        api.vis.debugOut("Drift: r              " + Double.toString(r));
+        api.vis.debugOut("Drift: alpha          " + Double.toString(getAngleDiff(alpha, 0)));
+        api.vis.debugOut("Drift: deltaAlpha     " + Double.toString(getAngleDiff(deltaAlpha, 0)));
+        api.vis.debugOut("Drift: diff           " + Double.toString(getAngleDiff(deltaAlpha, alpha)));
+
+        if (getAngleDiff(deltaAlpha, alpha) < Math.PI / 2) {
+            // alien bearing slightly left, make it more left depending on r^3
+            deltaAlpha = alpha + (Math.PI / 2) - (((Math.PI / 2) - getAngleDiff(deltaAlpha, alpha)) * (1 - Math.pow(r / 250, 3)));
+        } else if (getAngleDiff(deltaAlpha, alpha) > 3 * Math.PI / 2) {
+            // alien bearing slightly right, make it more left depending on r^3
+            deltaAlpha = alpha + (Math.PI / 2) - (((Math.PI / 2) - getAngleDiff(deltaAlpha, alpha)) * (1 - Math.pow(r / 250, 3)));
         }
-        deltaR /= reduction;
+        deltaAlpha = getAngleDiff(deltaAlpha, 0);
+        api.vis.debugOut("Drift: new deltaAlpha " + Double.toString(deltaAlpha));
 
         //put the x,y back together
         dx = deltaR * Math.cos(deltaAlpha);
         dy = deltaR * Math.sin(deltaAlpha);
 
+        api.vis.debugOut("Drift: ("
+                + Integer.toString(oldy) + ","
+                + Integer.toString(oldx) + ") -> ("
+                + Integer.toString((int) Math.round(dx)) + ","
+                + Integer.toString((int) Math.round(dy)) + ")");
+
         return new MoveDir((int) Math.round(dx), (int) Math.round(dy));
+    }
+
+    // normalizes angle difference to fit in [0:2pi[
+    public double getAngleDiff(double alpha, double beta) {
+        alpha = alpha < 0 ? alpha + (Math.PI * 2) : alpha;
+        beta = beta < 0 ? beta + (Math.PI * 2) : beta;
+        double gamma = alpha - beta;
+        gamma = gamma >= Math.PI * 2 ? gamma - (Math.PI * 2) : gamma;
+        gamma = gamma <= 0 ? gamma + (Math.PI * 2) : gamma;
+        return gamma;
     }
 
     public void kill() {

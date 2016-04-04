@@ -21,6 +21,10 @@ public interface GameVisualizer {
     void showFightAfter(int x, int y, String[] participants, int[] newEnergyLevels, int[] newTechLevels);
 
     void showSection(int x, int y, int width);
+    
+    void showSpawn(String packageName, String className, int id, int newX, int newY, int energy, int tech);
+            
+    void showDeath(String packageName, String className, int id, int oldX, int oldY);
 
     void highlightPositions();
 

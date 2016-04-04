@@ -106,7 +106,7 @@ public class Martian implements Alien {
         } else if (ctx.getEnergy() < 3 && ctx.getEnergy() > ctx.getTech()) {
             ctx.debugOut("Researching");
             return new Action(ActionCode.Research);
-        } else if (ctx.getEnergy() > ctx.getSpawningCost()) {
+        } else if (ctx.getEnergy() > ctx.getSpawningCost() + 2) {
             ctx.debugOut("Spawning");
             return new Action(ActionCode.Spawn, 2);
         } 
