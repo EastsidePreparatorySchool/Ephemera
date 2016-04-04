@@ -21,6 +21,7 @@ public class Action {
     
     public Action (ActionCode code) {
         this.code = code;
+        this.power = 0;
     }
     // TODO add in code for a constructor where the name of the action and the
     // power are passed in, instead of a code and a power

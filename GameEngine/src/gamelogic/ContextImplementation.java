@@ -16,10 +16,12 @@ public class ContextImplementation implements Context {
     private AlienContainer aC;
     public GameVisualizer vis;
     public ViewImplementation view;
+    public boolean chatter;
     
     ContextImplementation(AlienContainer aC, GameVisualizer vis) {
         this.aC = aC;
         this.vis = vis;
+        chatter = false;
         view = new ViewImplementation ();
     }
     
@@ -44,7 +46,9 @@ public class ContextImplementation implements Context {
     }
     
     public void debugOut(String s) {
-        vis.debugOut("Alien "+aC.alienPackageName + ":" + aC.alienClassName + "(" 
-                +Integer.toHexString(aC.alien.hashCode()).toUpperCase()+"): " + s);
+        if (chatter) {
+            vis.debugOut("Alien "+aC.alienPackageName + ":" + aC.alienClassName + "(" 
+                    +Integer.toHexString(aC.alien.hashCode()).toUpperCase()+"): " + s);
+        }
     }
 }

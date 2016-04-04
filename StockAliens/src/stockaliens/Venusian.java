@@ -74,7 +74,7 @@ public class Venusian implements Alien {
                 // if so, do we have any energy?
                 if (ctx.getEnergy() < 10) {
                     // no, keep moving.
-                    return new Action(ActionCode.None);
+                    return new Action(ActionCode.Gain);
                 }
 
                 // or, hit really hard then run again
@@ -93,7 +93,7 @@ public class Venusian implements Alien {
             if (ctx.getEnergy() > 20) {
                 //should spawn fast at the beggining,
                 ctx.debugOut("Spawning");
-                return new Action(ActionCode.Spawn);
+                return new Action(ActionCode.Spawn, 10);
             }
             ctx.debugOut("Researching");
             return new Action(ActionCode.Research);

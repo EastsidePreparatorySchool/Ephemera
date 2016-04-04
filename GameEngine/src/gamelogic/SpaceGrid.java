@@ -23,9 +23,8 @@ public class SpaceGrid {
     // our list needs to be able to grow and shrink
 
     List<SpaceObject> objects; // Stars, planets, space stations, etc.
-    
-    static Random rand = new Random(System.currentTimeMillis());
 
+    static Random rand = new Random(System.currentTimeMillis());
 
     public boolean executeGameTurn() {
         moveAliens();
@@ -58,7 +57,7 @@ public class SpaceGrid {
 
         for (AlienContainer a : aliens) {
             if (a != null) {
-                a.api.debugOut("X:" + Integer.toString(a.x)
+                a.debugOut("X:" + Integer.toString(a.x)
                         + " Y:" + Integer.toString(a.y)
                         + " E:" + Integer.toString(a.energy)
                         + " T:" + Integer.toString(a.tech));
@@ -74,6 +73,7 @@ public class SpaceGrid {
     }
 
     public void moveAliens() {
+        vis.debugOut ("Moving " + Integer.toString(aliens.size()) + " aliens");
         for (int i = 0; i < aliens.size(); i++) {
             ViewImplementation view = getAlienView(i);
             try {
@@ -81,10 +81,9 @@ public class SpaceGrid {
 
             } catch (Exception ex) {
                 //Logger.getLogger(SpaceGrid.class.getName()).log(Level.SEVERE, null, ex);
-                aliens.get(i).api.debugOut("Unhandled exception in move: ");
-                aliens.get(i).api.debugOut(ex.getMessage());
+                aliens.get(i).debugErr("Unhandled exception in move: " + ex.toString());
                 //ex.printStackTrace();
-                aliens.remove(i);
+                aliens.get(i).kill();
             }
         }
 
@@ -180,10 +179,11 @@ public class SpaceGrid {
     }
 
     public void removeDeadAliens() {
-        for (int i = 0; i < aliens.size(); i++) {
+        int number = aliens.size();
+        for (int i = number - 1; i >=0; i--) {
             if (aliens.get(i).energy <= 0) {
                 // running this through the API automatically logs alien info
-                aliens.get(i).api.debugOut("Ran out of energy and died.");
+                aliens.get(i).debugOut("Died.");
                 aliens.remove(i);
             }
         }
@@ -197,27 +197,40 @@ public class SpaceGrid {
     }
 
     public void performAlienActions() {
-
+        int number = aliens.size();
+        
+        vis.debugOut ("Processing actions for " + Integer.toString(number) + " aliens");
+        
         // Obtain all actions before enacting any of them
-        Action[] actions = new Action[aliens.size()];
+        Action[] actions = new Action[number];
 
-        for (int i = 0; i < aliens.size(); i++) {
+        for (int i = 0; i < number; i++) {
+            AlienContainer thisAlien = aliens.get(i);
+
             ViewImplementation view = getAlienView(i);
 
             try {
+                //thisAlien.api.debugOut("Query action ...");
                 // Note: getAction() checks validity
-                actions[i] = aliens.get(i).getAction(view);
+                actions[i] = thisAlien.getAction(view);
+                //thisAlien.api.debugOut(actions[i].code.name());
 
             } catch (Exception ex) {
                 // if an alien blows up here, we'll kill it. 
                 actions[i] = new Action(ActionCode.None);
-                aliens.get(i).api.debugOut("Blew up on getAction()");
-                aliens.get(i).kill();
+                thisAlien.debugErr("Blew up on getAction(): " + ex.toString());
+                thisAlien.kill();
             }
         }
+        
+        // now process all actions
 
         for (int i = 0; i < actions.length; i++) {
-            switch (actions[i].code) {
+            Action thisAction = actions[i];
+            AlienContainer thisAlien = aliens.get(i);
+            thisAlien.debugOut(thisAction.code.toString());
+
+            switch (thisAction.code) {
                 case Fight:
                     //vis.debugOut("SpaceGrid: Processing Fight");
                     // Note: You can fight with aliens of your own species
@@ -230,35 +243,38 @@ public class SpaceGrid {
                     List<Integer> fightingPowers = new ArrayList<Integer>();
 
                     fightingAliens.add(i);
-                    fightingRaces.add(aliens.get(i).alienPackageName + ":"
-                            + aliens.get(i).alienClassName
-                            + "(" + Integer.toHexString(aliens.get(i).alien.hashCode()).toUpperCase() + ")");
-                    fightingPowers.add(actions[i].power);
+                    fightingRaces.add(thisAlien.alienPackageName + ":"
+                            + thisAlien.alienClassName
+                            + "(" + Integer.toHexString(thisAlien.alien.hashCode()).toUpperCase() + ")");
+                    fightingPowers.add(thisAction.power);
 
                     int energyForWinner = 0;
-                    aliens.get(i).fought = true;
+                    thisAlien.fought = true;
 
-                    for (int k = i + 1; k < aliens.size(); k++) {
-                        if (aliens.get(k).x == aliens.get(i).x
-                                && aliens.get(k).y == aliens.get(i).y) {
+                    for (int k = i + 1; k < actions.length; k++) {
+                        AlienContainer theOtherAlien = aliens.get(k);
+                        Action theOtherAction = actions[k];
+
+                        if (theOtherAlien.x == thisAlien.x
+                                && theOtherAlien.y == thisAlien.y) {
 
                             // If an alien didn't choose to fight at all
                             // (even if they fought with zero power)
                             // they will get blown off the board and the alien
                             // that won the fight will take their energy
                             // TODO: consider whether they should be killed or just lose
-                            aliens.get(k).fought = true;
+                            theOtherAlien.fought = true;
                             fightingAliens.add(k);
-                            fightingRaces.add(aliens.get(k).alienPackageName + ":"
-                                    + aliens.get(k).alienClassName
-                                    + "(" + Integer.toHexString(aliens.get(k).alien.hashCode()).toUpperCase() + ")");
-                            fightingPowers.add(actions[k].power);
+                            fightingRaces.add(theOtherAlien.alienPackageName + ":"
+                                    + theOtherAlien.alienClassName
+                                    + "(" + Integer.toHexString(theOtherAlien.alien.hashCode()).toUpperCase() + ")");
+                            fightingPowers.add(theOtherAction.power);
 
-                            if (actions[k].code != ActionCode.Fight) {
+                            if (theOtherAction.code != ActionCode.Fight) {
                                 //aliens.get(k).api.debugOut("Was a pacifist at the wrong time and place.");
 
-                                energyForWinner += aliens.get(k).energy;
-                                aliens.get(k).kill();
+                                energyForWinner += theOtherAlien.energy;
+                                theOtherAlien.kill();
                             } else {
                                 fightingAliens.add(k);
                             }
@@ -317,16 +333,19 @@ public class SpaceGrid {
                         }
                         // TODO: Write showFightAfter here
                     }
+                    break;
 
                 case Gain:
-                    aliens.get(i).energy += Math.floor(aliens.get(i).tech / 10) + 1;
-                    continue;
+                    thisAlien.energy += Math.floor(thisAlien.tech / 10) + 1;
+                    break;
+                    
                 case Research:
-                    aliens.get(i).energy -= aliens.get(i).tech; //TODO: This doesn't make much sense
-                    aliens.get(i).tech++; // you only gain 1 tech regardless of energy invested
-                    continue;
+                    thisAlien.energy -= thisAlien.tech;
+                    thisAlien.tech++; // you only gain 1 tech regardless of energy invested
+                    break;
+                    
                 case Spawn:
-                    aliens.get(i).energy -= 3 + actions[i].power;
+                    thisAlien.energy -= 3 + thisAction.power;
 
                     // Add in the alien to the end of the list so actions
                     // are not executed on it this turn
@@ -334,13 +353,15 @@ public class SpaceGrid {
                     // e.g. Alien alien = new Martian();
                     aliens.add(new AlienContainer(
                             this.vis,
-                            aliens.get(i).x + rand.nextInt(6) - 3, // TODO: hard-coded constant  
-                            aliens.get(i).y + rand.nextInt(6) - 3, // need to be justified or moved somewhere central
-                            aliens.get(i).alienPackageName,
-                            aliens.get(i).alienClassName,
-                            aliens.get(i).alienConstructor,
-                            actions[i].power, 1)); // initial tech = 1;
+                            thisAlien.x + rand.nextInt(6) - 3, // TODO: hard-coded constant  
+                            thisAlien.y + rand.nextInt(6) - 3, // need to be justified or moved somewhere central
+                            thisAlien.alienPackageName,
+                            thisAlien.alienClassName,
+                            thisAlien.alienConstructor,
+                            thisAction.power, 1)); // initial tech = 1;
+                    break;
             }
+            // this ends our big switch statement
         }
     }
 

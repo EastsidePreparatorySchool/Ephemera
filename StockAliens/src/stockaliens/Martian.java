@@ -14,8 +14,8 @@ public class Martian implements Alien {
 
     //declaring everything that will need to be used later
     Context ctx;
-    int HorizontalMove;
-    int VerticalMove;
+    long HorizontalMove;
+    long VerticalMove;
     int Remainder;
     int fightStrength;
     //gets a random boolean to determine positive or negative move function.
@@ -64,7 +64,7 @@ public class Martian implements Alien {
         ClosestAlienYCoordinate = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY())[1];
 
         //Checks to see if the closest alien is withen moving capability.
-        if ((long) Math.abs(ClosestAlienXCoordinate - ctx.getX()) + (long) Math.abs(ClosestAlienYCoordinate - ctx.getY()) <= (long) ctx.getEnergy()) {
+        if ((long) Math.abs((long)ClosestAlienXCoordinate - ctx.getX()) + (long) Math.abs((long)ClosestAlienYCoordinate - ctx.getY()) <= (long) ctx.getEnergy()) {
 
             HorizontalMove = ClosestAlienXCoordinate - ctx.getX();
             VerticalMove = ClosestAlienYCoordinate - ctx.getY();
@@ -81,7 +81,7 @@ public class Martian implements Alien {
         }
 
         //ctx.debugOut("Moving ("+ Integer.toString(HorizontalMove) + "," + Integer.toString(VerticalMove) + ")");
-        return new MoveDir(HorizontalMove, VerticalMove);
+        return new MoveDir((int)HorizontalMove, (int)VerticalMove);
     }
 
     public Action getAction() {
@@ -97,22 +97,21 @@ public class Martian implements Alien {
             }
         } catch (Exception e) {
             ctx.debugOut("Fighting");
-            return new Action(ActionCode.Fight, ctx.getEnergy());
+            return new Action(ActionCode.Fight, ctx.getEnergy()-1);
         }
         //if it doesnt fight, it chooses a item to do depending on how much energy it has.
         if (ctx.getEnergy() < 2) {
             ctx.debugOut("Gaining");
             return new Action(ActionCode.Gain);
-        } else if (ctx.getEnergy() < 3) {
-            if (ctx.getEnergy() > ctx.getTech()) {
-                ctx.debugOut("Researching");
-            }
+        } else if (ctx.getEnergy() < 3 && ctx.getEnergy() > ctx.getTech()) {
+            ctx.debugOut("Researching");
             return new Action(ActionCode.Research);
-        } else {
+        } else if (ctx.getEnergy() > 6) {
             ctx.debugOut("Spawning");
-            return new Action(ActionCode.Spawn);
-        }
-
+            return new Action(ActionCode.Spawn, 2);
+        } 
+        
+        return new Action (ActionCode.Gain);
     }
 
     @Override

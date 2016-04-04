@@ -83,7 +83,7 @@ public class AlienContainer {
         
         // debug code following
         if (x > 1000 || y > 1000 || x < -1000 || y < -1000) {
-            api.vis.debugErr("Moving out of control");
+            debugOut("Moving out of control");
         }
         
         api.vis.showMove(alienPackageName, alienClassName, this.hashCode(), oldx, oldy, x, y, energy, tech);
@@ -101,13 +101,15 @@ public class AlienContainer {
         switch (action.code) {
             case None:
             case Gain:
-                return new Action(action.code);
+                return action;
             case Research:
-                if (tech > energy) { // If the tech can't be researched due to lack of energy
+                if (tech >= energy) { // If the tech can't be researched due to lack of energy
+                    debugOut("AC: Research with T:" + Integer.toString(tech) + " and E:" + Integer.toString(energy));
                     throw new NotEnoughEnergyException();
                 }
-                // Otherwise
-                return new Action(ActionCode.Research, tech);
+                // return new Action(ActionCode.Research, tech); // GM: This seems like a mistake
+                return action;
+
             case Spawn:
                 if (action.power + 3 > energy) {
                     throw new NotEnoughEnergyException();
@@ -118,7 +120,7 @@ public class AlienContainer {
                 return action;
 
             default:
-                api.vis.debugErr("AC: Checking action, unknown: " + action.code.toString());
+                debugOut("AC: Checking action, unknown: " + action.code.toString());
                 throw new UnknownActionException();
         }
     }
@@ -145,16 +147,29 @@ public class AlienContainer {
 
     private void checkMove(MoveDir direction) throws NotEnoughTechException {
         // for immediate vicinity, just let this go
-        if (Math.abs(direction.x()) + Math.abs(direction.y())
+        if (Math.abs((long)direction.x()) + Math.abs((long)direction.y())
                 <= 2) {
             return;
         }
         // If the move is farther than the alien has the tech to move
         // distance |x|+|y|, easier to program.
-        if (Math.abs(direction.x()) + Math.abs(direction.y())
-                > (double) tech) {
+        if (Math.abs((long)direction.x()) + Math.abs((long)
+                direction.y())
+                > (long) tech) {
+            debugErr("Illegal move: " + Integer.toString(direction.x()) + "," + Integer.toString(direction.y()));
             throw new NotEnoughTechException();
         }
+    }
+    
+    // this debugOut is not sensitive to chatter control
+    public void debugOut(String s) {
+            api.vis.debugOut("Alien "+alienPackageName + ":" + alienClassName + "(" 
+                +Integer.toHexString(alien.hashCode()).toUpperCase()+"): " + s);
+    }
+
+    public void debugErr(String s) {
+            api.vis.debugErr("Alien "+alienPackageName + ":" + alienClassName + "(" 
+                +Integer.toHexString(alien.hashCode()).toUpperCase()+"): " + s);
     }
 }
 
@@ -166,3 +181,5 @@ class NotEnoughTechException extends Exception {
 
 class UnknownActionException extends Exception {
 }
+
+

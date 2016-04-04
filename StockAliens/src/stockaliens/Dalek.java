@@ -86,7 +86,7 @@ public class Dalek implements Alien {
             }
 
             // do we have enough tech?
-            if (ctx.getTech() < 10) {
+            if (ctx.getTech() < 10 && ctx.getEnergy() > ctx.getTech()) {
                 // no, research
                 ctx.debugOut("Choosing to research"
                         + " E:" + Integer.toString(ctx.getEnergy())
@@ -123,7 +123,7 @@ public class Dalek implements Alien {
                 + " T:" + Integer.toString(ctx.getTech()));
 
         if (ctx.getEnergy() > (ctx.getTech() + 2)) {
-            return new Action(ActionCode.Research);
+            return new Action(ActionCode.Research, ctx.getTech());
         }
         return new Action(ActionCode.Gain);
     }
