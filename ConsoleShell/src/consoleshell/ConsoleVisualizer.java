@@ -23,9 +23,12 @@ public class ConsoleVisualizer implements GameVisualizer {
     int totalTurnCounter = 0;
     int numTurns = 1;
     BufferedWriter logFile;
+    GameEngine engine;
 
-    public ConsoleVisualizer(String path) {
+    public ConsoleVisualizer(GameEngine eng, String path) {
         Date date = new Date();
+        engine = eng;
+        
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
 
         try {
@@ -64,11 +67,13 @@ public class ConsoleVisualizer implements GameVisualizer {
 
     @Override
     public void showMove(String packageName, String className, int id, int oldx, int oldy, int newX, int newY, int energy, int tech) {
+        
         print("Vis.ShowMove: " + packageName + ":" + className);
         print("(" + Integer.toHexString(id).toUpperCase() + ") moved from (");
         print(Integer.toString(oldx) + "," + Integer.toString(oldy) + ") to (");
         print(Integer.toString(newX) + "," + Integer.toString(newY));
         println("), E:" + Integer.toString(energy) + ", T:" + Integer.toString(tech));
+        
     }
 
     @Override
@@ -123,8 +128,17 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public String showContinuePrompt() {
+    public boolean showContinuePrompt() {
         --turnCounter;
+        
+        try {
+            if (System.in.available() > 0) {
+                // pause here
+                turnCounter = 0;
+            }
+        } catch (Exception e) {
+        }
+        
 
         // every numTurns, display prompt, wait for exit phrase or new number of turns
         if (turnCounter == 0) {
@@ -134,16 +148,29 @@ public class ConsoleVisualizer implements GameVisualizer {
             String answer = scan.nextLine().trim();
             if (answer.compareToIgnoreCase("exit") == 0) {
                 // game over
-                return "exit";
+                engine.queueCommand(new GameCommand(GameCommandCode.End));
+                ConsoleShell.gameOver = true;
+                return true;
             } else if (answer.compareToIgnoreCase("list") == 0) {
                 // list current aliens
                 // set turn counter to 1 so we end up in here again next time
                 turnCounter = 1;
-                return "list";
+                engine.queueCommand(new GameCommand(GameCommandCode.List));
+                return false;
+            } else if (answer.compareToIgnoreCase("chatter on") == 0) {
+                // set turn counter to 1 so we end up in here again next time
+                turnCounter = 1;
+                engine.queueCommand(new GameCommand(GameCommandCode.SetVariable, "chatter", "on"));
+                return false;
+            } else if (answer.compareToIgnoreCase("chatter off") == 0) {
+                // set turn counter to 1 so we end up in here again next time
+                turnCounter = 1;
+                engine.queueCommand(new GameCommand(GameCommandCode.SetVariable, "chatter", "off"));
+                return false;
             } else if (answer.compareToIgnoreCase("") == 0) {
                 // list current aliens
                 // set turn counter to 1 so we end up in here again next time
-                return "continue";
+                return true;
             }
 
             try {
@@ -153,7 +180,7 @@ public class ConsoleVisualizer implements GameVisualizer {
                 // leave numTurns alone
                 turnCounter = 1;
                 println("Invalid command");
-                return ("invalid");
+                return false;
             }
 
             turnCounter = numTurns;
@@ -161,6 +188,6 @@ public class ConsoleVisualizer implements GameVisualizer {
         }
 
         // not done with number of turns, return "game not over"
-        return "continue";
+        return true;
     }
 }

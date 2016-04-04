@@ -16,5 +16,7 @@ public interface Context
     int getX();
     int getY();
     View getView();
+    int getSpawningCost();
+    int getFightingCost();
     void debugOut(String s);
 }

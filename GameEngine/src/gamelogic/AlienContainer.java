@@ -24,12 +24,13 @@ public class AlienContainer {
 
     int tech;
     int energy;
+    boolean chatter;
 
     boolean fought;
     public int x;
     public int y;
     public boolean action; // Whether the alien has performed an action this turn
-    
+
     static Random rand = new Random(System.currentTimeMillis());
 
     // Declare stats here
@@ -44,22 +45,20 @@ public class AlienContainer {
         this.alienConstructor = cns;
         this.energy = energy;
         this.tech = tech;
+        this.chatter = false;
         this.api = new ContextImplementation(this, vis);
 
         // if position = (0,0) assign random position
         if (x == 0 && y == 0) {
-            
+
             this.x = rand.nextInt(20) - 10; // TODO: get these hardcoded constants from spacegrid instead
             this.y = rand.nextInt(20) - 10;
         } else {
             this.x = x;
             this.y = y;
         }
-        
-        
-        
-        // construct and initialize alien
 
+        // construct and initialize alien
         try {
             a = (Alien) cns.newInstance();
             this.alien = a;
@@ -73,24 +72,69 @@ public class AlienContainer {
 
     public void move(ViewImplementation view) throws NotEnoughTechException {
         // Whether the move goes off the board will be determined by the grid
-        api.view = view;
+
         MoveDir direction = alien.getMove();
         checkMove(direction); // Throws an exception if illegal
+
+        direction = applyDrift(x, y, direction);
+
         int oldx = x;
         int oldy = y;
         x += direction.x();
         y += direction.y();
-        
-        // debug code following
-        if (x > 1000 || y > 1000 || x < -1000 || y < -1000) {
-            debugOut("Moving out of control");
-        }
-        
+
         api.vis.showMove(alienPackageName, alienClassName, this.hashCode(), oldx, oldy, x, y, energy, tech);
     }
 
+    // this calculates inward drift based on location
+    // keeps aliens within 250 spaces of Earth
+    public MoveDir applyDrift(int x, int y, MoveDir dir) {
+        double r;
+        double alpha;
+        double deltaAlpha;
+        double deltaR;
+        double dx;
+        double dy;
+        double reduction;
+
+        //distance from Earth
+        r = Math.sqrt(Math.pow((double)x, 2) + Math.pow((double)y, 2));
+        alpha = Math.atan2(x, y);
+
+        // wormhole for escapees
+        if (r > 250) {
+            // return these people to Earth
+            return new MoveDir(0 - x, 0 - y);
+        }
+
+        // get angle of proposed move
+        deltaAlpha = Math.atan2(dir.x(), dir.y());
+        // no action if inward
+        if (Math.abs(deltaAlpha - alpha) >= Math.PI / 2) {
+            return dir;
+        }
+        // and magnitude
+        deltaR = Math.sqrt(Math.pow(dir.x(), 2) + Math.pow(dir.y(), 2)) + 1;
+
+        // Apply gentle inward force
+        // cubic function of how close to border, modulated by angle
+        reduction = (1/Math.pow((250 - r), 3)) * (Math.abs(Math.abs(alpha - deltaAlpha) / Math.PI - 1)) + 1;
+
+        if (reduction > 5) {
+            //api.vis.debugOut("r: " + Double.toString(r));
+            //api.vis.debugOut(Double.toString(Math.abs(Math.abs(alpha - deltaAlpha) / Math.PI - 1)));
+            //api.vis.debugOut("Reduction: " + Double.toString(reduction));
+        }
+        deltaR /= reduction;
+
+        //put the x,y back together
+        dx = deltaR * Math.cos(deltaAlpha);
+        dy = deltaR * Math.sin(deltaAlpha);
+
+        return new MoveDir((int) Math.round(dx), (int) Math.round(dy));
+    }
+
     public void kill() {
-        //energy = Integer.MIN_VALUE; // GM: Gavin, this strikes me as a bug ...
         energy = 0;
 
     }
@@ -111,7 +155,7 @@ public class AlienContainer {
                 return action;
 
             case Spawn:
-                if (action.power + 3 > energy) {
+                if (action.power + api.getSpawningCost() > energy) {
                     throw new NotEnoughEnergyException();
                 }
                 return action;
@@ -147,29 +191,32 @@ public class AlienContainer {
 
     private void checkMove(MoveDir direction) throws NotEnoughTechException {
         // for immediate vicinity, just let this go
-        if (Math.abs((long)direction.x()) + Math.abs((long)direction.y())
+        if (Math.abs((long) direction.x()) + Math.abs((long) direction.y())
                 <= 2) {
             return;
         }
         // If the move is farther than the alien has the tech to move
         // distance |x|+|y|, easier to program.
-        if (Math.abs((long)direction.x()) + Math.abs((long)
-                direction.y())
+        if (Math.abs((long) direction.x()) + Math.abs((long) direction.y())
                 > (long) tech) {
             debugErr("Illegal move: " + Integer.toString(direction.x()) + "," + Integer.toString(direction.y()));
             throw new NotEnoughTechException();
         }
     }
-    
+
     // this debugOut is not sensitive to chatter control
     public void debugOut(String s) {
-            api.vis.debugOut("Alien "+alienPackageName + ":" + alienClassName + "(" 
-                +Integer.toHexString(alien.hashCode()).toUpperCase()+"): " + s);
+        if (chatter) {
+            api.vis.debugOut("Alien " + alienPackageName + ":" + alienClassName + "("
+                    + Integer.toHexString(alien.hashCode()).toUpperCase() + "): " + s);
+        }
     }
 
     public void debugErr(String s) {
-            api.vis.debugErr("Alien "+alienPackageName + ":" + alienClassName + "(" 
-                +Integer.toHexString(alien.hashCode()).toUpperCase()+"): " + s);
+        if (chatter) {
+            api.vis.debugErr("Alien " + alienPackageName + ":" + alienClassName + "("
+                    + Integer.toHexString(alien.hashCode()).toUpperCase() + "): " + s);
+        }
     }
 }
 
@@ -181,5 +228,3 @@ class NotEnoughTechException extends Exception {
 
 class UnknownActionException extends Exception {
 }
-
-

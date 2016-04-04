@@ -45,6 +45,14 @@ public class ContextImplementation implements Context {
         return this.view;
     }
     
+    public int getSpawningCost () {
+        return 100;
+    }
+    
+    public int getFightingCost () {
+        return 0;
+    }
+    
     public void debugOut(String s) {
         if (chatter) {
             vis.debugOut("Alien "+aC.alienPackageName + ":" + aC.alienClassName + "(" 

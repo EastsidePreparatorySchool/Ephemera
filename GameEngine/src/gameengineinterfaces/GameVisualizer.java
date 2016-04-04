@@ -30,5 +30,5 @@ public interface GameVisualizer {
 
     void debugErr(String s);
 
-    String showContinuePrompt();
+    boolean showContinuePrompt();
 }

@@ -39,7 +39,6 @@ public class Dalek implements Alien {
         //ctx.debugOut("Move requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
-
         int move_energy;
 
         // don't move more than you have tech
@@ -54,7 +53,6 @@ public class Dalek implements Alien {
         int y = move_energy;
 
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
-
         return new MoveDir(x, y);
     }
 
@@ -63,7 +61,6 @@ public class Dalek implements Alien {
         //ctx.debugOut("Action requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
-
         View view = ctx.getView();
 
         // catch and shenanigans
@@ -104,12 +101,15 @@ public class Dalek implements Alien {
 
                 return new Action(ActionCode.Fight, ctx.getEnergy() - 2);
             }
-            // no other aliens here, have enough stuff, spawn!
-            ctx.debugOut("DALEKS RULE SUPREME! SPAWNING!"
-                    + " E:" + Integer.toString(ctx.getEnergy())
-                    + " T:" + Integer.toString(ctx.getTech()));
 
-            return new Action(ActionCode.Spawn, 5);
+            if (ctx.getEnergy() > (ctx.getSpawningCost() + 10))  {
+                // no other aliens here, have enough stuff, spawn!
+                ctx.debugOut("DALEKS RULE SUPREME! SPAWNING!"
+                        + " E:" + Integer.toString(ctx.getEnergy())
+                        + " T:" + Integer.toString(ctx.getTech()));
+
+                return new Action(ActionCode.Spawn, 5);
+            }
         } catch (Exception e) {
             // do something here to deal with errors
             ctx.debugOut("EXPLAIN??????");

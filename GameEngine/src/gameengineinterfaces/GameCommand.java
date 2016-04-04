@@ -16,4 +16,9 @@ public class GameCommand {
     public GameCommand(GameCommandCode newcode) {
         this.code = newcode;
     }
+    public GameCommand(GameCommandCode newcode, String variable, String value) {
+        this.code = newcode;
+        this.parameters[0] = variable;
+        this.parameters[1] = value;
+    }
 }

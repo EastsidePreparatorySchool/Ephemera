@@ -39,7 +39,7 @@ public class ConsoleShell {
             gameJarPath = "c:\\users\\public\\ephemera\\drop\\";
         }
 
-        ConsoleVisualizer convis = new ConsoleVisualizer(gameJarPath);
+        ConsoleVisualizer convis = new ConsoleVisualizer(engine, gameJarPath);
 
         // get engine up and running
         engine.initFromFile(convis, gameJarPath, "ephemera_initial_setup.csv");
@@ -53,7 +53,7 @@ public class ConsoleShell {
                 sleep(50);
 
                 // check whether anything catatrophic happened on the other thread
-                if (!engine.isAlive()) {
+                if (!gameOver && !engine.isAlive()) {
                     convis.debugErr("ConsoleShell: GameEngine died");
                     gameOver = true;
                 }
@@ -63,8 +63,6 @@ public class ConsoleShell {
 
             // gameOver is also set by the ConsoleVisualizer
         } while (!gameOver);
-
-        engine.queueCommand(new GameCommand(GameCommandCode.End));
     }
 
 }

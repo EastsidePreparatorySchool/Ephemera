@@ -67,23 +67,20 @@ public class GameEngineThread extends Thread {
 
                     engine.vis.showCompletedTurn();
 
-                    // TODO: this is clunky, but it will do for the current time.
                     // asking for confirmation for another turn here, this is some
                     // kind of debug mode.
                     if (engine.gameState != GameState.Paused) {
-                        String answer;
+                        boolean continueGame;
                         do {
-                            answer = engine.vis.showContinuePrompt();
-                            if (answer.compareToIgnoreCase("exit") == 0) {
-                                // game aborted
-                                engine.gameState = GameState.Paused;
-                                engine.vis.showGameOver();
-                                answer = "continue";
-                            } else if (answer.compareToIgnoreCase("list") == 0) {
-                                // list aliens
-                                engine.grid.listStatus();
+                            continueGame = engine.vis.showContinuePrompt();
+                            // do we have work requests? Only peek, don't wait
+                            while (!engine.queue.isEmpty()) {
+                                gc = (GameCommand) engine.queue.remove();
+                                // Process the work item
+                                endGame = processCommand(gc);
+                                // endGame signifies that an "End" request has come through
                             }
-                        } while (answer.compareToIgnoreCase("continue") != 0);
+                        } while (!continueGame && !endGame);
                     }
                 }
 
@@ -107,7 +104,7 @@ public class GameEngineThread extends Thread {
                     // Process the work item
                     //engine.vis.debugOut("GameEngineThread: Processing command");
                     endGame = processCommand(gc);
-                    // endGame signifies that an "End" requeat has come through
+                    // endGame signifies that an "End" request has come through
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -156,6 +153,14 @@ public class GameEngineThread extends Thread {
                 engine.vis.debugOut("GameEngineThread: Resuming");
                 engine.vis.debugOut("---------------------------------- Game segment starts here:");
                 engine.gameState = GameState.Running;
+                break;
+                
+            case SetVariable:
+                // TODO: Process status variables here
+                break;
+                
+            case List:
+                engine.grid.listStatus();
                 break;
 
             case End:

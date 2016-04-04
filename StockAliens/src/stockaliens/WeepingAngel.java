@@ -88,7 +88,7 @@ public class WeepingAngel implements Alien {
             }
             // every 
             turn = turn + 1;
-            if (turn %5 == 0) {
+            if (turn %5 == 0 && ctx.getEnergy() > ctx.getSpawningCost() * 2) {
                 ctx.debugOut("Spwaning"
                     + " E:" + Integer.toString(ctx.getEnergy())
                     + " T:" + Integer.toString(ctx.getTech()));

@@ -57,7 +57,9 @@ public class SpaceGrid {
 
         for (AlienContainer a : aliens) {
             if (a != null) {
-                a.debugOut("X:" + Integer.toString(a.x)
+                vis.debugOut("Alien " + a.alienPackageName + ":" + a.alienClassName + "("
+                        + Integer.toHexString(a.alien.hashCode()).toUpperCase() + "): "
+                        + "X:" + Integer.toString(a.x)
                         + " Y:" + Integer.toString(a.y)
                         + " E:" + Integer.toString(a.energy)
                         + " T:" + Integer.toString(a.tech));
@@ -345,7 +347,7 @@ public class SpaceGrid {
                     break;
                     
                 case Spawn:
-                    thisAlien.energy -= 3 + thisAction.power;
+                    thisAlien.energy -= thisAlien.api.getSpawningCost() + thisAction.power;
 
                     // Add in the alien to the end of the list so actions
                     // are not executed on it this turn
@@ -353,8 +355,8 @@ public class SpaceGrid {
                     // e.g. Alien alien = new Martian();
                     aliens.add(new AlienContainer(
                             this.vis,
-                            thisAlien.x + rand.nextInt(6) - 3, // TODO: hard-coded constant  
-                            thisAlien.y + rand.nextInt(6) - 3, // need to be justified or moved somewhere central
+                            thisAlien.x + rand.nextInt(thisAction.power) - thisAction.power, // TODO: using thisAction.power  
+                            thisAlien.y + rand.nextInt(thisAction.power) - thisAction.power, // needs to be justified or changed
                             thisAlien.alienPackageName,
                             thisAlien.alienClassName,
                             thisAlien.alienConstructor,
