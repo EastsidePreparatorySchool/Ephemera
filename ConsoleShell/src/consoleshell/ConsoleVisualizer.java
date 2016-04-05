@@ -21,12 +21,13 @@ public class ConsoleVisualizer implements GameVisualizer {
     int turnCounter = 1;
     int totalTurnCounter = 0;
     int numTurns = 1;
+    int numAliens = 0;
     boolean showMove = false;
-    boolean showFights = true;
-    boolean showSpawn = true;
-    boolean showDeath = true;
-    String filter = "Drift";
-    
+    boolean showFights = false;
+    boolean showSpawn = false;
+    boolean showDeath = false;
+    String filter = null;
+
     BufferedWriter logFile;
     GameEngine engine;
 
@@ -42,6 +43,7 @@ public class ConsoleVisualizer implements GameVisualizer {
             System.err.println("Convis: Cannot create log file");
         }
 
+        println("Ephemera Console Shell V0.8");
     }
 
     private void print(String s) {
@@ -64,10 +66,10 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showCompletedTurn() {
+    public void showCompletedTurn(int numAliens) {
         ++totalTurnCounter;
-        println("Turn #" + Integer.toString(totalTurnCounter) + " complete.");
-        println("--------------------------------------------");
+        this.numAliens = numAliens;
+        debugOut("Turn #" + Integer.toString(totalTurnCounter) + " complete.");
     }
 
     @Override
@@ -117,7 +119,11 @@ public class ConsoleVisualizer implements GameVisualizer {
         if (showDeath) {
             print("Death: " + packageName + ":" + className);
             print("(" + Integer.toHexString(id).toUpperCase() + ") at (");
-            println(Integer.toString(oldX) + "," + Integer.toString(oldY));
+            println(Integer.toString(oldX) + "," + Integer.toString(oldY) + ")");
+        } else {
+            debugOut("Death: " + packageName + ":" + className
+                    + "(" + Integer.toHexString(id).toUpperCase() + ") at ("
+                    + Integer.toString(oldX) + "," + Integer.toString(oldY) + ")");
         }
     }
 
@@ -161,6 +167,7 @@ public class ConsoleVisualizer implements GameVisualizer {
             if (System.in.available() > 0) {
                 // pause here
                 turnCounter = 0;
+                System.in.read();
             }
         } catch (Exception e) {
         }
@@ -169,11 +176,18 @@ public class ConsoleVisualizer implements GameVisualizer {
         if (turnCounter == 0) {
             turnCounter = numTurns;
             Scanner scan = new Scanner(System.in);
-            print("Debug filter ");
-            println(filter == null? "off":"\""+filter+"\"");
+            println("");
+            if (totalTurnCounter > 0) {
+                print("Completed " + Integer.toString(totalTurnCounter) + " turn"
+                        + (totalTurnCounter == 1 ? "" : "s") + ", "
+                        + Integer.toString(numAliens) + " alien" + (numAliens == 1 ? "" : "s") + ", "
+                        + "debug filter ");
+                println(filter == null ? "off" : "\"" + filter + "\"");
+            }
             print("<Enter> to continue with ");
             print(Integer.toString(numTurns));
-            print(" turns, \"exit\" to exit, \"list\" to list aliens, <number> to set number of turns: ");
+            print(" turn" + (numTurns == 1 ? "" : "s")
+                    + ", \"exit\" to exit, \"list\" to list aliens, <number> to set number of turns: ");
             String answer = scan.nextLine().trim();
             if (answer.compareToIgnoreCase("exit") == 0) {
                 // game over
@@ -197,6 +211,7 @@ public class ConsoleVisualizer implements GameVisualizer {
                 return false;
             } else if (answer.compareToIgnoreCase("") == 0) {
                 // continue with default turns
+                println("Number of turns before pause: " + Integer.toString(numTurns) + ", <Enter> to interrupt");
                 return true;
             }
 
@@ -211,10 +226,9 @@ public class ConsoleVisualizer implements GameVisualizer {
             }
 
             turnCounter = numTurns;
-            println("Number of turns before pause: " + Integer.toString(numTurns));
+            println("Number of turns before pause: " + Integer.toString(numTurns) + ", <Enter> to interrupt");
         }
-
-        // not done with number of turns, return "game not over"
+        // not done with number of turns before prompt, don't display anything, return "game not over"
         return true;
     }
 }
