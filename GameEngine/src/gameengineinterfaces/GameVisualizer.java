@@ -12,7 +12,7 @@ import alieninterfaces.*;
  * @author gmein
  */
 public interface GameVisualizer {
-    void showCompletedTurn();
+    void showCompletedTurn(int numAliens);
     
     void showMove(String packageName, String className, int id, int oldX, int oldY, int newX, int newY, int energy, int tech);
 

@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class GameEngineV1 implements GameEngine {
 
-    SpaceGrid grid;
+    public SpaceGrid grid;
     GameVisualizer vis;
     Queue<GameCommand> queue;
     GameEngineThread gameThread;

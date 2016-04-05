@@ -76,6 +76,7 @@ public class AlienContainer {
         MoveDir direction = alien.getMove();
         this.checkMove(direction); // Throws an exception if illegal
 
+        // we want to contain aliens in the 250 sphere, so apply the "cosmic drift"
         direction = this.applyDrift(x, y, direction);
 
         int oldx = x;
@@ -83,7 +84,7 @@ public class AlienContainer {
         x += direction.x();
         y += direction.y();
 
-        api.vis.showMove(alienPackageName, alienClassName, this.hashCode(), oldx, oldy, x, y, energy, tech);
+        api.vis.showMove(alienPackageName, alienClassName, alien.hashCode(), oldx, oldy, x, y, energy, tech);
     }
 
     // this calculates inward drift based on location
@@ -101,8 +102,8 @@ public class AlienContainer {
         oldx = dir.x();
         oldy = dir.y();
 
-        //distance from Earth
-        r = Math.sqrt(Math.pow((double) x, 2) + Math.pow((double) y, 2));
+        // distance from Earth, and vector angle
+        r = Math.hypot((double) x, (double) y);
         alpha = Math.atan2(x, y);
 
         // no action under r = 10
@@ -125,7 +126,7 @@ public class AlienContainer {
         }
 
         // and magnitude
-        deltaR = Math.sqrt(Math.pow(dir.x(), 2) + Math.pow(dir.y(), 2)) + 1;
+        deltaR = Math.hypot((double)dir.x(), (double) dir.y());
 
         /* 
          //Approach 1:
@@ -140,6 +141,8 @@ public class AlienContainer {
          }
          deltaR /= reduction;
          */
+        
+        
         // Approach 2:
         // Make the new move ever more tangential as the alien gets closer to the rim
         api.vis.debugOut("Drift: r              " + Double.toString(r));
@@ -160,6 +163,7 @@ public class AlienContainer {
         //put the x,y back together
         dx = deltaR * Math.cos(deltaAlpha);
         dy = deltaR * Math.sin(deltaAlpha);
+        
 
         api.vis.debugOut("Drift: ("
                 + Integer.toString(oldy) + ","
@@ -237,8 +241,7 @@ public class AlienContainer {
 
     private void checkMove(MoveDir direction) throws NotEnoughTechException {
         // for immediate vicinity, just let this go
-        if (Math.abs((long) direction.x()) + Math.abs((long) direction.y())
-                <= 2) {
+        if (Math.abs((long) direction.x()) + Math.abs((long) direction.y()) <= 2) {
             return;
         }
         // If the move is farther than the alien has the tech to move

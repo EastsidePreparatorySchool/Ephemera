@@ -49,14 +49,27 @@ public class GameEngineThread extends Thread {
         engine.vis.debugOut("GameEngineThread: Started");
         do {
             try {
-                if (engine.gameState == GameState.Running) {
+                if (engine.gameState == GameState.Running && !endGame) {
+                    // giving the shell a channce to ask for confirmation for another turn here
+                    boolean continueGame;
+                    do {
+                        continueGame = engine.vis.showContinuePrompt();
+                        // do we have work requests? Only peek, don't wait
+                        while (!engine.queue.isEmpty()) {
+                            gc = (GameCommand) engine.queue.remove();
+                            // Process the work item
+                            endGame = processCommand(gc);
+                            // endGame signifies that an "End" request has come through
+                        }
+                    } while (!continueGame && !endGame);
+                    
                     //
                     // Execute game turn
                     //
 
                     try {
                         if (engine.grid.executeGameTurn()) {
-                            // game over because at most one species left
+                            // return true == game over because at most one species left
                             engine.gameState = GameState.Paused;
                             engine.vis.showGameOver();
                         }
@@ -64,24 +77,7 @@ public class GameEngineThread extends Thread {
                         engine.vis.debugErr("GameEngineThread: Unhandled exception during turn: " + e.getMessage());
                         e.printStackTrace();
                     }
-
-                    engine.vis.showCompletedTurn();
-
-                    // asking for confirmation for another turn here, this is some
-                    // kind of debug mode.
-                    if (engine.gameState != GameState.Paused) {
-                        boolean continueGame;
-                        do {
-                            continueGame = engine.vis.showContinuePrompt();
-                            // do we have work requests? Only peek, don't wait
-                            while (!engine.queue.isEmpty()) {
-                                gc = (GameCommand) engine.queue.remove();
-                                // Process the work item
-                                endGame = processCommand(gc);
-                                // endGame signifies that an "End" request has come through
-                            }
-                        } while (!continueGame && !endGame);
-                    }
+                    engine.vis.showCompletedTurn(engine.grid.aliens.size());
                 }
 
                 //
@@ -154,11 +150,11 @@ public class GameEngineThread extends Thread {
                 engine.vis.debugOut("---------------------------------- Game segment starts here:");
                 engine.gameState = GameState.Running;
                 break;
-                
+
             case SetVariable:
                 // TODO: Process status variables here
                 break;
-                
+
             case List:
                 engine.grid.listStatus();
                 break;
