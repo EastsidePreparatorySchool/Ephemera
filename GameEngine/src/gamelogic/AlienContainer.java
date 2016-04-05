@@ -166,10 +166,10 @@ public class AlienContainer {
         
 
         api.vis.debugOut("Drift: ("
-                + Integer.toString(oldy) + ","
-                + Integer.toString(oldx) + ") -> ("
-                + Integer.toString((int) Math.round(dx)) + ","
-                + Integer.toString((int) Math.round(dy)) + ")");
+                + (oldy) + ","
+                + (oldx) + ") -> ("
+                + ((int) Math.round(dx)) + ","
+                + ((int) Math.round(dy)) + ")");
 
         return new MoveDir((int) Math.round(dx), (int) Math.round(dy));
     }
@@ -198,7 +198,7 @@ public class AlienContainer {
                 return action;
             case Research:
                 if (tech >= energy) { // If the tech can't be researched due to lack of energy
-                    debugOut("AC: Research with T:" + Integer.toString(tech) + " and E:" + Integer.toString(energy));
+                    debugOut("AC: Research with T:" + (tech) + " and E:" + (energy));
                     throw new NotEnoughEnergyException();
                 }
                 // return new Action(ActionCode.Research, tech); // GM: This seems like a mistake
@@ -248,7 +248,7 @@ public class AlienContainer {
         // distance |x|+|y|, easier to program.
         if (Math.abs((long) direction.x()) + Math.abs((long) direction.y())
                 > (long) tech) {
-            debugErr("Illegal move: " + Integer.toString(direction.x()) + "," + Integer.toString(direction.y()));
+            debugErr("Illegal move: " + (direction.x()) + "," + (direction.y()));
             throw new NotEnoughTechException();
         }
     }

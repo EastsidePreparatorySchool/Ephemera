@@ -69,7 +69,7 @@ public class ConsoleVisualizer implements GameVisualizer {
     public void showCompletedTurn(int numAliens) {
         ++totalTurnCounter;
         this.numAliens = numAliens;
-        debugOut("Turn #" + Integer.toString(totalTurnCounter) + " complete.");
+        debugOut("Turn #" + totalTurnCounter + " complete.");
     }
 
     @Override
@@ -77,19 +77,19 @@ public class ConsoleVisualizer implements GameVisualizer {
         if (showMove) {
             print("Vis.ShowMove: " + packageName + ":" + className);
             print("(" + Integer.toHexString(id).toUpperCase() + ") moved from (");
-            print(Integer.toString(oldx) + "," + Integer.toString(oldy) + ") to (");
-            print(Integer.toString(newX) + "," + Integer.toString(newY));
-            println("), E:" + Integer.toString(energy) + ", T:" + Integer.toString(tech));
+            print(oldx + "," + oldy + ") to (");
+            print(newX + "," + newY);
+            println("), E:" + energy + ", T:" + tech);
         }
     }
 
     @Override
     public void showFightBefore(int x, int y, String[] participants, Integer[] fightPowers) {
         if (showFights) {
-            println("Fight at (" + Integer.toString(x) + "," + Integer.toString(y) + "):");
+            println("Fight at (" + x + "," + y + "):");
             for (int i = 0; i < participants.length; i++) {
                 print("Alien " + participants[i] + " ");
-                println("is fighting with energy " + Integer.toString(fightPowers[i]));
+                println("is fighting with energy " + fightPowers[i]);
             }
         }
     }
@@ -100,8 +100,8 @@ public class ConsoleVisualizer implements GameVisualizer {
         println("Here is what is left from that fight:");
         for (int i = 0; i < participants.length; i++) {
             print("Alien \"" + participants[i] + "\" ");
-            print(" now has energy " + Integer.toString(newEnergy[i]));
-            print(" and new tech level " + Integer.toString(newTech[i]));
+            print(" now has energy " + newEnergy[i]);
+            print(" and new tech level " + newTech[i]);
         }
         println("");
     }
@@ -110,8 +110,8 @@ public class ConsoleVisualizer implements GameVisualizer {
         if (showSpawn) {
             print("Spawn: " + packageName + ":" + className);
             print("(" + Integer.toHexString(id).toUpperCase() + ") at (");
-            print(Integer.toString(newX) + "," + Integer.toString(newY));
-            println("), E:" + Integer.toString(energy) + ", T:" + Integer.toString(tech));
+            print(newX + "," + newY);
+            println("), E:" + energy + ", T:" + tech);
         }
     }
 
@@ -119,11 +119,11 @@ public class ConsoleVisualizer implements GameVisualizer {
         if (showDeath) {
             print("Death: " + packageName + ":" + className);
             print("(" + Integer.toHexString(id).toUpperCase() + ") at (");
-            println(Integer.toString(oldX) + "," + Integer.toString(oldY) + ")");
+            println(oldX + "," + oldY + ")");
         } else {
             debugOut("Death: " + packageName + ":" + className
                     + "(" + Integer.toHexString(id).toUpperCase() + ") at ("
-                    + Integer.toString(oldX) + "," + Integer.toString(oldY) + ")");
+                    + oldX + "," + oldY + ")");
         }
     }
 
@@ -157,6 +157,11 @@ public class ConsoleVisualizer implements GameVisualizer {
                 println(s);
             }
         }
+
+        // code to detect underflows of any reported values
+        if (s.contains("2147483")) {
+            println((char) 27 + "[31;1m" + "Underflow: " + s);
+        }
     }
 
     @Override
@@ -176,16 +181,14 @@ public class ConsoleVisualizer implements GameVisualizer {
         if (turnCounter == 0) {
             turnCounter = numTurns;
             Scanner scan = new Scanner(System.in);
-            println("");
+            println("---------------------------");
             if (totalTurnCounter > 0) {
-                print("Completed " + Integer.toString(totalTurnCounter) + " turn"
+                print("Completed " + totalTurnCounter + " turn"
                         + (totalTurnCounter == 1 ? "" : "s") + ", "
-                        + Integer.toString(numAliens) + " alien" + (numAliens == 1 ? "" : "s") + ", "
-                        + "debug filter ");
-                println(filter == null ? "off" : "\"" + filter + "\"");
+                        + numAliens + " alien" + (numAliens == 1 ? "" : "s")  + ". ");
             }
-            print("<Enter> to continue with ");
-            print(Integer.toString(numTurns));
+            println("Debug filter " + (filter == null ? "off" : "\"" + filter + "\""));
+            print("<Enter> to " + (totalTurnCounter == 0 ? "start" : "continue") + " with " + numTurns);
             print(" turn" + (numTurns == 1 ? "" : "s")
                     + ", \"exit\" to exit, \"list\" to list aliens, <number> to set number of turns: ");
             String answer = scan.nextLine().trim();
@@ -211,7 +214,7 @@ public class ConsoleVisualizer implements GameVisualizer {
                 return false;
             } else if (answer.compareToIgnoreCase("") == 0) {
                 // continue with default turns
-                println("Number of turns before pause: " + Integer.toString(numTurns) + ", <Enter> to interrupt");
+                println("Number of turns before pause: " + numTurns + ", <Enter> to interrupt");
                 return true;
             }
 
@@ -226,7 +229,7 @@ public class ConsoleVisualizer implements GameVisualizer {
             }
 
             turnCounter = numTurns;
-            println("Number of turns before pause: " + Integer.toString(numTurns) + ", <Enter> to interrupt");
+            println("Number of turns before pause: " + numTurns + ", <Enter> to interrupt");
         }
         // not done with number of turns before prompt, don't display anything, return "game not over"
         return true;

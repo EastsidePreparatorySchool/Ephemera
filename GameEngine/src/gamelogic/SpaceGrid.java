@@ -59,11 +59,11 @@ public class SpaceGrid {
             if (a != null) {
                 vis.debugErr("Alien " + a.alienPackageName + ":" + a.alienClassName + "("
                         + Integer.toHexString(a.alien.hashCode()).toUpperCase() + "): "
-                        + "X:" + Integer.toString(a.x)
-                        + " Y:" + Integer.toString(a.y)
-                        + " E:" + Integer.toString(a.energy)
-                        + " T:" + Integer.toString(a.tech)
-                        + " r:" + Integer.toString((int) Math.floor(Math.hypot((double) a.x, (double) a.y))));
+                        + "X:" + (a.x)
+                        + " Y:" + (a.y)
+                        + " E:" + (a.energy)
+                        + " T:" + (a.tech)
+                        + " r:" + ((int) Math.floor(Math.hypot((double) a.x, (double) a.y))));
             }
         }
         vis.debugErr("");
@@ -76,7 +76,7 @@ public class SpaceGrid {
     }
 
     public void moveAliens() {
-        vis.debugOut("Moving " + Integer.toString(aliens.size()) + " aliens");
+        vis.debugOut("Moving " + (aliens.size()) + " aliens");
         for (int i = 0; i < aliens.size(); i++) {
             ViewImplementation view = getAlienView(i);
             try {
@@ -109,7 +109,7 @@ public class SpaceGrid {
     public void performAlienActions() {
         int number = aliens.size();
 
-        vis.debugOut("Processing actions for " + Integer.toString(number) + " aliens");
+        vis.debugOut("Processing actions for " + (number) + " aliens");
 
         // Obtain all actions before enacting any of them
         Action[] actions = new Action[number];
