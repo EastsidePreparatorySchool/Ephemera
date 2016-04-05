@@ -7,12 +7,14 @@ the EPS Programming 2 class develop aliens (Java classes implementing and consum
 their mid-term or final project.
 
 This project will have 6 major parts - 
-  AlienInterfaces - interfaces and common classes between aliens and game
-  GameEngine - the main engine that queues aliens and runs games
-  ConsoleShell - minimal command line shell for running the game, mostly for testing
-  GUIShell - desktop JavaFX UI for the game
-  WebShell - web version of the game shell
-  StockAliens - Alien implementations for stocking the game board and as example code for students
+<ul>
+<li> AlienInterfaces - interfaces and common classes between aliens and game</li>
+<li> GameEngine - the main engine that queues aliens and runs games</li>
+<li> ConsoleShell - minimal command line shell for running the game, mostly for testing</li>
+<li> GUIShell - desktop JavaFX UI for the game</li>
+<li> WebShell - web version of the game shell</li>
+<li> StockAliens - Alien implementations for stocking the game board and as example code for students</li>
+</ul>
   
 We are currently developing version 1.0. There is a lot of code that can't stay as it is, and we are aware. 
 This is a learning project, and so this is to be expected. That said, feel free to point it out to us at any time. 
