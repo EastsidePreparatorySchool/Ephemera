@@ -14,6 +14,7 @@ This project will have 6 major parts -
   WebShell - web version of the game shell
   StockAliens - Alien implementations for stocking the game board and as example code for students
   
-We are currently developing version 0, and we will limit ambition until after 3/4/2016. 
+We are currently developing version 1.0. There is a lot of code that can't stay as it is, and we are aware. 
+This is a learning project, and so this is to be expected. That said, feel free to point it out to us at any time. 
 
 See the Wiki for details. 
