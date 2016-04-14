@@ -77,7 +77,7 @@ public class AlienContainer {
         this.checkMove(direction); // Throws an exception if illegal
 
         // we want to contain aliens in the 250 sphere, so apply the "cosmic drift"
-        direction = this.applyDrift(x, y, direction);
+        //direction = this.applyDrift(x, y, direction);
 
         int oldx = x;
         int oldy = y;

@@ -28,8 +28,6 @@ public class ConsoleShell {
 
         //get some objects created (not initialized, nothing important happens here)
         GameEngineV1 engine = new GameEngineV1();
-        GameElementSpec[] gameSpec = new GameElementSpec[1];
-        Scanner scan = new Scanner(System.in);
 
         // can override the path for class jar files in arguments
         String gameJarPath;

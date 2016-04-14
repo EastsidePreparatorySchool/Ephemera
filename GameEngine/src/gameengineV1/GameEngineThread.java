@@ -35,7 +35,8 @@ public class GameEngineThread extends Thread {
     public void run() {
         GameCommand gc;
         boolean endGame = false;
-        Scanner scan = new Scanner(System.in);
+        
+        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
         engine.grid = new SpaceGrid(engine.vis);
 

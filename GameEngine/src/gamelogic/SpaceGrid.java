@@ -351,6 +351,7 @@ public class SpaceGrid {
     void addAlien(int x, int y, String alienPackageName, String alienClassName, Constructor<?> cns) {
         AlienContainer aC = new AlienContainer(this.vis, x, y, alienPackageName, alienClassName, cns, 1, 1);
         aliens.add(aC);
+        vis.showSpawn(alienPackageName, alienClassName, aC.alien.hashCode(), x, y, aC.energy, aC.tech);
     }
 
     // Note: Having a seperate method for each SpaceObject seems a little gross,

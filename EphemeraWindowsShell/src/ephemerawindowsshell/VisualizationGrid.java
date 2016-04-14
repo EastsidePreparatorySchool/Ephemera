@@ -3,20 +3,43 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package consoleshell;
+package ephemerawindowsshell;
 
-import gameengineinterfaces.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 import java.util.Scanner;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import gameengineinterfaces.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import static java.lang.Thread.sleep;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Scanner;
+import javafx.application.Platform;
+import javafx.scene.canvas.Canvas;
 
 /**
  *
  * @author gmein
  */
-public class ConsoleVisualizer implements GameVisualizer {
+class VisualizationGrid implements GameVisualizer {
+
+    public Cell[][] grid;
+    public Canvas canvas;
+
+    private int width;
+    private int height;
+    private int cellWidth;
+    private int cellHeight;
+    public int widthPX;
+    public int heightPX;
+
+    private static final Color[] colors = {Color.BLACK, Color.DARKSLATEBLUE, Color.DARKVIOLET, Color.MAGENTA, Color.PURPLE, Color.RED};
 
     int turnCounter = 1;
     int totalTurnCounter = 0;
@@ -31,19 +54,80 @@ public class ConsoleVisualizer implements GameVisualizer {
     BufferedWriter logFile;
     GameEngine engine;
 
-    public ConsoleVisualizer(GameEngine eng, String path) {
+    public void init(GameEngine eng, String path, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
         Date date = new Date();
         engine = eng;
+
+        // Set up properties
+        this.width = width;
+        this.height = height;
+        this.cellWidth = cellWidth;
+        this.cellHeight = cellHeight;
+
+        widthPX = width * cellWidth;
+        heightPX = height * cellHeight;
+
+        // Store ref to canvas for updating
+        this.canvas = canvas;
+
+        // cet up a grid with cells holding alien counts to display in a color code
+        grid = new Cell[height][width];
+        for (int i = 0; i < grid.length; i++) {
+            for (int k = 0; k < grid[i].length; k++) {
+                grid[i][k] = new Cell();
+            }
+        }
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
         try {
             logFile = new BufferedWriter(new FileWriter(path + "game" + dateFormat.format(date) + ".txt"));
         } catch (Exception e) {
-            System.err.println("Convis: Cannot create log file");
+            System.err.println("visgrid: Cannot create log file");
+        }
+    }
+
+    public void renderOnScreen(GraphicsContext gc) {
+        for (int i = 0; i < grid.length; i++) {
+            for (int k = 0; k < grid[i].length; k++) {
+                gc.setFill(getColor(grid[i][k].alienCount));
+                gc.fillRect(
+                        cellWidth * k,
+                        cellHeight * i,
+                        cellWidth,
+                        cellHeight);
+            }
+        }
+    }
+
+    public Color getColor(int alienCount) {
+        if (alienCount < 0) {
+            return colors[0];
+        }
+        if (alienCount >= colors.length) {
+            return colors[colors.length - 1];
+        } else {
+            return colors[alienCount];
+        }
+    }
+
+    public void incrementCell(int x, int y) {
+        if (x > 124 || x < -125 || y > 124 || y < -125) {
+            return;
+        }
+        grid[x + 125][y + 125].alienCount++;
+    }
+
+    public void decrementCell(int x, int y) {
+        if (x > 124 || x < -125 || y > 124 || y < -125) {
+            return;
         }
 
-        println("Ephemera Console Shell V0.8");
+        if (grid[x + 125][y + 125].alienCount > 0) {
+            grid[x + 125][y + 125].alienCount--;
+        } else {
+            debugOut("winvis: cell underflow at (" + x + "," + y + ")");
+        }
     }
 
     private void print(String s) {
@@ -70,6 +154,18 @@ public class ConsoleVisualizer implements GameVisualizer {
         ++totalTurnCounter;
         this.numAliens = numAliens;
         debugOut("Turn #" + totalTurnCounter + " complete.");
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                GraphicsContext gc = canvas.getGraphicsContext2D();
+                renderOnScreen(gc);
+            }
+        });
+        try {
+            sleep(50); // give window some time to draw;
+        } catch (Exception e) {
+        }
+
     }
 
     @Override
@@ -81,6 +177,8 @@ public class ConsoleVisualizer implements GameVisualizer {
             print(newX + "," + newY);
             println("), E:" + energy + ", T:" + tech);
         }
+        decrementCell (oldx, oldy);
+        incrementCell (newX, newY);
     }
 
     @Override
@@ -96,14 +194,16 @@ public class ConsoleVisualizer implements GameVisualizer {
 
     @Override
     public void showFightAfter(int x, int y, String[] participants, int[] newEnergy, int[] newTech) {
-        println("");
-        println("Here is what is left from that fight:");
-        for (int i = 0; i < participants.length; i++) {
-            print("Alien \"" + participants[i] + "\" ");
-            print(" now has energy " + newEnergy[i]);
-            print(" and new tech level " + newTech[i]);
+        if (showFights) {
+            println("");
+            println("Here is what is left from that fight:");
+            for (int i = 0; i < participants.length; i++) {
+                print("Alien \"" + participants[i] + "\" ");
+                print(" now has energy " + newEnergy[i]);
+                print(" and new tech level " + newTech[i]);
+            }
+            println("");
         }
-        println("");
     }
 
     public void showSpawn(String packageName, String className, int id, int newX, int newY, int energy, int tech) {
@@ -113,6 +213,7 @@ public class ConsoleVisualizer implements GameVisualizer {
             print(newX + "," + newY);
             println("), E:" + energy + ", T:" + tech);
         }
+        incrementCell (newX, newY);
     }
 
     public void showDeath(String packageName, String className, int id, int oldX, int oldY) {
@@ -125,6 +226,7 @@ public class ConsoleVisualizer implements GameVisualizer {
                     + "(" + Integer.toHexString(id).toUpperCase() + ") at ("
                     + oldX + "," + oldY + ")");
         }
+        decrementCell (oldX, oldY);
     }
 
     @Override
@@ -138,7 +240,7 @@ public class ConsoleVisualizer implements GameVisualizer {
 
     @Override
     public void showGameOver() {
-        ConsoleShell.gameOver = true;
+        EphemeraWindowsShell.gameOver = true;
         try {
             logFile.close();
         } catch (Exception e) {
@@ -147,7 +249,7 @@ public class ConsoleVisualizer implements GameVisualizer {
 
     @Override
     public void debugErr(String s) {
-        println((char) 27 + "[31;1m" + s);
+        println(s);
     }
 
     @Override
@@ -166,71 +268,16 @@ public class ConsoleVisualizer implements GameVisualizer {
 
     @Override
     public boolean showContinuePrompt() {
-        --turnCounter;
+        /*
+         --turnCounter;
 
-        try {
-            if (System.in.available() > 0) {
-                // pause here
-                turnCounter = 0;
-                System.in.read();
-            }
-        } catch (Exception e) {
-        }
+         // every numTurns, display prompt, wait for exit phrase or new number of turns
+         if (turnCounter == 0) {
+         turnCounter = numTurns;
+         engine.queueCommand(new GameCommand(GameCommandCode.Pause));
+         }
+         */
 
-        // every numTurns, display prompt, wait for exit phrase or new number of turns
-        if (turnCounter == 0) {
-            turnCounter = numTurns;
-            Scanner scan = new Scanner(System.in);
-            println("---------------------------");
-            if (totalTurnCounter > 0) {
-                print("Completed " + totalTurnCounter + " turn"
-                        + (totalTurnCounter == 1 ? "" : "s") + ", "
-                        + numAliens + " alien" + (numAliens == 1 ? "" : "s")  + ". ");
-            }
-            println("Debug filter " + (filter == null ? "off" : "\"" + filter + "\""));
-            print("<Enter> to " + (totalTurnCounter == 0 ? "start" : "continue") + " with " + numTurns);
-            print(" turn" + (numTurns == 1 ? "" : "s")
-                    + ", \"exit\" to exit, \"list\" to list aliens, <number> to set number of turns: ");
-            String answer = scan.nextLine().trim();
-            if (answer.compareToIgnoreCase("exit") == 0) {
-                // game over
-                engine.queueCommand(new GameCommand(GameCommandCode.End));
-                ConsoleShell.gameOver = true;
-                return true;
-            } else if (answer.compareToIgnoreCase("list") == 0) {
-                // list current aliens
-                // set turn counter to 1 so we end up in here again next time
-                turnCounter = 1;
-                engine.queueCommand(new GameCommand(GameCommandCode.List));
-                return false;
-            } else if (answer.startsWith("debug ")) {
-                if (answer.substring(6).trim().equalsIgnoreCase("off")) {
-                    filter = null;
-                } else {
-                    filter = answer.substring(6).trim();
-                }
-                // next prompt
-                turnCounter = 1;
-                return false;
-            } else if (answer.compareToIgnoreCase("") == 0) {
-                // continue with default turns
-                println("Number of turns before pause: " + numTurns + ", <Enter> to interrupt");
-                return true;
-            }
-
-            try {
-                // got new numTurns from user
-                numTurns = Integer.parseInt(answer);
-            } catch (Exception e) {
-                // leave numTurns alone
-                turnCounter = 1;
-                println("Invalid command");
-                return false;
-            }
-
-            turnCounter = numTurns;
-            println("Number of turns before pause: " + numTurns + ", <Enter> to interrupt");
-        }
         // not done with number of turns before prompt, don't display anything, return "game not over"
         return true;
     }

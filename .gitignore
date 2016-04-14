@@ -35,3 +35,8 @@ ConsoleShell/nbproject/private/private.properties
 ConsoleShell/nbproject/private/private.properties
 ConsoleShell/nbproject/private/private.xml
 ConsoleShell/nbproject/private/profiler/configurations.xml
+/EphemeraWindowsShell/nbproject/private/
+/EphemeraWindowsShell/build/
+/EphemeraWindowsShell/dist/
+/BubbleSortAndBinarySearch/nbproject/private/
+/BubbleSortAndBinarySearch/build/
