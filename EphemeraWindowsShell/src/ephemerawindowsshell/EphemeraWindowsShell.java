@@ -9,6 +9,7 @@ import gameengineV1.GameEngineV1;
 import gameengineinterfaces.GameCommand;
 import gameengineinterfaces.GameCommandCode;
 import gameengineinterfaces.GameElementSpec;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Timer;
@@ -36,6 +37,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -64,23 +66,34 @@ import javafx.stage.Stage;
 public class EphemeraWindowsShell extends Application {
 
     public static boolean gameOver = false;
-    public Canvas canvas;
-    public GameEngineV1 engine;
-    public VisualizationGrid field;
+    public static Canvas canvas;
+    public static GameEngineV1 engine;
+    public static VisualizationGrid field;
+    public static SpeciesSet species;
+    public static Text turnCounterText;
 
     @Override
     public void start(Stage stage) {
 
-        // Constants
-        int width = 1600;
-        int height = 800;
-        int cellWidth = 1;
+        // Constants from current Ephemera game
+        int width = 500;
+        int height = 500;
 
+        // get screen geometry
         javafx.geometry.Rectangle2D screenBounds;
         screenBounds = Screen.getPrimary().getVisualBounds();
 
-        stage.setTitle("Ephemera Windows Shell V0.1");
+        // for most screens, 1500x500 will display nicely
+        // TODO: Make this adapt to available space (from bounds)
+        int cellWidth = 3;
+        int cellHeight = 1;
 
+        
+        // keep track of species, need this before constructing UI
+        species = new SpeciesSet();
+        
+        // set up main window
+        stage.setTitle("Ephemera Windows Shell V0.1");
         setSize(stage, screenBounds);
 
         // Use a border pane as the root for scene
@@ -93,7 +106,7 @@ public class EphemeraWindowsShell extends Application {
         border.setBottom(addBottomBox());
 
         // add a center pane
-        this.canvas = new Canvas(1500, 750);
+        this.canvas = new Canvas(width * cellWidth, height * cellHeight);
         border.setCenter(canvas);
 
         //
@@ -107,7 +120,7 @@ public class EphemeraWindowsShell extends Application {
 
         // init visualizer
         this.field = new VisualizationGrid();
-        this.field.init(engine, gameJarPath, 250, 250, 6, 3, canvas);
+        this.field.init(engine, species, gameJarPath, width, height, cellWidth, cellHeight, canvas);
 
         // get engine up and running
         engine.initFromFile(field, gameJarPath, "ephemera_initial_setup.csv");
@@ -120,9 +133,8 @@ public class EphemeraWindowsShell extends Application {
         stage.setScene(scene);
         stage.show();
 
-        // give it a go
-        engine.queueCommand(new GameCommand(GameCommandCode.Resume));
-
+        // give it a go - commented out because we start this with the start button
+        // engine.queueCommand(new GameCommand(GameCommandCode.Resume));
         // return to platform and wait for events
     }
 
@@ -159,7 +171,7 @@ public class EphemeraWindowsShell extends Application {
         hbox.setSpacing(10);   // Gap between nodes
         hbox.setStyle("-fx-background-color: #336699;");
 
-        Button buttonPause = new Button("Pause");
+        Button buttonPause = new Button("Start");
         buttonPause.setPrefSize(100, 20);
         buttonPause.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -176,7 +188,6 @@ public class EphemeraWindowsShell extends Application {
 
         //Button buttonProjected = new Button("Stop");
         //buttonProjected.setPrefSize(100, 20);
-
         hbox.getChildren().addAll(buttonPause);
 
         return hbox;
@@ -195,21 +206,32 @@ public class EphemeraWindowsShell extends Application {
         return hbox;
     }
 
+    ListView<AlienSpecies> addAlienSpeciesList() {
+        ListView<AlienSpecies> speciesView = new ListView<AlienSpecies>(species.getObservableList());
+        return speciesView;
+    }
+    
+    
+    
     /*
      * Creates a VBox for the left region
      */
+
+
     private VBox addLeftBox() {
 
         VBox vbox = new VBox();
         vbox.setPadding(new Insets(10)); // Set all sides to 10
         vbox.setSpacing(8);              // Gap between nodes
 
-        //Text title = new Text("Top Aliens");
-        //title.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        //vbox.getChildren().add(title);
-        
+        EphemeraWindowsShell.turnCounterText = new Text("Turns completed: 0");
+        EphemeraWindowsShell.turnCounterText .setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        vbox.getChildren().add(EphemeraWindowsShell.turnCounterText );
         vbox.setStyle("-fx-background-color: #336699;");
 
+        // add list of alien species
+        vbox.getChildren().add(this.addAlienSpeciesList());
+ 
         return vbox;
     }
 

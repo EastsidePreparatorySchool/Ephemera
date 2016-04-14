@@ -14,7 +14,7 @@ import java.util.Random;
  */
 public class Dalek implements Alien {
 
-    Random rand;
+    static Random rand = new Random(System.currentTimeMillis() * Dalek.class.hashCode());
     Context ctx;
 
     final boolean debug = true;
@@ -23,7 +23,6 @@ public class Dalek implements Alien {
     }
 
     public void init(Context game_ctx) {
-        rand = new Random();
         ctx = game_ctx;
         ctx.debugOut("Initialized at "
                 + "(" + Integer.toString(ctx.getX())

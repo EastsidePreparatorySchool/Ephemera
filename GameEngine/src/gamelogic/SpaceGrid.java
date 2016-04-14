@@ -54,7 +54,7 @@ public class SpaceGrid {
     public void listStatus() {
         vis.debugErr("");
         vis.debugErr("Current Aliens:");
-        
+
         for (AlienContainer a : aliens) {
             if (a != null) {
                 vis.debugErr("Alien " + a.alienPackageName + ":" + a.alienClassName + "("
@@ -228,7 +228,6 @@ public class SpaceGrid {
                                 // The winning alien will get their energy
                                 // energyForWinner += aliens.get(fightingAliens.get(k)).energy;
                                 // GM: Also, you never gave it to the winner anywhere
-
                                 // The alien will then be killed
                                 // aliens.get(k).api.debugOut("Lost and died of its wounds.");
                                 aliens.get(fightingAliens.get(k)).kill();
@@ -260,14 +259,27 @@ public class SpaceGrid {
 
                     // construct a random move for the new alien depending on power and send that move through drift correction
                     // spend thisAction.power randomly on x move, y move and initital power
-                    int power = rand.nextInt(thisAction.power);
-                    thisAction.power -= power;
-                    int x = rand.nextInt(thisAction.power) - thisAction.power;
-                    thisAction.power -= x;
-                    int y = thisAction.power * (rand.nextInt(2) == 0 ? 1 : -1);
+                    int power = Math.min(rand.nextInt(thisAction.power), thisAction.power/2);
+                    int powerForX = rand.nextInt(thisAction.power - power);
+                    int powerForY = thisAction.power - power - powerForX;
+
+                    int x = powerForX * (rand.nextInt(2) == 0 ? 1 : -1);
+                    int y = powerForY * (rand.nextInt(2) == 0 ? 1 : -1);
 
                     MoveDir dir = new MoveDir(x, y);
                     dir = thisAlien.applyDrift(thisAlien.x, thisAlien.y, dir);
+
+                    x = thisAlien.x + dir.x();
+                    y = thisAlien.y + dir.y();
+
+                    int width = 500;
+                    int height = 500;
+                    if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
+                        vis.debugErr("sg.spawn: Out of bounds: (" + x + ":" + y + ")");
+                        vis.debugErr("sg.spawn: Out of bounds: old(" + thisAlien.x + ":" + thisAlien.y + ")");
+                        vis.debugErr("sg.spawn: Out of bounds: dir(" + dir.x() + ":" + dir.y() + ")");
+                        vis.debugErr("sg.spawn: Out of bounds: power " + thisAction.power);
+                    }
 
                     // make a container, it will create the alien
                     AlienContainer aC = new AlienContainer(
@@ -279,7 +291,7 @@ public class SpaceGrid {
                             thisAlien.alienConstructor,
                             power,
                             thisAlien.tech);   // tech inherited undiminished from parent
-                    
+
                     // Add in the alien to the end of the list so actions
                     // are not executed on it this turn
                     aliens.add(aC);

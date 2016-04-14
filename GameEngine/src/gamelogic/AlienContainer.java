@@ -77,13 +77,19 @@ public class AlienContainer {
         this.checkMove(direction); // Throws an exception if illegal
 
         // we want to contain aliens in the 250 sphere, so apply the "cosmic drift"
-        //direction = this.applyDrift(x, y, direction);
+        direction = this.applyDrift(x, y, direction);
 
         int oldx = x;
         int oldy = y;
         x += direction.x();
         y += direction.y();
 
+        int width = 500;
+        int height = 500;
+        if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
+            debugErr("ac.move: Out of bounds: (" + x + ":" + y + ")");
+        }
+        
         api.vis.showMove(alienPackageName, alienClassName, alien.hashCode(), oldx, oldy, x, y, energy, tech);
     }
 
@@ -96,7 +102,7 @@ public class AlienContainer {
         double deltaR;
         double dx;
         double dy;
-        double reduction;
+        //double reduction;
         int oldx, oldy;
 
         oldx = dir.x();
@@ -126,7 +132,7 @@ public class AlienContainer {
         }
 
         // and magnitude
-        deltaR = Math.hypot((double)dir.x(), (double) dir.y());
+        deltaR = Math.hypot((double) dir.x(), (double) dir.y());
 
         /* 
          //Approach 1:
@@ -141,8 +147,6 @@ public class AlienContainer {
          }
          deltaR /= reduction;
          */
-        
-        
         // Approach 2:
         // Make the new move ever more tangential as the alien gets closer to the rim
         api.vis.debugOut("Drift: r              " + Double.toString(r));
@@ -163,7 +167,6 @@ public class AlienContainer {
         //put the x,y back together
         dx = deltaR * Math.cos(deltaAlpha);
         dy = deltaR * Math.sin(deltaAlpha);
-        
 
         api.vis.debugOut("Drift: ("
                 + (oldy) + ","
