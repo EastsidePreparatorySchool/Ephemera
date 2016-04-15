@@ -25,8 +25,8 @@ public class AlienSpecies {
     Color color;
     String style;
 
-    static Color[] alienColors = {Color.BLUE, Color.RED, Color.YELLOW, Color.MAGENTA, Color.GREEN, Color.ORANGE};
-    static String[] alienStyles = {"blue", "red", "yellow", "magenta", "green", "orange"};
+    static Color[] alienColors = {Color.LIGHTBLUE, Color.RED, Color.YELLOW, Color.LIGHTPINK, Color.GREEN, Color.ORANGE};
+    static String[] alienStyles = {"lightblue", "red", "yellow", "lightpink", "green", "orange"};
     static int colorCount = 0;
 
     AlienSpecies(String packageName, String className) {

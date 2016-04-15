@@ -250,11 +250,11 @@ public class EphemeraWindowsShell extends Application {
 
         EphemeraWindowsShell.turnCounterText = new Text("Turns completed: 0");
         EphemeraWindowsShell.turnCounterText.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        EphemeraWindowsShell.turnCounterText.setStyle("-fx-background-color: black; -fx-text-fill: navy;");
-        EphemeraWindowsShell.turnCounterText.setFill(Color.NAVY);
+        EphemeraWindowsShell.turnCounterText.setStyle("-fx-background-color: black; -fx-text-fill: white;");
+        EphemeraWindowsShell.turnCounterText.setFill(Color.WHITE);
 
         vbox.getChildren().add(EphemeraWindowsShell.turnCounterText);
-        vbox.setStyle("-fx-background-color: black; -fx-text-fill: navy;");
+        vbox.setStyle("-fx-background-color: black; -fx-text-fill: white;");
 
         // add list of alien species
         vbox.getChildren().add(this.addAlienSpeciesList());
