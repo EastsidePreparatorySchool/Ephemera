@@ -3,6 +3,7 @@ ALIEN,stockaliens,Dalek,,,,,,
 ALIEN,stockaliens,Martian,,,,,,
 ALIEN,stockaliens,Venusian,,,,,,
 ALIEN,stockaliens,WeepingAngel,,,,,,
+ALIEN,stockaliens,Alf,,,,,,
 STAR,stockelements,ProximaCentauri,,-34,-20,15.45,,
 PLANET,stockelements,Slathri,stockelements:ProximaCentauri,-1,-1,5,10,"notes:""Gravity on planet is strong. Takes a bunch of energy when you first go to planet"""
 PLANET,stockelements,Kukaro,stockelements:ProximaCentauri,0,1,20,5,"notes:""Very peaceful. Energy refreshes twice as fast"""
