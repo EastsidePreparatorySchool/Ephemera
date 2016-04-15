@@ -23,15 +23,19 @@ public class AlienSpecies {
     String className;
     int count;
     Color color;
+    String style;
 
     static Color[] alienColors = {Color.BLUE, Color.RED, Color.YELLOW, Color.MAGENTA, Color.GREEN, Color.ORANGE};
-    static int colorCount;
+    static String[] alienStyles = {"blue", "red", "yellow", "magenta", "green", "orange"};
+    static int colorCount = 0;
 
     AlienSpecies(String packageName, String className) {
         this.packageName = packageName;
         this.className = className;
         this.count = 1; // if we create this object, there is at least one alien
-        this.color = alienColors[colorCount++ % alienColors.length];
+        this.color = alienColors[colorCount % alienColors.length];
+        this.style = alienStyles[colorCount % alienColors.length];
+        colorCount++;
     }
 
     @Override
@@ -39,4 +43,7 @@ public class AlienSpecies {
         return packageName + ":" + className + ": " + count;
     }
 
+    public String getStyle() {
+        return "-fx-text-fill: " + style + "; -fx-background-color: black;";
+    }
 }

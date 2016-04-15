@@ -41,15 +41,16 @@ public class Dalek implements Alien {
         int move_energy;
 
         // don't move more than you have tech
-        move_energy = Math.min(ctx.getEnergy(), ctx.getTech());
+        move_energy = ctx.getTech();
         // don't move more than 5, leave energy for other stuff
-        move_energy = Math.min(move_energy, 1);
+        move_energy = Math.min(move_energy, 10);
 
         // spend a random amount of that moving into x direction
-        int x = rand.nextInt(move_energy * 2) - move_energy;
-        move_energy -= Math.abs(x);
+        int powerX = rand.nextInt(move_energy) ;
+        int x = powerX * (rand.nextInt(2) == 0?-1:1);
+        move_energy -= powerX;
         // and y takes the rest
-        int y = move_energy;
+        int y = move_energy * (rand.nextInt(2) == 0?-1:1);
 
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
         return new MoveDir(x, y);

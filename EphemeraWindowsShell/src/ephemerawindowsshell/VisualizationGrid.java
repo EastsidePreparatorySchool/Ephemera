@@ -39,6 +39,8 @@ class VisualizationGrid implements GameVisualizer {
     private int cellHeight;
     public int widthPX;
     public int heightPX;
+    
+    public ConsolePane console;
 
     private static final Color[] colors = {Color.BLACK, Color.SLATEBLUE, Color.DARKVIOLET, Color.MAGENTA, Color.PURPLE, Color.RED};
 
@@ -50,12 +52,12 @@ class VisualizationGrid implements GameVisualizer {
     boolean showFights = false;
     boolean showSpawn = false;
     boolean showDeath = false;
-    String filter = "out of bounds";
+    String filter = null;
 
     BufferedWriter logFile;
     GameEngine engine;
 
-    public void init(GameEngine eng, SpeciesSet species, String path, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
+    public void init(GameEngine eng, ConsolePane console, SpeciesSet species, String path, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
         Date date = new Date();
         engine = eng;
 
@@ -65,6 +67,7 @@ class VisualizationGrid implements GameVisualizer {
         this.cellWidth = cellWidth;
         this.cellHeight = cellHeight;
         this.species = species;
+        this.console = console;
 
         widthPX = width * cellWidth;
         heightPX = height * cellHeight;
@@ -93,10 +96,11 @@ class VisualizationGrid implements GameVisualizer {
         for (int i = 0; i < grid.length; i++) {
             for (int k = 0; k < grid[i].length; k++) {
                 Cell cell = grid[i][k];
+                boolean isFighting = cell.isFighting();
                 if (cell.cellChanged) {
                     if (cell.alienCount == 0) {
                         // no aliens, just paint fighting residue
-                        if (cell.isFighting()) {
+                        if (isFighting) {
                             gc.setFill(Color.BLACK);
                             gc.fillRect(cellWidth * k, cellHeight * i, cellWidth / 3, cellHeight);
                             gc.setFill(Color.RED);
@@ -111,7 +115,7 @@ class VisualizationGrid implements GameVisualizer {
                         // one alien, paint in color in center
                         gc.setFill(cell.getColor(1));
                         gc.fillRect(cellWidth * k + 1, cellHeight * i, cellWidth / 3, cellHeight);
-                        gc.setFill(cell.isFighting() ? Color.RED : Color.BLACK);
+                        gc.setFill(isFighting ? Color.RED : Color.BLACK);
                         gc.fillRect(cellWidth * k, cellHeight * i, cellWidth / 3, cellHeight);
                         gc.setFill(Color.BLACK);
                         gc.fillRect(cellWidth * k + 2, cellHeight * i, cellWidth / 3, cellHeight);
@@ -119,7 +123,7 @@ class VisualizationGrid implements GameVisualizer {
                         // two aliens, paint left and right in their own color
                         gc.setFill(cell.getColor(1));
                         gc.fillRect(cellWidth * k, cellHeight * i, cellWidth / 3, cellHeight);
-                        gc.setFill(cell.isFighting() ? Color.RED : Color.BLACK);
+                        gc.setFill(isFighting ? Color.RED : Color.BLACK);
                         gc.fillRect(cellWidth * k + 1, cellHeight * i, cellWidth / 3, cellHeight);
                         gc.setFill(cell.getColor(2));
                         gc.fillRect(cellWidth * k + 2, cellHeight * i, cellWidth / 3, cellHeight);
@@ -127,7 +131,7 @@ class VisualizationGrid implements GameVisualizer {
                         // more than two aliens, paint left and right in white
                         gc.setFill(Color.WHITE);
                         gc.fillRect(cellWidth * k, cellHeight * i, cellWidth / 3, cellHeight);
-                        gc.setFill(cell.isFighting() ? Color.RED : Color.BLACK);
+                        gc.setFill(isFighting ? Color.RED : Color.BLACK);
                         gc.fillRect(cellWidth * k + 1, cellHeight * i, cellWidth / 3, cellHeight);
                         gc.setFill(Color.WHITE);
                         gc.fillRect(cellWidth * k + 2, cellHeight * i, cellWidth / 3, cellHeight);
@@ -136,6 +140,9 @@ class VisualizationGrid implements GameVisualizer {
                 }
             }
         }
+        gc.setStroke(Color.RED);
+        gc.setLineWidth(1.0);
+        gc.strokeOval(0.5,0.5,widthPX-0.5,heightPX-0.5);
     }
 
     public Color getColor(int alienCount) {
@@ -182,7 +189,7 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     private void print(String s) {
-        System.out.print(s);
+        console.print(s);
         try {
             logFile.write(s);
             logFile.flush();
@@ -191,7 +198,7 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     private void println(String s) {
-        System.out.println(s);
+        console.println(s);
         try {
             logFile.write(s);
             logFile.newLine();
@@ -211,10 +218,11 @@ class VisualizationGrid implements GameVisualizer {
                 GraphicsContext gc = canvas.getGraphicsContext2D();
                 renderOnScreen(gc);
                 EphemeraWindowsShell.turnCounterText.setText("Turns completed: " + totalTurnCounter);
+                //EphemeraWindowsShell.armPauseButton();
             }
         });
         try {
-            sleep(50); // give window some time to draw;
+            sleep(100); // give window some time to draw;
         } catch (Exception e) {
         }
 

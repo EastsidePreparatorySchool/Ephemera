@@ -78,6 +78,9 @@ class Cell {
     }
 
     public Color getColor(int i) {
+        // color for cells is MOSTLY right.
+        // when more than one aliens get in or out of the cell, this cache will become stale
+        // - but it gets reset when the count goes to 0
 
         Color color = Color.BLACK;
 
