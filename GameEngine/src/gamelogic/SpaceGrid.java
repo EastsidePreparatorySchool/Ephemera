@@ -143,9 +143,11 @@ public class SpaceGrid {
                 case Fight:
                     //vis.debugOut("SpaceGrid: Processing Fight");
                     // Note: You can fight with aliens of your own species
+                    
                     if (aliens.get(i).fought) {
                         break;
                     }
+                    
 
                     List<Integer> fightingAliens = new ArrayList<>(); // Stores indexes
                     List<String> fightingRaces = new ArrayList<String>();
@@ -157,7 +159,6 @@ public class SpaceGrid {
                             + "(" + Integer.toHexString(thisAlien.alien.hashCode()).toUpperCase() + ")");
                     fightingPowers.add(thisAction.power);
 
-                    int energyForWinner = 0;
                     thisAlien.fought = true;
 
                     for (int k = i + 1; k < actions.length; k++) {
@@ -168,24 +169,24 @@ public class SpaceGrid {
                                 && theOtherAlien.y == thisAlien.y) {
 
                             // If an alien didn't choose to fight at all
-                            // (even if they fought with zero power)
+                            // (or if they fought with zero power)
                             // they will get blown off the board and the alien
                             // that won the fight will take their energy
                             // TODO: consider whether they should be killed or just lose
+                            
                             theOtherAlien.fought = true;
                             fightingAliens.add(k);
                             fightingRaces.add(theOtherAlien.alienPackageName + ":"
                                     + theOtherAlien.alienClassName
                                     + "(" + Integer.toHexString(theOtherAlien.alien.hashCode()).toUpperCase() + ")");
-                            fightingPowers.add(theOtherAction.power);
+                            
+                            //fightingPowers.add(theOtherAction.power);
 
                             if (theOtherAction.code != ActionCode.Fight) {
                                 //theOtherAlien.api.debugOut("Was a pacifist at the wrong time and place.");
-
-                                energyForWinner += theOtherAlien.energy;
-                                theOtherAlien.kill();
+                                fightingPowers.add(0);
                             } else {
-                                fightingAliens.add(k);
+                                fightingPowers.add(theOtherAction.power);
                             }
                         }
                     }
@@ -196,50 +197,55 @@ public class SpaceGrid {
                     vis.showFightBefore(aliens.get(i).x, aliens.get(i).y, fightingRaces.toArray(fRs), fightingPowers.toArray(fPs));
 
                     // Determine the winner and maximum tech in the fight
-                    int winner = 0;
+                    int winningPower = 0; // The fight powers might tie
                     int maxTech = 0;
+                    
                     for (int k = 0; k < fightingAliens.size(); k++) {
-                        // Winner
-                        if (actions[fightingAliens.get(k)].power
-                                > actions[fightingAliens.get(winner)].power) {
-                            winner = k;
-                        }
+                        // Winning power
+                        winningPower = Math.max(winningPower, fightingPowers.get(k));
 
                         // Max tech
                         if (aliens.get(fightingAliens.get(k)).tech > maxTech) {
                             maxTech = aliens.get(fightingAliens.get(k)).tech;
                         }
                     }
-
-                    // The winner's tech is brought up to the max in the group
-                    aliens.get(fightingAliens.get(winner)).tech = maxTech;
-
+                    
+                    List<String> winningSpecies = new ArrayList<>();
+                    int winnerPos = 0; // Must be initialized to make Java happy
+                    
                     for (int k = 0; k < fightingAliens.size(); k++) {
-                        // If the alien is a loser and of a different species than the winner
-                        if (k != winner
-                                && aliens.get(fightingAliens.get(k)).alienConstructor
-                                == aliens.get(fightingAliens.get(winner)).alienConstructor) {
+                        // If alien was winner / part of a tie
+                        if (fightingPowers.get(k) == winningPower) {
+                            // If the species was not already known to be a winning race
+                            String name = aliens.get(fightingAliens.get(k)).getFullName();
+                            if (!winningSpecies.contains(name)) {
+                                // Add it
+                                winningSpecies.add(name);
+                            }
+                            
+                            winnerPos = k;
+                        }
+                    }
+                    
+                    if (winningSpecies.size() == 1) { // If there is no tie
+                        // The winner's tech is brought up to the max in the group
+                        aliens.get(fightingAliens.get(winnerPos)).tech = maxTech;
+                    }
+                    
+                    for (int k = 0; k < fightingAliens.size(); k++) {
+                        // If the alien was not part of one of the winning species
+                        if (!winningSpecies.contains(aliens.get(fightingAliens.get(k)).getFullName())){
 
                             // If the alien was beaten by more than five energy points
-                            if (actions[fightingAliens.get(winner)].power
-                                    < actions[fightingAliens.get(k)].power + 5) {
-
-                                // GM : I took this out because it makes it too good for the winner
-                                // The winning alien will get their energy
-                                // energyForWinner += aliens.get(fightingAliens.get(k)).energy;
-                                // GM: Also, you never gave it to the winner anywhere
+                            if (winningPower > actions[fightingAliens.get(k)].power + 5) {
 
                                 // The alien will then be killed
                                 // aliens.get(k).api.debugOut("Lost and died of its wounds.");
                                 aliens.get(fightingAliens.get(k)).kill();
 
                             } else { // If the alien was beaten by less than 5 points
-                                // They lose 5 points of technology
-                                // However, their tech cannot go below 1
-                                aliens.get(fightingAliens.get(k)).tech
-                                        = Math.max(
-                                                aliens.get(fightingAliens.get(k)).tech - 5,
-                                                1);
+                                // They go down to two technology
+                                aliens.get(fightingAliens.get(k)).tech = 2;
                             }
                         }
                         // TODO: Write showFightAfter here

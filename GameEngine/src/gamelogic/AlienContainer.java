@@ -70,6 +70,9 @@ public class AlienContainer {
 
     }
 
+    public String getFullName() {
+        return alienPackageName + ":" + alienClassName;
+    }
     public void move(ViewImplementation view) throws NotEnoughTechException {
         // Whether the move goes off the board will be determined by the grid
 
@@ -256,14 +259,14 @@ public class AlienContainer {
     // this debugOut is not sensitive to chatter control
     public void debugOut(String s) {
         if (chatter) {
-            api.vis.debugOut("Alien " + alienPackageName + ":" + alienClassName + "("
+            api.vis.debugOut("Alien " + getFullName() + "("
                     + Integer.toHexString(alien.hashCode()).toUpperCase() + "): " + s);
         }
     }
 
     public void debugErr(String s) {
         if (chatter) {
-            api.vis.debugErr("Alien " + alienPackageName + ":" + alienClassName + "("
+            api.vis.debugErr("Alien " + getFullName() + "("
                     + Integer.toHexString(alien.hashCode()).toUpperCase() + "): " + s);
         }
     }
