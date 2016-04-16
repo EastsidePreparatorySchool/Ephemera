@@ -12,30 +12,37 @@ import java.util.ArrayList;
  * @author gmein
  */
 public class AlienGrid extends ArrayList<AlienContainer> {
-    
+
     ArrayList<AlienContainer>[][] acGrid;
-    
+    int centerX;
+    int centerY;
+
     public AlienGrid(int width, int height) {
         acGrid = new ArrayList[width][height];
+        centerX = width / 2;
+        centerY = height / 2;
     }
-    
-    
+
     @Override
     public boolean add(AlienContainer ac) {
         // add alien to grid as well as to master list
-        acGrid[ac.x][ac.y].add(ac);
+        acGrid[ac.x+centerX][ac.y+centerY].add(ac);
         return super.add(ac);
     }
-    
+
     public AlienContainer remove(int i) {
         // remove alien from grid as well as from master list
         AlienContainer ac = super.remove(i);
-        acGrid[ac.x][ac.y].remove(ac);
+        acGrid[ac.x + centerX][ac.y + centerY].remove(ac);
         return ac;
     }
-    
+
     public void move(AlienContainer ac, int oldX, int oldY, int newX, int newY) {
-        acGrid[oldX][oldY].remove(ac);
-        acGrid[newX][newY].add(ac);
+        acGrid[oldX+centerX][oldY+centerY].remove(ac);
+        acGrid[newX+centerX][newY+centerY].add(ac);
+    }
+
+    public ArrayList<AlienContainer> getAliensAt(int x, int y) {
+        return acGrid[x+centerX][y+centerY];
     }
 }

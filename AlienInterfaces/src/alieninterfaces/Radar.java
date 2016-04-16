@@ -18,10 +18,10 @@ public interface Radar {
     ArrayList<AlienSpec> getAliensAtPos(int x, int y) throws CantSeeSquareException;
     ArrayList<AlienSpec> getAliensInView() throws CantSeeSquareException;
     
-    SpaceObjectSpec getSpaceObjectAtPos() throws CantSeeSquareException;
+    SpaceObjectSpec getSpaceObjectAtPos(int x, int y) throws CantSeeSquareException;
     ArrayList<SpaceObjectSpec> getSpaceObjectsInView() throws CantSeeSquareException;
     
     AlienSpec getClosestAlienToPos(int x, int y);
-    AlienSpec getClosestSpecificAlienToPos(String domainName, String packageName, String className, int x, int y);
-    AlienSpec getClosestXenoToPos(String domainName, String packageName, String className, int x, int y);
+    AlienSpec getClosestSpecificAlienToPos(AlienSpec as, int x, int y);
+    AlienSpec getClosestXenoToPos(AlienSpec as, int x, int y);
 }

@@ -12,127 +12,114 @@ import java.util.ArrayList;
 /**
  *
  * @author gmein
- * 
+ *
  * This replaces "ViewImplementation"
  */
 public class RadarImplementation implements Radar {
 
-    private final List<AlienContainer> aCs;
-    private final List<SpaceObject> sOs;
-    private final int bottomX;
-    private final int bottomY;
-    private final int size;
-    private final AlienGrid ag;
+    private ArrayList<SpaceObject> sOs;
+    private AlienGrid ag;
+    private int x;
+    private int y;
+    private int size;
 
     public RadarImplementation(AlienGrid ag) {
         this.ag = ag;
-        this.aCs = new ArrayList<>();
         this.sOs = new ArrayList<>();
-        this.bottomX = 0;
-        this.bottomY = 0;
+        this.x = 0;
+        this.y = 0;
         this.size = 0;
     }
 
-    public RadarImplementation(AlienGrid ag, List<AlienContainer> aCs, List<SpaceObject> sOs, int bottomX, int bottomY, int size) {
+    public RadarImplementation(AlienGrid ag, ArrayList<SpaceObject> sOs, int x, int y, int size) {
         this.ag = ag;
-        this.aCs = aCs;
         this.sOs = sOs;
-        this.bottomX = bottomX;
-        this.bottomY = bottomY;
+        this.x = x;
+        this.y = y;
         this.size = size;
     }
 
-    public int getEnergyAtPos(int x, int y) throws CantSeeSquareException {
-        if (bottomX + 2 * size < x
-                || bottomX > x
-                || bottomY + 2 * size < y
-                || bottomY > y) {
+    public int checkPosX(int x) throws CantSeeSquareException {
+        if (x < this.x - size
+                || x > this.x + size) {
             throw new CantSeeSquareException();
         }
-        for (AlienContainer aC : aCs) {
-            if (aC.x == x && aC.y == y) {
-                return aC.energy;
-            }
+        if (x < 0) {
+            return 0;
         }
-        return -1;
+        if (x > ag.acGrid.length - 1) {
+            return ag.acGrid.length - 1;
+        }
+        return x;
     }
 
-    public int getAlienCountAtPos(int x, int y) throws CantSeeSquareException {
-        int count = 0;
-        for (AlienContainer aC : aCs) {
-            if (aC.x == x && aC.y == y) {
-                count++;
-            }
+    public int checkPosY(int y) throws CantSeeSquareException {
+        if (y < this.y - size
+                || y > this.y + size) {
+            throw new CantSeeSquareException();
         }
-        return count;
+        if (y < 0) {
+            return 0;
+        }
+        if (y > ag.acGrid[0].length - 1) {
+            return ag.acGrid[0].length - 1;
+        }
+        return y;
     }
 
-    public int[] getClosestAlienPos(int x, int y) {
-
-        if (aCs.isEmpty()) { // If there are no visible aliens
-            //throw new NoVisibleAliensException();
-            int[] invalid_pos = {Integer.MAX_VALUE, Integer.MAX_VALUE};
-            return invalid_pos;
-        }
-
-        // Returns an array of two numbers corresponding to the x and y of the alien
-        int alienX = aCs.get(0).x;
-        int alienY = aCs.get(0).y;
-
-        for (AlienContainer aC : aCs) {
-            if (getPointDistance(x, y, aC.x, aC.y)
-                    < getPointDistance(x, y, alienX, alienY)) {
-                alienX = aC.x;
-                alienY = aC.y;
-            }
-        }
-
-        int[] pos = {alienX, alienY};
-
-        return pos;
-    }
-
-    private int getPointDistance(int x1, int y1, int x2, int y2) {
+    private int getPointDistanceProxy(int x1, int y1, int x2, int y2) {
         // Square roots are expensive, and we only need to determine
         // which of two distances is the greatest, so we use the distance
         // formula but don't square root it because we can simply compare
-        // the squares of distances instead
+        // the sum of squares of distances instead
 
-        int distance = (int) Math.pow(Math.abs(x1 - x2), 2);
-        return distance + (int) Math.pow(Math.abs(y1 - y2), 2);
+        int distance = (int) (x1 - x2) * (x1 - x2);
+        return distance + (int) (y1 - y2) * (y1 - y2) ;
     }
-    
-    
-    
-    
+
     public ArrayList<AlienSpec> getAliensAtPos(int x, int y) throws CantSeeSquareException {
-        return null;
+        ArrayList<AlienSpec> as = new ArrayList();
+        for (AlienContainer ac : ag.acGrid[x][y]) {
+            as.add(new AlienSpec(null, ac.alienPackageName, ac.alienClassName));
+        }
+        return as;
     }
-    
+
     public ArrayList<AlienSpec> getAliensInView() throws CantSeeSquareException {
+        ArrayList<AlienSpec> as = new ArrayList();
+        int x1 = checkPosX(this.x - size);
+        int x2 = checkPosX(this.x + size);
+        int y1 = checkPosY(this.y - size);
+        int y2 = checkPosY(this.y + size);
+
+        for (int x = x1; x <= x2; x++) {
+            for (int y = y1; y <= y2; y++) {
+                for (AlienContainer ac : ag.acGrid[x][y]) {
+                    as.add(new AlienSpec(null, ac.alienPackageName, ac.alienClassName, ac.alien.hashCode(), ac.x, ac.y));
+                }
+            }
+        }
+        return as;
+    }
+
+    public SpaceObjectSpec getSpaceObjectAtPos(int x, int y) throws CantSeeSquareException {
         return null;
     }
-    
-    public SpaceObjectSpec getSpaceObjectAtPos() throws CantSeeSquareException {
-        return null;
-    }
-    
+
     public ArrayList<SpaceObjectSpec> getSpaceObjectsInView() throws CantSeeSquareException {
         return null;
     }
-    
+
     public AlienSpec getClosestAlienToPos(int x, int y) {
         return null;
     }
-    
-    public AlienSpec getClosestSpecificAlienToPos(String domainName, String packageName, String className, int x, int y) {
+
+    public AlienSpec getClosestSpecificAlienToPos(AlienSpec as, int x, int y) {
         return null;
     }
-    
-    public AlienSpec getClosestXenoToPos(String domainName, String packageName, String className, int x, int y) {
+
+    public AlienSpec getClosestXenoToPos(AlienSpec as, int x, int y) {
         return null;
     }
-    
+
 }
-
-
