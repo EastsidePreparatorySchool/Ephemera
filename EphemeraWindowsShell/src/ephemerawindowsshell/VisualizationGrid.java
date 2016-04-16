@@ -219,9 +219,9 @@ class VisualizationGrid implements GameVisualizer {
                 renderOnScreen(gc);
                 EphemeraWindowsShell.turnCounterText.setText("Turns completed: " + totalTurnCounter
                         + ", Total aliens: " + numAliens
-                        + ", time for turn: " + time + "ms"
-                        + ", time/(#aliens/10): " + (1000 * (long) time) / (((long) numAliens/10)+1) + (char) 181 + "s"
-                        + ", time/((#aliens/10)^2): " + (1000 * (long) time) / (((long) (numAliens/10) * (long) (numAliens/10))+1) + (char) 181 + "s"
+                        + ", time for turn: " + (time/1000) + (char) 181 + "s"
+                        + ", time/#aliens " + (((long) time/1000) / (((long) numAliens))) + (char) 181 + "s"
+                        + ", time/#aliens^2 " + ((long) time) / (((long) numAliens * (long) numAliens)) + "ns"
                 );
                 //EphemeraWindowsShell.armPauseButton();
             }

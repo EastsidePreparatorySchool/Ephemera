@@ -69,7 +69,7 @@ public class GameEngineThread extends Thread {
                     // Execute game turn
                     //
 
-                    long startTurnTime = System.currentTimeMillis();
+                    long startTurnTime = System.nanoTime();
                     try {
                         
                         if (engine.grid.executeGameTurn()) {
@@ -82,7 +82,7 @@ public class GameEngineThread extends Thread {
                         engine.vis.debugErr("GameEngineThread: Unhandled exception during turn: " + e.getMessage());
                         e.printStackTrace();
                     }
-                    engine.vis.showCompletedTurn(totalTurns, engine.grid.aliens.size(), System.currentTimeMillis() - startTurnTime);
+                    engine.vis.showCompletedTurn(totalTurns, engine.grid.aliens.size(), System.nanoTime() - startTurnTime);
                 }
 
                 //
