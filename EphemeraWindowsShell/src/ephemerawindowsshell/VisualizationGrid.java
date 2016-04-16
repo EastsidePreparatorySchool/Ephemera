@@ -39,7 +39,7 @@ class VisualizationGrid implements GameVisualizer {
     private int cellHeight;
     public int widthPX;
     public int heightPX;
-    
+
     public ConsolePane console;
 
     private static final Color[] colors = {Color.BLACK, Color.SLATEBLUE, Color.DARKVIOLET, Color.MAGENTA, Color.PURPLE, Color.RED};
@@ -142,7 +142,7 @@ class VisualizationGrid implements GameVisualizer {
         }
         gc.setStroke(Color.RED);
         gc.setLineWidth(1.0);
-        gc.strokeOval(0.5,0.5,widthPX-0.5,heightPX-0.5);
+        gc.strokeOval(0.5, 0.5, widthPX - 0.5, heightPX - 0.5);
     }
 
     public Color getColor(int alienCount) {
@@ -208,7 +208,7 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showCompletedTurn(int numAliens) {
+    public void showCompletedTurn(int totalTurns, int numAliens, long time) {
         ++totalTurnCounter;
         this.numAliens = numAliens;
         debugOut("Turn #" + totalTurnCounter + " complete.");
@@ -217,7 +217,12 @@ class VisualizationGrid implements GameVisualizer {
             public void run() {
                 GraphicsContext gc = canvas.getGraphicsContext2D();
                 renderOnScreen(gc);
-                EphemeraWindowsShell.turnCounterText.setText("Turns completed: " + totalTurnCounter);
+                EphemeraWindowsShell.turnCounterText.setText("Turns completed: " + totalTurnCounter
+                        + ", Total aliens: " + numAliens
+                        + ", time for turn: " + time + "ms"
+                        + ", time/(#aliens/10): " + (1000 * (long) time) / (((long) numAliens/10)+1) + (char) 181 + "s"
+                        + ", time/((#aliens/10)^2): " + (1000 * (long) time) / (((long) (numAliens/10) * (long) (numAliens/10))+1) + (char) 181 + "s"
+                );
                 //EphemeraWindowsShell.armPauseButton();
             }
         });

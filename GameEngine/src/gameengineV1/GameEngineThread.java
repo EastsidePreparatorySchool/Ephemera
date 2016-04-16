@@ -35,6 +35,7 @@ public class GameEngineThread extends Thread {
     public void run() {
         GameCommand gc;
         boolean endGame = false;
+        int totalTurns = 0;
         
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
@@ -68,17 +69,20 @@ public class GameEngineThread extends Thread {
                     // Execute game turn
                     //
 
+                    long startTurnTime = System.currentTimeMillis();
                     try {
+                        
                         if (engine.grid.executeGameTurn()) {
                             // return true == game over because at most one species left
                             engine.gameState = GameState.Paused;
                             engine.vis.showGameOver();
                         }
+                        totalTurns++;
                     } catch (Exception e) {
                         engine.vis.debugErr("GameEngineThread: Unhandled exception during turn: " + e.getMessage());
                         e.printStackTrace();
                     }
-                    engine.vis.showCompletedTurn(engine.grid.aliens.size());
+                    engine.vis.showCompletedTurn(totalTurns, engine.grid.aliens.size(), System.currentTimeMillis() - startTurnTime);
                 }
 
                 //

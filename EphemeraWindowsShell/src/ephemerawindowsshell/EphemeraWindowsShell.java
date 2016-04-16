@@ -182,12 +182,12 @@ public class EphemeraWindowsShell extends Application {
     /*
      * Creates an HBox with two buttons for the top region
      */
-    private HBox addTopBox() {
+    private VBox addTopBox() {
 
-        HBox hbox = new HBox();
-        hbox.setPadding(new Insets(15, 12, 15, 12));
-        hbox.setSpacing(10);   // Gap between nodes
-        hbox.setStyle("-fx-background-color: black;");
+        VBox vbox = new VBox();
+        vbox.setPadding(new Insets(15, 12, 15, 12));
+        vbox.setSpacing(10);   // Gap between nodes
+        vbox.setStyle("-fx-background-color: black;");
 
         buttonPause = new Button("Start");
         buttonPause.setPrefSize(100, 20);
@@ -207,9 +207,15 @@ public class EphemeraWindowsShell extends Application {
 
         //Button buttonProjected = new Button("Stop");
         //buttonProjected.setPrefSize(100, 20);
-        hbox.getChildren().addAll(buttonPause);
+        vbox.getChildren().addAll(buttonPause);
+        EphemeraWindowsShell.turnCounterText = new Text("Turns completed: 0");
+        EphemeraWindowsShell.turnCounterText.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        EphemeraWindowsShell.turnCounterText.setStyle("-fx-background-color: black;");
+        EphemeraWindowsShell.turnCounterText.setFill(Color.WHITE);
 
-        return hbox;
+        vbox.getChildren().add(EphemeraWindowsShell.turnCounterText);
+
+        return vbox;
     }
 
     
@@ -248,12 +254,6 @@ public class EphemeraWindowsShell extends Application {
         vbox.setPadding(new Insets(10)); // Set all sides to 10
         vbox.setSpacing(8);              // Gap between nodes
 
-        EphemeraWindowsShell.turnCounterText = new Text("Turns completed: 0");
-        EphemeraWindowsShell.turnCounterText.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        EphemeraWindowsShell.turnCounterText.setStyle("-fx-background-color: black; -fx-text-fill: white;");
-        EphemeraWindowsShell.turnCounterText.setFill(Color.WHITE);
-
-        vbox.getChildren().add(EphemeraWindowsShell.turnCounterText);
         vbox.setStyle("-fx-background-color: black; -fx-text-fill: white;");
 
         // add list of alien species
