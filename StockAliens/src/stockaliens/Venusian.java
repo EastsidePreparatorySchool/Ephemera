@@ -94,10 +94,12 @@ public class Venusian implements Alien {
             if (ctx.getEnergy() > ctx.getSpawningCost() + 10) {
                 //should spawn fast at the beggining,
                 ctx.debugOut("Spawning");
-                return new Action(ActionCode.Spawn, 10);
+                return new Action(ActionCode.Spawn, 5);
             }
-            ctx.debugOut("Researching");
-            return new Action(ActionCode.Research);
+            if (ctx.getTech() < 30) {
+                ctx.debugOut("Researching");
+                return new Action(ActionCode.Research);
+            }
         }
         ctx.debugOut("Gaining");
 

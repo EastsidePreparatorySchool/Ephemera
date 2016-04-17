@@ -37,9 +37,11 @@ public class SpaceGrid {
     public boolean executeGameTurn() {
         moveAliens();
         removeDeadAliens();
+        Thread.yield();
         performAlienActions();
         removeDeadAliens();
-        resetMovesAndFights();
+        resetAliens();
+        Thread.yield();
 
         AlienContainer aUniqueAlien = null;
         for (AlienContainer a : aliens) {
@@ -80,16 +82,24 @@ public class SpaceGrid {
     public void moveAliens() {
         vis.debugOut("Moving " + (aliens.size()) + " aliens");
         for (AlienContainer ac : aliens) {
-            ViewImplementation view = ac.getView();
+            // get rid of stale views from prior moves
+            ac.ctx.view = null;
+
+            // call the alien to move
             try {
                 int oldX = ac.x;
                 int oldY = ac.y;
-                ac.move(view);
+                ac.move();
+                
+                // record the move in the grid
                 aliens.move(ac, oldX, oldY, ac.x, ac.y);
             } catch (Exception ex) {
-                ac.debugErr("Unhandled exception in move: " + ex.toString());
+                ac.debugErr("Unhandled exception in getMove(): " + ex.toString());
                 ac.kill();
             }
+            
+            // any obtained view is potentially stale again
+            ac.ctx.view = null;
         }
     }
 
@@ -105,10 +115,10 @@ public class SpaceGrid {
         }
     }
 
-    public void resetMovesAndFights() {
+    public void resetAliens() {
         aliens.stream().forEach((alien) -> {
-            alien.action = false;
             alien.fought = false;
+            alien.ctx.view = null;
         });
     }
 
@@ -119,7 +129,6 @@ public class SpaceGrid {
 
         // first request all the actions from the aliens
         for (AlienContainer thisAlien : aliens) {
-            ViewImplementation view = thisAlien.getView();
 
             try {
                 // Note: getAction() checks validity
@@ -129,7 +138,7 @@ public class SpaceGrid {
                 // if an alien blows up here, we'll kill it. 
                 thisAlien.currentActionCode = ActionCode.None;
                 thisAlien.currentActionPower = 0;
-                thisAlien.debugErr("Blew up on getAction(): " + ex.toString());
+                thisAlien.debugErr("Unhandled exception in getAction(): " + ex.toString());
                 thisAlien.kill();
             }
         }

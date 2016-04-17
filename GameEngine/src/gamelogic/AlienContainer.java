@@ -9,6 +9,7 @@ import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -35,7 +36,6 @@ public class AlienContainer {
     boolean fought;
     public int x;
     public int y;
-    public boolean action; // Whether the alien has performed an action this turn
 
     static Random rand = new Random(System.currentTimeMillis());
 
@@ -81,7 +81,7 @@ public class AlienContainer {
         return alienPackageName + ":" + alienClassName;
     }
 
-    public void move(ViewImplementation view) throws NotEnoughTechException {
+    public void move() throws NotEnoughTechException {
         // Whether the move goes off the board will be determined by the grid
 
         MoveDir direction = alien.getMove();
@@ -185,22 +185,26 @@ public class AlienContainer {
         // stop-gap-measure to keep things in grid
         if (x + dxi > 249) {
             dxi = 249 - x;
+            ctx.vis.debugOut("Drift stop: x: " + x + dxi);
         }
         if (x + dxi < -250) {
             dxi = -250 - x;
+            ctx.vis.debugOut("Drift stop: x: " + x + dxi);
         }
         if (y + dyi > 249) {
             dyi = 249 - y;
+            ctx.vis.debugOut("Drift stop: y: " + y + dyi);
         }
         if (y + dyi < -250) {
             dyi = -250 - y;
+            ctx.vis.debugOut("Drift stop: y: " + y + dyi);
         }
 
-        ctx.vis.debugOut("Drift: ("
-                + (oldy) + ","
-                + (oldx) + ") -> ("
-                + dxi + ","
-                + dyi + ")");
+        ctx.vis.debugOut("Drift final: ("
+                + (x + oldx) + ","
+                + (y + oldy) + ") -> ("
+                + (x + dxi) + ","
+                + (y + dyi) + ")");
 
         return new MoveDir(dxi, dyi);
     }
@@ -253,26 +257,6 @@ public class AlienContainer {
         }
     }
 
-    public int fight(int fightPower) throws NotEnoughEnergyException, NotEnoughTechException {
-        //int fightPower = 0; //alien.getFightPower(api); GM need to fix this up after reconciling fighting into Action
-
-        // If the alien cannot fight with the amount of energy it wants
-        // Throw the appropriate exception
-        if (fightPower > energy) {
-            throw new NotEnoughEnergyException();
-        }
-        if (fightPower > tech) {
-            throw new NotEnoughTechException();
-        }
-
-        // If the move is valid, subtract the energy expended
-        energy -= fightPower;
-        energy = Integer.max(energy, 0); // let's not drop below zero.
-
-        // Return how much power the alien will fight with
-        return fightPower;
-    }
-
     private void checkMove(MoveDir direction) throws NotEnoughTechException {
         // for immediate vicinity, just let this go
         if (Math.abs((long) direction.x()) + Math.abs((long) direction.y()) <= 2) {
@@ -282,24 +266,20 @@ public class AlienContainer {
         // distance |x|+|y|, easier to program.
         if (Math.abs((long) direction.x()) + Math.abs((long) direction.y())
                 > (long) tech) {
-            debugErr("Illegal move: " + (direction.x()) + "," + (direction.y()));
+            debugErr("Illegal move: " + (direction.x()) + "," + (direction.y()) + " tech " + tech);
             throw new NotEnoughTechException();
         }
     }
 
     // this debugOut is not sensitive to chatter control
     public void debugOut(String s) {
-        if (chatter) {
-            ctx.vis.debugOut("Alien " + getFullName() + "("
-                    + Integer.toHexString(alien.hashCode()).toUpperCase() + "): " + s);
-        }
+        ctx.vis.debugOut("Alien " + getFullName() + "("
+                + Integer.toHexString(alien.hashCode()).toUpperCase() + "): " + s);
     }
 
     public void debugErr(String s) {
-        if (chatter) {
-            ctx.vis.debugErr("Alien " + getFullName() + "("
-                    + Integer.toHexString(alien.hashCode()).toUpperCase() + "): " + s);
-        }
+        ctx.vis.debugErr("Alien " + getFullName() + "("
+                + Integer.toHexString(alien.hashCode()).toUpperCase() + "): " + s);
     }
 
     public ViewImplementation getView() {
@@ -310,8 +290,8 @@ public class AlienContainer {
         int highX = Math.min(x + size, ((grid.width / 2) - 1));
         int highY = Math.min(y + size, ((grid.height / 2) - 1));
 
-        List<AlienContainer> visibleAliens = new ArrayList<>();
-        List<SpaceObject> visibleObjects = new ArrayList<>();
+        List<AlienContainer> visibleAliens = new LinkedList<>();
+        List<SpaceObject> visibleObjects = new LinkedList<>();
 
         for (int x = lowX; x <= highX; x++) {
             for (int y = lowY; y <= highY; y++) {
@@ -321,7 +301,7 @@ public class AlienContainer {
                 //visibleObjects.add()..
             }
         }
-        
+
         // excluse thyself
         visibleAliens.remove(this);
 

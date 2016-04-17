@@ -64,7 +64,7 @@ public class Martian implements Alien {
         ClosestAlienYCoordinate = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY())[1];
 
         //Checks to see if the closest alien is withen moving capability.
-        if ((long) Math.abs((long)ClosestAlienXCoordinate - ctx.getX()) + (long) Math.abs((long)ClosestAlienYCoordinate - ctx.getY()) <= (long) ctx.getEnergy()) {
+        if ((long) Math.abs((long)ClosestAlienXCoordinate - ctx.getX()) + (long) Math.abs((long)ClosestAlienYCoordinate - ctx.getY()) <= (long) ctx.getTech()) {
 
             HorizontalMove = ClosestAlienXCoordinate - ctx.getX();
             VerticalMove = ClosestAlienYCoordinate - ctx.getY();
@@ -103,7 +103,7 @@ public class Martian implements Alien {
         if (ctx.getEnergy() < 2) {
             ctx.debugOut("Gaining");
             return new Action(ActionCode.Gain);
-        } else if (ctx.getEnergy() < 3 && ctx.getEnergy() > ctx.getTech()) {
+        } else if (ctx.getEnergy() < 3 && ctx.getEnergy() > ctx.getTech() && ctx.getTech() < 30) {
             ctx.debugOut("Researching");
             return new Action(ActionCode.Research);
         } else if (ctx.getEnergy() > ctx.getSpawningCost() + 2) {

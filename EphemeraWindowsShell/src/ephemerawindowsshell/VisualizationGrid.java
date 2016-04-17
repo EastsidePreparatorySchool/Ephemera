@@ -5,21 +5,13 @@
  */
 package ephemerawindowsshell;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Random;
-import java.util.Scanner;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import gameengineinterfaces.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import static java.lang.Thread.sleep;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Scanner;
 import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 
@@ -217,17 +209,17 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     String paddedTimeString(long ns) {
-        return paddedString(timeString(ns), 6);
+        return paddedString(timeString(ns), 7);
     }
 
     String timeString(long ns) {
-        if (ns > 1000000000L) {
+        if (ns > 10000000000L) {
             return (ns / 1000000000L) + "s";
         }
-        if (ns > 1000000L) {
+        if (ns > 10000000L) {
             return (ns / 1000000L) + "ms";
         }
-        if (ns > 1000L) {
+        if (ns > 10000L) {
             return (ns / 1000L) + (((char) 181) + "s");
         }
         return ns + "ns";
@@ -252,11 +244,13 @@ class VisualizationGrid implements GameVisualizer {
                 //EphemeraWindowsShell.armPauseButton();
             }
         });
+        
         try {
-            sleep(100); // give window some time to draw;
+            Thread.sleep(100);
         } catch (Exception e) {
         }
-
+        
+        Thread.yield();
     }
 
     @Override
@@ -368,11 +362,6 @@ class VisualizationGrid implements GameVisualizer {
             if (s.toLowerCase().contains(filter.toLowerCase())) {
                 println(s);
             }
-        }
-
-        // code to detect underflows of any reported values
-        if (s.contains("2147483")) {
-            println((char) 27 + "[31;1m" + "Underflow: " + s);
         }
     }
 

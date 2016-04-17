@@ -17,6 +17,7 @@ public class ContextImplementation implements Context {
     private AlienContainer aC;
     public GameVisualizer vis;
     public boolean chatter;
+    public ViewImplementation view;
 
     ContextImplementation(AlienContainer aC, GameVisualizer vis) {
         this.aC = aC;
@@ -41,7 +42,11 @@ public class ContextImplementation implements Context {
     }
 
     public View getView() {
-        return this.aC.getView();
+        if (this.view == null) {
+            this.view = new ViewImplementation(aC);
+            // full object: this.view = this.aC.getView();
+        }
+        return this.view;
     }
 
     public int getSpawningCost() {
@@ -53,7 +58,9 @@ public class ContextImplementation implements Context {
     }
 
     public void debugOut(String s) {
-        vis.debugOut("Alien " + aC.alienPackageName + ":" + aC.alienClassName + "("
-                + Integer.toHexString(aC.alien.hashCode()).toUpperCase() + "): " + s);
+        if (aC.chatter) {
+            vis.debugOut("Alien " + aC.alienPackageName + ":" + aC.alienClassName + "("
+                    + Integer.toHexString(aC.alien.hashCode()).toUpperCase() + "): " + s);
+        }
     }
 }

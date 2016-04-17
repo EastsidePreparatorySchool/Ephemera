@@ -37,7 +37,7 @@ public class GameEngineThread extends Thread {
         boolean endGame = false;
         int totalTurns = 0;
 
-        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+        //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
         engine.grid = new SpaceGrid(engine.vis, 500, 500);
 
