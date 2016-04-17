@@ -19,8 +19,7 @@ import javafx.scene.paint.Color;
  */
 public class AlienSpecies {
 
-    String packageName;
-    String className;
+    String speciesName;
     int count;
     Color color;
     String style;
@@ -29,9 +28,8 @@ public class AlienSpecies {
     static String[] alienStyles = {"lightblue", "yellow", "lightpink", "lightgreen", "orange"};
     static int colorCount = 0;
 
-    AlienSpecies(String packageName, String className) {
-        this.packageName = packageName;
-        this.className = className;
+    AlienSpecies(String speciesName) {
+        this.speciesName = speciesName;
         this.count = 1; // if we create this object, there is at least one alien
         this.color = alienColors[colorCount % alienColors.length];
         this.style = alienStyles[colorCount % alienColors.length];
@@ -40,7 +38,7 @@ public class AlienSpecies {
 
     @Override
     public String toString() {
-        return packageName + ":" + className + ": " + count;
+        return speciesName + ": " + count;
     }
 
     public String getStyle() {

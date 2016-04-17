@@ -27,37 +27,41 @@ class Cell {
         cellChanged = true;
     }
 
-    public int addSpecies(String packageName, String className, Color color) {
-        int count;
+    public int addSpecies(String speciesName, Color color) {
+        CellInfo ci;
+
         if (speciesMap == null) {
             speciesMap = new HashMap<>();
         }
-        CellInfo ci = speciesMap.get(packageName + ":" + className);
+
+        ci = speciesMap.get(speciesName);
+
         if (ci == null) {
             ci = new CellInfo(0, color);
+            speciesMap.put(speciesName, ci);
         }
+
         ci.count++;
-        speciesMap.put(packageName + ":" + className, ci);
         alienCount++;
         cellChanged = true;
-        
+
         if (color1 == null) {
             color1 = color;
         } else if (color2 == null) {
             color2 = color;
         }
-        
+
         return ci.count;
     }
 
-    public boolean removeSpecies(String packageName, String className) {
-        CellInfo ci = speciesMap.get(packageName + ":" + className);
+    public boolean removeSpecies(String speciesName) {
+        CellInfo ci = speciesMap.get(speciesName);
         if (ci != null) {
             if (ci.count > 1) {
                 ci.count--;
-                speciesMap.put(packageName + ":" + className, ci);
+                speciesMap.put(speciesName, ci);
             } else {
-                speciesMap.remove(packageName + ":" + className);
+                speciesMap.remove(speciesName);
             }
         }
         alienCount--;
@@ -65,14 +69,13 @@ class Cell {
         if (empty) {
             speciesMap = null;
         }
-        
         if (alienCount == 0) {
             color1 = null;
             color2 = null;
         } else if (alienCount == 1) {
             color2 = null;
         }
-        
+
         cellChanged = true;
         return empty;
     }

@@ -14,37 +14,37 @@ import gameengineinterfaces.GameVisualizer;
  */
 public class ContextImplementation implements Context {
 
-    private AlienContainer aC;
+    private AlienContainer ac;
     public GameVisualizer vis;
     public boolean chatter;
     public ViewImplementation view;
 
-    ContextImplementation(AlienContainer aC, GameVisualizer vis) {
-        this.aC = aC;
+    ContextImplementation(AlienContainer ac, GameVisualizer vis) {
+        this.ac = ac;
         this.vis = vis;
         chatter = false;
     }
 
     public int getEnergy() {
-        return aC.energy;
+        return ac.energy;
     }
 
     public int getTech() {
-        return aC.tech;
+        return ac.tech;
     }
 
     public int getX() {
-        return aC.x;
+        return ac.x;
     }
 
     public int getY() {
-        return aC.y;
+        return ac.y;
     }
 
     public View getView() {
         if (this.view == null) {
-            this.view = new ViewImplementation(aC);
-            // full object: this.view = this.aC.getView();
+            this.view = new ViewImplementation(ac);
+            // full object: this.view = this.aC.getFullView();
         }
         return this.view;
     }
@@ -57,10 +57,10 @@ public class ContextImplementation implements Context {
         return 0;
     }
 
+    // alien chatter is prefixed with full info, and only talks when chatter is on
     public void debugOut(String s) {
-        if (aC.chatter) {
-            vis.debugOut("Alien " + aC.alienPackageName + ":" + aC.alienClassName + "("
-                    + Integer.toHexString(aC.alien.hashCode()).toUpperCase() + "): " + s);
+        if (ac.chatter) {
+            vis.debugOut(ac.getFullName() + ": " + s);
         }
     }
 }

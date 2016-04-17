@@ -6,6 +6,7 @@
 package gameengineinterfaces;
 
 import alieninterfaces.*;
+import java.util.List;
 
 /**
  *
@@ -14,19 +15,21 @@ import alieninterfaces.*;
 public interface GameVisualizer {
     void showCompletedTurn(int totalTurns, int numAliens, long timeTaken);
     
-    void showMove(String packageName, String className, int id, int oldX, int oldY, int newX, int newY, int energy, int tech);
-
-    void showFightBefore(int x, int y, String[] participants, Integer[] fightPower);
-
-    void showFightAfter(int x, int y, String[] participants, int[] newEnergyLevels, int[] newTechLevels);
-
-    void showSection(int x, int y, int width);
+    void showAliens(List<AlienSpec> aliens);
     
-    void showSpawn(String packageName, String className, int id, int newX, int newY, int energy, int tech);
-            
-    void showDeath(String packageName, String className, int id, int oldX, int oldY);
+    void showMove(AlienSpec as, int oldX, int oldY);
 
-    void highlightPositions();
+    void showFightBefore(int x, int y, List<AlienSpec> aiens);
+
+    void showFightAfter(int x, int y, List<AlienSpec> aliens);
+
+    void showSpawn(AlienSpec as);
+            
+    void showDeath(AlienSpec as);
+    
+    boolean showContinuePrompt();
+
+    void showEngineStateChange(GameState gs);
 
     void showGameOver();
 
@@ -34,5 +37,4 @@ public interface GameVisualizer {
 
     void debugErr(String s);
 
-    boolean showContinuePrompt();
 }

@@ -5,6 +5,7 @@
  */
 package ephemerawindowsshell;
 
+import alieninterfaces.AlienSpec;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import gameengineinterfaces.*;
@@ -12,6 +13,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 
@@ -137,27 +139,16 @@ class VisualizationGrid implements GameVisualizer {
         gc.strokeOval(0.5, 0.5, widthPX - 0.5, heightPX - 0.5);
     }
 
-    public Color getColor(int alienCount) {
-        if (alienCount < 0) {
-            return colors[0];
-        }
-        if (alienCount >= colors.length) {
-            return colors[colors.length - 1];
-        } else {
-            return colors[alienCount];
-        }
-    }
-
-    public void incrementCell(int x, int y, String packageName, String className) {
+    public void incrementCell(int x, int y, String speciesName) {
         if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
             debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
             return;
         }
         Cell cell = grid[x + (width / 2)][y + (height / 2)];
-        cell.addSpecies(packageName, className, species.getColor(packageName, className));
+        cell.addSpecies(speciesName, species.getColor(speciesName));
     }
 
-    public void decrementCell(int x, int y, String packageName, String className) {
+    public void decrementCell(int x, int y, String speciesName) {
         if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
             debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
             return;
@@ -165,7 +156,7 @@ class VisualizationGrid implements GameVisualizer {
 
         Cell cell = grid[x + (width / 2)][y + (height / 2)];
         if (cell.alienCount > 0) {
-            cell.removeSpecies(packageName, className);
+            cell.removeSpecies(speciesName);
         } else {
             debugOut("winvis: cell underflow at (" + x + "," + y + ")");
         }
@@ -191,6 +182,15 @@ class VisualizationGrid implements GameVisualizer {
 
     private void println(String s) {
         console.println(s);
+        try {
+            logFile.write(s);
+            logFile.newLine();
+            logFile.flush();
+        } catch (Exception e) {
+        }
+    }
+
+    private void printlnLogOnly(String s) {
         try {
             logFile.write(s);
             logFile.newLine();
@@ -244,96 +244,92 @@ class VisualizationGrid implements GameVisualizer {
                 //EphemeraWindowsShell.armPauseButton();
             }
         });
-        
+
         try {
             Thread.sleep(100);
         } catch (Exception e) {
         }
-        
+
         Thread.yield();
     }
 
     @Override
-    public void showMove(String packageName, String className, int id, int oldx, int oldy, int newX, int newY, int energy, int tech) {
+    public void showMove(AlienSpec as, int oldx, int oldy) {
         if (showMove) {
-            print("Vis.showMove: " + packageName + ":" + className);
-            print("(" + Integer.toHexString(id).toUpperCase() + ") moved from (");
-            print(oldx + "," + oldy + ") to (");
-            print(newX + "," + newY);
-            println("), E:" + energy + ", T:" + tech);
+            print("Vis.showMove: " + as.toString() + ",  moved from (");
+            print(oldx + "," + oldy + ")");
         }
-        decrementCell(oldx, oldy, packageName, className);
-        incrementCell(newX, newY, packageName, className);
+        
+        String speciesName = as.getFullSpeciesName();
+        int x = as.x;
+        int y = as.y;
+        
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                decrementCell(oldx, oldy, speciesName);
+                incrementCell(x, y, speciesName);
+            }
+        });
     }
 
     @Override
-    public void showFightBefore(int x, int y, String[] participants, Integer[] fightPowers) {
+    public void showFightBefore(int x, int y, List<AlienSpec> participants) {
         if (showFights) {
             println("Vis.showFightBefore at (" + x + "," + y + "):");
-            for (int i = 0; i < participants.length; i++) {
-                print("Alien " + participants[i] + " ");
-                println("is fighting with energy " + fightPowers[i]);
+            for (AlienSpec as : participants) {
+                print("Alien \"" + as.getFullName() + "\" ");
+                print(" is fighting with power " + as.actionPower);
+                println("");
             }
         }
         markFight(x, y);
     }
 
     @Override
-    public void showFightAfter(int x, int y, String[] participants, int[] newEnergy, int[] newTech) {
+    public void showFightAfter(int x, int y, List<AlienSpec> participants) {
         if (showFights) {
             println("");
             println("Here is what is left from that fight:");
-            for (int i = 0; i < participants.length; i++) {
-                print("Alien \"" + participants[i] + "\" ");
-                print(" now has energy " + newEnergy[i]);
-                print(" and new tech level " + newTech[i]);
+            for (AlienSpec as : participants) {
+                print("Alien \"" + as.getFullName() + "\" ");
+                print(" now has tech/energy " + as.getTechEnergyString());
+                println("");
             }
-            println("");
         }
     }
 
-    public void showSpawn(String packageName, String className, int id, int newX, int newY, int energy, int tech) {
+    @Override
+    public void showSpawn(AlienSpec as) {
         if (showSpawn) {
-            print("Vis.showSpawn: " + packageName + ":" + className);
-            print("(" + Integer.toHexString(id).toUpperCase() + ") at (");
-            print(newX + "," + newY);
-            println("), E:" + energy + ", T:" + tech);
-        }
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                species.addAlien(packageName, className);
-                incrementCell(newX, newY, packageName, className);
-            }
-        });
-    }
 
-    public void showDeath(String packageName, String className, int id, int oldX, int oldY) {
-        if (showDeath) {
-            print("Death: " + packageName + ":" + className);
-            print("(" + Integer.toHexString(id).toUpperCase() + ") at (");
-            println(oldX + "," + oldY + ")");
+            print("Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
         } else {
-            debugOut("Death: " + packageName + ":" + className
-                    + "(" + Integer.toHexString(id).toUpperCase() + ") at ("
-                    + oldX + "," + oldY + ")");
+            debugOut("Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
         }
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                decrementCell(oldX, oldY, packageName, className);
-                species.removeAlien(packageName, className);
+                species.addAlien(as.getFullSpeciesName());
+                incrementCell(as.x, as.y, as.getFullSpeciesName());
             }
         });
     }
 
-    @Override
-    public void showSection(int x, int y, int width) {
-        println("Showing sections costs extra");
-    }
+    public void showDeath(AlienSpec as) {
+        if (showDeath) {
 
-    @Override
-    public void highlightPositions() {
+            print("Death: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
+        } else {
+            debugOut("Death: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
+        }
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                decrementCell(as.x, as.y, as.getFullSpeciesName());
+                species.removeAlien(as.getFullSpeciesName());
+            }
+        });
     }
 
     @Override
@@ -362,6 +358,8 @@ class VisualizationGrid implements GameVisualizer {
             if (s.toLowerCase().contains(filter.toLowerCase())) {
                 println(s);
             }
+        } else {
+            printlnLogOnly(s);
         }
     }
 
@@ -379,5 +377,15 @@ class VisualizationGrid implements GameVisualizer {
 
         // not done with number of turns before prompt, don't display anything, return "game not over"
         return true;
+    }
+
+    @Override
+    public void showEngineStateChange(GameState gs) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void showAliens(List<AlienSpec> aliens) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

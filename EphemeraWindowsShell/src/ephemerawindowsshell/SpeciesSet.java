@@ -31,9 +31,9 @@ public class SpeciesSet {
         speciesList.set(i, as);
     }
 
-    public void addAlien(String packageName, String className) {
+    public void addAlien(String speciesName) {
         for (AlienSpecies as : speciesList) {
-            if (as.packageName.equals(packageName) && as.className.equals(className)) {
+            if (as.speciesName.equalsIgnoreCase(speciesName)) {
                 as.count++;
                 notifyListeners(as);
                 return;
@@ -41,12 +41,12 @@ public class SpeciesSet {
         }
 
         // if we got here, no matching species found
-        speciesList.add(new AlienSpecies(packageName, className));
+        speciesList.add(new AlienSpecies(speciesName));
     }
 
-    public void removeAlien(String packageName, String className) {
+    public void removeAlien(String speciesName) {
         for (AlienSpecies as : speciesList) {
-            if (as.packageName.equals(packageName) && as.className.equals(className)) {
+            if (as.speciesName.equals(speciesName)) {
                 as.count--;
                 notifyListeners(as);
 
@@ -63,14 +63,14 @@ public class SpeciesSet {
     }
     
     
-    public Color getColor(String packageName, String className) {
+    public synchronized Color getColor(String speciesName) {
         for (AlienSpecies as : speciesList) {
-            if (as.packageName.equals(packageName) && as.className.equals(className)) {
+            if (as.speciesName.equals(speciesName)) {
                 return as.color;
             }
         }
         
-        return Color.PINK;
+        return Color.SILVER;
     }
 
 

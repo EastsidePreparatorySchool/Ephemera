@@ -5,11 +5,13 @@
  */
 package consoleshell;
 
+import alieninterfaces.AlienSpec;
 import gameengineinterfaces.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -73,37 +75,36 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showMove(String packageName, String className, int id, int oldx, int oldy, int newX, int newY, int energy, int tech) {
+    public void showMove(AlienSpec as, int oldx, int oldy) {
         if (showMove) {
-            print("Vis.showMove: " + packageName + ":" + className);
-            print("(" + Integer.toHexString(id).toUpperCase() + ") moved from (");
-            print(oldx + "," + oldy + ") to (");
-            print(newX + "," + newY);
-            println("), E:" + energy + ", T:" + tech);
+            print("Vis.showMove: " + as.toString() + ",  moved from (");
+            print(oldx + "," + oldy + ")");
         }
     }
 
     @Override
-    public void showFightBefore(int x, int y, String[] participants, Integer[] fightPowers) {
+    public void showFightBefore(int x, int y, List<AlienSpec> participants) {
         if (showFights) {
             println("Vis.showFightBefore at (" + x + "," + y + "):");
-            for (int i = 0; i < participants.length; i++) {
-                print("Alien " + participants[i] + " ");
-                println("is fighting with energy " + fightPowers[i]);
+            for (AlienSpec as : participants) {
+                print("Alien \"" + as.getFullName() + "\" ");
+                print(" is fighting with power " + as.actionPower);
+                println("");
             }
         }
     }
 
     @Override
-    public void showFightAfter(int x, int y, String[] participants, int[] newEnergy, int[] newTech) {
-        println("");
-        println("Here is what is left from that fight:");
-        for (int i = 0; i < participants.length; i++) {
-            print("Alien \"" + participants[i] + "\" ");
-            print(" now has energy " + newEnergy[i]);
-            print(" and new tech level " + newTech[i]);
+    public void showFightAfter(int x, int y, List<AlienSpec> participants) {
+        if (showFights) {
+            println("");
+            println("Here is what is left from that fight:");
+            for (AlienSpec as : participants) {
+                print("Alien \"" + as.getFullName() + "\" ");
+                print(" now has tech/energy " + as.getTechEnergyString());
+                println("");
+            }
         }
-        println("");
     }
 
     public void showSpawn(String packageName, String className, int id, int newX, int newY, int energy, int tech) {
@@ -125,15 +126,6 @@ public class ConsoleVisualizer implements GameVisualizer {
                     + "(" + Integer.toHexString(id).toUpperCase() + ") at ("
                     + oldX + "," + oldY + ")");
         }
-    }
-
-    @Override
-    public void showSection(int x, int y, int width) {
-        println("Showing sections costs extra");
-    }
-
-    @Override
-    public void highlightPositions() {
     }
 
     @Override
@@ -233,5 +225,25 @@ public class ConsoleVisualizer implements GameVisualizer {
         }
         // not done with number of turns before prompt, don't display anything, return "game not over"
         return true;
+    }
+
+    @Override
+    public void showSpawn(AlienSpec as) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void showDeath(AlienSpec as) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void showEngineStateChange(GameState gs) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void showAliens(List<AlienSpec> aliens) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

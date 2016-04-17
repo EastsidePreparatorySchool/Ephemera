@@ -8,7 +8,6 @@ package gamelogic;
 import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -19,9 +18,10 @@ import java.util.Random;
  */
 public class AlienContainer {
 
-    public final String alienPackageName;
-    public final String alienClassName;
-    public final Constructor<?> alienConstructor;
+    public final String domainName;
+    public final String packageName;
+    public final String className;
+    public final Constructor<?> constructor;
     public Alien alien;
     public final ContextImplementation ctx;
     public final SpaceGrid grid;
@@ -36,19 +36,22 @@ public class AlienContainer {
     boolean fought;
     public int x;
     public int y;
+    public int nextX;
+    public int nextY;
 
-    static Random rand = new Random(System.currentTimeMillis());
+    static Random rand = new Random(System.nanoTime());
 
     // Declare stats here
     //
     // Heads up: This constructs an AlienContainer and contained Alien
     //
-    public AlienContainer(SpaceGrid sg, GameVisualizer vis, int x, int y, String alienPackageName, String alienClassName, Constructor<?> cns, int energy, int tech) {
+    public AlienContainer(SpaceGrid sg, GameVisualizer vis, int x, int y, String alienDomainName, String alienPackageName, String alienClassName, Constructor<?> cns, int energy, int tech) {
         Alien a;
 
-        this.alienPackageName = alienPackageName;
-        this.alienClassName = alienClassName;
-        this.alienConstructor = cns;
+        this.domainName = alienDomainName;
+        this.packageName = alienPackageName;
+        this.className = alienClassName;
+        this.constructor = cns;
         this.energy = energy;
         this.tech = tech;
         this.chatter = false;
@@ -72,15 +75,39 @@ public class AlienContainer {
             a.init(this.ctx);
         } catch (Throwable t) {
             this.alien = null;
-            t.printStackTrace();
+            debugErr("ac: Error constructing Alien");
         }
 
     }
 
-    public String getFullName() {
-        return alienPackageName + ":" + alienClassName;
+    // class-related helpers
+    public String getFullSpeciesName() {
+        return domainName + ":" + packageName + ":" + className;
     }
 
+    public String getFullName() {
+        return getFullSpeciesName() + "(" + Integer.toHexString(alien.hashCode()).toUpperCase() + ")";
+    }
+
+    public AlienSpec getFullAlienSpec() {
+        return new AlienSpec(this.domainName, this.packageName, this.className, this.hashCode(), this.x, this.y, this.tech, this.energy, this.currentActionPower);
+    }
+
+    public AlienSpec getSimpleAlienSpec() {
+        return new AlienSpec(this.domainName, this.packageName, this.className);
+    }
+
+    @Override
+    public String toString() {
+        return getFullName() + ": "
+                + "X:" + (x)
+                + " Y:" + (y)
+                + " E:" + (energy)
+                + " T:" + (tech)
+                + " r:" + ((int) Math.floor(Math.hypot((double) x, (double) y)));
+    }
+
+    // checked moves
     public void move() throws NotEnoughTechException {
         // Whether the move goes off the board will be determined by the grid
 
@@ -101,7 +128,31 @@ public class AlienContainer {
             debugErr("ac.move: Out of bounds: (" + x + ":" + y + ")");
         }
 
-        ctx.vis.showMove(alienPackageName, alienClassName, alien.hashCode(), oldx, oldy, x, y, energy, tech);
+        // call shell visulizer
+        // just make sure we don't blow up the alien beacuse of an exception in the shell
+        try {
+            ctx.vis.showMove(getFullAlienSpec(), oldx, oldy);
+        } catch (Exception e) {
+            grid.vis.debugErr("Unhandled exception in visualize: showMove");
+            for (StackTraceElement s: e.getStackTrace()){
+                grid.vis.debugErr(s.toString());
+            }
+        }
+    }
+
+    // this does the actual checking
+    private void checkMove(MoveDir direction) throws NotEnoughTechException {
+        // for immediate vicinity, just let this go
+        if (Math.abs((long) direction.x()) + Math.abs((long) direction.y()) <= 2) {
+            return;
+        }
+        // If the move is farther than the alien has the tech to move
+        // distance |x|+|y|, easier to program.
+        if (Math.abs((long) direction.x()) + Math.abs((long) direction.y())
+                > (long) tech) {
+            debugErr("Illegal move: " + (direction.x()) + "," + (direction.y()) + " tech " + tech);
+            throw new NotEnoughTechException();
+        }
     }
 
     // this calculates inward drift based on location
@@ -219,11 +270,12 @@ public class AlienContainer {
         return gamma;
     }
 
+    // easy way to kill an alien
     public void kill() {
         energy = 0;
-
     }
 
+    // checked action
     public void getAction() throws NotEnoughEnergyException, UnknownActionException {
         Action a = alien.getAction();
 
@@ -257,32 +309,16 @@ public class AlienContainer {
         }
     }
 
-    private void checkMove(MoveDir direction) throws NotEnoughTechException {
-        // for immediate vicinity, just let this go
-        if (Math.abs((long) direction.x()) + Math.abs((long) direction.y()) <= 2) {
-            return;
-        }
-        // If the move is farther than the alien has the tech to move
-        // distance |x|+|y|, easier to program.
-        if (Math.abs((long) direction.x()) + Math.abs((long) direction.y())
-                > (long) tech) {
-            debugErr("Illegal move: " + (direction.x()) + "," + (direction.y()) + " tech " + tech);
-            throw new NotEnoughTechException();
-        }
-    }
-
     // this debugOut is not sensitive to chatter control
     public void debugOut(String s) {
-        ctx.vis.debugOut("Alien " + getFullName() + "("
-                + Integer.toHexString(alien.hashCode()).toUpperCase() + "): " + s);
+        ctx.vis.debugOut("Alien " + getFullName() + ": " + s);
     }
 
     public void debugErr(String s) {
-        ctx.vis.debugErr("Alien " + getFullName() + "("
-                + Integer.toHexString(alien.hashCode()).toUpperCase() + "): " + s);
+        ctx.vis.debugErr("Alien " + getFullName() + ": " + s);
     }
 
-    public ViewImplementation getView() {
+    public ViewImplementation getFullView() {
         // Create the alien's view
         int size = tech;
         int lowX = Math.max(x - size, (grid.width / -2));

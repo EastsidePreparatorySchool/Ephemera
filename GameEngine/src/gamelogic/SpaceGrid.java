@@ -47,7 +47,7 @@ public class SpaceGrid {
         for (AlienContainer a : aliens) {
             if (a != null) {
                 if (aUniqueAlien != null) {
-                    if (aUniqueAlien.alienConstructor != a.alienConstructor) {
+                    if (aUniqueAlien.constructor != a.constructor) {
                         // more than one species active, game not over
                         return false;
                     }
@@ -65,15 +65,9 @@ public class SpaceGrid {
         vis.debugErr("");
         vis.debugErr("Current Aliens:");
 
-        for (AlienContainer a : aliens) {
-            if (a != null) {
-                vis.debugErr("Alien " + a.alienPackageName + ":" + a.alienClassName + "("
-                        + Integer.toHexString(a.alien.hashCode()).toUpperCase() + "): "
-                        + "X:" + (a.x)
-                        + " Y:" + (a.y)
-                        + " E:" + (a.energy)
-                        + " T:" + (a.tech)
-                        + " r:" + ((int) Math.floor(Math.hypot((double) a.x, (double) a.y))));
+        for (AlienContainer ac : aliens) {
+            if (ac != null) {
+                vis.debugErr("Alien " + ac.toString());
             }
         }
         vis.debugErr("");
@@ -84,20 +78,25 @@ public class SpaceGrid {
         for (AlienContainer ac : aliens) {
             // get rid of stale views from prior moves
             ac.ctx.view = null;
+            int oldX = ac.x;
+            int oldY = ac.y;
 
             // call the alien to move
             try {
-                int oldX = ac.x;
-                int oldY = ac.y;
                 ac.move();
-                
-                // record the move in the grid
-                aliens.move(ac, oldX, oldY, ac.x, ac.y);
             } catch (Exception ex) {
                 ac.debugErr("Unhandled exception in getMove(): " + ex.toString());
+                for(StackTraceElement s:ex.getStackTrace()) {
+                    ac.debugErr(s.toString());
+                }
                 ac.kill();
             }
-            
+
+            // record the move in the grid
+            if (oldX != ac.x || oldY != ac.y) {
+                aliens.move(ac, oldX, oldY, ac.x, ac.y);
+            }
+
             // any obtained view is potentially stale again
             ac.ctx.view = null;
         }
@@ -107,8 +106,7 @@ public class SpaceGrid {
         for (Iterator<AlienContainer> iterator = aliens.iterator(); iterator.hasNext();) {
             AlienContainer ac = iterator.next();
             if (ac.energy <= 0) {
-                vis.showDeath(ac.alienPackageName, ac.alienClassName, ac.alien.hashCode(),
-                        ac.x, ac.y);
+                vis.showDeath(ac.getFullAlienSpec());
                 aliens.unplug(ac);
                 iterator.remove();
             }
@@ -139,7 +137,10 @@ public class SpaceGrid {
                 thisAlien.currentActionCode = ActionCode.None;
                 thisAlien.currentActionPower = 0;
                 thisAlien.debugErr("Unhandled exception in getAction(): " + ex.toString());
-                thisAlien.kill();
+                for(StackTraceElement s:ex.getStackTrace()) {
+                    thisAlien.debugErr(s.toString());
+                }
+                 thisAlien.kill();
             }
         }
 
@@ -155,7 +156,8 @@ public class SpaceGrid {
             switch (thisAlien.currentActionCode) {
                 case Fight:
                     //vis.debugOut("SpaceGrid: Processing Fight");
-                    // Note: You can fight with aliens of your own species
+
+                    List<AlienSpec> fightSpecs = new ArrayList<>();
 
                     thisAlien.fought = true;
 
@@ -172,7 +174,11 @@ public class SpaceGrid {
                         if (fightingAlien.currentActionCode != ActionCode.Fight) {
                             fightingAlien.currentActionPower = 0;
                         }
+
+                        fightSpecs.add(fightingAlien.getFullAlienSpec());
                     }
+
+                    vis.showFightBefore(thisAlien.x, thisAlien.y, fightSpecs);
 
                     // Determine the winner and maximum tech in the fight
                     int winningPower = 0; // The fight powers might tie
@@ -193,7 +199,7 @@ public class SpaceGrid {
                         // If alien was winner / part of a tie
                         if (ac.currentActionPower == winningPower) {
                             // If the species was not already known to be a winning race
-                            String name = ac.getFullName();
+                            String name = ac.getFullSpeciesName();
                             if (!winningSpecies.contains(name)) {
                                 // Add it
                                 winningSpecies.add(name);
@@ -216,7 +222,6 @@ public class SpaceGrid {
                             if (winningPower > ac.currentActionPower + 5) {
 
                                 // The alien will then be killed
-                                // aliens.get(k).api.debugOut("Lost and died of its wounds.");
                                 ac.kill();
 
                             } else { // If the alien was beaten by less than 5 points
@@ -224,7 +229,7 @@ public class SpaceGrid {
                                 ac.tech = 2;
                             }
                         }
-                        // TODO: Write showFightAfter here
+                        vis.showFightAfter(thisAlien.x, thisAlien.y, fightSpecs);
                     }
                     break;
 
@@ -275,9 +280,10 @@ public class SpaceGrid {
                             this.vis,
                             thisAlien.x + dir.x(),
                             thisAlien.y + dir.y(),
-                            thisAlien.alienPackageName,
-                            thisAlien.alienClassName,
-                            thisAlien.alienConstructor,
+                            thisAlien.domainName,
+                            thisAlien.packageName,
+                            thisAlien.className,
+                            thisAlien.constructor,
                             power,
                             thisAlien.tech);   // tech inherited undiminished from parent
 
@@ -294,16 +300,14 @@ public class SpaceGrid {
         for (AlienContainer ac : newAliens) {
             aliens.addAlienAndPlug(ac);
             // visualize
-            vis.showSpawn(ac.alienPackageName, ac.alienClassName, ac.alien.hashCode(),
-                    ac.x, ac.y, ac.energy, ac.tech);
+            vis.showSpawn(ac.getFullAlienSpec());
         }
     }
 
-
-    void addAlien(int x, int y, String alienPackageName, String alienClassName, Constructor<?> cns) {
-        AlienContainer aC = new AlienContainer(this, this.vis, x, y, alienPackageName, alienClassName, cns, 1, 1);
-        aliens.addAlienAndPlug(aC);
-        vis.showSpawn(alienPackageName, alienClassName, aC.alien.hashCode(), x, y, aC.energy, aC.tech);
+    void addAlien(int x, int y, String domainName, String alienPackageName, String alienClassName, Constructor<?> cns) {
+        AlienContainer ac = new AlienContainer(this, this.vis, x, y, domainName, alienPackageName, alienClassName, cns, 1, 1);
+        aliens.addAlienAndPlug(ac);
+        vis.showSpawn(ac.getFullAlienSpec());
     }
 
     // Note: Having a seperate method for each SpaceObject seems a little gross,
@@ -334,7 +338,7 @@ public class SpaceGrid {
             debugMessage += "alien";
 
             // position (0,0) leads to random assignment
-            addAlien(0, 0, element.packageName, element.className, element.cns);
+            addAlien(0, 0, "eastsideprep.org", element.packageName, element.className, element.cns);
 
         } else if (element.kind == GameElementKind.PLANET) {
             debugMessage += "planet";

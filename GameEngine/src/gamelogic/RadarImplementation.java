@@ -18,29 +18,29 @@ public class RadarImplementation implements Radar {
 
     private ArrayList<SpaceObject> sOs;
     private AlienGrid ag;
-    private int x;
-    private int y;
+    private int centerX;
+    private int centerY;
     private int size;
 
     public RadarImplementation(AlienGrid ag) {
         this.ag = ag;
         this.sOs = new ArrayList<>();
-        this.x = 0;
-        this.y = 0;
+        this.centerX = 0;
+        this.centerY = 0;
         this.size = 0;
     }
 
-    public RadarImplementation(AlienGrid ag, ArrayList<SpaceObject> sOs, int x, int y, int size) {
+    public RadarImplementation(AlienGrid ag, ArrayList<SpaceObject> sOs, int centerX, int centerY, int size) {
         this.ag = ag;
         this.sOs = sOs;
-        this.x = x;
-        this.y = y;
+        this.centerX = centerX;
+        this.centerY = centerY;
         this.size = size;
     }
 
     public int checkPosX(int x) throws CantSeeSquareException {
-        if (x < this.x - size
-                || x > this.x + size) {
+        if (x < this.centerX - size
+                || x > this.centerX + size) {
             throw new CantSeeSquareException();
         }
         if (x < 0) {
@@ -53,8 +53,8 @@ public class RadarImplementation implements Radar {
     }
 
     public int checkPosY(int y) throws CantSeeSquareException {
-        if (y < this.y - size
-                || y > this.y + size) {
+        if (y < this.centerY - size
+                || y > this.centerY + size) {
             throw new CantSeeSquareException();
         }
         if (y < 0) {
@@ -79,22 +79,22 @@ public class RadarImplementation implements Radar {
     public ArrayList<AlienSpec> getAliensAtPos(int x, int y) throws CantSeeSquareException {
         ArrayList<AlienSpec> as = new ArrayList();
         for (AlienContainer ac : ag.acGrid[x][y]) {
-            as.add(new AlienSpec(null, ac.alienPackageName, ac.alienClassName));
+            as.add(ac.getSimpleAlienSpec());
         }
         return as;
     }
 
     public ArrayList<AlienSpec> getAliensInView() throws CantSeeSquareException {
         ArrayList<AlienSpec> as = new ArrayList();
-        int x1 = checkPosX(this.x - size);
-        int x2 = checkPosX(this.x + size);
-        int y1 = checkPosY(this.y - size);
-        int y2 = checkPosY(this.y + size);
+        int x1 = checkPosX(this.centerX - size);
+        int x2 = checkPosX(this.centerX + size);
+        int y1 = checkPosY(this.centerY - size);
+        int y2 = checkPosY(this.centerY + size);
 
         for (int x = x1; x <= x2; x++) {
             for (int y = y1; y <= y2; y++) {
                 for (AlienContainer ac : ag.acGrid[x][y]) {
-                    as.add(new AlienSpec(null, ac.alienPackageName, ac.alienClassName, ac.alien.hashCode(), ac.x, ac.y));
+                    as.add(ac.getSimpleAlienSpec());
                 }
             }
         }
