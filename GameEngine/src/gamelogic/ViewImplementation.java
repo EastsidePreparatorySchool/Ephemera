@@ -15,21 +15,15 @@ import java.util.ArrayList;
  */
 public class ViewImplementation implements View {
 
+    private final AlienContainer ac;
     private final List<AlienContainer> aCs;
     private final List<SpaceObject> sOs;
     private final int bottomX;
     private final int bottomY;
     private final int size;
 
-    public ViewImplementation() {
-        this.aCs = new ArrayList<>();
-        this.sOs = new ArrayList<>();
-        this.bottomX = 0;
-        this.bottomY = 0;
-        this.size = 0;
-    }
-
-    public ViewImplementation(List<AlienContainer> aCs, List<SpaceObject> sOs, int bottomX, int bottomY, int size) {
+    public ViewImplementation(AlienContainer ac, List<AlienContainer> aCs, List<SpaceObject> sOs, int bottomX, int bottomY, int size) {
+        this.ac = ac;
         this.aCs = aCs;
         this.sOs = sOs;
         this.bottomX = bottomX;
@@ -39,18 +33,7 @@ public class ViewImplementation implements View {
 
     @Override
     public int getEnergyAtPos(int x, int y) throws CantSeeSquareException {
-        if (bottomX + 2 * size < x
-                || bottomX > x
-                || bottomY + 2 * size < y
-                || bottomY > y) {
-            throw new CantSeeSquareException();
-        }
-        for (AlienContainer aC : aCs) {
-            if (aC.x == x && aC.y == y) {
-                return aC.energy;
-            }
-        }
-        return -1;
+        return 0;
     }
 
     @Override

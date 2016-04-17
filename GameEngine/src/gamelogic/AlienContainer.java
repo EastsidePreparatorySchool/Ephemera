@@ -8,6 +8,8 @@ package gamelogic;
 import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -20,7 +22,11 @@ public class AlienContainer {
     public final String alienClassName;
     public final Constructor<?> alienConstructor;
     public Alien alien;
-    public final ContextImplementation api;
+    public final ContextImplementation ctx;
+    public final SpaceGrid grid;
+
+    public ActionCode currentActionCode;
+    public int currentActionPower;
 
     int tech;
     int energy;
@@ -37,7 +43,7 @@ public class AlienContainer {
     //
     // Heads up: This constructs an AlienContainer and contained Alien
     //
-    public AlienContainer(GameVisualizer vis, int x, int y, String alienPackageName, String alienClassName, Constructor<?> cns, int energy, int tech) {
+    public AlienContainer(SpaceGrid sg, GameVisualizer vis, int x, int y, String alienPackageName, String alienClassName, Constructor<?> cns, int energy, int tech) {
         Alien a;
 
         this.alienPackageName = alienPackageName;
@@ -46,7 +52,8 @@ public class AlienContainer {
         this.energy = energy;
         this.tech = tech;
         this.chatter = false;
-        this.api = new ContextImplementation(this, vis);
+        this.ctx = new ContextImplementation(this, vis);
+        this.grid = sg;
 
         // if position = (0,0) assign random position
         if (x == 0 && y == 0) {
@@ -62,7 +69,7 @@ public class AlienContainer {
         try {
             a = (Alien) cns.newInstance();
             this.alien = a;
-            a.init(this.api);
+            a.init(this.ctx);
         } catch (Throwable t) {
             this.alien = null;
             t.printStackTrace();
@@ -73,6 +80,7 @@ public class AlienContainer {
     public String getFullName() {
         return alienPackageName + ":" + alienClassName;
     }
+
     public void move(ViewImplementation view) throws NotEnoughTechException {
         // Whether the move goes off the board will be determined by the grid
 
@@ -92,8 +100,8 @@ public class AlienContainer {
         if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
             debugErr("ac.move: Out of bounds: (" + x + ":" + y + ")");
         }
-        
-        api.vis.showMove(alienPackageName, alienClassName, alien.hashCode(), oldx, oldy, x, y, energy, tech);
+
+        ctx.vis.showMove(alienPackageName, alienClassName, alien.hashCode(), oldx, oldy, x, y, energy, tech);
     }
 
     // this calculates inward drift based on location
@@ -152,10 +160,10 @@ public class AlienContainer {
          */
         // Approach 2:
         // Make the new move ever more tangential as the alien gets closer to the rim
-        api.vis.debugOut("Drift: r              " + Double.toString(r));
-        api.vis.debugOut("Drift: alpha          " + Double.toString(getAngleDiff(alpha, 0)));
-        api.vis.debugOut("Drift: deltaAlpha     " + Double.toString(getAngleDiff(deltaAlpha, 0)));
-        api.vis.debugOut("Drift: diff           " + Double.toString(getAngleDiff(deltaAlpha, alpha)));
+        ctx.vis.debugOut("Drift: r              " + Double.toString(r));
+        ctx.vis.debugOut("Drift: alpha          " + Double.toString(getAngleDiff(alpha, 0)));
+        ctx.vis.debugOut("Drift: deltaAlpha     " + Double.toString(getAngleDiff(deltaAlpha, 0)));
+        ctx.vis.debugOut("Drift: diff           " + Double.toString(getAngleDiff(deltaAlpha, alpha)));
 
         if (getAngleDiff(deltaAlpha, alpha) < Math.PI / 2) {
             // alien bearing slightly left, make it more left depending on r^3
@@ -165,19 +173,36 @@ public class AlienContainer {
             deltaAlpha = alpha + (Math.PI / 2) - (((Math.PI / 2) - getAngleDiff(deltaAlpha, alpha)) * (1 - Math.pow(r / 250, 3)));
         }
         deltaAlpha = getAngleDiff(deltaAlpha, 0);
-        api.vis.debugOut("Drift: new deltaAlpha " + Double.toString(deltaAlpha));
+        ctx.vis.debugOut("Drift: new deltaAlpha " + Double.toString(deltaAlpha));
 
         //put the x,y back together
         dx = deltaR * Math.cos(deltaAlpha);
         dy = deltaR * Math.sin(deltaAlpha);
 
-        api.vis.debugOut("Drift: ("
+        int dxi = (int) Math.round(dx);
+        int dyi = (int) Math.round(dy);
+
+        // stop-gap-measure to keep things in grid
+        if (x + dxi > 249) {
+            dxi = 249 - x;
+        }
+        if (x + dxi < -250) {
+            dxi = -250 - x;
+        }
+        if (y + dyi > 249) {
+            dyi = 249 - y;
+        }
+        if (y + dyi < -250) {
+            dyi = -250 - y;
+        }
+
+        ctx.vis.debugOut("Drift: ("
                 + (oldy) + ","
                 + (oldx) + ") -> ("
-                + ((int) Math.round(dx)) + ","
-                + ((int) Math.round(dy)) + ")");
+                + dxi + ","
+                + dyi + ")");
 
-        return new MoveDir((int) Math.round(dx), (int) Math.round(dy));
+        return new MoveDir(dxi, dyi);
     }
 
     // normalizes angle difference to fit in [0:2pi[
@@ -195,32 +220,35 @@ public class AlienContainer {
 
     }
 
-    public Action getAction(ViewImplementation view) throws NotEnoughEnergyException, UnknownActionException {
-        api.view = view;
-        Action action = alien.getAction();
-        switch (action.code) {
+    public void getAction() throws NotEnoughEnergyException, UnknownActionException {
+        Action a = alien.getAction();
+
+        this.currentActionCode = a.code;
+        this.currentActionPower = a.power;
+
+        switch (a.code) {
             case None:
             case Gain:
-                return action;
+                break;
+
             case Research:
                 if (tech >= energy) { // If the tech can't be researched due to lack of energy
                     debugOut("AC: Research with T:" + (tech) + " and E:" + (energy));
                     throw new NotEnoughEnergyException();
                 }
-                // return new Action(ActionCode.Research, tech); // GM: This seems like a mistake
-                return action;
+                break;
 
             case Spawn:
-                if (action.power + api.getSpawningCost() > energy) {
+                if (a.power + ctx.getSpawningCost() > energy) {
                     throw new NotEnoughEnergyException();
                 }
-                return action;
+                break;
             case Fight:
                 //TODO: Perform necessary checks
-                return action;
+                break;
 
             default:
-                debugOut("AC: Checking action, unknown: " + action.code.toString());
+                debugOut("AC: Checking action, unknown: " + a.code.toString());
                 throw new UnknownActionException();
         }
     }
@@ -262,17 +290,44 @@ public class AlienContainer {
     // this debugOut is not sensitive to chatter control
     public void debugOut(String s) {
         if (chatter) {
-            api.vis.debugOut("Alien " + getFullName() + "("
+            ctx.vis.debugOut("Alien " + getFullName() + "("
                     + Integer.toHexString(alien.hashCode()).toUpperCase() + "): " + s);
         }
     }
 
     public void debugErr(String s) {
         if (chatter) {
-            api.vis.debugErr("Alien " + getFullName() + "("
+            ctx.vis.debugErr("Alien " + getFullName() + "("
                     + Integer.toHexString(alien.hashCode()).toUpperCase() + "): " + s);
         }
     }
+
+    public ViewImplementation getView() {
+        // Create the alien's view
+        int size = tech;
+        int lowX = Math.max(x - size, (grid.width / -2));
+        int lowY = Math.max(y - size, (grid.height / -2));
+        int highX = Math.min(x + size, ((grid.width / 2) - 1));
+        int highY = Math.min(y + size, ((grid.height / 2) - 1));
+
+        List<AlienContainer> visibleAliens = new ArrayList<>();
+        List<SpaceObject> visibleObjects = new ArrayList<>();
+
+        for (int x = lowX; x <= highX; x++) {
+            for (int y = lowY; y <= highY; y++) {
+                if (!grid.aliens.isEmptyAt(x, y)) {
+                    visibleAliens.addAll(grid.aliens.getAliensAt(x, y));
+                }
+                //visibleObjects.add()..
+            }
+        }
+        
+        // excluse thyself
+        visibleAliens.remove(this);
+
+        return new ViewImplementation(this, visibleAliens, visibleObjects, lowX, lowY, size);
+    }
+
 }
 
 class NotEnoughEnergyException extends Exception {

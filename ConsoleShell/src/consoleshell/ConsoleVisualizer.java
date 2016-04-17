@@ -66,7 +66,7 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showCompletedTurn(int numAliens) {
+    public void showCompletedTurn(int totalTurns, int numAliens, long timeTaken) {
         ++totalTurnCounter;
         this.numAliens = numAliens;
         debugOut("Turn #" + totalTurnCounter + " complete.");

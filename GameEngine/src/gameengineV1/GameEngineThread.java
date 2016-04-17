@@ -36,10 +36,10 @@ public class GameEngineThread extends Thread {
         GameCommand gc;
         boolean endGame = false;
         int totalTurns = 0;
-        
+
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
-        engine.grid = new SpaceGrid(engine.vis);
+        engine.grid = new SpaceGrid(engine.vis, 500, 500);
 
         try {
             addClassPathFile("alieninterfaces");
@@ -64,24 +64,23 @@ public class GameEngineThread extends Thread {
                             // endGame signifies that an "End" request has come through
                         }
                     } while (!continueGame && !endGame);
-                    
+
                     //
                     // Execute game turn
                     //
-
                     long startTurnTime = System.nanoTime();
                     try {
-                        
+
                         if (engine.grid.executeGameTurn()) {
                             // return true == game over because at most one species left
                             engine.gameState = GameState.Paused;
                             engine.vis.showGameOver();
                         }
-                        totalTurns++;
                     } catch (Exception e) {
                         engine.vis.debugErr("GameEngineThread: Unhandled exception during turn: " + e.getMessage());
                         e.printStackTrace();
                     }
+                    totalTurns++;
                     engine.vis.showCompletedTurn(totalTurns, engine.grid.aliens.size(), System.nanoTime() - startTurnTime);
                 }
 

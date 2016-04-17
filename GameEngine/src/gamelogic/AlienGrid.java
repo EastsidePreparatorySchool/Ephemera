@@ -5,44 +5,77 @@
  */
 package gamelogic;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  *
  * @author gmein
  */
-public class AlienGrid extends ArrayList<AlienContainer> {
+public class AlienGrid extends LinkedList<AlienContainer> {
 
-    ArrayList<AlienContainer>[][] acGrid;
+    LinkedList<AlienContainer>[][] acGrid;
     int centerX;
     int centerY;
 
     public AlienGrid(int width, int height) {
-        acGrid = new ArrayList[width][height];
+        acGrid = new LinkedList[width][height];
         centerX = width / 2;
         centerY = height / 2;
     }
 
-    @Override
-    public boolean add(AlienContainer ac) {
+    public boolean addAlienAndPlug(AlienContainer ac) {
         // add alien to grid as well as to master list
-        acGrid[ac.x+centerX][ac.y+centerY].add(ac);
+        LinkedList<AlienContainer> acs = acGrid[ac.x + centerX][ac.y + centerY];
+        if (acs == null) {
+            acs = new LinkedList();
+            acGrid[ac.x + centerX][ac.y + centerY] = acs;
+        }
+        acs.add(ac);
+        //System.out.println("added "+ ac.hashCode() + " to list " + acs.hashCode());
         return super.add(ac);
     }
 
-    public AlienContainer remove(int i) {
+    public AlienContainer removeAlienAndUnplug(AlienContainer ac) {
         // remove alien from grid as well as from master list
-        AlienContainer ac = super.remove(i);
-        acGrid[ac.x + centerX][ac.y + centerY].remove(ac);
+        super.remove(ac);
+        unplug(ac);
         return ac;
     }
+    
+    
 
     public void move(AlienContainer ac, int oldX, int oldY, int newX, int newY) {
-        acGrid[oldX+centerX][oldY+centerY].remove(ac);
-        acGrid[newX+centerX][newY+centerY].add(ac);
+        LinkedList<AlienContainer> acs = acGrid[oldX + centerX][oldY + centerY];
+        acs.remove(ac);
+        //System.out.println("removing "+ ac.hashCode() + " from list " + acs.hashCode());
+        if (acs.isEmpty()) {
+            acGrid[oldX + centerX][oldY + centerY] = null;
+        }
+
+        acs = acGrid[newX + centerX][newY + centerY];
+        if (acs == null) {
+            acs = new LinkedList();
+            acGrid[newX + centerX][newY + centerY] = acs;
+        }
+        acs.add(ac);
+        //System.out.println("added "+ ac.hashCode() + " to list " + acs.hashCode());
     }
 
-    public ArrayList<AlienContainer> getAliensAt(int x, int y) {
-        return acGrid[x+centerX][y+centerY];
+    public void unplug(AlienContainer ac) {
+        // remove alien from grid as well as from master list
+        LinkedList<AlienContainer> acs = acGrid[ac.x + centerX][ac.y + centerY];
+        //System.out.println("removing "+ ac.hashCode() + " from list " + acs.hashCode());
+        acs.remove(ac);
+        if (acs.isEmpty()) {
+            acGrid[ac.x + centerX][ac.y + centerY] = null;
+        }
+    }
+
+    public LinkedList<AlienContainer> getAliensAt(int x, int y) {
+        return acGrid[x + centerX][y + centerY];
+    }
+
+    public boolean isEmptyAt(int x, int y) {
+        return acGrid[x + centerX][y + centerY] == null;
     }
 }

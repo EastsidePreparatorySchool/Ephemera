@@ -19,12 +19,20 @@ public class SpaceGrid {
 
     GameSpace[][] grid;
     GameVisualizer vis;
-    public List<AlienContainer> aliens;    // Aliens are born and die, so
-    // our list needs to be able to grow and shrink
-
-    List<SpaceObject> objects; // Stars, planets, space stations, etc.
+    public AlienGrid aliens;    // Aliens are born and die, so our list needs to be able to grow and shrink
+    List<SpaceObject> objects;  // Stars, planets, space stations, etc.
+    int width;
+    int height;
 
     static Random rand = new Random(System.currentTimeMillis());
+
+    public SpaceGrid(GameVisualizer vis, int width, int height) {
+        this.vis = vis;
+        this.width = width;
+        this.height = height;
+        aliens = new AlienGrid(width, height); // AlienContainer type is inferred
+        objects = new ArrayList<>();
+    }
 
     public boolean executeGameTurn() {
         moveAliens();
@@ -69,32 +77,30 @@ public class SpaceGrid {
         vis.debugErr("");
     }
 
-    public SpaceGrid(GameVisualizer vis) {
-        this.vis = vis;
-        aliens = new ArrayList<>(); // AlienContainer type is inferred
-        objects = new ArrayList<>();
-    }
-
     public void moveAliens() {
         vis.debugOut("Moving " + (aliens.size()) + " aliens");
-        for (int i = 0; i < aliens.size(); i++) {
-            ViewImplementation view = getAlienView(i);
+        for (AlienContainer ac : aliens) {
+            ViewImplementation view = ac.getView();
             try {
-                aliens.get(i).move(view);
+                int oldX = ac.x;
+                int oldY = ac.y;
+                ac.move(view);
+                aliens.move(ac, oldX, oldY, ac.x, ac.y);
             } catch (Exception ex) {
-                aliens.get(i).debugErr("Unhandled exception in move: " + ex.toString());
-                aliens.get(i).kill();
+                ac.debugErr("Unhandled exception in move: " + ex.toString());
+                ac.kill();
             }
         }
     }
 
     public void removeDeadAliens() {
-        int number = aliens.size();
-        for (int i = number - 1; i >= 0; i--) {
-            if (aliens.get(i).energy <= 0) {
-                vis.showDeath(aliens.get(i).alienPackageName, aliens.get(i).alienClassName, aliens.get(i).alien.hashCode(),
-                        aliens.get(i).x, aliens.get(i).y);
-                aliens.remove(i);
+        for (Iterator<AlienContainer> iterator = aliens.iterator(); iterator.hasNext();) {
+            AlienContainer ac = iterator.next();
+            if (ac.energy <= 0) {
+                vis.showDeath(ac.alienPackageName, ac.alienClassName, ac.alien.hashCode(),
+                        ac.x, ac.y);
+                aliens.unplug(ac);
+                iterator.remove();
             }
         }
     }
@@ -107,145 +113,106 @@ public class SpaceGrid {
     }
 
     public void performAlienActions() {
-        int number = aliens.size();
+        LinkedList<AlienContainer> newAliens = new LinkedList();
 
-        vis.debugOut("Processing actions for " + (number) + " aliens");
+        vis.debugOut("Processing actions for " + (aliens.size()) + " aliens");
 
-        // Obtain all actions before enacting any of them
-        Action[] actions = new Action[number];
-
-        for (int i = 0; i < number; i++) {
-            AlienContainer thisAlien = aliens.get(i);
-
-            ViewImplementation view = getAlienView(i);
+        // first request all the actions from the aliens
+        for (AlienContainer thisAlien : aliens) {
+            ViewImplementation view = thisAlien.getView();
 
             try {
-                //thisAlien.api.debugOut("Query action ...");
                 // Note: getAction() checks validity
-                actions[i] = thisAlien.getAction(view);
-                //thisAlien.api.debugOut(actions[i].code.name());
-
+                thisAlien.getAction();
+                //thisAlien.api.debugOut(thisAlien.currentAction.name());
             } catch (Exception ex) {
                 // if an alien blows up here, we'll kill it. 
-                actions[i] = new Action(ActionCode.None);
+                thisAlien.currentActionCode = ActionCode.None;
+                thisAlien.currentActionPower = 0;
                 thisAlien.debugErr("Blew up on getAction(): " + ex.toString());
                 thisAlien.kill();
             }
         }
 
         // now process all actions
-        for (int i = 0; i < actions.length; i++) {
-            Action thisAction = actions[i];
-            AlienContainer thisAlien = aliens.get(i);
-            thisAlien.debugOut(thisAction.code.toString());
+        for (AlienContainer thisAlien : aliens) {
+            thisAlien.debugOut(thisAlien.currentActionCode.toString());
 
-            switch (thisAction.code) {
+            // if this guy was part of a fight, don't bother with more actions
+            if (thisAlien.fought) {
+                continue;
+            }
+
+            switch (thisAlien.currentActionCode) {
                 case Fight:
                     //vis.debugOut("SpaceGrid: Processing Fight");
                     // Note: You can fight with aliens of your own species
-                    
-                    if (aliens.get(i).fought) {
-                        break;
-                    }
-                    
-
-                    List<Integer> fightingAliens = new ArrayList<>(); // Stores indexes
-                    List<String> fightingRaces = new ArrayList<String>();
-                    List<Integer> fightingPowers = new ArrayList<Integer>();
-
-                    fightingAliens.add(i);
-                    fightingRaces.add(thisAlien.alienPackageName + ":"
-                            + thisAlien.alienClassName
-                            + "(" + Integer.toHexString(thisAlien.alien.hashCode()).toUpperCase() + ")");
-                    fightingPowers.add(thisAction.power);
 
                     thisAlien.fought = true;
 
-                    for (int k = i + 1; k < actions.length; k++) {
-                        AlienContainer theOtherAlien = aliens.get(k);
-                        Action theOtherAction = actions[k];
+                    LinkedList<AlienContainer> fightingAliens = aliens.getAliensAt(thisAlien.x, thisAlien.y);
+                    for (AlienContainer fightingAlien : fightingAliens) {
 
-                        if (theOtherAlien.x == thisAlien.x
-                                && theOtherAlien.y == thisAlien.y) {
+                        // If an alien didn't choose to fight at all
+                        // (or if they fought with zero power)
+                        // they will get blown off the board and the alien
+                        // that won the fight will take their energy
+                        // TODO: consider whether they should be killed or just lose
+                        fightingAlien.fought = true;
 
-                            // If an alien didn't choose to fight at all
-                            // (or if they fought with zero power)
-                            // they will get blown off the board and the alien
-                            // that won the fight will take their energy
-                            // TODO: consider whether they should be killed or just lose
-                            
-                            theOtherAlien.fought = true;
-                            fightingAliens.add(k);
-                            fightingRaces.add(theOtherAlien.alienPackageName + ":"
-                                    + theOtherAlien.alienClassName
-                                    + "(" + Integer.toHexString(theOtherAlien.alien.hashCode()).toUpperCase() + ")");
-                            
-                            //fightingPowers.add(theOtherAction.power);
-
-                            if (theOtherAction.code != ActionCode.Fight) {
-                                //theOtherAlien.api.debugOut("Was a pacifist at the wrong time and place.");
-                                fightingPowers.add(0);
-                            } else {
-                                fightingPowers.add(theOtherAction.power);
-                            }
+                        if (fightingAlien.currentActionCode != ActionCode.Fight) {
+                            fightingAlien.currentActionPower = 0;
                         }
                     }
-
-                    String[] fRs = new String[fightingRaces.size()];
-                    Integer[] fPs = new Integer[fightingPowers.size()];
-
-                    vis.showFightBefore(aliens.get(i).x, aliens.get(i).y, fightingRaces.toArray(fRs), fightingPowers.toArray(fPs));
 
                     // Determine the winner and maximum tech in the fight
                     int winningPower = 0; // The fight powers might tie
                     int maxTech = 0;
-                    
-                    for (int k = 0; k < fightingAliens.size(); k++) {
+
+                    for (AlienContainer candidateWinner : fightingAliens) {
                         // Winning power
-                        winningPower = Math.max(winningPower, fightingPowers.get(k));
+                        winningPower = Math.max(winningPower, candidateWinner.currentActionPower);
 
                         // Max tech
-                        if (aliens.get(fightingAliens.get(k)).tech > maxTech) {
-                            maxTech = aliens.get(fightingAliens.get(k)).tech;
-                        }
+                        maxTech = Math.max(maxTech, candidateWinner.tech);
                     }
-                    
+
                     List<String> winningSpecies = new ArrayList<>();
-                    int winnerPos = 0; // Must be initialized to make Java happy
-                    
-                    for (int k = 0; k < fightingAliens.size(); k++) {
+                    AlienContainer winner = null; // Must be initialized to make Java happy
+
+                    for (AlienContainer ac : fightingAliens) {
                         // If alien was winner / part of a tie
-                        if (fightingPowers.get(k) == winningPower) {
+                        if (ac.currentActionPower == winningPower) {
                             // If the species was not already known to be a winning race
-                            String name = aliens.get(fightingAliens.get(k)).getFullName();
+                            String name = ac.getFullName();
                             if (!winningSpecies.contains(name)) {
                                 // Add it
                                 winningSpecies.add(name);
                             }
-                            
-                            winnerPos = k;
+                            winner = ac;
                         }
                     }
-                    
+
+                    // TODO/BUG: This bestowes maxtech on only one alien of the wining species
                     if (winningSpecies.size() == 1) { // If there is no tie
                         // The winner's tech is brought up to the max in the group
-                        aliens.get(fightingAliens.get(winnerPos)).tech = maxTech;
+                        winner.tech = maxTech;
                     }
-                    
-                    for (int k = 0; k < fightingAliens.size(); k++) {
+
+                    for (AlienContainer ac : fightingAliens) {
                         // If the alien was not part of one of the winning species
-                        if (!winningSpecies.contains(aliens.get(fightingAliens.get(k)).getFullName())){
+                        if (!winningSpecies.contains(ac.getFullName())) {
 
                             // If the alien was beaten by more than five energy points
-                            if (winningPower > actions[fightingAliens.get(k)].power + 5) {
+                            if (winningPower > ac.currentActionPower + 5) {
 
                                 // The alien will then be killed
                                 // aliens.get(k).api.debugOut("Lost and died of its wounds.");
-                                aliens.get(fightingAliens.get(k)).kill();
+                                ac.kill();
 
                             } else { // If the alien was beaten by less than 5 points
                                 // They go down to two technology
-                                aliens.get(fightingAliens.get(k)).tech = 2;
+                                ac.tech = 2;
                             }
                         }
                         // TODO: Write showFightAfter here
@@ -257,21 +224,26 @@ public class SpaceGrid {
                     break;
 
                 case Research:
-                    thisAlien.energy -= thisAlien.tech;
-                    thisAlien.tech++; // you only gain 1 tech regardless of energy invested
+                    // there is an arbitrary border at 32 to keep views under control
+                    if (thisAlien.tech < 30) {
+                        thisAlien.energy -= thisAlien.tech;
+                        thisAlien.tech++; // you only gain 1 tech regardless of energy invested
+                    }
                     break;
 
                 case Spawn:
-                    thisAlien.energy -= thisAlien.api.getSpawningCost() + thisAction.power;
+                    thisAlien.energy -= thisAlien.ctx.getSpawningCost() + thisAlien.currentActionPower;
 
                     // construct a random move for the new alien depending on power and send that move through drift correction
                     // spend thisAction.power randomly on x move, y move and initital power
-                    int power = Math.min(rand.nextInt(thisAction.power), thisAction.power/2);
-                    int powerForX = rand.nextInt(thisAction.power - power);
-                    int powerForY = thisAction.power - power - powerForX;
+                    int power = Math.min(rand.nextInt(thisAlien.currentActionPower), thisAlien.currentActionPower / 2);
+                    int powerForX = rand.nextInt(thisAlien.currentActionPower - power);
+                    int powerForY = rand.nextInt(thisAlien.currentActionPower - power - powerForX);
 
                     int x = powerForX * (rand.nextInt(2) == 0 ? 1 : -1);
                     int y = powerForY * (rand.nextInt(2) == 0 ? 1 : -1);
+
+                    thisAlien.energy -= power + powerForX + powerForY;
 
                     MoveDir dir = new MoveDir(x, y);
                     dir = thisAlien.applyDrift(thisAlien.x, thisAlien.y, dir);
@@ -285,11 +257,12 @@ public class SpaceGrid {
                         vis.debugErr("sg.spawn: Out of bounds: (" + x + ":" + y + ")");
                         vis.debugErr("sg.spawn: Out of bounds: old(" + thisAlien.x + ":" + thisAlien.y + ")");
                         vis.debugErr("sg.spawn: Out of bounds: dir(" + dir.x() + ":" + dir.y() + ")");
-                        vis.debugErr("sg.spawn: Out of bounds: power " + thisAction.power);
+                        vis.debugErr("sg.spawn: Out of bounds: power " + thisAlien.currentActionPower);
                     }
 
                     // make a container, it will create the alien
                     AlienContainer aC = new AlienContainer(
+                            this,
                             this.vis,
                             thisAlien.x + dir.x(),
                             thisAlien.y + dir.y(),
@@ -299,77 +272,28 @@ public class SpaceGrid {
                             power,
                             thisAlien.tech);   // tech inherited undiminished from parent
 
-                    // Add in the alien to the end of the list so actions
-                    // are not executed on it this turn
-                    aliens.add(aC);
+                    // Add in the alien to a new arraylist
+                    // so the list is not disrupted
+                    newAliens.add(aC);
 
-                    // visualize
-                    vis.showSpawn(aC.alienPackageName, aC.alienClassName, aC.alien.hashCode(),
-                            aC.x, aC.y, aC.energy, aC.tech);
                     break;
             }
             // this ends our big switch statement
         }
+
+        // add all new aliens
+        for (AlienContainer ac : newAliens) {
+            aliens.addAlienAndPlug(ac);
+            // visualize
+            vis.showSpawn(ac.alienPackageName, ac.alienClassName, ac.alien.hashCode(),
+                    ac.x, ac.y, ac.energy, ac.tech);
+        }
     }
 
-    private ViewImplementation getAlienView(int index) {
-        // Create the alien's view
-        int size = aliens.get(index).tech;
-        int cornerX = aliens.get(index).x - size;
-        int cornerY = aliens.get(index).y - size;
-        // Bottom left corner
-        List<AlienContainer> visibleAliens = new ArrayList<>();
-        List<SpaceObject> visibleObjects = new ArrayList<>();
-
-        for (int k = 0; k < aliens.size(); k++) {
-            if (k != index) { // The alien does not show itself on the map
-                AlienContainer alien = aliens.get(k);
-                if ( // If the alien can be seen
-                        alien.x >= cornerX
-                        && alien.x <= cornerX + size * 2
-                        && alien.y >= cornerY
-                        && alien.y <= cornerY + size * 2) {
-                    visibleAliens.add(alien);
-                }
-            }
-        }
-        for (int k = 0; k < objects.size(); k++) {
-            SpaceObject obj = objects.get(k);
-            if ( // If the alien can be seen
-                    obj.x >= cornerX
-                    && obj.x <= cornerX + size * 2
-                    && obj.y >= cornerY
-                    && obj.y <= cornerY + size * 2) {
-                visibleObjects.add(obj);
-            }
-        }
-
-        return new ViewImplementation(visibleAliens, visibleObjects, cornerX, cornerY, size);
-    }
-
-    private int maxValueIndex(List<Integer> array) {
-        int index = 0;
-        for (int i = 0; i < array.size(); i++) {
-            if (array.get(i) > array.get(index)) {
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    private int maxValue(int[] array) {
-        int max = Integer.MIN_VALUE;
-        for (int item : array) {
-            if (item > max) {
-                max = item;
-            }
-        }
-        return max;
-    }
 
     void addAlien(int x, int y, String alienPackageName, String alienClassName, Constructor<?> cns) {
-        AlienContainer aC = new AlienContainer(this.vis, x, y, alienPackageName, alienClassName, cns, 1, 1);
-        aliens.add(aC);
+        AlienContainer aC = new AlienContainer(this, this.vis, x, y, alienPackageName, alienClassName, cns, 1, 1);
+        aliens.addAlienAndPlug(aC);
         vis.showSpawn(alienPackageName, alienClassName, aC.alien.hashCode(), x, y, aC.energy, aC.tech);
     }
 

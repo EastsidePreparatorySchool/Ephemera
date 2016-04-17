@@ -209,7 +209,7 @@ public class EphemeraWindowsShell extends Application {
         //buttonProjected.setPrefSize(100, 20);
         vbox.getChildren().addAll(buttonPause);
         EphemeraWindowsShell.turnCounterText = new Text("Turns completed: 0");
-        EphemeraWindowsShell.turnCounterText.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        EphemeraWindowsShell.turnCounterText.setFont(Font.font("Consolas", FontWeight.BOLD, 18));
         EphemeraWindowsShell.turnCounterText.setStyle("-fx-background-color: black;");
         EphemeraWindowsShell.turnCounterText.setFill(Color.WHITE);
 

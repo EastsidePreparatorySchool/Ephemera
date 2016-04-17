@@ -59,7 +59,7 @@ class VisualizationGrid implements GameVisualizer {
 
     public void init(GameEngine eng, ConsolePane console, SpeciesSet species, String path, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
         Date date = new Date();
-        engine = eng;
+        this.engine = eng;
 
         // Set up properties
         this.width = width;
@@ -207,6 +207,32 @@ class VisualizationGrid implements GameVisualizer {
         }
     }
 
+    String paddedString(String s, int space) {
+        s = "          ".substring(0, space) + s;
+        return s.substring(s.length() - space);
+    }
+
+    String paddedString(long i, int space) {
+        return paddedString(Long.toString(i), space);
+    }
+
+    String paddedTimeString(long ns) {
+        return paddedString(timeString(ns), 6);
+    }
+
+    String timeString(long ns) {
+        if (ns > 1000000000L) {
+            return (ns / 1000000000L) + "s";
+        }
+        if (ns > 1000000L) {
+            return (ns / 1000000L) + "ms";
+        }
+        if (ns > 1000L) {
+            return (ns / 1000L) + (((char) 181) + "s");
+        }
+        return ns + "ns";
+    }
+
     @Override
     public void showCompletedTurn(int totalTurns, int numAliens, long time) {
         ++totalTurnCounter;
@@ -217,11 +243,11 @@ class VisualizationGrid implements GameVisualizer {
             public void run() {
                 GraphicsContext gc = canvas.getGraphicsContext2D();
                 renderOnScreen(gc);
-                EphemeraWindowsShell.turnCounterText.setText("Turns completed: " + totalTurnCounter
-                        + ", Total aliens: " + numAliens
-                        + ", time for turn: " + (time/1000) + (char) 181 + "s"
-                        + ", time/#aliens " + (((long) time/1000) / (((long) numAliens))) + (char) 181 + "s"
-                        + ", time/#aliens^2 " + ((long) time) / (((long) numAliens * (long) numAliens)) + "ns"
+                EphemeraWindowsShell.turnCounterText.setText("Turns completed: " + paddedString(totalTurnCounter, 6)
+                        + ", Total aliens: " + paddedString(numAliens, 7)
+                        + ", time for turn: " + paddedTimeString(time)
+                        + ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens)))
+                        + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)))
                 );
                 //EphemeraWindowsShell.armPauseButton();
             }
@@ -328,6 +354,12 @@ class VisualizationGrid implements GameVisualizer {
     @Override
     public void debugErr(String s) {
         println(s);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                engine.queueCommand(new GameCommand(GameCommandCode.Pause));
+            }
+        });
     }
 
     @Override

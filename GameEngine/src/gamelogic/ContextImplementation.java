@@ -16,14 +16,12 @@ public class ContextImplementation implements Context {
 
     private AlienContainer aC;
     public GameVisualizer vis;
-    public ViewImplementation view;
     public boolean chatter;
 
     ContextImplementation(AlienContainer aC, GameVisualizer vis) {
         this.aC = aC;
         this.vis = vis;
         chatter = false;
-        view = new ViewImplementation();
     }
 
     public int getEnergy() {
@@ -43,7 +41,7 @@ public class ContextImplementation implements Context {
     }
 
     public View getView() {
-        return this.view;
+        return this.aC.getView();
     }
 
     public int getSpawningCost() {
