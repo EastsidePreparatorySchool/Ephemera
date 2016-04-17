@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.shape.StrokeLineCap;
 
 /**
  *
@@ -25,7 +26,7 @@ class VisualizationGrid implements GameVisualizer {
 
     public Cell[][] grid;
     public Canvas canvas;
-    public SpeciesSet species;
+    public SpeciesSet speciesSet;
 
     private int width;
     private int height;
@@ -60,7 +61,7 @@ class VisualizationGrid implements GameVisualizer {
         this.height = height;
         this.cellWidth = cellWidth;
         this.cellHeight = cellHeight;
-        this.species = species;
+        this.speciesSet = species;
         this.console = console;
 
         widthPX = width * cellWidth;
@@ -73,7 +74,7 @@ class VisualizationGrid implements GameVisualizer {
         grid = new Cell[height][width];
         for (int i = 0; i < grid.length; i++) {
             for (int k = 0; k < grid[i].length; k++) {
-                grid[i][k] = new Cell();
+                grid[i][k] = new Cell(speciesSet);
             }
         }
 
@@ -139,27 +140,54 @@ class VisualizationGrid implements GameVisualizer {
         gc.strokeOval(0.5, 0.5, widthPX - 0.5, heightPX - 0.5);
     }
 
-    public void incrementCell(int x, int y, String speciesName) {
-        if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
-            debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
-            return;
-        }
-        Cell cell = grid[x + (width / 2)][y + (height / 2)];
-        cell.addSpecies(speciesName, species.getColor(speciesName));
-    }
+    public void renderOnScreen2(GraphicsContext gc) {
+        Color[] color = {Color.BLACK, Color.BLACK, Color.BLACK};
 
-    public void decrementCell(int x, int y, String speciesName) {
-        if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
-            debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
-            return;
-        }
+        gc.setLineCap(StrokeLineCap.SQUARE);
+        gc.setLineWidth(1);
+        for (int i = 0; i < height; i++) {
+            for (int k = 0; k < width; k++) {
 
-        Cell cell = grid[x + (width / 2)][y + (height / 2)];
-        if (cell.alienCount > 0) {
-            cell.removeSpecies(speciesName);
-        } else {
-            debugOut("winvis: cell underflow at (" + x + "," + y + ")");
+                Cell cell = grid[i][k];
+                boolean isFighting = cell.isFighting();
+
+                if (cell.cellChanged) {
+                    int x = cellWidth * k;
+                    int y = cellHeight * i;
+
+                    color[1] = (isFighting ? Color.RED : Color.BLACK);
+                    if (cell.alienCount == 0) {
+                        if (!isFighting) {
+                            gc.setStroke(Color.BLACK);
+                            gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth + 0.5, y + 0.5);
+                            cell.cellChanged = false;
+                            continue;
+                        }
+                        color[0] = Color.BLACK;
+                        color[2] = Color.BLACK;
+                    } else if (cell.alienCount == 1) {
+                        color[0] = cell.getColor(1);
+                        color[2] = Color.BLACK;
+                    } else if (cell.alienCount == 2) {
+                        color[0] = cell.getColor(1);
+                        color[2] = cell.getColor(2);
+                    } else {
+                        color[0] = Color.WHITE;
+                        color[2] = Color.WHITE;
+                    }
+
+                    for (int l = 0; l < 3; l++) {
+                        gc.setStroke(color[l]);
+                        gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth / 3 + 0.5, y + 0.5);
+                        x++;
+                    }
+                    cell.cellChanged = false;
+                }
+            }
         }
+        gc.setStroke(Color.RED);
+        gc.setLineWidth(1.0);
+        gc.strokeOval(0.5, 0.5, widthPX - 0.5, heightPX - 0.5);
     }
 
     public void markFight(int x, int y) {
@@ -171,60 +199,6 @@ class VisualizationGrid implements GameVisualizer {
         cell.fight();
     }
 
-    private void print(String s) {
-        console.print(s);
-        try {
-            logFile.write(s);
-            logFile.flush();
-        } catch (Exception e) {
-        }
-    }
-
-    private void println(String s) {
-        console.println(s);
-        try {
-            logFile.write(s);
-            logFile.newLine();
-            logFile.flush();
-        } catch (Exception e) {
-        }
-    }
-
-    private void printlnLogOnly(String s) {
-        try {
-            logFile.write(s);
-            logFile.newLine();
-            logFile.flush();
-        } catch (Exception e) {
-        }
-    }
-
-    String paddedString(String s, int space) {
-        s = "          ".substring(0, space) + s;
-        return s.substring(s.length() - space);
-    }
-
-    String paddedString(long i, int space) {
-        return paddedString(Long.toString(i), space);
-    }
-
-    String paddedTimeString(long ns) {
-        return paddedString(timeString(ns), 7);
-    }
-
-    String timeString(long ns) {
-        if (ns > 10000000000L) {
-            return (ns / 1000000000L) + "s";
-        }
-        if (ns > 10000000L) {
-            return (ns / 1000000L) + "ms";
-        }
-        if (ns > 10000L) {
-            return (ns / 1000L) + (((char) 181) + "s");
-        }
-        return ns + "ns";
-    }
-
     @Override
     public void showCompletedTurn(int totalTurns, int numAliens, long time) {
         ++totalTurnCounter;
@@ -234,7 +208,7 @@ class VisualizationGrid implements GameVisualizer {
             @Override
             public void run() {
                 GraphicsContext gc = canvas.getGraphicsContext2D();
-                renderOnScreen(gc);
+                renderOnScreen2(gc);
                 EphemeraWindowsShell.turnCounterText.setText("Turns completed: " + paddedString(totalTurnCounter, 6)
                         + ", Total aliens: " + paddedString(numAliens, 7)
                         + ", time for turn: " + paddedTimeString(time)
@@ -253,17 +227,40 @@ class VisualizationGrid implements GameVisualizer {
         Thread.yield();
     }
 
+    public void incrementCell(int x, int y, String speciesName) {
+        if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
+            debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
+            return;
+        }
+        Cell cell = grid[x + (width / 2)][y + (height / 2)];
+        cell.addSpecies(speciesName);
+    }
+
+    public void decrementCell(int x, int y, String speciesName) {
+        if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
+            debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
+            return;
+        }
+
+        Cell cell = grid[x + (width / 2)][y + (height / 2)];
+        if (cell.alienCount > 0) {
+            cell.removeSpecies(speciesName);
+        } else {
+            debugOut("winvis: cell underflow at (" + x + "," + y + ")");
+        }
+    }
+
     @Override
     public void showMove(AlienSpec as, int oldx, int oldy) {
         if (showMove) {
             print("Vis.showMove: " + as.toString() + ",  moved from (");
             print(oldx + "," + oldy + ")");
         }
-        
+
         String speciesName = as.getFullSpeciesName();
         int x = as.x;
         int y = as.y;
-        
+
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -310,7 +307,7 @@ class VisualizationGrid implements GameVisualizer {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                species.addAlien(as.getFullSpeciesName());
+                speciesSet.addAlien(as.getFullSpeciesName());
                 incrementCell(as.x, as.y, as.getFullSpeciesName());
             }
         });
@@ -327,7 +324,7 @@ class VisualizationGrid implements GameVisualizer {
             @Override
             public void run() {
                 decrementCell(as.x, as.y, as.getFullSpeciesName());
-                species.removeAlien(as.getFullSpeciesName());
+                speciesSet.removeAlien(as.getFullSpeciesName());
             }
         });
     }
@@ -388,4 +385,59 @@ class VisualizationGrid implements GameVisualizer {
     public void showAliens(List<AlienSpec> aliens) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    private void print(String s) {
+        console.print(s);
+        try {
+            logFile.write(s);
+            logFile.flush();
+        } catch (Exception e) {
+        }
+    }
+
+    private void println(String s) {
+        console.println(s);
+        try {
+            logFile.write(s);
+            logFile.newLine();
+            logFile.flush();
+        } catch (Exception e) {
+        }
+    }
+
+    private void printlnLogOnly(String s) {
+        try {
+            logFile.write(s);
+            logFile.newLine();
+            logFile.flush();
+        } catch (Exception e) {
+        }
+    }
+
+    String paddedString(String s, int space) {
+        s = "          ".substring(0, space) + s;
+        return s.substring(s.length() - space);
+    }
+
+    String paddedString(long i, int space) {
+        return paddedString(Long.toString(i), space);
+    }
+
+    String paddedTimeString(long ns) {
+        return paddedString(timeString(ns), 7);
+    }
+
+    String timeString(long ns) {
+        if (ns > 10000000000L) {
+            return (ns / 1000000000L) + "s";
+        }
+        if (ns > 10000000L) {
+            return (ns / 1000000L) + "ms";
+        }
+        if (ns > 10000L) {
+            return (ns / 1000L) + (((char) 181) + "s");
+        }
+        return ns + "ns";
+    }
+
 }

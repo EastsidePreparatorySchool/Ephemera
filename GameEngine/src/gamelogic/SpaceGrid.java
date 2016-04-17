@@ -35,11 +35,14 @@ public class SpaceGrid {
     }
 
     public boolean executeGameTurn() {
-        moveAliens();
-        removeDeadAliens();
+        requestAlienMoves();
         Thread.yield();
+        recordAlienMoves();
+        removeDeadAliens();
+
         performAlienActions();
         removeDeadAliens();
+
         resetAliens();
         Thread.yield();
 
@@ -73,8 +76,8 @@ public class SpaceGrid {
         vis.debugErr("");
     }
 
-    public void moveAliens() {
-        vis.debugOut("Moving " + (aliens.size()) + " aliens");
+    public void requestAlienMoves() {
+        //vis.debugOut("Requesting moves for " + (aliens.size()) + " aliens");
         for (AlienContainer ac : aliens) {
             // get rid of stale views from prior moves
             ac.ctx.view = null;
@@ -86,19 +89,41 @@ public class SpaceGrid {
                 ac.move();
             } catch (Exception ex) {
                 ac.debugErr("Unhandled exception in getMove(): " + ex.toString());
-                for(StackTraceElement s:ex.getStackTrace()) {
+                for (StackTraceElement s : ex.getStackTrace()) {
                     ac.debugErr(s.toString());
                 }
                 ac.kill();
             }
 
-            // record the move in the grid
-            if (oldX != ac.x || oldY != ac.y) {
+            // any obtained view is potentially stale again
+            ac.ctx.view = null;
+        }
+    }
+
+    // now that moving is done and views don't matter anymore,
+    // record the moves in AlienContainers and the grid
+    public void recordAlienMoves() {
+        //vis.debugOut("Recording moves for " + (aliens.size()) + " aliens");
+        for (AlienContainer ac : aliens) {
+            int oldX = ac.x;
+            int oldY = ac.y;
+
+            if (oldX != ac.nextX || oldY != ac.nextY) {
+                ac.x = ac.nextX;
+                ac.y = ac.nextY;
                 aliens.move(ac, oldX, oldY, ac.x, ac.y);
             }
 
-            // any obtained view is potentially stale again
-            ac.ctx.view = null;
+            // call shell visulizer
+            // just make sure we don't blow up the alien beacuse of an exception in the shell
+            try {
+                vis.showMove(ac.getFullAlienSpec(), oldX, oldY);
+            } catch (Exception e) {
+                vis.debugErr("Unhandled exception in visualize: showMove");
+                for (StackTraceElement s : e.getStackTrace()) {
+                    vis.debugErr(s.toString());
+                }
+            }
         }
     }
 
@@ -137,10 +162,10 @@ public class SpaceGrid {
                 thisAlien.currentActionCode = ActionCode.None;
                 thisAlien.currentActionPower = 0;
                 thisAlien.debugErr("Unhandled exception in getAction(): " + ex.toString());
-                for(StackTraceElement s:ex.getStackTrace()) {
+                for (StackTraceElement s : ex.getStackTrace()) {
                     thisAlien.debugErr(s.toString());
                 }
-                 thisAlien.kill();
+                thisAlien.kill();
             }
         }
 

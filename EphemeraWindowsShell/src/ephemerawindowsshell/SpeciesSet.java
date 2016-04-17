@@ -63,7 +63,7 @@ public class SpeciesSet {
     }
     
     
-    public synchronized Color getColor(String speciesName) {
+    public Color getColor(String speciesName) {
         for (AlienSpecies as : speciesList) {
             if (as.speciesName.equals(speciesName)) {
                 return as.color;

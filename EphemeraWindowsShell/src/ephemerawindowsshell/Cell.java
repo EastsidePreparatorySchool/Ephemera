@@ -17,17 +17,19 @@ class Cell {
     int alienCount;
     int fightCountDown;
     HashMap<String, CellInfo> speciesMap;
+    SpeciesSet speciesSet;  // master set of species
     boolean cellChanged;
-    Color color1;
-    Color color2;
+    CellInfo color1;
+    CellInfo color2;
 
-    public Cell() { // Constructor
+    public Cell(SpeciesSet s) { // Constructor
         alienCount = 0;
         fightCountDown = 0;
         cellChanged = true;
+        this.speciesSet = s;
     }
 
-    public int addSpecies(String speciesName, Color color) {
+    public int addSpecies(String speciesName) {
         CellInfo ci;
 
         if (speciesMap == null) {
@@ -37,7 +39,7 @@ class Cell {
         ci = speciesMap.get(speciesName);
 
         if (ci == null) {
-            ci = new CellInfo(0, color);
+            ci = new CellInfo(0, Color.BLACK, speciesName);
             speciesMap.put(speciesName, ci);
         }
 
@@ -46,9 +48,9 @@ class Cell {
         cellChanged = true;
 
         if (color1 == null) {
-            color1 = color;
+            color1 = ci;
         } else if (color2 == null) {
-            color2 = color;
+            color2 = ci;
         }
 
         return ci.count;
@@ -88,9 +90,18 @@ class Cell {
         Color color = Color.BLACK;
 
         if (i == 1) {
-            color = color1;
+            if (color1.color == color.BLACK) {
+                // not initialized yet
+                color1.color = this.speciesSet.getColor(color1.speciesName);
+            }
+            color = color1.color;
+
         } else if (i == 2) {
-            color = color2;
+            if (color2.color == color.BLACK) {
+                // not initialized yet
+                color2.color = this.speciesSet.getColor(color2.speciesName);
+            }
+            color = color2.color;
         }
 
         return color;
@@ -103,11 +114,14 @@ class Cell {
 
     public boolean isFighting() {
         if (fightCountDown > 0) {
-            --fightCountDown;
+            fightCountDown--;
+            if (fightCountDown == 0) {
+                cellChanged = true;
+                return false;
+            }
             return true;
         }
 
-        cellChanged = true;
         return false;
     }
 }

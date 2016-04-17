@@ -10,6 +10,7 @@ package alieninterfaces;
  * @author gmein
  */
 public class AlienSpec {
+
     public String domainName;
     public String packageName;
     public String className;
@@ -19,9 +20,12 @@ public class AlienSpec {
     public int tech;
     public int energy;
     public int actionPower;
-    
-    
-    public AlienSpec(String domainName, String packageName, String className, int hashCode, int x, int y, int tech, int energy) {
+    public String fullName;
+    public String speciesName;
+
+    public AlienSpec(String domainName, String packageName, String className,
+            int hashCode, int x, int y, int tech, int energy,
+            String fullName, String speciesName) {
         this.domainName = domainName;
         this.packageName = packageName;
         this.className = className;
@@ -30,9 +34,13 @@ public class AlienSpec {
         this.y = y;
         this.tech = tech;
         this.energy = energy;
+        this.fullName = fullName;
+        this.speciesName = speciesName;
     }
 
-    public AlienSpec(String domainName, String packageName, String className, int hashCode, int x, int y, int tech, int energy, int actionPower) {
+    public AlienSpec(String domainName, String packageName, String className,
+            int hashCode, int x, int y, int tech, int energy,
+            String fullName, String speciesName, int actionPower) {
         this.domainName = domainName;
         this.packageName = packageName;
         this.className = className;
@@ -42,28 +50,39 @@ public class AlienSpec {
         this.tech = tech;
         this.energy = energy;
         this.actionPower = actionPower;
+        this.fullName = fullName;
+        this.speciesName = speciesName;
     }
 
     // for purposes of describing a species of alien
-    public AlienSpec(String domainName, String packageName, String className) {
+    public AlienSpec(String domainName, String packageName, String className,
+            String fullName, String speciesName) {
         this.domainName = domainName;
         this.packageName = packageName;
         this.className = className;
+        this.fullName = fullName;
+        this.speciesName = speciesName;
     }
- 
-    
+
     // helpers
     public String getFullSpeciesName() {
-        return domainName + ":" + packageName + ":" + className;
+        if (speciesName == null) {
+            speciesName = domainName + ":" + packageName + ":" + className;
+        }
+        return speciesName;
     }
 
     public String getFullName() {
-        return getFullSpeciesName() + "(" + Integer.toHexString(hashCode).toUpperCase() + ")";
+        if (fullName == null) {
+            fullName = getFullSpeciesName() + "(" + Integer.toHexString(hashCode).toUpperCase() + ")";
+        }
+        return fullName;
     }
 
     public String getXYString() {
         return "(" + x + "," + y + ")";
     }
+
     public String getTechEnergyString() {
         return "(" + tech + "," + energy + ")";
     }

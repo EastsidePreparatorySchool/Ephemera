@@ -21,6 +21,8 @@ public class AlienContainer {
     public final String domainName;
     public final String packageName;
     public final String className;
+    public String fullName;
+    public String speciesName;
     public final Constructor<?> constructor;
     public Alien alien;
     public final ContextImplementation ctx;
@@ -78,27 +80,35 @@ public class AlienContainer {
             debugErr("ac: Error constructing Alien");
         }
 
+        fullName = this.getFullName();
+        speciesName = this.getFullSpeciesName();
     }
 
     // class-related helpers
     public String getFullSpeciesName() {
-        return domainName + ":" + packageName + ":" + className;
+        if (speciesName == null) {
+            speciesName = domainName + ":" + packageName + ":" + className;
+        }
+        return speciesName;
     }
 
     public String getFullName() {
-        return getFullSpeciesName() + "(" + Integer.toHexString(alien.hashCode()).toUpperCase() + ")";
+        if (fullName == null) {
+            fullName = getFullSpeciesName() + "(" + Integer.toHexString(alien.hashCode()).toUpperCase() + ")";
+        }
+        return fullName;
     }
 
     public AlienSpec getFullAlienSpec() {
-        return new AlienSpec(this.domainName, this.packageName, this.className, this.hashCode(), this.x, this.y, this.tech, this.energy, this.currentActionPower);
+        return new AlienSpec(this.domainName, this.packageName, this.className, this.hashCode(), this.x, this.y,
+                this.tech, this.energy, this.fullName, this.speciesName, this.currentActionPower);
     }
 
     public AlienSpec getSimpleAlienSpec() {
-        return new AlienSpec(this.domainName, this.packageName, this.className);
+        return new AlienSpec(this.domainName, this.packageName, this.className, this.fullName, this.speciesName);
     }
 
-    @Override
-    public String toString() {
+    public String toStringExpensive() {
         return getFullName() + ": "
                 + "X:" + (x)
                 + " Y:" + (y)
@@ -119,24 +129,13 @@ public class AlienContainer {
 
         int oldx = x;
         int oldy = y;
-        x += direction.x();
-        y += direction.y();
+        nextX = x + direction.x();
+        nextY = y + direction.y();
 
         int width = 500;
         int height = 500;
-        if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
+        if (nextX >= (width / 2) || nextX < (0 - width / 2) || nextY >= (height / 2) || nextY < (0 - height / 2)) {
             debugErr("ac.move: Out of bounds: (" + x + ":" + y + ")");
-        }
-
-        // call shell visulizer
-        // just make sure we don't blow up the alien beacuse of an exception in the shell
-        try {
-            ctx.vis.showMove(getFullAlienSpec(), oldx, oldy);
-        } catch (Exception e) {
-            grid.vis.debugErr("Unhandled exception in visualize: showMove");
-            for (StackTraceElement s: e.getStackTrace()){
-                grid.vis.debugErr(s.toString());
-            }
         }
     }
 

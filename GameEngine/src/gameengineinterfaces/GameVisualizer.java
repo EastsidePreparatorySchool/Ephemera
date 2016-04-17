@@ -13,6 +13,7 @@ import java.util.List;
  * @author gmein
  */
 public interface GameVisualizer {
+    
     void showCompletedTurn(int totalTurns, int numAliens, long timeTaken);
     
     void showAliens(List<AlienSpec> aliens);
