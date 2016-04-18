@@ -8,53 +8,26 @@ package ephemerawindowsshell;
 import gameengineV1.GameEngineV1;
 import gameengineinterfaces.GameCommand;
 import gameengineinterfaces.GameCommandCode;
-import gameengineinterfaces.GameElementSpec;
-import java.util.Map;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
-import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.stage.Screen;
-import javafx.stage.Stage;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.geometry.VPos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -63,7 +36,7 @@ import javafx.util.Callback;
 
 /**
  *
- * @author gmein based on "Conway's game of life" by guberti
+ * @author gmein
  */
 public class EphemeraWindowsShell extends Application {
 
@@ -114,12 +87,11 @@ public class EphemeraWindowsShell extends Application {
         this.canvas = new Canvas(width * cellWidth, height * cellHeight);
         canvas.setStyle("-fx-border-color: red;");
         border.setCenter(canvas);
-        
+
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setStroke(Color.RED);
         gc.setLineWidth(1.0);
-        gc.strokeOval(0.5,0.5,width * cellWidth-0.5,height * cellHeight-0.5);
-
+        gc.strokeOval(0.5, 0.5, width * cellWidth - 0.5, height * cellHeight - 0.5);
 
         //
         // initialize Ephemera game engine and visualizer
@@ -144,9 +116,8 @@ public class EphemeraWindowsShell extends Application {
         Scene scene = new Scene(border);
         stage.setScene(scene);
         stage.show();
-        
-        //console.println("Test");
 
+        //console.println("Test");
         // give it a go - commented out because we start this with the start button
         // engine.queueCommand(new GameCommand(GameCommandCode.Resume));
         // return to platform and wait for events
@@ -174,8 +145,8 @@ public class EphemeraWindowsShell extends Application {
         stage.setHeight(bounds.getHeight());
 
     }
-    
-    public static void armPauseButton(){
+
+    public static void armPauseButton() {
         buttonPause.setDisable(false);
     }
 
@@ -218,9 +189,6 @@ public class EphemeraWindowsShell extends Application {
         return vbox;
     }
 
-    
-    
-    
     /*     * Creates an HBox for the bottom region
 
      */
@@ -255,6 +223,7 @@ public class EphemeraWindowsShell extends Application {
         vbox.setSpacing(8);              // Gap between nodes
 
         vbox.setStyle("-fx-background-color: black; -fx-text-fill: white;");
+        vbox.setPrefWidth(350);
 
         // add list of alien species
         vbox.getChildren().add(this.addAlienSpeciesList());

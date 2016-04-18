@@ -9,11 +9,6 @@ package alieninterfaces;
  *
  * @author gmein
  */
-public interface Alien
-{
-    void init(Context ctx, int id, int parent, String message);
-    void communicate();
-    void receive(String[] messages);
-    MoveDir getMove();
-    Action getAction();
+public class NotEnoughEnergyException extends Exception{
+    
 }

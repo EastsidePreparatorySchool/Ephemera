@@ -13,12 +13,12 @@ import java.util.LinkedList;
  */
 public class AlienGrid extends LinkedList<AlienContainer> {
 
-    LinkedList<AlienContainer>[][] acGrid;
+    AlienCell[][] acGrid;
     int centerX;
     int centerY;
 
     public AlienGrid(int width, int height) {
-        acGrid = new LinkedList[width][height];
+        acGrid = new AlienCell[width][height];
         centerX = width / 2;
         centerY = height / 2;
     }
@@ -28,9 +28,9 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     }
     public boolean addAlienAndPlug(AlienContainer ac) {
         // add alien to grid as well as to master list
-        LinkedList<AlienContainer> acs = acGrid[ac.x + centerX][ac.y + centerY];
+        AlienCell acs = acGrid[ac.x + centerX][ac.y + centerY];
         if (acs == null) {
-            acs = new LinkedList();
+            acs = new AlienCell();
             acGrid[ac.x + centerX][ac.y + centerY] = acs;
         }
         acs.add(ac);
@@ -50,7 +50,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         //    ac.debugOut("Grid: standing still, shouldn't be here");
         //}
 
-        LinkedList<AlienContainer> acs = acGrid[oldX + centerX][oldY + centerY];
+        AlienCell acs = acGrid[oldX + centerX][oldY + centerY];
         //ac.debugOut("Grid: removing from list " + getXYString(oldX, oldY));
         acs.remove(ac);
         if (acs.isEmpty()) {
@@ -59,7 +59,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
 
         acs = acGrid[newX + centerX][newY + centerY];
         if (acs == null) {
-            acs = new LinkedList();
+            acs = new AlienCell();
             acGrid[newX + centerX][newY + centerY] = acs;
         }
         acs.add(ac);
@@ -76,7 +76,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         }
     }
 
-    public LinkedList<AlienContainer> getAliensAt(int x, int y) {
+    public AlienCell getAliensAt(int x, int y) {
         return acGrid[x + centerX][y + centerY];
     }
 

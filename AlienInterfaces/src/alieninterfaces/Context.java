@@ -9,14 +9,31 @@ package alieninterfaces;
  *
  * @author gmein
  */
-public interface Context
-{
+public interface Context {
+
     int getEnergy();
+
     int getTech();
+
     int getX();
+
     int getY();
+
     View getView();
+
+    Radar getRadar();
+
     int getSpawningCost();
+
     int getFightingCost();
-    void debugOut(String s);
+
+    int getRandomInt(int ceiling);
+    
+    int getGameTurn();
+
+    void broadcastAndListen(String message, int power, boolean listen)
+            throws NotEnoughTechException, NotEnoughEnergyException;
+
+    void debugOut(String s
+    );
 }

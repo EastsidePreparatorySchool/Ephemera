@@ -17,12 +17,12 @@ import java.io.IOException;
  */
 public class SpaceGrid {
 
-    GameSpace[][] grid;
     GameVisualizer vis;
     public AlienGrid aliens;    // Aliens are born and die, so our list needs to be able to grow and shrink
     List<SpaceObject> objects;  // Stars, planets, space stations, etc.
     int width;
     int height;
+    int currentTurn = 1;
 
     static Random rand = new Random(System.currentTimeMillis());
 
@@ -35,16 +35,23 @@ public class SpaceGrid {
     }
 
     public boolean executeGameTurn() {
-        requestAlienMoves();
+        performCommunications();
+        removeDeadAliens();
+        performReceives();
+        removeDeadAliens();
         Thread.yield();
+
+        requestAlienMoves();
         recordAlienMoves();
         removeDeadAliens();
+        Thread.yield();
 
         performAlienActions();
         removeDeadAliens();
-
         resetAliens();
         Thread.yield();
+
+        currentTurn++;
 
         AlienContainer aUniqueAlien = null;
         for (AlienContainer a : aliens) {
@@ -84,6 +91,7 @@ public class SpaceGrid {
 
             // get rid of stale views from prior moves
             ac.ctx.view = null;
+
             int oldX = ac.x;
             int oldY = ac.y;
 
@@ -98,8 +106,64 @@ public class SpaceGrid {
                 ac.kill();
             }
 
-            // any obtained view is potentially stale again
+        }
+    }
+
+    public void performCommunications() {
+        // phase 1: take outgoing messages and store in ac
+        for (AlienContainer ac : aliens) {
+
+            Thread.yield();
+
+            // get rid of stale views from prior phases
             ac.ctx.view = null;
+
+            // call the alien to communicate
+            try {
+                ac.alien.communicate();
+            } catch (Exception ex) {
+                ac.debugErr("Unhandled exception in communicate(): " + ex.toString());
+                for (StackTraceElement s : ex.getStackTrace()) {
+                    ac.debugErr(s.toString());
+                }
+                ac.kill();
+            }
+        }
+
+        // phase 2: route messages to gridpoints
+        for (AlienContainer ac : aliens) {
+            if (ac.outgoingMessage != null & ac.outgoingPower != 0) {
+                Thread.yield();
+                ac.ctx.routeMessages();
+                ac.outgoingMessage = null;
+            }
+        }
+    }
+
+    public void performReceives() {
+        // phase 3: receive messages
+        for (AlienContainer ac : aliens) {
+            if (ac.listening) {
+                Thread.yield();
+
+                // get rid of stale views from prior phases
+                ac.ctx.view = null;
+
+                // call the alien to receive messages
+                AlienCell acell = aliens.getAliensAt(ac.x, ac.y);
+                if (acell.currentMessages != null) {
+                    String[] messages = new String[acell.currentMessages.size()];
+                    try {
+                        ac.alien.receive(acell.currentMessages.toArray(messages));
+                    } catch (Exception ex) {
+                        ac.debugErr("Unhandled exception in receive(): " + ex.toString());
+                        for (StackTraceElement s : ex.getStackTrace()) {
+                            ac.debugErr(s.toString());
+                        }
+                        ac.kill();
+                    }
+                }
+            }
         }
     }
 
@@ -145,6 +209,12 @@ public class SpaceGrid {
         aliens.stream().forEach((alien) -> {
             alien.fought = false;
             alien.ctx.view = null;
+            alien.outgoingMessage = null;
+            alien.listening = false;
+
+            AlienCell acell = alien.grid.aliens.getAliensAt(alien.x, alien.y);
+            acell.listening = false;
+            acell.currentMessages = null;
         });
     }
 
@@ -154,8 +224,10 @@ public class SpaceGrid {
         //vis.debugOut("Processing actions for " + (aliens.size()) + " aliens");
         // first request all the actions from the aliens
         for (AlienContainer thisAlien : aliens) {
-
             Thread.yield(); // be polite
+
+            // get rid of stale views from prior phases
+            thisAlien.ctx.view = null;
 
             try {
                 // Note: getAction() checks validity

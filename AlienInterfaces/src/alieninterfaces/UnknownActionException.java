@@ -3,17 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gamelogic;
-
+package alieninterfaces;
 
 /**
  *
- * @author guberti
+ * @author gmein
  */
-public class GameSpace {
-    public AlienContainer alien;
+public class UnknownActionException extends Exception{
     
-    public void removeAlien() {
-        alien = null;
-    }
 }

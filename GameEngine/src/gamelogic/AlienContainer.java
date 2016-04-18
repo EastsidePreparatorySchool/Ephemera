@@ -8,15 +8,17 @@ package gamelogic;
 import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 /**
  *
  * @author guberti
  */
 public class AlienContainer {
+    
+    public static int currentID = 0;
 
     public final String domainName;
     public final String packageName;
@@ -32,6 +34,7 @@ public class AlienContainer {
     public ActionCode currentActionCode;
     public int currentActionPower;
     public String currentActionMessage;
+    public boolean listening;
 
     int tech;
     int energy;
@@ -42,8 +45,9 @@ public class AlienContainer {
     public int y;
     public int nextX;
     public int nextY;
-
-    static Random rand = new Random(System.nanoTime());
+    public String outgoingMessage;
+    public int outgoingPower;
+    
 
     // Declare stats here
     //
@@ -62,14 +66,16 @@ public class AlienContainer {
         this.chatter = false;
         this.ctx = new ContextImplementation(this, vis);
         this.grid = sg;
+        this.listening = false;
+
 
         Alien a;
 
         // if position = (0,0) assign random position
         if (x == 0 && y == 0) {
 
-            this.x = rand.nextInt(20) - 10; // TODO: get these hardcoded constants from spacegrid instead
-            this.y = rand.nextInt(20) - 10;
+            this.x = ctx.getRandomInt(20) - 10; // TODO: get these hardcoded constants from spacegrid instead
+            this.y = ctx.getRandomInt(20) - 10;
         } else {
             this.x = x;
             this.y = y;
@@ -81,11 +87,11 @@ public class AlienContainer {
         try {
             a = (Alien) cns.newInstance();
             this.alien = a;
-            this.alienHashCode = this.alien.hashCode();
-            a.init(this.ctx, this.alienHashCode, parent, message);
+            this.alienHashCode = ++currentID; 
+            a.init(this.ctx, alienHashCode, parent, message);
         } catch (Throwable t) {
             this.alien = null;
-            debugErr("ac: Error constructing Alien");
+            debugOut("ac: Error constructing Alien");
         }
 
         fullName = this.getFullName();
@@ -358,11 +364,3 @@ public class AlienContainer {
 
 }
 
-class NotEnoughEnergyException extends Exception {
-}
-
-class NotEnoughTechException extends Exception {
-}
-
-class UnknownActionException extends Exception {
-}
