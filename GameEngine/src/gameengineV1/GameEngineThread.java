@@ -5,6 +5,7 @@
  */
 package gameengineV1;
 
+import gameengineinterfaces.GameElementKind;
 import gameengineinterfaces.GameState;
 import gamelogic.*;
 import alieninterfaces.*;
@@ -39,7 +40,6 @@ public class GameEngineThread extends Thread {
         int totalTurns = 0;
 
         //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-
         engine.grid = new SpaceGrid(engine.vis, 500, 500);
 
         try {
@@ -119,6 +119,25 @@ public class GameEngineThread extends Thread {
     private boolean processCommand(GameCommand gc) throws Exception {
         boolean gameOver = false;
         switch (gc.code) {
+            case RandSeed:
+                long randSeed = (long) gc.parameters[0];
+                engine.grid.rand.setSeed(randSeed);
+                engine.vis.debugOut("RandSeed: " + randSeed);
+                break;
+
+            case SetVariable:
+                String s = (String) gc.parameters[0];
+                if (s.equalsIgnoreCase("AlienChatter")) {
+                    String s2 = (String) gc.parameters[1];
+                    if (s2.equalsIgnoreCase("on")) {
+                        AlienContainer.chatter = true;
+                    } else {
+                        AlienContainer.chatter = false;
+                    }
+                }
+
+                break;
+
             case AddElement:
                 GameElementSpec element = (GameElementSpec) gc.parameters[0];
 
@@ -156,10 +175,6 @@ public class GameEngineThread extends Thread {
                 engine.gameState = GameState.Running;
                 break;
 
-            case SetVariable:
-                // TODO: Process status variables here
-                break;
-
             case List:
                 engine.grid.listStatus();
                 break;
@@ -174,7 +189,7 @@ public class GameEngineThread extends Thread {
         }
         return gameOver;
     }
-    //
+        //
     // Dynamic class loader (.jar files)
     // stolen from StackOverflow, considered dark voodoo magic
     //
