@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.shape.StrokeLineCap;
@@ -51,6 +52,7 @@ class VisualizationGrid implements GameVisualizer {
 
     BufferedWriter logFile;
     GameEngine engine;
+    private final Object monitor = new Object();
 
     public void init(GameEngine eng, ConsolePane console, SpeciesSet species, String path, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
         Date date = new Date();
@@ -190,21 +192,12 @@ class VisualizationGrid implements GameVisualizer {
         gc.strokeOval(0.5, 0.5, widthPX - 0.5, heightPX - 0.5);
     }
 
-    public void markFight(int x, int y) {
-        if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
-            debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
-            return;
-        }
-        Cell cell = grid[x + (width / 2)][y + (height / 2)];
-        cell.fight();
-    }
-
     @Override
     public void showCompletedTurn(int totalTurns, int numAliens, long time) {
         ++totalTurnCounter;
         this.numAliens = numAliens;
         debugOut("Turn #" + totalTurnCounter + " complete.");
-        Platform.runLater(new Runnable() {
+        runAndWait(new Runnable() {
             @Override
             public void run() {
                 GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -215,16 +208,15 @@ class VisualizationGrid implements GameVisualizer {
                         + ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens)))
                         + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)))
                 );
-                //EphemeraWindowsShell.armPauseButton();
             }
         });
 
-        try {
-            Thread.sleep(100);
-        } catch (Exception e) {
+        if (totalTurnCounter % 20 == 0) {
+            try {
+                //Thread.sleep(200);
+            } catch (Exception e) {
+            }
         }
-
-        Thread.yield();
     }
 
     public void incrementCell(int x, int y, String speciesName) {
@@ -268,6 +260,16 @@ class VisualizationGrid implements GameVisualizer {
                 incrementCell(x, y, speciesName);
             }
         });
+        Thread.yield();
+    }
+
+    public void markFight(int x, int y) {
+        if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
+            debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
+            return;
+        }
+        Cell cell = grid[x + (width / 2)][y + (height / 2)];
+        cell.fight();
     }
 
     @Override
@@ -281,6 +283,7 @@ class VisualizationGrid implements GameVisualizer {
             }
         }
         markFight(x, y);
+        Thread.yield();
     }
 
     @Override
@@ -294,6 +297,7 @@ class VisualizationGrid implements GameVisualizer {
                 println("");
             }
         }
+        Thread.yield();
     }
 
     @Override
@@ -311,6 +315,7 @@ class VisualizationGrid implements GameVisualizer {
                 incrementCell(as.x, as.y, as.getFullSpeciesName());
             }
         });
+        Thread.yield();
     }
 
     public void showDeath(AlienSpec as) {
@@ -327,6 +332,7 @@ class VisualizationGrid implements GameVisualizer {
                 speciesSet.removeAlien(as.getFullSpeciesName());
             }
         });
+        Thread.yield();
     }
 
     @Override
@@ -347,6 +353,7 @@ class VisualizationGrid implements GameVisualizer {
                 engine.queueCommand(new GameCommand(GameCommandCode.Pause));
             }
         });
+        Thread.yield();
     }
 
     @Override
@@ -358,6 +365,7 @@ class VisualizationGrid implements GameVisualizer {
         } else {
             printlnLogOnly(s);
         }
+        Thread.yield();
     }
 
     @Override
@@ -373,12 +381,14 @@ class VisualizationGrid implements GameVisualizer {
          */
 
         // not done with number of turns before prompt, don't display anything, return "game not over"
+        Thread.yield();
         return true;
     }
 
     @Override
     public void showEngineStateChange(GameState gs) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Thread.yield();
     }
 
     @Override
@@ -438,6 +448,41 @@ class VisualizationGrid implements GameVisualizer {
             return (ns / 1000L) + (((char) 181) + "s");
         }
         return ns + "ns";
+    }
+
+    /**
+     * Runs the specified {@link Runnable} on the JavaFX application thread and
+     * waits for completion.
+     *
+     * @param action the {@link Runnable} to run
+     * @throws NullPointerException if {@code action} is {@code null}
+     */
+    public static void runAndWait(Runnable action) {
+        if (action == null) {
+            throw new NullPointerException("action");
+        }
+
+        // run synchronously on JavaFX thread
+        if (Platform.isFxApplicationThread()) {
+            action.run();
+            return;
+        }
+
+        // queue on JavaFX thread and wait for completion
+        final CountDownLatch doneLatch = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                action.run();
+            } finally {
+                doneLatch.countDown();
+            }
+        });
+
+        try {
+            doneLatch.await();
+        } catch (InterruptedException e) {
+            // ignore exception
+        }
     }
 
 }

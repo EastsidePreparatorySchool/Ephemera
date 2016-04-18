@@ -27,9 +27,11 @@ public class AlienContainer {
     public Alien alien;
     public final ContextImplementation ctx;
     public final SpaceGrid grid;
+    public int alienHashCode;
 
     public ActionCode currentActionCode;
     public int currentActionPower;
+    public String currentActionMessage;
 
     int tech;
     int energy;
@@ -47,8 +49,9 @@ public class AlienContainer {
     //
     // Heads up: This constructs an AlienContainer and contained Alien
     //
-    public AlienContainer(SpaceGrid sg, GameVisualizer vis, int x, int y, String alienDomainName, String alienPackageName, String alienClassName, Constructor<?> cns, int energy, int tech) {
-        Alien a;
+    public AlienContainer(SpaceGrid sg, GameVisualizer vis, int x, int y,
+            String alienDomainName, String alienPackageName, String alienClassName, Constructor<?> cns,
+            int energy, int tech, int parent, String message) {
 
         this.domainName = alienDomainName;
         this.packageName = alienPackageName;
@@ -60,6 +63,8 @@ public class AlienContainer {
         this.ctx = new ContextImplementation(this, vis);
         this.grid = sg;
 
+        Alien a;
+
         // if position = (0,0) assign random position
         if (x == 0 && y == 0) {
 
@@ -70,11 +75,14 @@ public class AlienContainer {
             this.y = y;
         }
 
+        this.alienHashCode = 0;
+        
         // construct and initialize alien
         try {
             a = (Alien) cns.newInstance();
             this.alien = a;
-            a.init(this.ctx);
+            this.alienHashCode = this.alien.hashCode();
+            a.init(this.ctx, this.alienHashCode, parent, message);
         } catch (Throwable t) {
             this.alien = null;
             debugErr("ac: Error constructing Alien");
@@ -100,7 +108,7 @@ public class AlienContainer {
     }
 
     public AlienSpec getFullAlienSpec() {
-        return new AlienSpec(this.domainName, this.packageName, this.className, this.hashCode(), this.x, this.y,
+        return new AlienSpec(this.domainName, this.packageName, this.className, this.alienHashCode, this.x, this.y,
                 this.tech, this.energy, this.fullName, this.speciesName, this.currentActionPower);
     }
 
@@ -170,16 +178,17 @@ public class AlienContainer {
         oldy = dir.y();
 
         // distance from Earth, and vector angle
-        r = Math.hypot((double) x, (double) y);
+        //r = Math.hypot((double) x, (double) y);
+        r = (double) ((long) x * (long) x + (long) y * (long) y); // reasoning in r^2 instead
         alpha = Math.atan2(x, y);
 
-        // no action under r = 10
-        if (r < 20) {
+        // no action below r = 20
+        if (r < 400) {
             return dir;
         }
 
-        // wormhole for escapees
-        if (r > 250) {
+        // wormhole for escapees (r > 250)
+        if (r > 62500) {
             // return these people to Earth
             this.debugOut("Tunneled back to Earth");
             return new MoveDir(0 - x, 0 - y);
@@ -187,47 +196,40 @@ public class AlienContainer {
 
         // get angle of proposed move
         deltaAlpha = Math.atan2(dir.x(), dir.y());
+        // keep track of it as difference from current angle
+        deltaAlpha = getAngleDiff(alpha, deltaAlpha);
+        //debugOut("Drift: deltaAlpha" + deltaAlpha);
+
+        deltaR = (double) (dir.x() + dir.y()); // cheating: not hypothenuse, but sum of sides.
+
         // no action if inward
-        if (getAngleDiff(deltaAlpha, alpha) >= Math.PI / 2 && getAngleDiff(deltaAlpha, alpha) <= 3 * Math.PI / 2) {
-            return dir;
+        if (deltaAlpha < Math.PI / 2 || deltaAlpha > -Math.PI / 2) {
+            // outward: push the alien counterclockwise
+            deltaAlpha += getAngleDiff(deltaAlpha, Math.PI) * (Math.abs(r) / 55000);
+            deltaAlpha = getAngleDiff(deltaAlpha, 0); // normalize
         }
 
-        // and magnitude
-        deltaR = Math.hypot((double) dir.x(), (double) dir.y());
+        // this is final drift correction: we keep changing angle and radius of the move until it fits
+        long hypotSq;
+        int count = 0;
+        do {
+            //put the x,y back together
+            dx = deltaR * Math.cos(deltaAlpha + alpha);
+            dy = deltaR * Math.sin(deltaAlpha + alpha);
+            deltaR *= 1.1; // expecting a correction in next loop
+            deltaAlpha += 2 * Math.PI / 10;
 
-        /* 
-         //Approach 1:
-         // Apply gentle inward force
-         // cubic function of how close to border, modulated by angle
-         reduction = (1/Math.pow((250 - r), 3)) * (Math.abs(Math.abs(alpha - deltaAlpha) / Math.PI - 1)) + 1;
-
-         if (reduction > 5) {
-         //api.vis.debugOut("r: " + Double.toString(r));
-         //api.vis.debugOut(Double.toString(Math.abs(Math.abs(alpha - deltaAlpha) / Math.PI - 1)));
-         //api.vis.debugOut("Reduction: " + Double.toString(reduction));
-         }
-         deltaR /= reduction;
-         */
-        // Approach 2:
-        // Make the new move ever more tangential as the alien gets closer to the rim
-        ctx.vis.debugOut("Drift: r              " + Double.toString(r));
-        ctx.vis.debugOut("Drift: alpha          " + Double.toString(getAngleDiff(alpha, 0)));
-        ctx.vis.debugOut("Drift: deltaAlpha     " + Double.toString(getAngleDiff(deltaAlpha, 0)));
-        ctx.vis.debugOut("Drift: diff           " + Double.toString(getAngleDiff(deltaAlpha, alpha)));
-
-        if (getAngleDiff(deltaAlpha, alpha) < Math.PI / 2) {
-            // alien bearing slightly left, make it more left depending on r^3
-            deltaAlpha = alpha + (Math.PI / 2) - (((Math.PI / 2) - getAngleDiff(deltaAlpha, alpha)) * (1 - Math.pow(r / 250, 3)));
-        } else if (getAngleDiff(deltaAlpha, alpha) > 3 * Math.PI / 2) {
-            // alien bearing slightly right, make it more left depending on r^3
-            deltaAlpha = alpha + (Math.PI / 2) - (((Math.PI / 2) - getAngleDiff(deltaAlpha, alpha)) * (1 - Math.pow(r / 250, 3)));
-        }
-        deltaAlpha = getAngleDiff(deltaAlpha, 0);
-        ctx.vis.debugOut("Drift: new deltaAlpha " + Double.toString(deltaAlpha));
-
-        //put the x,y back together
-        dx = deltaR * Math.cos(deltaAlpha);
-        dy = deltaR * Math.sin(deltaAlpha);
+            hypotSq = hypotSquare((x + (long) dx), (y + (long) dy));
+            //debugOut("Drift hypotSq of new r: " + hypotSq);
+            if (count++ > 10) {
+                if (count > 11) {
+                    break;
+                }
+                // this isn't working, turn it all the way back
+                deltaAlpha = Math.PI;
+                deltaR = 32;
+            }
+        } while (hypotSq >= 55000);
 
         int dxi = (int) Math.round(dx);
         int dyi = (int) Math.round(dy);
@@ -235,37 +237,47 @@ public class AlienContainer {
         // stop-gap-measure to keep things in grid
         if (x + dxi > 249) {
             dxi = 249 - x;
-            ctx.vis.debugOut("Drift stop: x: " + x + dxi);
+            debugOut("Drift stop: x: " + (x + dxi));
         }
         if (x + dxi < -250) {
             dxi = -250 - x;
-            ctx.vis.debugOut("Drift stop: x: " + x + dxi);
+            debugOut("Drift stop: x: " + (x + dxi));
         }
         if (y + dyi > 249) {
             dyi = 249 - y;
-            ctx.vis.debugOut("Drift stop: y: " + y + dyi);
+            debugOut("Drift stop: y: " + (y + dyi));
         }
         if (y + dyi < -250) {
             dyi = -250 - y;
-            ctx.vis.debugOut("Drift stop: y: " + y + dyi);
+            debugOut("Drift stop: y: " + (y + dyi));
         }
+        /*
+         ctx.vis.debugOut("Drift final: ("
+         + (x + oldx) + ","
+         + (y + oldy) + ") -> ("
+         + (x + dxi) + ","
+         + (y + dyi) + ")");
+         */
 
-        ctx.vis.debugOut("Drift final: ("
-                + (x + oldx) + ","
-                + (y + oldy) + ") -> ("
-                + (x + dxi) + ","
-                + (y + dyi) + ")");
-
+        if (Math.hypot(dxi + x, dyi + y) > 250) {
+            debugOut("Drift not contained: " + (dxi + x) + "," + (dyi + y));
+        }
         return new MoveDir(dxi, dyi);
     }
 
-    // normalizes angle difference to fit in [0:2pi[
+    public long hypotSquare(long x, long y) {
+        return x * x + y * y;
+    }
+
+    // normalizes angle difference to fit in [-pi:pi]
     public double getAngleDiff(double alpha, double beta) {
-        alpha = alpha < 0 ? alpha + (Math.PI * 2) : alpha;
-        beta = beta < 0 ? beta + (Math.PI * 2) : beta;
         double gamma = alpha - beta;
-        gamma = gamma >= Math.PI * 2 ? gamma - (Math.PI * 2) : gamma;
-        gamma = gamma <= 0 ? gamma + (Math.PI * 2) : gamma;
+        if (gamma > Math.PI) {
+            gamma = gamma - (Math.PI * 2);
+        }
+        if (gamma < -Math.PI) {
+            gamma = gamma + (Math.PI * 2);
+        }
         return gamma;
     }
 
@@ -280,6 +292,7 @@ public class AlienContainer {
 
         this.currentActionCode = a.code;
         this.currentActionPower = a.power;
+        this.currentActionMessage = a.message;
 
         switch (a.code) {
             case None:
@@ -288,7 +301,7 @@ public class AlienContainer {
 
             case Research:
                 if (tech >= energy) { // If the tech can't be researched due to lack of energy
-                    debugOut("AC: Research with T:" + (tech) + " and E:" + (energy));
+                    //debugOut("AC: Research with T:" + (tech) + " and E:" + (energy));
                     throw new NotEnoughEnergyException();
                 }
                 break;

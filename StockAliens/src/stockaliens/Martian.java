@@ -30,7 +30,7 @@ public class Martian implements Alien {
     }
 
     @Override
-    public void init(Context ctx) {
+    public void init(Context ctx,int id, int parent, String message) {
         this.ctx = ctx;
         ctx.debugOut("Initialized at "
                 + "(" + Integer.toString(ctx.getX())
@@ -114,9 +114,10 @@ public class Martian implements Alien {
         return new Action (ActionCode.Gain);
     }
 
+
     @Override
-    public void processResults() {
-        // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void communicate() {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

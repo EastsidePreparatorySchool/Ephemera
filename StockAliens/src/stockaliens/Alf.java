@@ -27,7 +27,7 @@ public class Alf implements Alien {
     public Alf() {
     }
 
-    public void init(Context game_ctx) {
+    public void init(Context game_ctx, int id, int parent, String message) {
         totalCount += 1;
         myAlienNumber = totalCount;
 
@@ -120,5 +120,10 @@ public class Alf implements Alien {
     public void processResults() {
         ctx.debugOut("Processing results");
         return;
+    }
+
+    @Override
+    public void communicate() {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

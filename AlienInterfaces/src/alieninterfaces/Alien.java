@@ -11,8 +11,8 @@ package alieninterfaces;
  */
 public interface Alien
 {
-    void init(Context ctx);
+    void init(Context ctx, int id, int parent, String message);
+    void communicate();
     MoveDir getMove();
     Action getAction();
-    void processResults(); 
 }
