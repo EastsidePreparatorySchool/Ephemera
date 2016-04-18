@@ -143,9 +143,10 @@ public class GameEngineV1 implements GameEngine {
                     v.debugOut("GameEngineV1:init:File parse error");
                     v.debugOut("GameEngineV1:init:     " + e.getMessage());
                 }
-
-                in.close();
             }
+
+            in.close();
+
         } catch (Exception e) {
             v.debugOut("GameEngineV1:init:File-related error");
             v.debugOut("GameEngineV1:init:     " + e.getMessage());
@@ -178,7 +179,7 @@ public class GameEngineV1 implements GameEngine {
         vis.debugOut("GameEngine: Starting thread");
         this.gameThread.start();
 
-            //
+        //
         // queue every game element
         //
         vis.debugOut("GameEngineV1: Elements in config: " + Integer.toString(savedGame.length));
@@ -192,7 +193,7 @@ public class GameEngineV1 implements GameEngine {
             queueCommand(gc);
         }
 
-            //
+        //
         // start the game
         //
     }
