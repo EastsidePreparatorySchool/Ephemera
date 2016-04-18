@@ -22,7 +22,7 @@ public class WeepingAngel implements Alien {
     int fightStrength;
     int turn = 0;
     //gets a random boolean to determine positive or negative move function.
-    static Random rnd = new Random(System.currentTimeMillis() * WeepingAngel.class.hashCode());
+    private static Random rnd = new Random();
 
     public static boolean getRandomBoolean() {
         return rnd.nextBoolean();
@@ -45,7 +45,7 @@ public class WeepingAngel implements Alien {
 
     public MoveDir getMove() {
         // doesn't move ever except to 1,1 where it shall stay
-        return new MoveDir(1, 1);
+        return new MoveDir(0,0);
     }
 
     public Action getAction() {
@@ -57,7 +57,8 @@ public class WeepingAngel implements Alien {
 
         // if there is someone at our position fight
         try {
-
+           
+            
             if (view.getAlienCountAtPos(ctx.getX(), ctx.getY()) > 1) {
                 ctx.debugOut("Don't Blink!!!!!"
                         + " E:" + Integer.toString(ctx.getEnergy())
@@ -66,19 +67,19 @@ public class WeepingAngel implements Alien {
                         + " Y:" + Integer.toString(ctx.getY()));
 
                 return new Action(ActionCode.Fight, ctx.getEnergy() - 2);
-
+                
             }
             // always get energy
-            if (ctx.getEnergy() < 15) {
+            if (ctx.getEnergy() < 25) {
                 // no, charge
                 ctx.debugOut("Choosing to gain Energy,"
                         + " E:" + Integer.toString(ctx.getEnergy())
                         + " T:" + Integer.toString(ctx.getTech()));
                 return new Action(ActionCode.Gain);
-            }
-
-            // do we have enough tech?
-            if (ctx.getTech() < 10) {
+            } 
+           
+             // do we have enough tech?
+            if (ctx.getTech() < 20) {
                 // no, research
                 ctx.debugOut("Choosing to research"
                         + " E:" + Integer.toString(ctx.getEnergy())
@@ -87,23 +88,29 @@ public class WeepingAngel implements Alien {
             }
             // every 
             turn = turn + 1;
-            if (turn % 5 == 0 && ctx.getEnergy() > ctx.getSpawningCost() * 2) {
+            if (ctx.getEnergy()>=40 ) {
                 ctx.debugOut("Spwaning"
-                        + " E:" + Integer.toString(ctx.getEnergy())
-                        + " T:" + Integer.toString(ctx.getTech()));
+                    + " E:" + Integer.toString(ctx.getEnergy())
+                    + " T:" + Integer.toString(ctx.getTech()));
 
-                return new Action(ActionCode.Spawn, ctx.getEnergy() / 2);
+            return new Action(ActionCode.Spawn,ctx.getEnergy()/2) ;
             }
-
+            
         } catch (Exception e) {
         }
-
+        
         // always gains energy
         ctx.debugOut("Weeping Angels: Must gain energy"
                 + " E:" + Integer.toString(ctx.getEnergy())
                 + " T:" + Integer.toString(ctx.getTech()));
         return new Action(ActionCode.Gain);
     }
+
+    public void processResults() {
+        ctx.debugOut("Processing results");
+        return;
+    }
+
 
     @Override
     public void communicate() {
