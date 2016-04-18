@@ -5,6 +5,7 @@
  */
 package gameengineV1;
 
+import gameengineinterfaces.GameState;
 import gamelogic.*;
 import gameengineinterfaces.*;
 import java.io.BufferedReader;

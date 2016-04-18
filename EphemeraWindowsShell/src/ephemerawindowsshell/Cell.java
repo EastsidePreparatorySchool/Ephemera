@@ -17,47 +17,53 @@ class Cell {
     int alienCount;
     int fightCountDown;
     HashMap<String, CellInfo> speciesMap;
+    SpeciesSet speciesSet;  // master set of species
     boolean cellChanged;
-    Color color1;
-    Color color2;
+    CellInfo color1;
+    CellInfo color2;
 
-    public Cell() { // Constructor
+    public Cell(SpeciesSet s) { // Constructor
         alienCount = 0;
         fightCountDown = 0;
         cellChanged = true;
+        this.speciesSet = s;
     }
 
-    public int addSpecies(String packageName, String className, Color color) {
-        int count;
+    public int addSpecies(String speciesName) {
+        CellInfo ci;
+
         if (speciesMap == null) {
             speciesMap = new HashMap<>();
         }
-        CellInfo ci = speciesMap.get(packageName + ":" + className);
+
+        ci = speciesMap.get(speciesName);
+
         if (ci == null) {
-            ci = new CellInfo(0, color);
+            ci = new CellInfo(0, Color.BLACK, speciesName);
+            speciesMap.put(speciesName, ci);
         }
+
         ci.count++;
-        speciesMap.put(packageName + ":" + className, ci);
         alienCount++;
         cellChanged = true;
-        
+
         if (color1 == null) {
-            color1 = color;
+            color1 = ci;
         } else if (color2 == null) {
-            color2 = color;
+            color2 = ci;
         }
-        
+
         return ci.count;
     }
 
-    public boolean removeSpecies(String packageName, String className) {
-        CellInfo ci = speciesMap.get(packageName + ":" + className);
+    public boolean removeSpecies(String speciesName) {
+        CellInfo ci = speciesMap.get(speciesName);
         if (ci != null) {
             if (ci.count > 1) {
                 ci.count--;
-                speciesMap.put(packageName + ":" + className, ci);
+                speciesMap.put(speciesName, ci);
             } else {
-                speciesMap.remove(packageName + ":" + className);
+                speciesMap.remove(speciesName);
             }
         }
         alienCount--;
@@ -65,14 +71,13 @@ class Cell {
         if (empty) {
             speciesMap = null;
         }
-        
         if (alienCount == 0) {
             color1 = null;
             color2 = null;
         } else if (alienCount == 1) {
             color2 = null;
         }
-        
+
         cellChanged = true;
         return empty;
     }
@@ -85,9 +90,18 @@ class Cell {
         Color color = Color.BLACK;
 
         if (i == 1) {
-            color = color1;
+            if (color1.color == color.BLACK) {
+                // not initialized yet
+                color1.color = this.speciesSet.getColor(color1.speciesName);
+            }
+            color = color1.color;
+
         } else if (i == 2) {
-            color = color2;
+            if (color2.color == color.BLACK) {
+                // not initialized yet
+                color2.color = this.speciesSet.getColor(color2.speciesName);
+            }
+            color = color2.color;
         }
 
         return color;
@@ -100,11 +114,14 @@ class Cell {
 
     public boolean isFighting() {
         if (fightCountDown > 0) {
-            --fightCountDown;
+            fightCountDown--;
+            if (fightCountDown == 0) {
+                cellChanged = true;
+                return false;
+            }
             return true;
         }
 
-        cellChanged = true;
         return false;
     }
 }

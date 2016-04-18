@@ -5,23 +5,19 @@
  */
 package ephemerawindowsshell;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Random;
-import java.util.Scanner;
+import alieninterfaces.AlienSpec;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import gameengineinterfaces.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import static java.lang.Thread.sleep;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Scanner;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.shape.StrokeLineCap;
 
 /**
  *
@@ -31,7 +27,7 @@ class VisualizationGrid implements GameVisualizer {
 
     public Cell[][] grid;
     public Canvas canvas;
-    public SpeciesSet species;
+    public SpeciesSet speciesSet;
 
     private int width;
     private int height;
@@ -39,7 +35,7 @@ class VisualizationGrid implements GameVisualizer {
     private int cellHeight;
     public int widthPX;
     public int heightPX;
-    
+
     public ConsolePane console;
 
     private static final Color[] colors = {Color.BLACK, Color.SLATEBLUE, Color.DARKVIOLET, Color.MAGENTA, Color.PURPLE, Color.RED};
@@ -56,17 +52,18 @@ class VisualizationGrid implements GameVisualizer {
 
     BufferedWriter logFile;
     GameEngine engine;
+    private final Object monitor = new Object();
 
     public void init(GameEngine eng, ConsolePane console, SpeciesSet species, String path, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
         Date date = new Date();
-        engine = eng;
+        this.engine = eng;
 
         // Set up properties
         this.width = width;
         this.height = height;
         this.cellWidth = cellWidth;
         this.cellHeight = cellHeight;
-        this.species = species;
+        this.speciesSet = species;
         this.console = console;
 
         widthPX = width * cellWidth;
@@ -79,7 +76,7 @@ class VisualizationGrid implements GameVisualizer {
         grid = new Cell[height][width];
         for (int i = 0; i < grid.length; i++) {
             for (int k = 0; k < grid[i].length; k++) {
-                grid[i][k] = new Cell();
+                grid[i][k] = new Cell(speciesSet);
             }
         }
 
@@ -142,30 +139,96 @@ class VisualizationGrid implements GameVisualizer {
         }
         gc.setStroke(Color.RED);
         gc.setLineWidth(1.0);
-        gc.strokeOval(0.5,0.5,widthPX-0.5,heightPX-0.5);
+        gc.strokeOval(0.5, 0.5, widthPX - 0.5, heightPX - 0.5);
     }
 
-    public Color getColor(int alienCount) {
-        if (alienCount < 0) {
-            return colors[0];
+    public void renderOnScreen2(GraphicsContext gc) {
+        Color[] color = {Color.BLACK, Color.BLACK, Color.BLACK};
+
+        gc.setLineCap(StrokeLineCap.SQUARE);
+        gc.setLineWidth(1);
+        for (int i = 0; i < height; i++) {
+            for (int k = 0; k < width; k++) {
+
+                Cell cell = grid[i][k];
+                boolean isFighting = cell.isFighting();
+
+                if (cell.cellChanged) {
+                    int x = cellWidth * k;
+                    int y = cellHeight * i;
+
+                    color[1] = (isFighting ? Color.RED : Color.BLACK);
+                    if (cell.alienCount == 0) {
+                        if (!isFighting) {
+                            gc.setStroke(Color.BLACK);
+                            gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth + 0.5, y + 0.5);
+                            cell.cellChanged = false;
+                            continue;
+                        }
+                        color[0] = Color.BLACK;
+                        color[2] = Color.BLACK;
+                    } else if (cell.alienCount == 1) {
+                        color[0] = cell.getColor(1);
+                        color[2] = Color.BLACK;
+                    } else if (cell.alienCount == 2) {
+                        color[0] = cell.getColor(1);
+                        color[2] = cell.getColor(2);
+                    } else {
+                        color[0] = Color.WHITE;
+                        color[2] = Color.WHITE;
+                    }
+
+                    for (int l = 0; l < 3; l++) {
+                        gc.setStroke(color[l]);
+                        gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth / 3 + 0.5, y + 0.5);
+                        x++;
+                    }
+                    cell.cellChanged = false;
+                }
+            }
         }
-        if (alienCount >= colors.length) {
-            return colors[colors.length - 1];
-        } else {
-            return colors[alienCount];
+        gc.setStroke(Color.RED);
+        gc.setLineWidth(1.0);
+        gc.strokeOval(0.5, 0.5, widthPX - 0.5, heightPX - 0.5);
+    }
+
+    @Override
+    public void showCompletedTurn(int totalTurns, int numAliens, long time) {
+        ++totalTurnCounter;
+        this.numAliens = numAliens;
+        debugOut("Turn #" + totalTurnCounter + " complete.");
+        runAndWait(new Runnable() {
+            @Override
+            public void run() {
+                GraphicsContext gc = canvas.getGraphicsContext2D();
+                renderOnScreen2(gc);
+                EphemeraWindowsShell.turnCounterText.setText("Turns completed: " + paddedString(totalTurnCounter, 6)
+                        + ", Total aliens: " + paddedString(numAliens, 7)
+                        + ", time for turn: " + paddedTimeString(time)
+                        + ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens)))
+                        + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)))
+                );
+            }
+        });
+
+        if (totalTurnCounter % 20 == 0) {
+            try {
+                //Thread.sleep(200);
+            } catch (Exception e) {
+            }
         }
     }
 
-    public void incrementCell(int x, int y, String packageName, String className) {
+    public void incrementCell(int x, int y, String speciesName) {
         if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
             debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
             return;
         }
         Cell cell = grid[x + (width / 2)][y + (height / 2)];
-        cell.addSpecies(packageName, className, species.getColor(packageName, className));
+        cell.addSpecies(speciesName);
     }
 
-    public void decrementCell(int x, int y, String packageName, String className) {
+    public void decrementCell(int x, int y, String speciesName) {
         if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
             debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
             return;
@@ -173,10 +236,31 @@ class VisualizationGrid implements GameVisualizer {
 
         Cell cell = grid[x + (width / 2)][y + (height / 2)];
         if (cell.alienCount > 0) {
-            cell.removeSpecies(packageName, className);
+            cell.removeSpecies(speciesName);
         } else {
             debugOut("winvis: cell underflow at (" + x + "," + y + ")");
         }
+    }
+
+    @Override
+    public void showMove(AlienSpec as, int oldx, int oldy) {
+        if (showMove) {
+            print("Vis.showMove: " + as.toString() + ",  moved from (");
+            print(oldx + "," + oldy + ")");
+        }
+
+        String speciesName = as.getFullSpeciesName();
+        int x = as.x;
+        int y = as.y;
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                decrementCell(oldx, oldy, speciesName);
+                incrementCell(x, y, speciesName);
+            }
+        });
+        Thread.yield();
     }
 
     public void markFight(int x, int y) {
@@ -186,6 +270,130 @@ class VisualizationGrid implements GameVisualizer {
         }
         Cell cell = grid[x + (width / 2)][y + (height / 2)];
         cell.fight();
+    }
+
+    @Override
+    public void showFightBefore(int x, int y, List<AlienSpec> participants) {
+        if (showFights) {
+            println("Vis.showFightBefore at (" + x + "," + y + "):");
+            for (AlienSpec as : participants) {
+                print("Alien \"" + as.getFullName() + "\" ");
+                print(" is fighting with power " + as.actionPower);
+                println("");
+            }
+        }
+        markFight(x, y);
+        Thread.yield();
+    }
+
+    @Override
+    public void showFightAfter(int x, int y, List<AlienSpec> participants) {
+        if (showFights) {
+            println("");
+            println("Here is what is left from that fight:");
+            for (AlienSpec as : participants) {
+                print("Alien \"" + as.getFullName() + "\" ");
+                print(" now has tech/energy " + as.getTechEnergyString());
+                println("");
+            }
+        }
+        Thread.yield();
+    }
+
+    @Override
+    public void showSpawn(AlienSpec as) {
+        if (showSpawn) {
+
+            print("Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
+        } else {
+            debugOut("Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
+        }
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                speciesSet.addAlien(as.getFullSpeciesName());
+                incrementCell(as.x, as.y, as.getFullSpeciesName());
+            }
+        });
+        Thread.yield();
+    }
+
+    public void showDeath(AlienSpec as) {
+        if (showDeath) {
+
+            print("Death: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
+        } else {
+            debugOut("Death: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
+        }
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                decrementCell(as.x, as.y, as.getFullSpeciesName());
+                speciesSet.removeAlien(as.getFullSpeciesName());
+            }
+        });
+        Thread.yield();
+    }
+
+    @Override
+    public void showGameOver() {
+        EphemeraWindowsShell.gameOver = true;
+        try {
+            logFile.close();
+        } catch (Exception e) {
+        }
+    }
+
+    @Override
+    public void debugErr(String s) {
+        println(s);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                engine.queueCommand(new GameCommand(GameCommandCode.Pause));
+            }
+        });
+        Thread.yield();
+    }
+
+    @Override
+    public void debugOut(String s) {
+        if (filter != null) {
+            if (s.toLowerCase().contains(filter.toLowerCase())) {
+                println(s);
+            }
+        } else {
+            printlnLogOnly(s);
+        }
+        Thread.yield();
+    }
+
+    @Override
+    public boolean showContinuePrompt() {
+        /*
+         --turnCounter;
+
+         // every numTurns, display prompt, wait for exit phrase or new number of turns
+         if (turnCounter == 0) {
+         turnCounter = numTurns;
+         engine.queueCommand(new GameCommand(GameCommandCode.Pause));
+         }
+         */
+
+        // not done with number of turns before prompt, don't display anything, return "game not over"
+        Thread.yield();
+        return true;
+    }
+
+    @Override
+    public void showEngineStateChange(GameState gs) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Thread.yield();
+    }
+
+    @Override
+    public void showAliens(List<AlienSpec> aliens) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private void print(String s) {
@@ -207,151 +415,74 @@ class VisualizationGrid implements GameVisualizer {
         }
     }
 
-    @Override
-    public void showCompletedTurn(int numAliens) {
-        ++totalTurnCounter;
-        this.numAliens = numAliens;
-        debugOut("Turn #" + totalTurnCounter + " complete.");
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                GraphicsContext gc = canvas.getGraphicsContext2D();
-                renderOnScreen(gc);
-                EphemeraWindowsShell.turnCounterText.setText("Turns completed: " + totalTurnCounter);
-                //EphemeraWindowsShell.armPauseButton();
-            }
-        });
+    private void printlnLogOnly(String s) {
         try {
-            sleep(100); // give window some time to draw;
-        } catch (Exception e) {
-        }
-
-    }
-
-    @Override
-    public void showMove(String packageName, String className, int id, int oldx, int oldy, int newX, int newY, int energy, int tech) {
-        if (showMove) {
-            print("Vis.showMove: " + packageName + ":" + className);
-            print("(" + Integer.toHexString(id).toUpperCase() + ") moved from (");
-            print(oldx + "," + oldy + ") to (");
-            print(newX + "," + newY);
-            println("), E:" + energy + ", T:" + tech);
-        }
-        decrementCell(oldx, oldy, packageName, className);
-        incrementCell(newX, newY, packageName, className);
-    }
-
-    @Override
-    public void showFightBefore(int x, int y, String[] participants, Integer[] fightPowers) {
-        if (showFights) {
-            println("Vis.showFightBefore at (" + x + "," + y + "):");
-            for (int i = 0; i < participants.length; i++) {
-                print("Alien " + participants[i] + " ");
-                println("is fighting with energy " + fightPowers[i]);
-            }
-        }
-        markFight(x, y);
-    }
-
-    @Override
-    public void showFightAfter(int x, int y, String[] participants, int[] newEnergy, int[] newTech) {
-        if (showFights) {
-            println("");
-            println("Here is what is left from that fight:");
-            for (int i = 0; i < participants.length; i++) {
-                print("Alien \"" + participants[i] + "\" ");
-                print(" now has energy " + newEnergy[i]);
-                print(" and new tech level " + newTech[i]);
-            }
-            println("");
-        }
-    }
-
-    public void showSpawn(String packageName, String className, int id, int newX, int newY, int energy, int tech) {
-        if (showSpawn) {
-            print("Vis.showSpawn: " + packageName + ":" + className);
-            print("(" + Integer.toHexString(id).toUpperCase() + ") at (");
-            print(newX + "," + newY);
-            println("), E:" + energy + ", T:" + tech);
-        }
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                species.addAlien(packageName, className);
-                incrementCell(newX, newY, packageName, className);
-            }
-        });
-    }
-
-    public void showDeath(String packageName, String className, int id, int oldX, int oldY) {
-        if (showDeath) {
-            print("Death: " + packageName + ":" + className);
-            print("(" + Integer.toHexString(id).toUpperCase() + ") at (");
-            println(oldX + "," + oldY + ")");
-        } else {
-            debugOut("Death: " + packageName + ":" + className
-                    + "(" + Integer.toHexString(id).toUpperCase() + ") at ("
-                    + oldX + "," + oldY + ")");
-        }
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                decrementCell(oldX, oldY, packageName, className);
-                species.removeAlien(packageName, className);
-            }
-        });
-    }
-
-    @Override
-    public void showSection(int x, int y, int width) {
-        println("Showing sections costs extra");
-    }
-
-    @Override
-    public void highlightPositions() {
-    }
-
-    @Override
-    public void showGameOver() {
-        EphemeraWindowsShell.gameOver = true;
-        try {
-            logFile.close();
+            logFile.write(s);
+            logFile.newLine();
+            logFile.flush();
         } catch (Exception e) {
         }
     }
 
-    @Override
-    public void debugErr(String s) {
-        println(s);
+    String paddedString(String s, int space) {
+        s = "          ".substring(0, space) + s;
+        return s.substring(s.length() - space);
     }
 
-    @Override
-    public void debugOut(String s) {
-        if (filter != null) {
-            if (s.toLowerCase().contains(filter.toLowerCase())) {
-                println(s);
+    String paddedString(long i, int space) {
+        return paddedString(Long.toString(i), space);
+    }
+
+    String paddedTimeString(long ns) {
+        return paddedString(timeString(ns), 7);
+    }
+
+    String timeString(long ns) {
+        if (ns > 10000000000L) {
+            return (ns / 1000000000L) + "s";
+        }
+        if (ns > 10000000L) {
+            return (ns / 1000000L) + "ms";
+        }
+        if (ns > 10000L) {
+            return (ns / 1000L) + (((char) 181) + "s");
+        }
+        return ns + "ns";
+    }
+
+    /**
+     * Runs the specified {@link Runnable} on the JavaFX application thread and
+     * waits for completion.
+     *
+     * @param action the {@link Runnable} to run
+     * @throws NullPointerException if {@code action} is {@code null}
+     */
+    public static void runAndWait(Runnable action) {
+        if (action == null) {
+            throw new NullPointerException("action");
+        }
+
+        // run synchronously on JavaFX thread
+        if (Platform.isFxApplicationThread()) {
+            action.run();
+            return;
+        }
+
+        // queue on JavaFX thread and wait for completion
+        final CountDownLatch doneLatch = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                action.run();
+            } finally {
+                doneLatch.countDown();
             }
-        }
+        });
 
-        // code to detect underflows of any reported values
-        if (s.contains("2147483")) {
-            println((char) 27 + "[31;1m" + "Underflow: " + s);
+        try {
+            doneLatch.await();
+        } catch (InterruptedException e) {
+            // ignore exception
         }
     }
 
-    @Override
-    public boolean showContinuePrompt() {
-        /*
-         --turnCounter;
-
-         // every numTurns, display prompt, wait for exit phrase or new number of turns
-         if (turnCounter == 0) {
-         turnCounter = numTurns;
-         engine.queueCommand(new GameCommand(GameCommandCode.Pause));
-         }
-         */
-
-        // not done with number of turns before prompt, don't display anything, return "game not over"
-        return true;
-    }
 }

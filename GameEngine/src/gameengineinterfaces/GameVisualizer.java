@@ -6,27 +6,31 @@
 package gameengineinterfaces;
 
 import alieninterfaces.*;
+import java.util.List;
 
 /**
  *
  * @author gmein
  */
 public interface GameVisualizer {
-    void showCompletedTurn(int numAliens);
     
-    void showMove(String packageName, String className, int id, int oldX, int oldY, int newX, int newY, int energy, int tech);
-
-    void showFightBefore(int x, int y, String[] participants, Integer[] fightPower);
-
-    void showFightAfter(int x, int y, String[] participants, int[] newEnergyLevels, int[] newTechLevels);
-
-    void showSection(int x, int y, int width);
+    void showCompletedTurn(int totalTurns, int numAliens, long timeTaken);
     
-    void showSpawn(String packageName, String className, int id, int newX, int newY, int energy, int tech);
+    void showAliens(List<AlienSpec> aliens);
+    
+    void showMove(AlienSpec as, int oldX, int oldY);
+
+    void showFightBefore(int x, int y, List<AlienSpec> aiens);
+
+    void showFightAfter(int x, int y, List<AlienSpec> aliens);
+
+    void showSpawn(AlienSpec as);
             
-    void showDeath(String packageName, String className, int id, int oldX, int oldY);
+    void showDeath(AlienSpec as);
+    
+    boolean showContinuePrompt();
 
-    void highlightPositions();
+    void showEngineStateChange(GameState gs);
 
     void showGameOver();
 
@@ -34,5 +38,4 @@ public interface GameVisualizer {
 
     void debugErr(String s);
 
-    boolean showContinuePrompt();
 }

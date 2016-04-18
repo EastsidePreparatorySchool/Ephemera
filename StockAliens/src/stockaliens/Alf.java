@@ -27,10 +27,10 @@ public class Alf implements Alien {
     public Alf() {
     }
 
-    public void init(Context game_ctx) {
+    public void init(Context game_ctx, int id, int parent, String message) {
         totalCount += 1;
         myAlienNumber = totalCount;
-        
+
         ctx = game_ctx;
         ctx.debugOut("Initialized at "
                 + "(" + Integer.toString(ctx.getX())
@@ -45,10 +45,9 @@ public class Alf implements Alien {
         //ctx.debugOut("Move requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
-
         // Venusians run away from the nearest alien
         int techLevel = ctx.getTech();
-        
+
         int[] nearestAlienPos = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY());
 
         int x = 0;
@@ -76,7 +75,6 @@ public class Alf implements Alien {
         //ctx.debugOut("Action requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
-
         View view = ctx.getView();
 
         //goal is to make a ton of Venusians fast and be good at hiding
@@ -84,6 +82,7 @@ public class Alf implements Alien {
         try {
             // is there another alien on our position?
             if (view.getAlienCountAtPos(ctx.getX(), ctx.getY()) > 1) {
+                ctx.debugOut("Others are here");
                 // if so, do we have any energy?
                 if (ctx.getEnergy() < 10) {
                     // no, keep moving.
@@ -103,14 +102,15 @@ public class Alf implements Alien {
         //tech is not a priority
         if (ctx.getEnergy() > (ctx.getTech() + 5)) {
 
-            // TODO: Assumption: spawning cost will never be greater than 20
             if (ctx.getEnergy() > ctx.getSpawningCost() + 10) {
                 //should spawn fast at the beggining,
                 ctx.debugOut("Spawning");
-                return new Action(ActionCode.Spawn, 10);
+                return new Action(ActionCode.Spawn, 5);
             }
-            ctx.debugOut("Researching");
-            return new Action(ActionCode.Research);
+            if (ctx.getTech() < 30) {
+                ctx.debugOut("Researching");
+                return new Action(ActionCode.Research);
+            }
         }
         ctx.debugOut("Gaining");
 
@@ -120,5 +120,15 @@ public class Alf implements Alien {
     public void processResults() {
         ctx.debugOut("Processing results");
         return;
+    }
+
+    @Override
+    public void communicate() {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void receive(String[] messages) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

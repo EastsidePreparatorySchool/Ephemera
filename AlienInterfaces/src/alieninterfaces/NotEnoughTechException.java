@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gameengineV1;
+package alieninterfaces;
 
 /**
  *
  * @author gmein
  */
-public enum GameState {
-    Running, Paused
+public class NotEnoughTechException extends Exception{
+    
 }

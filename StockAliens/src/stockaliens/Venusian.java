@@ -19,7 +19,7 @@ public class Venusian implements Alien {
     public Venusian() {
     }
 
-    public void init(Context game_ctx) {
+    public void init(Context game_ctx, int id, int parent, String message) {
         ctx = game_ctx;
         ctx.debugOut("Initialized at "
                 + "(" + Integer.toString(ctx.getX())
@@ -94,18 +94,26 @@ public class Venusian implements Alien {
             if (ctx.getEnergy() > ctx.getSpawningCost() + 10) {
                 //should spawn fast at the beggining,
                 ctx.debugOut("Spawning");
-                return new Action(ActionCode.Spawn, 10);
+                return new Action(ActionCode.Spawn, 5);
             }
-            ctx.debugOut("Researching");
-            return new Action(ActionCode.Research);
+            if (ctx.getTech() < 30) {
+                ctx.debugOut("Researching");
+                return new Action(ActionCode.Research);
+            }
         }
         ctx.debugOut("Gaining");
 
         return new Action(ActionCode.Gain);
     }
 
-    public void processResults() {
-        ctx.debugOut("Processing results");
-        return;
+
+    @Override
+    public void communicate() {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void receive(String[] messages) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -30,7 +30,7 @@ public class Martian implements Alien {
     }
 
     @Override
-    public void init(Context ctx) {
+    public void init(Context ctx,int id, int parent, String message) {
         this.ctx = ctx;
         ctx.debugOut("Initialized at "
                 + "(" + Integer.toString(ctx.getX())
@@ -64,7 +64,7 @@ public class Martian implements Alien {
         ClosestAlienYCoordinate = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY())[1];
 
         //Checks to see if the closest alien is withen moving capability.
-        if ((long) Math.abs((long)ClosestAlienXCoordinate - ctx.getX()) + (long) Math.abs((long)ClosestAlienYCoordinate - ctx.getY()) <= (long) ctx.getEnergy()) {
+        if ((long) Math.abs((long)ClosestAlienXCoordinate - ctx.getX()) + (long) Math.abs((long)ClosestAlienYCoordinate - ctx.getY()) <= (long) ctx.getTech()) {
 
             HorizontalMove = ClosestAlienXCoordinate - ctx.getX();
             VerticalMove = ClosestAlienYCoordinate - ctx.getY();
@@ -103,7 +103,7 @@ public class Martian implements Alien {
         if (ctx.getEnergy() < 2) {
             ctx.debugOut("Gaining");
             return new Action(ActionCode.Gain);
-        } else if (ctx.getEnergy() < 3 && ctx.getEnergy() > ctx.getTech()) {
+        } else if (ctx.getEnergy() < 3 && ctx.getEnergy() > ctx.getTech() && ctx.getTech() < 30) {
             ctx.debugOut("Researching");
             return new Action(ActionCode.Research);
         } else if (ctx.getEnergy() > ctx.getSpawningCost() + 2) {
@@ -114,9 +114,15 @@ public class Martian implements Alien {
         return new Action (ActionCode.Gain);
     }
 
+
     @Override
-    public void processResults() {
-        // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void communicate() {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void receive(String[] messages) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

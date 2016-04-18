@@ -5,6 +5,7 @@
  */
 package gameengineV1;
 
+import gameengineinterfaces.GameState;
 import gamelogic.*;
 import alieninterfaces.*;
 import gameengineinterfaces.*;
@@ -35,10 +36,11 @@ public class GameEngineThread extends Thread {
     public void run() {
         GameCommand gc;
         boolean endGame = false;
-        
-        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+        int totalTurns = 0;
 
-        engine.grid = new SpaceGrid(engine.vis);
+        //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+
+        engine.grid = new SpaceGrid(engine.vis, 500, 500);
 
         try {
             addClassPathFile("alieninterfaces");
@@ -63,12 +65,13 @@ public class GameEngineThread extends Thread {
                             // endGame signifies that an "End" request has come through
                         }
                     } while (!continueGame && !endGame);
-                    
+
                     //
                     // Execute game turn
                     //
-
+                    long startTurnTime = System.nanoTime();
                     try {
+
                         if (engine.grid.executeGameTurn()) {
                             // return true == game over because at most one species left
                             engine.gameState = GameState.Paused;
@@ -78,7 +81,8 @@ public class GameEngineThread extends Thread {
                         engine.vis.debugErr("GameEngineThread: Unhandled exception during turn: " + e.getMessage());
                         e.printStackTrace();
                     }
-                    engine.vis.showCompletedTurn(engine.grid.aliens.size());
+                    totalTurns++;
+                    engine.vis.showCompletedTurn(totalTurns, engine.grid.aliens.size(), System.nanoTime() - startTurnTime);
                 }
 
                 //

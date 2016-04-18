@@ -5,24 +5,31 @@ package alieninterfaces;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author gmein
  */
 public class Action {
-    public ActionCode code;
-    public int power;
-    
-    public Action (ActionCode code, int power) {
+
+    final public ActionCode code;
+    final public int power;
+    final public String message;
+
+    public Action(ActionCode code, int power) {
         this.code = code;
         this.power = power;
+        this.message = null;
     }
-    
-    public Action (ActionCode code) {
+
+    public Action(ActionCode code) {
         this.code = code;
         this.power = 0;
+        this.message = null;
     }
-    // TODO add in code for a constructor where the name of the action and the
-    // power are passed in, instead of a code and a power
+
+    public Action(ActionCode code, int power, String message) {
+        this.code = code;
+        this.power = power;
+        this.message = message;
+    }
 }
