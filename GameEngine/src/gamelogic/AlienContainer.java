@@ -8,7 +8,6 @@ package gamelogic;
 import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class AlienContainer {
 
     int tech;
     int energy;
-    boolean chatter;
+    public static boolean chatter = false;
 
     boolean fought;
     public int x;
@@ -63,7 +62,6 @@ public class AlienContainer {
         this.constructor = cns;
         this.energy = energy;
         this.tech = tech;
-        this.chatter = false;
         this.ctx = new ContextImplementation(this, vis);
         this.grid = sg;
         this.listening = false;
@@ -209,9 +207,9 @@ public class AlienContainer {
         deltaR = (double) (dir.x() + dir.y()); // cheating: not hypothenuse, but sum of sides.
 
         // no action if inward
-        if (deltaAlpha < Math.PI / 2 || deltaAlpha > -Math.PI / 2) {
+        if (deltaAlpha <= Math.PI / 2 && deltaAlpha >= -Math.PI / 2) {
             // outward: push the alien counterclockwise
-            deltaAlpha += getAngleDiff(deltaAlpha, Math.PI) * (Math.abs(r) / 55000);
+            deltaAlpha += getAngleDiff(deltaAlpha, Math.PI) * (r / 55000);
             deltaAlpha = getAngleDiff(deltaAlpha, 0); // normalize
         }
 
@@ -265,9 +263,9 @@ public class AlienContainer {
          + (y + dyi) + ")");
          */
 
-        if (Math.hypot(dxi + x, dyi + y) > 250) {
-            debugOut("Drift not contained: " + (dxi + x) + "," + (dyi + y));
-        }
+        //if (Math.hypot(dxi + x, dyi + y) > 250) {
+        //    debugOut("Drift not contained: " + (dxi + x) + "," + (dyi + y));
+        //}
         return new MoveDir(dxi, dyi);
     }
 

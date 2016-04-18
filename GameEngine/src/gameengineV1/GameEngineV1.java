@@ -74,7 +74,7 @@ public class GameEngineV1 implements GameEngine {
                         continue;
                     }
 
-                    // make new GameElement from code and next few fields
+                    //if (strElement[0].equalsIgnoreCase("COMMAND")) // make new GameElement from code and next few fields
                     GameElementSpec element = new GameElementSpec(strElement[0]);
 
                     // get package name
@@ -135,15 +135,17 @@ public class GameEngineV1 implements GameEngine {
 
                     // add to list
                     elements.add(element);
-                //v.debugOut("GameEngineV1:init:Parsed element " + element.packageName + ":"
+                    //v.debugOut("GameEngineV1:init:Parsed element " + element.packageName + ":"
                     //        + element.className + ", "
                     //        + element.state);
+
                 } catch (Exception e) {
                     v.debugOut("GameEngineV1:init:File parse error");
                     v.debugOut("GameEngineV1:init:     " + e.getMessage());
                 }
+
+                in.close();
             }
-            in.close();
         } catch (Exception e) {
             v.debugOut("GameEngineV1:init:File-related error");
             v.debugOut("GameEngineV1:init:     " + e.getMessage());
@@ -158,7 +160,8 @@ public class GameEngineV1 implements GameEngine {
     }
 
     @Override
-    public void init(GameVisualizer v, String gameJarPath, GameElementSpec[] savedGame) {
+    public void init(GameVisualizer v, String gameJarPath, GameElementSpec[] savedGame
+    ) {
         // 
         // save the visualizer (how we report status)
         // create a new Spacegrid (the game board)
@@ -175,7 +178,7 @@ public class GameEngineV1 implements GameEngine {
         vis.debugOut("GameEngine: Starting thread");
         this.gameThread.start();
 
-        //
+            //
         // queue every game element
         //
         vis.debugOut("GameEngineV1: Elements in config: " + Integer.toString(savedGame.length));
@@ -189,13 +192,14 @@ public class GameEngineV1 implements GameEngine {
             queueCommand(gc);
         }
 
-        //
+            //
         // start the game
         //
     }
 
     @Override
-    public void queueCommand(GameCommand gc) {
+    public void queueCommand(GameCommand gc
+    ) {
         //
         // queue alien info to synchronized queue
         //

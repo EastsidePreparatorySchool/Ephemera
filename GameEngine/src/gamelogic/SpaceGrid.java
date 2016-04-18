@@ -5,6 +5,7 @@
  */
 package gamelogic;
 
+import gameengineinterfaces.GameElementKind;
 import java.util.*;
 import java.lang.reflect.Constructor;
 import alieninterfaces.*;
@@ -24,7 +25,8 @@ public class SpaceGrid {
     int height;
     int currentTurn = 1;
 
-    static Random rand = new Random(System.currentTimeMillis());
+    // this is the only approved random generator for the game. Leave it alone!
+    public static Random rand;
 
     public SpaceGrid(GameVisualizer vis, int width, int height) {
         this.vis = vis;
@@ -32,6 +34,10 @@ public class SpaceGrid {
         this.height = height;
         aliens = new AlienGrid(width, height); // AlienContainer type is inferred
         objects = new ArrayList<>();
+        
+        long randSeed = System.nanoTime();
+        rand = new Random(randSeed);
+        vis.debugOut("RandSeed: "+ randSeed);
     }
 
     public boolean executeGameTurn() {
@@ -51,7 +57,7 @@ public class SpaceGrid {
         resetAliens();
         Thread.yield();
 
-        currentTurn++;
+        currentTurn++; 
 
         AlienContainer aUniqueAlien = null;
         for (AlienContainer a : aliens) {
