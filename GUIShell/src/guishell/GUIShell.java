@@ -73,7 +73,7 @@ public class GUIShell extends Application {
         species = new SpeciesSet();
 
         // set up main window
-        stage.setTitle("Ephemera Windows Shell V0.1");
+        stage.setTitle("Ephemera GUI Shell V0.1");
         setSize(stage, screenBounds);
 
         // Use a border pane as the root for scene
@@ -118,7 +118,7 @@ public class GUIShell extends Application {
                 + System.getProperty("path.separator"));
            
 // init visualizer
-           this.field = new VisualizationGrid();
+        this.field = new VisualizationGrid();
         this.field.init(engine, console, species, gameJarPath, alienPath, width, height, cellWidth, cellHeight, canvas);
 
         // get engine up and running

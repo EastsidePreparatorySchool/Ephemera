@@ -52,3 +52,5 @@ EphemeraWindowsShell/nbproject/jfx-impl_backup_2.xml
 EphemeraWindowsShell/nbproject/jfx-impl.xml
 /GUIShell/nbproject/private/
 /GUIShell/build/
+/GUIShell/dist/
+ConsoleShell/nbproject/private/private.xml
