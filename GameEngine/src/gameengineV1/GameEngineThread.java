@@ -205,11 +205,12 @@ public class GameEngineThread extends Thread {
      */
     private void addClassPathFile(String packageName) throws IOException {
         String fullName;
-        
-        if (packageName.equalsIgnoreCase("stockaliens")) {
+
+        if (packageName.equalsIgnoreCase("stockaliens")
+                || packageName.equalsIgnoreCase("alieninterfaces")) {
             fullName = engine.gameJarPath
                     + System.getProperty("file.separator")
-                    + "stockaliens"
+                    + packageName
                     + System.getProperty("file.separator")
                     + "dist"
                     + System.getProperty("file.separator")
