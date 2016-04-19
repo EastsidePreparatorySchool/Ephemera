@@ -62,12 +62,12 @@ public class GUIShell extends Application {
 
         // get screen geometry
         javafx.geometry.Rectangle2D screenBounds;
-        double w= Screen.getPrimary().getDpi();
+        double w = Screen.getPrimary().getDpi();
         screenBounds = Screen.getPrimary().getVisualBounds();
 
         // for most screens, 1500x500 will display nicely
         // TODO: Make this adapt to available space (from bounds)
-        int cellWidth = screenBounds.getWidth() < 1900 ? 2:3;
+        int cellWidth = screenBounds.getWidth() < 1900 ? 2 : 3;
         int cellHeight = 1;
 
         // keep track of species, need this before constructing UI
@@ -106,25 +106,35 @@ public class GUIShell extends Application {
         engine = new GameEngineV1();
 
         // can override the path for class jar files in arguments
-        String gameJarPath = System.getProperty("user.dir")
-                + System.getProperty("file.separator")
-                + "ephemera"
-                + System.getProperty("file.separator");
+        String gamePath = System.getProperty("user.dir");
+        gamePath = gamePath.toLowerCase();
 
-        String alienPath = gameJarPath
+        if (gamePath.contains("ephemera" + System.getProperty("file.separator") + "guishell")) {
+            // probably started from netbeans
+            gamePath = gamePath.substring(0, gamePath.indexOf("guishell"));
+        } else {
+            // probably started from other folder
+            gamePath = System.getProperty("user.home");
+            gamePath = gamePath.toLowerCase();
+            gamePath += System.getProperty("file.separator")
+                    + "ephemera"
+                    + System.getProperty("file.separator");
+        }
+
+        String alienPath = gamePath
                 + "aliens"
                 + System.getProperty("file.separator");
-           
-        String logPath = gameJarPath 
+
+        String logPath = gamePath
                 + "logs"
                 + System.getProperty("file.separator");
-           
+
         // init visualizer
         this.field = new VisualizationGrid();
         this.field.init(engine, console, species, logPath, width, height, cellWidth, cellHeight, canvas);
 
         // get engine up and running
-        engine.initFromFile(field, gameJarPath, alienPath, "ephemera_initial_setup.csv");
+        engine.initFromFile(field, gamePath, alienPath, "ephemera_initial_setup.csv");
 
         // set a hook to shut down engine on game exit
         stage.setOnCloseRequest(e -> handleExit());
@@ -223,7 +233,7 @@ public class GUIShell extends Application {
 
         speciesView.setCellFactory((ListView<AlienSpecies> list) -> new SpeciesListCell());
         speciesView.setStyle("-fx-background-color: black;");
- 
+
         return speciesView;
     }
 

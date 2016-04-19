@@ -82,10 +82,12 @@ class VisualizationGrid implements GameVisualizer {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
+        String fileName = "";
         try {
-            logFile = new BufferedWriter(new FileWriter(logPath + "game" + dateFormat.format(date) + ".txt"));
+            fileName = logPath + "game" + dateFormat.format(date) + ".txt";
+            logFile = new BufferedWriter(new FileWriter(fileName));
         } catch (Exception e) {
-            System.err.println("visgrid: Cannot create log file");
+            System.err.println("visgrid: Cannot create log file " + fileName);
         }
     }
 
@@ -221,12 +223,14 @@ class VisualizationGrid implements GameVisualizer {
             public void run() {
                 GraphicsContext gc = canvas.getGraphicsContext2D();
                 renderOnScreen2(gc);
-                GUIShell.turnCounterText.setText("Turns completed: " + paddedString(totalTurnCounter, 6)
-                        + ", Total aliens: " + paddedString(numAliens, 7)
-                        + ", time for turn: " + paddedTimeString(time)
+                String text = "Turns completed: " + paddedString(totalTurnCounter, 6)
+                        + ", Total aliens: " + paddedString(numAliens, 7);
+                if (time > 100000000L) {
+                        text += ", time for turn: " + paddedTimeString(time)
                         + ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens)))
-                        + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)))
-                );
+                        + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)));
+                }
+                GUIShell.turnCounterText.setText(text);
             }
         });
 
