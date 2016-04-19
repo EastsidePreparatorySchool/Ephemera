@@ -12,7 +12,7 @@ package gameengineinterfaces;
 public interface GameEngine {
     void init(GameVisualizer v, String gameJarPath, GameElementSpec[] gameConfig);
 
-    void initFromFile(GameVisualizer v, String gameJarPath, String gameConfigFile);
+    void initFromFile(GameVisualizer v, String gameJarPath, String alienPath, String gameConfigFile);
 
     void queueCommand(GameCommand gc);
 

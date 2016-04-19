@@ -27,6 +27,7 @@ public class GameEngineV1 implements GameEngine {
     GameEngineThread gameThread;
     GameState gameState;
     String gameJarPath;
+    String alienPath;
 
     @Override
     public boolean isAlive() {
@@ -34,7 +35,7 @@ public class GameEngineV1 implements GameEngine {
     }
 
     @Override
-    public void initFromFile(GameVisualizer v, String gameJarPath, String savedGameFile) {
+    public void initFromFile(GameVisualizer v, String gameJarPath, String alienPath, String savedGameFile) {
         GameElementSpec[] savedGame;
 
         this.vis = v;

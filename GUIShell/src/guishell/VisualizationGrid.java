@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ephemerawindowsshell;
+package guishell;
 
 import alieninterfaces.AlienSpec;
 import javafx.scene.canvas.GraphicsContext;
@@ -54,7 +54,7 @@ class VisualizationGrid implements GameVisualizer {
     GameEngine engine;
     private final Object monitor = new Object();
 
-    public void init(GameEngine eng, ConsolePane console, SpeciesSet species, String path, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
+    public void init(GameEngine eng, ConsolePane console, SpeciesSet species, String path, String alienPath, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
         Date date = new Date();
         this.engine = eng;
 
@@ -202,7 +202,7 @@ class VisualizationGrid implements GameVisualizer {
             public void run() {
                 GraphicsContext gc = canvas.getGraphicsContext2D();
                 renderOnScreen2(gc);
-                EphemeraWindowsShell.turnCounterText.setText("Turns completed: " + paddedString(totalTurnCounter, 6)
+                GUIShell.turnCounterText.setText("Turns completed: " + paddedString(totalTurnCounter, 6)
                         + ", Total aliens: " + paddedString(numAliens, 7)
                         + ", time for turn: " + paddedTimeString(time)
                         + ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens)))
@@ -337,7 +337,7 @@ class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void showGameOver() {
-        EphemeraWindowsShell.gameOver = true;
+        GUIShell.gameOver = true;
         try {
             logFile.close();
         } catch (Exception e) {

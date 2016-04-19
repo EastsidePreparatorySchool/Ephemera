@@ -50,3 +50,5 @@ ConsoleShell/nbproject/private/private.properties
 ConsoleShell/nbproject/private/private.properties
 EphemeraWindowsShell/nbproject/jfx-impl_backup_2.xml
 EphemeraWindowsShell/nbproject/jfx-impl.xml
+/GUIShell/nbproject/private/
+/GUIShell/build/

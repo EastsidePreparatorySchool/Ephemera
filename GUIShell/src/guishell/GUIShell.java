@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ephemerawindowsshell;
+package guishell;
 
 import gameengineV1.GameEngineV1;
 import gameengineinterfaces.GameCommand;
@@ -37,12 +37,13 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import static javafx.application.Application.launch;
 
 /**
  *
  * @author gmein
  */
-public class EphemeraWindowsShell extends Application {
+public class GUIShell extends Application {
 
     public static boolean gameOver = false;
     public static Canvas canvas;
@@ -104,14 +105,24 @@ public class EphemeraWindowsShell extends Application {
         engine = new GameEngineV1();
 
         // can override the path for class jar files in arguments
-        String gameJarPath = "c:\\users\\public\\ephemera\\drop\\";
-
-        // init visualizer
-        this.field = new VisualizationGrid();
-        this.field.init(engine, console, species, gameJarPath, width, height, cellWidth, cellHeight, canvas);
+        String gameJarPath = System.getProperty("user.home"
+                + System.getProperty("path.separator")
+                + "ephemera"
+                + System.getProperty("path.separator"));
+        // can override the path for class jar files in arguments
+        String alienPath = System.getProperty("user.home"
+                + System.getProperty("path.separator")
+                + "ephemera"
+                + System.getProperty("path.separator")
+                + "aliens"
+                + System.getProperty("path.separator"));
+           
+// init visualizer
+           this.field = new VisualizationGrid();
+        this.field.init(engine, console, species, gameJarPath, alienPath, width, height, cellWidth, cellHeight, canvas);
 
         // get engine up and running
-        engine.initFromFile(field, gameJarPath, "ephemera_initial_setup.csv");
+        engine.initFromFile(field, gameJarPath, alienPath, "ephemera_initial_setup.csv");
 
         // set a hook to shut down engine on game exit
         stage.setOnCloseRequest(e -> handleExit());
@@ -126,8 +137,8 @@ public class EphemeraWindowsShell extends Application {
         // engine.queueCommand(new GameCommand(GameCommandCode.Resume));
         // return to platform and wait for events
     }
-
     // handle shutdown gracefully
+
     public void handleExit() {
         engine.queueCommand(new GameCommand(GameCommandCode.End));
         field.showGameOver(); // closes logfile
@@ -183,12 +194,12 @@ public class EphemeraWindowsShell extends Application {
         //Button buttonProjected = new Button("Stop");
         //buttonProjected.setPrefSize(100, 20);
         vbox.getChildren().addAll(buttonPause);
-        EphemeraWindowsShell.turnCounterText = new Text("Turns completed: 0");
-        EphemeraWindowsShell.turnCounterText.setFont(Font.font("Consolas", FontWeight.BOLD, 18));
-        EphemeraWindowsShell.turnCounterText.setStyle("-fx-background-color: black;");
-        EphemeraWindowsShell.turnCounterText.setFill(Color.WHITE);
+        GUIShell.turnCounterText = new Text("Turns completed: 0");
+        GUIShell.turnCounterText.setFont(Font.font("Consolas", FontWeight.BOLD, 18));
+        GUIShell.turnCounterText.setStyle("-fx-background-color: black;");
+        GUIShell.turnCounterText.setFill(Color.WHITE);
 
-        vbox.getChildren().add(EphemeraWindowsShell.turnCounterText);
+        vbox.getChildren().add(GUIShell.turnCounterText);
 
         return vbox;
     }
