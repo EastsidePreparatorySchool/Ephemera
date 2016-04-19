@@ -243,9 +243,9 @@ public class SpaceGrid {
                 // if an alien blows up here, we'll kill it. 
                 thisAlien.currentActionCode = ActionCode.None;
                 thisAlien.currentActionPower = 0;
-                thisAlien.debugErr("Unhandled exception in getAction(): " + ex.toString());
+                thisAlien.debugOut("Unhandled exception in getAction(): " + ex.toString());
                 for (StackTraceElement s : ex.getStackTrace()) {
-                    thisAlien.debugErr(s.toString());
+                    thisAlien.debugOut(s.toString());
                 }
                 thisAlien.kill();
             }
@@ -345,7 +345,8 @@ public class SpaceGrid {
                     break;
 
                 case Research:
-                    // there is an arbitrary border at 32 to keep views under control
+                    // there is an arbitrary bceiling at 32 to keep views under control
+                    // aliens can research up to 30, must buy tech beyond that from residents
                     if (thisAlien.tech < 30) {
                         thisAlien.energy -= thisAlien.tech;
                         thisAlien.tech++; // you only gain 1 tech regardless of energy invested

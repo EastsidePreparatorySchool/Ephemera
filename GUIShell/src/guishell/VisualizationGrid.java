@@ -54,7 +54,7 @@ class VisualizationGrid implements GameVisualizer {
     GameEngine engine;
     private final Object monitor = new Object();
 
-    public void init(GameEngine eng, ConsolePane console, SpeciesSet species, String path, String alienPath, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
+    public void init(GameEngine eng, ConsolePane console, SpeciesSet species, String path, String logPath, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
         Date date = new Date();
         this.engine = eng;
 
@@ -83,7 +83,7 @@ class VisualizationGrid implements GameVisualizer {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
         try {
-            logFile = new BufferedWriter(new FileWriter(path + "game" + dateFormat.format(date) + ".txt"));
+            logFile = new BufferedWriter(new FileWriter(logPath + "game" + dateFormat.format(date) + ".txt"));
         } catch (Exception e) {
             System.err.println("visgrid: Cannot create log file");
         }

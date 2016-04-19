@@ -28,6 +28,9 @@
 /GameEngine/nbproject/build-impl.xml
 /ConsoleShell/nbproject/build-impl.xml
 
+/logs/
+/ALIENS/
+
 /drop/
 
 
@@ -54,3 +57,5 @@ EphemeraWindowsShell/nbproject/jfx-impl.xml
 /GUIShell/build/
 /GUIShell/dist/
 ConsoleShell/nbproject/private/private.xml
+
+Logs/game2016-04-19-09-15-48.txt

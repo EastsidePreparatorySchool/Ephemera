@@ -40,6 +40,7 @@ public class GameEngineV1 implements GameEngine {
 
         this.vis = v;
         this.gameJarPath = gameJarPath;
+        this.alienPath = alienPath;
 
         //
         // read initial config from file
@@ -162,8 +163,7 @@ public class GameEngineV1 implements GameEngine {
     }
 
     @Override
-    public void init(GameVisualizer v, String gameJarPath, GameElementSpec[] savedGame
-    ) {
+    public void init(GameVisualizer v, String gameJarPath, GameElementSpec[] savedGame) {
         // 
         // save the visualizer (how we report status)
         // create a new Spacegrid (the game board)

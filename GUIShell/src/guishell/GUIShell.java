@@ -62,7 +62,8 @@ public class GUIShell extends Application {
 
         // get screen geometry
         javafx.geometry.Rectangle2D screenBounds;
-        screenBounds = Screen.getPrimary().getVisualBounds();
+        double w= Screen.getPrimary().getDpi();
+        screenBounds = Screen.getPrimary().getBounds();
 
         // for most screens, 1500x500 will display nicely
         // TODO: Make this adapt to available space (from bounds)
@@ -105,21 +106,22 @@ public class GUIShell extends Application {
         engine = new GameEngineV1();
 
         // can override the path for class jar files in arguments
-        String gameJarPath = System.getProperty("user.home"
-                + System.getProperty("path.separator")
+        String gameJarPath = System.getProperty("user.home")
+                + System.getProperty("file.separator")
                 + "ephemera"
-                + System.getProperty("path.separator"));
-        // can override the path for class jar files in arguments
-        String alienPath = System.getProperty("user.home"
-                + System.getProperty("path.separator")
-                + "ephemera"
-                + System.getProperty("path.separator")
+                + System.getProperty("file.separator");
+
+        String alienPath = gameJarPath
                 + "aliens"
-                + System.getProperty("path.separator"));
+                + System.getProperty("file.separator");
+           
+        String logPath = gameJarPath 
+                + "logs"
+                + System.getProperty("file.separator");
            
 // init visualizer
         this.field = new VisualizationGrid();
-        this.field.init(engine, console, species, gameJarPath, alienPath, width, height, cellWidth, cellHeight, canvas);
+        this.field.init(engine, console, species, gameJarPath, logPath, width, height, cellWidth, cellHeight, canvas);
 
         // get engine up and running
         engine.initFromFile(field, gameJarPath, alienPath, "ephemera_initial_setup.csv");

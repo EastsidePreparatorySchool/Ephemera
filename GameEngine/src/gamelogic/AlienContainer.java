@@ -16,7 +16,7 @@ import java.util.List;
  * @author guberti
  */
 public class AlienContainer {
-    
+
     public static int currentID = 0;
 
     public final String domainName;
@@ -46,7 +46,6 @@ public class AlienContainer {
     public int nextY;
     public String outgoingMessage;
     public int outgoingPower;
-    
 
     // Declare stats here
     //
@@ -66,7 +65,6 @@ public class AlienContainer {
         this.grid = sg;
         this.listening = false;
 
-
         Alien a;
 
         // if position = (0,0) assign random position
@@ -80,12 +78,12 @@ public class AlienContainer {
         }
 
         this.alienHashCode = 0;
-        
+
         // construct and initialize alien
         try {
             a = (Alien) cns.newInstance();
             this.alien = a;
-            this.alienHashCode = ++currentID; 
+            this.alienHashCode = ++currentID;
             a.init(this.ctx, alienHashCode, parent, message);
         } catch (Throwable t) {
             this.alien = null;
@@ -304,18 +302,29 @@ public class AlienContainer {
                 break;
 
             case Research:
-                if (tech >= energy) { // If the tech can't be researched due to lack of energy
-                    //debugOut("AC: Research with T:" + (tech) + " and E:" + (energy));
+                if (tech >= energy) {
+                    // If the tech can't be researched due to lack of energy
+                    debugOut("AC: Research fail with T:" + (tech) + " and E:" + (energy));
                     throw new NotEnoughEnergyException();
                 }
                 break;
 
             case Spawn:
                 if (a.power + ctx.getSpawningCost() > energy) {
-                    throw new NotEnoughEnergyException();
+                    debugOut("AC: Spawn fail with P:" + a.power + " T:" + (tech) + " and E:" + (energy));
+                   throw new NotEnoughEnergyException();
                 }
                 break;
             case Fight:
+                if (energy < (a.power + ctx.getFightingCost())) {
+                    debugOut("AC: Fight fail with P:" + a.power + " T:" + (tech) + " and E:" + (energy));
+                    throw new NotEnoughEnergyException();
+                }
+                
+                // limit power by tech
+                if (a.power > tech) {
+                    this.currentActionPower = tech;
+                }
                 //TODO: Perform necessary checks
                 break;
 
@@ -361,4 +370,3 @@ public class AlienContainer {
     }
 
 }
-

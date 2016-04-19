@@ -189,7 +189,8 @@ public class GameEngineThread extends Thread {
         }
         return gameOver;
     }
-        //
+
+    //
     // Dynamic class loader (.jar files)
     // stolen from StackOverflow, considered dark voodoo magic
     //
@@ -203,7 +204,20 @@ public class GameEngineThread extends Thread {
      *
      */
     private void addClassPathFile(String packageName) throws IOException {
-        String fullName = engine.gameJarPath + packageName + ".jar";
+        String fullName;
+        
+        if (packageName.equalsIgnoreCase("stockaliens")) {
+            fullName = engine.gameJarPath
+                    + System.getProperty("file.separator")
+                    + "stockaliens"
+                    + System.getProperty("file.separator")
+                    + "dist"
+                    + System.getProperty("file.separator")
+                    + packageName + ".jar";
+        } else {
+            fullName = engine.alienPath + packageName + ".jar";
+        }
+
         URL url = new File(fullName).toURI().toURL();
         URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class<?> sysclass = URLClassLoader.class;
@@ -216,6 +230,7 @@ public class GameEngineThread extends Thread {
             throw new IOException("GameElementThread: Error, could not add URL to system classloader");
         }
         //engine.vis.debugOut("GameElementThread: package " + packageName + " added as " + fullName);
+
     }
 
     public Constructor<?> Load(String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
