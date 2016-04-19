@@ -34,10 +34,10 @@ public class SpaceGrid {
         this.height = height;
         aliens = new AlienGrid(width, height); // AlienContainer type is inferred
         objects = new ArrayList<>();
-        
+
         long randSeed = System.nanoTime();
         rand = new Random(randSeed);
-        vis.debugOut("RandSeed: "+ randSeed);
+        vis.debugOut("RandSeed: " + randSeed);
     }
 
     public boolean executeGameTurn() {
@@ -57,7 +57,7 @@ public class SpaceGrid {
         resetAliens();
         Thread.yield();
 
-        currentTurn++; 
+        currentTurn++;
 
         AlienContainer aUniqueAlien = null;
         for (AlienContainer a : aliens) {
@@ -265,36 +265,57 @@ public class SpaceGrid {
                     //vis.debugOut("SpaceGrid: Processing Fight");
 
                     List<AlienSpec> fightSpecs = new ArrayList<>();
+                    HashMap<String, Integer> fightSpecies = new HashMap<>();
+
+                    LinkedList<AlienContainer> fightingAliens = aliens.getAliensAt(thisAlien.x, thisAlien.y);
 
                     thisAlien.fought = true;
 
-                    LinkedList<AlienContainer> fightingAliens = aliens.getAliensAt(thisAlien.x, thisAlien.y);
                     for (AlienContainer fightingAlien : fightingAliens) {
 
-                        // If an alien didn't choose to fight at all
-                        // (or if they fought with zero power)
-                        // they will get blown off the board and the alien
-                        // that won the fight will take their energy
-                        // TODO: consider whether they should be killed or just lose
                         fightingAlien.fought = true;
 
                         if (fightingAlien.currentActionCode != ActionCode.Fight) {
                             fightingAlien.currentActionPower = 0;
                         }
 
+                        Integer speciesCombinedPower = fightSpecies.get(fightingAlien.speciesName);
+                        if (speciesCombinedPower == null){
+                            speciesCombinedPower = 0;
+                        }
+                            
+                        speciesCombinedPower += fightingAlien.currentActionPower;
+                        /*if (fightSpecies.containsKey(fightingAlien.speciesName)) {
+                            fightSpecies.put(fightingAlien.speciesName,
+                                    fightSpecies.get(fightingAlien.speciesName) +
+                                    fightingAlien.currentActionPower);
+                        } else {
+                            fightSpecies.put(
+                                    fightingAlien.speciesName,
+                                    fightingAlien.currentActionPower);
+                        }*/
+                        fightSpecies.put(
+                                fightingAlien.speciesName,
+                                fightingAlien.currentActionPower);
+
                         fightSpecs.add(fightingAlien.getFullAlienSpec());
                     }
 
                     vis.showFightBefore(thisAlien.x, thisAlien.y, fightSpecs);
 
-                    // Determine the winner and maximum tech in the fight
+                    // Determine the winning power in the fight
                     int winningPower = 0; // The fight powers might tie
+
+                    Set set = fightSpecies.entrySet();
+                    Iterator iterator = set.iterator();
+                    while (iterator.hasNext()) {
+                        Map.Entry mentry = (Map.Entry) iterator.next();
+                        winningPower = Math.max(winningPower, (int) mentry.getValue());
+                    }
+
                     int maxTech = 0;
 
                     for (AlienContainer candidateWinner : fightingAliens) {
-                        // Winning power
-                        winningPower = Math.max(winningPower, candidateWinner.currentActionPower);
-
                         // Max tech
                         maxTech = Math.max(maxTech, candidateWinner.tech);
                     }
@@ -304,9 +325,9 @@ public class SpaceGrid {
 
                     for (AlienContainer ac : fightingAliens) {
                         // If alien was winner / part of a tie
-                        if (ac.currentActionPower == winningPower) {
+                        if (fightSpecies.get(ac.speciesName) == winningPower) {
                             // If the species was not already known to be a winning race
-                            String name = ac.getFullSpeciesName();
+                            String name = ac.speciesName;
                             if (!winningSpecies.contains(name)) {
                                 // Add it
                                 winningSpecies.add(name);
@@ -315,18 +336,21 @@ public class SpaceGrid {
                         }
                     }
 
-                    // TODO/BUG: This bestowes maxtech on only one alien of the wining species
                     if (winningSpecies.size() == 1) { // If there is no tie
-                        // The winner's tech is brought up to the max in the group
-                        winner.tech = maxTech;
+                        for (AlienContainer ac : fightingAliens) {
+                            if (ac.speciesName == winningSpecies.get(0)) {
+                                // The winning species's tech is brought up to the max in the group
+                                winner.tech = maxTech;
+                            }
+                        }
                     }
 
                     for (AlienContainer ac : fightingAliens) {
                         // If the alien was not part of one of the winning species
-                        if (!winningSpecies.contains(ac.getFullName())) {
+                        if (fightSpecies.get(ac.speciesName) != winningPower) {
 
                             // If the alien was beaten by more than five energy points
-                            if (winningPower > ac.currentActionPower + 5) {
+                            if (winningPower > fightSpecies.get(ac.speciesName) + 5) {
 
                                 // The alien will then be killed
                                 ac.kill();
