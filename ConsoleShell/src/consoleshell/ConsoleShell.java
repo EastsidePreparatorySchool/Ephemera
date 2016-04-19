@@ -9,7 +9,6 @@ import gameengineinterfaces.*;
 import gameengineV1.*;
 import java.io.IOException;
 import static java.lang.Thread.sleep;
-import java.util.Scanner;
 
 /**
  *
@@ -30,7 +29,7 @@ public class ConsoleShell {
         GameEngineV1 engine = new GameEngineV1();
 
         // can override the path for class jar files in arguments
-        String gameJarPath = System.getProperty("user.home")
+        String gameJarPath = System.getProperty("user.dir")
                 + System.getProperty("file.separator")
                 + "ephemera"
                 + System.getProperty("file.separator");

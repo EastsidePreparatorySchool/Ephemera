@@ -63,11 +63,11 @@ public class GUIShell extends Application {
         // get screen geometry
         javafx.geometry.Rectangle2D screenBounds;
         double w= Screen.getPrimary().getDpi();
-        screenBounds = Screen.getPrimary().getBounds();
+        screenBounds = Screen.getPrimary().getVisualBounds();
 
         // for most screens, 1500x500 will display nicely
         // TODO: Make this adapt to available space (from bounds)
-        int cellWidth = 3;
+        int cellWidth = screenBounds.getWidth() < 1900 ? 2:3;
         int cellHeight = 1;
 
         // keep track of species, need this before constructing UI
@@ -106,7 +106,7 @@ public class GUIShell extends Application {
         engine = new GameEngineV1();
 
         // can override the path for class jar files in arguments
-        String gameJarPath = System.getProperty("user.home")
+        String gameJarPath = System.getProperty("user.dir")
                 + System.getProperty("file.separator")
                 + "ephemera"
                 + System.getProperty("file.separator");
@@ -119,7 +119,7 @@ public class GUIShell extends Application {
                 + "logs"
                 + System.getProperty("file.separator");
            
-// init visualizer
+        // init visualizer
         this.field = new VisualizationGrid();
         this.field.init(engine, console, species, logPath, width, height, cellWidth, cellHeight, canvas);
 

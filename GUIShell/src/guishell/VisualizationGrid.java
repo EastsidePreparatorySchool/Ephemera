@@ -178,22 +178,41 @@ class VisualizationGrid implements GameVisualizer {
                         color[2] = Color.WHITE;
                     }
 
-                    for (int l = 0; l < 3; l++) {
-                        gc.setStroke(color[l]);
-                        gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth / 3 + 0.5, y + 0.5);
+                    if (cellWidth == 3) {
+                        // hires displays, HD1080 or better
+                        for (int l = 0; l < 3; l++) {
+                            gc.setStroke(color[l]);
+                            gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth / 3 + 0.5, y + 0.5);
+                            x++;
+                        }
+                    } else {
+                        // lowres displays
+                        if (color[1] == Color.RED) {
+                            // for fighting cells, color the whole thing red
+                            color[0] = color[1];
+                            color[2] = color[1];
+                        }
+
+                        gc.setStroke(color[0]);
+                        gc.strokeLine(x + 0.5, y + 0.5, x + 1.5, y + 0.5);
+                        x++;
+                        gc.setStroke(color[2]);
+                        gc.strokeLine(x + 0.5, y + 0.5, x + 1.5, y + 0.5);
                         x++;
                     }
+
                     cell.cellChanged = false;
                 }
             }
         }
         gc.setStroke(Color.RED);
         gc.setLineWidth(1.0);
-        gc.strokeOval(0.5, 0.5, widthPX - 0.5, heightPX - 0.5);
+        gc.strokeOval(0.5, 0.5, (width*cellWidth) - 0.5, heightPX - 0.5);
     }
 
     @Override
-    public void showCompletedTurn(int totalTurns, int numAliens, long time) {
+    public void showCompletedTurn(int totalTurns, int numAliens, long time
+    ) {
         ++totalTurnCounter;
         this.numAliens = numAliens;
         debugOut("Turn #" + totalTurnCounter + " complete.");
