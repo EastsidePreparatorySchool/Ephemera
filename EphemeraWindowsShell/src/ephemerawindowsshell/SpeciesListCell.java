@@ -5,23 +5,47 @@
  */
 package ephemerawindowsshell;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.util.Callback;
 
 /**
  *
  * @author gmein
  */
-public class SpeciesListCell extends ListCell<AlienSpecies> {
+public class SpeciesListCell extends CheckBoxListCell<AlienSpecies> {
+
+
+    public SpeciesListCell() {
+        this.setSelectedStateCallback(new Callback<AlienSpecies, ObservableValue<Boolean>>() {
+            @Override
+            public ObservableValue<Boolean> call(AlienSpecies item) {
+                BooleanProperty observable = new SimpleBooleanProperty(true);
+                observable.addListener((obs, wasSelected, isNowSelected)
+                        -> System.out.println("Check box for " + item + " changed from " + wasSelected + " to " + isNowSelected)
+                );
+                return observable;
+            }
+        });
+        
+    }
+
     @Override
     public void updateItem(AlienSpecies item, boolean empty) {
         super.updateItem(item, empty);
 
-        if (item != null) {
+        if (item != null && !empty) {
             this.setStyle(item.getStyle());
-            setText(item.toString());  
-        } else
+            setText(item.toString());
+        } else {
             this.setStyle("-fx-background-color: black; -fx-text-fill:black;");
+        }
     }
-}
-    
 
+    
+}

@@ -8,6 +8,10 @@ package ephemerawindowsshell;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
@@ -23,6 +27,8 @@ public class AlienSpecies {
     int count;
     Color color;
     String style;
+    private final StringProperty name = new SimpleStringProperty();
+    private final BooleanProperty on = new SimpleBooleanProperty();
 
     static Color[] alienColors = {Color.LIGHTBLUE, Color.YELLOW, Color.LIGHTPINK, Color.LIGHTGREEN, Color.ORANGE};
     static String[] alienStyles = {"lightblue", "yellow", "lightpink", "lightgreen", "orange"};
@@ -34,9 +40,36 @@ public class AlienSpecies {
         this.color = alienColors[colorCount % alienColors.length];
         this.style = alienStyles[colorCount % alienColors.length];
         colorCount++;
+        
+        on.setValue(true);
+
     }
 
-    @Override
+    public final StringProperty nameProperty() {
+        return this.name;
+    }
+
+    public final String getName() {
+        return this.toString();
+    }
+
+    public final void setName(final String name) {
+        this.nameProperty().set(name);
+    }
+
+    public final BooleanProperty onProperty() {
+        return this.on;
+    }
+
+    public final boolean isOn() {
+        return this.onProperty().get();
+    }
+
+    public final void setOn(final boolean on) {
+        this.onProperty().set(on);
+    }
+
+   @Override
     public String toString() {
         return speciesName + ": " + count;
     }

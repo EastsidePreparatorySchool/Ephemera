@@ -17,11 +17,15 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Screen;
 
 import javafx.application.Application;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -202,15 +206,14 @@ public class EphemeraWindowsShell extends Application {
     }
 
     ListView<AlienSpecies> addAlienSpeciesList() {
-        ListView<AlienSpecies> speciesView = new ListView<AlienSpecies>(species.getObservableList());
-        speciesView.setCellFactory(new Callback<ListView<AlienSpecies>, ListCell<AlienSpecies>>() {
-            @Override
-            public ListCell<AlienSpecies> call(ListView<AlienSpecies> list) {
-                return new SpeciesListCell();
-            }
-        });
+        ListView<AlienSpecies> speciesView = new ListView<>(species.getObservableList());
+
+        speciesView.setCellFactory((ListView<AlienSpecies> list) -> new SpeciesListCell());
+        speciesView.setStyle("-fx-background-color: black;");
+
         speciesView.setStyle("-fx-background-color: black;");
         return speciesView;
+
     }
 
     /*
