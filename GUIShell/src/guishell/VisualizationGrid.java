@@ -54,7 +54,7 @@ class VisualizationGrid implements GameVisualizer {
     GameEngine engine;
     private final Object monitor = new Object();
 
-    public void init(GameEngine eng, ConsolePane console, SpeciesSet species, String path, String logPath, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
+    public void init(GameEngine eng, ConsolePane console, SpeciesSet species, String logPath, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
         Date date = new Date();
         this.engine = eng;
 

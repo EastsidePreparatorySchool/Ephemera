@@ -121,7 +121,7 @@ public class GUIShell extends Application {
            
 // init visualizer
         this.field = new VisualizationGrid();
-        this.field.init(engine, console, species, gameJarPath, logPath, width, height, cellWidth, cellHeight, canvas);
+        this.field.init(engine, console, species, logPath, width, height, cellWidth, cellHeight, canvas);
 
         // get engine up and running
         engine.initFromFile(field, gameJarPath, alienPath, "ephemera_initial_setup.csv");

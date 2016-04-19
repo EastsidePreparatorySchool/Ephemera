@@ -26,21 +26,26 @@ public class ConsoleShell {
         // args[0] = jar path (optional)
         // args[1] = config file (optional)
 
-        //get some objects created (not initialized, nothing important happens here)
+       //get some objects created (not initialized, nothing important happens here)
         GameEngineV1 engine = new GameEngineV1();
 
         // can override the path for class jar files in arguments
-        String gameJarPath;
-        if (args.length > 0 && args[0] != null && !args[0].isEmpty()) {
-            gameJarPath = args[0];
-        } else {
-            gameJarPath = "c:\\users\\public\\ephemera\\drop\\";
-        }
+        String gameJarPath = System.getProperty("user.home")
+                + System.getProperty("file.separator")
+                + "ephemera"
+                + System.getProperty("file.separator");
 
-        ConsoleVisualizer convis = new ConsoleVisualizer(engine, gameJarPath);
-
+        String alienPath = gameJarPath
+                + "aliens"
+                + System.getProperty("file.separator");
+           
+        String logPath = gameJarPath 
+                + "logs"
+                + System.getProperty("file.separator");
+           
+        ConsoleVisualizer convis = new ConsoleVisualizer(engine, logPath);
         // get engine up and running
-        engine.initFromFile(convis, gameJarPath, "ephemera_initial_setup.csv");
+        engine.initFromFile(convis, gameJarPath, alienPath, "ephemera_initial_setup.csv");
 
         // give it a go
         engine.queueCommand(new GameCommand(GameCommandCode.Resume));
