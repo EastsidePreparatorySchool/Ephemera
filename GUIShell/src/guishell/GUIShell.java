@@ -117,17 +117,22 @@ public class GUIShell extends Application {
             gamePath = System.getProperty("user.home");
             gamePath = gamePath.toLowerCase();
             gamePath += System.getProperty("file.separator")
-                    + "ephemera"
-                    + System.getProperty("file.separator");
+                    + "ephemera";
         }
 
         String alienPath = gamePath
-                + "aliens"
-                + System.getProperty("file.separator");
+                + "aliens";
 
         String logPath = gamePath
-                + "logs"
-                + System.getProperty("file.separator");
+                + "logs";
+
+        Utilities.createFolder(gamePath);
+        Utilities.createFolder(alienPath);
+        Utilities.createFolder(logPath);
+
+        gamePath += System.getProperty("file.separator");
+        alienPath += System.getProperty("file.separator");
+        logPath += System.getProperty("file.separator");
 
         // init visualizer
         this.field = new VisualizationGrid();

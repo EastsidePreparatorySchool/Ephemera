@@ -5,6 +5,7 @@
  */
 package guishell;
 
+import java.io.File;
 import java.util.Objects;
 import javafx.application.Platform;
 
@@ -25,5 +26,16 @@ public class Utilities {
         else {
             Platform.runLater(runnable);
         }
+    }
+    
+    
+    public static void createFolder(String folder) {
+        File file = new File(folder);
+        if (!file.exists()) {
+            if (!file.mkdirs()) {
+                System.err.println ("Folder " + folder + "does not exist and cannot be created");
+            }
+        }
+
     }
 }
