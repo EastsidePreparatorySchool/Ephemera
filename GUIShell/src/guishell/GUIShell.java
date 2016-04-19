@@ -221,10 +221,8 @@ public class GUIShell extends Application {
 
         speciesView.setCellFactory((ListView<AlienSpecies> list) -> new SpeciesListCell());
         speciesView.setStyle("-fx-background-color: black;");
-
-        speciesView.setStyle("-fx-background-color: black;");
+ 
         return speciesView;
-
     }
 
     /*

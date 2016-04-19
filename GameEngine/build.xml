@@ -71,9 +71,6 @@
 
     -->
 <target name="-post-jar"> 
-	<exec dir="." executable="cmd"> 
-		<arg line="/c ..\copyjar.cmd"/> 
-	</exec> 
 </target>
 
 
