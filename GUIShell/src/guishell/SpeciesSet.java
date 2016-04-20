@@ -5,6 +5,7 @@
  */
 package guishell;
 
+import gameengineinterfaces.AlienSpec;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -44,22 +45,14 @@ public class SpeciesSet {
 
         // if we got here, no matching species found
         AlienSpeciesForDisplay as = new AlienSpeciesForDisplay(speciesName);
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                speciesList.add(as);
-            }
+        Utilities.runSafe(() -> {
+            speciesList.add(as);
         });
     }
 
-    public void addAlienSpecies(String speciesName, int id) {
-        AlienSpeciesForDisplay as = new AlienSpeciesForDisplay(speciesName);
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                speciesList.add(as);
-            }
-        });
+    public void addAlienSpecies(AlienSpec as) {
+        AlienSpeciesForDisplay asfd = new AlienSpeciesForDisplay(as);
+        Utilities.runSafe(() -> speciesList.add(asfd));
     }
 
     public void removeAlien(String speciesName) {
@@ -69,11 +62,8 @@ public class SpeciesSet {
 
                 // if this is the last one, take it out
                 if (as.count == 0) {
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            speciesList.remove(as);
-                        }
+                    Utilities.runSafe(() -> {
+                        speciesList.remove(as);
                     });
 
                 }

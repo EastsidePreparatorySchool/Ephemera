@@ -26,8 +26,8 @@ public class GameEngineV1 implements GameEngine {
     Queue<GameCommand> queue;
     GameEngineThread gameThread;
     GameState gameState;
-    String gameJarPath;
-    String alienPath;
+    public String gameJarPath;
+    public String alienPath;
 
     @Override
     public boolean isAlive() {

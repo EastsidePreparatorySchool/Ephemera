@@ -11,8 +11,14 @@ import gameengineinterfaces.GameElementKind;
 import java.util.*;
 import java.lang.reflect.Constructor;
 import alieninterfaces.*;
+import gameengineV1.GameEngineV1;
 import gameengineinterfaces.*;
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 /**
  *
@@ -20,10 +26,11 @@ import java.io.IOException;
  */
 public class SpaceGrid {
 
+    GameEngineV1 engine;
     GameVisualizer vis;
     public AlienGrid aliens;    // Aliens are born and die, so our list needs to be able to grow and shrink
     List<SpaceObject> objects;  // Stars, planets, space stations, etc.
-    HashMap<String, AlienSpecies> speciesMap; // Maps alienSpeciesNames to indexes
+    public HashMap<String, InternalAlienSpecies> speciesMap; // Maps alienSpeciesNames to indexes
     int width;
     int height;
     int currentTurn = 1;
@@ -33,10 +40,11 @@ public class SpaceGrid {
     public static Random rand;
     public static int randSeed = 0;
 
-    public SpaceGrid(GameVisualizer vis, int width, int height) {
+    public SpaceGrid(GameEngineV1 eng, GameVisualizer vis, int width, int height) {
         this.vis = vis;
         this.width = width;
         this.height = height;
+        this.engine = eng;
         aliens = new AlienGrid(width, height); // AlienContainer type is inferred
         objects = new ArrayList<>();
         speciesMap = new HashMap<>();
@@ -557,28 +565,45 @@ public class SpaceGrid {
     }
 
     void addSpecies(GameElementSpec element) {
-        AlienSpecies as = speciesMap.get(element.domainName + ":" + element.packageName + ":" + element.className);
-        if (as == null) {
-            as = new AlienSpecies(element.domainName, element.packageName, element.className, speciesCounter);
-            speciesMap.put(element.domainName + ":" + element.packageName + ":" + element.className, as);
-            speciesCounter++;
-        }
+        String speciesName = element.domainName + ":" + element.packageName + ":" + element.className;
 
-        vis.registerSpecies(new AlienSpec(as));
+        // add species if necessary
+        InternalAlienSpecies as = speciesMap.get(speciesName);
+        if (as == null) {
+
+            as = new InternalAlienSpecies(element.domainName, element.packageName, element.className, speciesCounter);
+            speciesMap.put(speciesName, as);
+            speciesCounter++;
+            vis.registerSpecies(new AlienSpec(as));
+        }
     }
 
     // TODO: add spawn state, tech, energy
-    void addAlien(int x, int y, String domainName, String alienPackageName, String alienClassName, Constructor<?> cns) {
+    void addAlien(int x, int y, String domainName, String alienPackageName, String alienClassName) {
+
         String speciesName = domainName + ":" + alienPackageName + ":" + alienClassName;
-        AlienSpecies as = speciesMap.get(speciesName);
+
+        // add species if necessary
+        InternalAlienSpecies as = speciesMap.get(speciesName);
         if (as == null) {
-            as = new AlienSpecies(domainName, alienPackageName, alienClassName, speciesCounter);
+            as = new InternalAlienSpecies(domainName, alienPackageName, alienClassName, speciesCounter);
             speciesMap.put(speciesName, as);
             speciesCounter++;
+            vis.registerSpecies(new AlienSpec(as));
         }
 
-        AlienContainer ac = new AlienContainer(this, this.vis, x, y, 
-                domainName, alienPackageName, alienClassName, cns, as, 
+        if (as.cns == null) {
+            // Load constructor
+            try {
+                as.cns = Load(engine, alienPackageName, alienClassName);
+            } catch (Exception e) {
+                vis.debugErr("sg.addAlien: Error loading contructor for " + speciesName);
+                //throw (e);
+            }
+        }
+
+        AlienContainer ac = new AlienContainer(this, this.vis, x, y,
+                domainName, alienPackageName, alienClassName, as.cns, as,
                 1, 1, // tech and power
                 0, // no parent
                 null); // no spawn state
@@ -614,7 +639,7 @@ public class SpaceGrid {
             debugMessage += "alien";
 
             // position (0,0) leads to random assignment
-            addAlien(0, 0, "eastsideprep.org", element.packageName, element.className, element.cns);
+            addAlien(0, 0, "eastsideprep.org", element.packageName, element.className);
 
         } else if (element.kind == GameElementKind.SPECIES) {
             debugMessage += "species";
@@ -639,4 +664,63 @@ public class SpaceGrid {
         debugMessage += " " + element.packageName + ":" + element.className;
         vis.debugOut(debugMessage);
     }
+
+    //
+    // Dynamic class loader (.jar files)
+    // stolen from StackOverflow, considered dark voodoo magic
+    //
+    /**
+     * Parameters of the method to add an URL to the System classes.
+     */
+    private static final Class<?>[] parameters = new Class[]{URL.class};
+
+    /**
+     * Adds the content pointed by the file to the class path.
+     *
+     */
+    public static void addClassPathFile(String gamePath, String alienPath, String packageName) throws IOException {
+        String fullName;
+
+        if (packageName.equalsIgnoreCase("stockaliens")
+                || packageName.equalsIgnoreCase("alieninterfaces")) {
+            fullName = gamePath
+                    + System.getProperty("file.separator")
+                    + packageName
+                    + System.getProperty("file.separator")
+                    + "dist"
+                    + System.getProperty("file.separator")
+                    + packageName + ".jar";
+        } else {
+            fullName = alienPath + packageName + ".jar";
+        }
+
+        URL url = new File(fullName).toURI().toURL();
+        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        Class<?> sysclass = URLClassLoader.class;
+        try {
+            Method method = sysclass.getDeclaredMethod("addURL", parameters);
+            method.setAccessible(true);
+            method.invoke(sysloader, new Object[]{url});
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("GameElementThread: Error, could not add URL to system classloader");
+        }
+        //engine.vis.debugOut("GameElementThread: package " + packageName + " added as " + fullName);
+
+    }
+
+    public static Constructor<?> Load(GameEngineV1 engine, String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Constructor<?> cs = null;
+
+        try {
+            addClassPathFile(engine.gameJarPath, engine.alienPath, packageName);
+            cs = ClassLoader.getSystemClassLoader().loadClass(packageName + "." + className).getConstructor();
+        } catch (Exception e) {
+            e.printStackTrace();
+            //vis.debugErr("GameElementThread: Error: Could not get constructor");
+            throw e;
+        }
+        return cs;
+    }
+
 }

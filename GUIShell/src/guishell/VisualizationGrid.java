@@ -223,21 +223,18 @@ class VisualizationGrid implements GameVisualizer {
         ++totalTurnCounter;
         this.numAliens = numAliens;
         debugOut("Turn #" + totalTurnCounter + " complete.");
-        runAndWait(new Runnable() {
-            @Override
-            public void run() {
-                GraphicsContext gc = canvas.getGraphicsContext2D();
-                renderOnScreen2(gc);
-                String text = "Turns completed: " + paddedString(totalTurnCounter, 6)
-                        + ", Total aliens: " + paddedString(numAliens, 7);
-                //if (time > 100000000L) {
-                text += ", time for turn: " + paddedTimeString(time)
-                        + ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens)))
-                        + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)));
-                //}
-                GUIShell.turnCounterText.setText(text);
-                speciesSet.notifyListeners();
-            }
+        runAndWait(() -> {
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+            renderOnScreen2(gc);
+            String text = "Turns completed: " + paddedString(totalTurnCounter, 6)
+                    + ", Total aliens: " + paddedString(numAliens, 7);
+            //if (time > 100000000L) {
+            text += ", time for turn: " + paddedTimeString(time)
+                    + ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens)));
+            //        + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)));
+            //}
+            GUIShell.turnCounterText.setText(text);
+            speciesSet.notifyListeners();
         });
 
         if (totalTurnCounter % 20 == 0) {
@@ -512,7 +509,7 @@ class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void registerSpecies(AlienSpec as) {
-        speciesSet.addAlienSpecies(as.getFullSpeciesName(), as.speciesID);
+        speciesSet.addAlienSpecies(as);
     }
 
 }

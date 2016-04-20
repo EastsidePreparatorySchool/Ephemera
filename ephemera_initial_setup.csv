@@ -1,10 +1,10 @@
 !GameElementKind,Domain,Package (jar file without .jar),Class (name),Parent (position will be relative to this),X,Y,"Energy (Mag equivalent for direct neighbor to star, 0-16)",Technology,State
 VARIABLE,,,randseed,,,,1,,
-ALIEN,eastsideprep.org,stockaliens,Dalek,,,,,,
-ALIEN,eastsideprep.org,stockaliens,Martian,,,,,,
-ALIEN,eastsideprep.org,stockaliens,Venusian,,,,,,
-ALIEN,eastsideprep.org,stockaliens,WeepingAngel,,,,,,
-ALIEN,eastsideprep.org,stockaliens,Alf,,,,,,
+SPECIES,eastsideprep.org,stockaliens,Dalek,,,,,,
+SPECIES,eastsideprep.org,stockaliens,Martian,,,,,,
+SPECIES,eastsideprep.org,stockaliens,Venusian,,,,,,
+SPECIES,eastsideprep.org,stockaliens,WeepingAngel,,,,,,
+SPECIES,eastsideprep.org,stockaliens,Alf,,,,,,
 STAR,eastsideprep.org,stockelements,ProximaCentauri,,-34,-20,15.45,,
 PLANET,eastsideprep.org,stockelements,Slathri,stockelements:ProximaCentauri,-1,-1,5,10,"notes:""Gravity on planet is strong. Takes a bunch of energy when you first go to planet"""
 PLANET,eastsideprep.org,stockelements,Kukaro,stockelements:ProximaCentauri,0,1,20,5,"notes:""Very peaceful. Energy refreshes twice as fast"""
@@ -18,8 +18,3 @@ PLANET,eastsideprep.org,stockelements,Liloso,stockelements:Lalande21185,0,1,8,30
 RESIDENT,eastsideprep.org,stockelements,Elbubbians,stockelements:Liloso,0,0,255,5,"notes:""Elbbubians: low tech. Planet bound but spread throughout multiple planets. Always willing to trade but will fight if technology is over 10."""
 PLANET,eastsideprep.org,stockelements,Cerile,stockelements:Lalande21186,1,0,12,5,"notes:""Nothing special happens here"""
 PLANET,eastsideprep.org,stockelements,Vorium,stockelements:Lalande21187,-1,1,10,3,"notes:""It is beautiful at night on this planet, gain 3 energy every 2 turns spent on the planet."""
-SPECIES,eastsideprep.org,stockaliens,Dalek,,,,,,
-SPECIES,eastsideprep.org,stockaliens,Martian,,,,,,
-SPECIES,eastsideprep.org,stockaliens,Venusian,,,,,,
-SPECIES,eastsideprep.org,stockaliens,WeepingAngel,,,,,,
-SPECIES,eastsideprep.org,stockaliens,Alf,,,,,,

@@ -25,7 +25,6 @@ public class GameElementSpec {
     public int y;
     public int energy;
     public int tech;
-    public Constructor<?> cns;
 
     public GameElementSpec(String kindString) {
         try {
@@ -42,7 +41,6 @@ public class GameElementSpec {
             this.packageName = packageName;
             this.className = className;
             this.state = state;
-            this.cns = cns;
         } catch (IllegalArgumentException e) {
             this.kind = GameElementKind.INVALID;
         }

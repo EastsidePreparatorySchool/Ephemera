@@ -5,16 +5,11 @@
  */
 package guishell;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
+import gameengineinterfaces.AlienSpec;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.scene.paint.Color;
 
 /**
@@ -24,6 +19,10 @@ import javafx.scene.paint.Color;
 public class AlienSpeciesForDisplay {
 
     String speciesName;
+    String domainName;
+    String packageName;
+    String className;
+
     int count;
     Color color;
     String style;
@@ -40,7 +39,21 @@ public class AlienSpeciesForDisplay {
         this.color = alienColors[colorCount % alienColors.length];
         this.style = alienStyles[colorCount % alienColors.length];
         colorCount++;
-        
+
+        on.setValue(true);
+
+    }
+
+    AlienSpeciesForDisplay(AlienSpec as) {
+        this.domainName = as.domainName;
+        this.packageName = as.packageName;
+        this.className = as.className;
+        this.speciesName = as.getFullSpeciesName();
+        this.count = 1; // if we create this object, there is at least one alien
+        this.color = alienColors[colorCount % alienColors.length];
+        this.style = alienStyles[colorCount % alienColors.length];
+        colorCount++;
+
         on.setValue(true);
 
     }
@@ -69,7 +82,7 @@ public class AlienSpeciesForDisplay {
         this.onProperty().set(on);
     }
 
-   @Override
+    @Override
     public String toString() {
         return speciesName + ": " + count;
     }

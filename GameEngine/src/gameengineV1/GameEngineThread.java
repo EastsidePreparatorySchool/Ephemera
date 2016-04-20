@@ -8,16 +8,7 @@ package gameengineV1;
 import gameengineinterfaces.GameElementKind;
 import gameengineinterfaces.GameState;
 import gamelogic.*;
-import alieninterfaces.*;
 import gameengineinterfaces.*;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Scanner;
 
 /**
  *
@@ -40,10 +31,10 @@ public class GameEngineThread extends Thread {
         int totalTurns = 0;
 
         //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-        engine.grid = new SpaceGrid(engine.vis, 500, 500);
+        engine.grid = new SpaceGrid(engine, engine.vis, 500, 500);
 
         try {
-            addClassPathFile("alieninterfaces");
+            SpaceGrid.addClassPathFile(engine.gameJarPath, engine.alienPath, "alieninterfaces");
         } catch (Exception e) {
             engine.vis.debugErr("GameEngineThread: run() could not load alieninterfaces.jar");
             return;
@@ -127,25 +118,12 @@ public class GameEngineThread extends Thread {
 
                 if (element.kind != GameElementKind.INVALID) {
                     if (element.kind == GameElementKind.ALIEN) {
-                        // instantiate an actual alien
-                        try {
-                            element.cns = Load(element.packageName, element.className);
-                        } catch (Exception e) {
-                            engine.vis.debugErr("GameEngineThread: Error loading game element");
-                            throw (e);
-                        }
                         engine.grid.addElement(element);
                     }
 
                     // register a species for the click menu
                     if (element.kind == GameElementKind.SPECIES) {
-                        try {
-                            //element.cns = Load(element.packageName, element.className);
-                        } catch (Exception e) {
-                            engine.vis.debugErr("GameEngineThread: Error loading game element");
-                            throw (e);
-                        }
-                        //engine.grid.addElement(element);
+                        engine.grid.addElement(element);
                     }
 
                     // If it is a SpaceObject (there could be a cleaner way to do this)
@@ -203,64 +181,6 @@ public class GameEngineThread extends Thread {
         }
 
         return gameOver;
-    }
-
-    //
-    // Dynamic class loader (.jar files)
-    // stolen from StackOverflow, considered dark voodoo magic
-    //
-    /**
-     * Parameters of the method to add an URL to the System classes.
-     */
-    private static final Class<?>[] parameters = new Class[]{URL.class};
-
-    /**
-     * Adds the content pointed by the file to the classpath.
-     *
-     */
-    private void addClassPathFile(String packageName) throws IOException {
-        String fullName;
-
-        if (packageName.equalsIgnoreCase("stockaliens")
-                || packageName.equalsIgnoreCase("alieninterfaces")) {
-            fullName = engine.gameJarPath
-                    + System.getProperty("file.separator")
-                    + packageName
-                    + System.getProperty("file.separator")
-                    + "dist"
-                    + System.getProperty("file.separator")
-                    + packageName + ".jar";
-        } else {
-            fullName = engine.alienPath + packageName + ".jar";
-        }
-
-        URL url = new File(fullName).toURI().toURL();
-        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        Class<?> sysclass = URLClassLoader.class;
-        try {
-            Method method = sysclass.getDeclaredMethod("addURL", parameters);
-            method.setAccessible(true);
-            method.invoke(sysloader, new Object[]{url});
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("GameElementThread: Error, could not add URL to system classloader");
-        }
-        //engine.vis.debugOut("GameElementThread: package " + packageName + " added as " + fullName);
-
-    }
-
-    public Constructor<?> Load(String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        Constructor<?> cs = null;
-
-        try {
-            addClassPathFile(packageName);
-            cs = ClassLoader.getSystemClassLoader().loadClass(packageName + "." + className).getConstructor();
-        } catch (Exception e) {
-            e.printStackTrace();
-            engine.vis.debugErr("GameElementThread: Error: Could not get constructor");
-            throw e;
-        }
-        return cs;
     }
 
 }

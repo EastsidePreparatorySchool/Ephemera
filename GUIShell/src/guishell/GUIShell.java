@@ -5,9 +5,11 @@
  */
 package guishell;
 
+import alieninterfaces.AlienSpecies;
 import gameengineV1.GameEngineV1;
 import gameengineinterfaces.GameCommand;
 import gameengineinterfaces.GameCommandCode;
+import gameengineinterfaces.GameElementSpec;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -165,7 +167,6 @@ public class GUIShell extends Application {
     //
     // Visual helpers
     //
-
     public static void setSize(Stage stage, javafx.geometry.Rectangle2D bounds) {
         stage.setX(bounds.getMinX());
         stage.setY(bounds.getMinY());
@@ -190,23 +191,12 @@ public class GUIShell extends Application {
 
         buttonPause = new Button("Start");
         buttonPause.setPrefSize(100, 20);
-        buttonPause.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                if (buttonPause.getText().equals("Pause")) {
-                    engine.queueCommand(new GameCommand(GameCommandCode.Pause));
-                    buttonPause.setText("Resume");
-                    //buttonPause.setDisable(true);
-                } else {
-                    engine.queueCommand(new GameCommand(GameCommandCode.Resume));
-                    buttonPause.setText("Pause");
-                }
-            }
-        });
+        buttonPause.setOnAction((ActionEvent e) -> startOrPauseGame(e));
 
         //Button buttonProjected = new Button("Stop");
         //buttonProjected.setPrefSize(100, 20);
         vbox.getChildren().addAll(buttonPause);
+
         GUIShell.turnCounterText = new Text("Turns completed: 0");
         GUIShell.turnCounterText.setFont(Font.font("Consolas", FontWeight.BOLD, 18));
         GUIShell.turnCounterText.setStyle("-fx-background-color: black;");
@@ -284,5 +274,28 @@ public class GUIShell extends Application {
         tile.setStyle("-fx-background-color: black;");
 
         return tile;
+    }
+
+    private static void startOrPauseGame(ActionEvent e) {
+        if (buttonPause.getText().equals("Pause")) {
+            // pause
+            engine.queueCommand(new GameCommand(GameCommandCode.Pause));
+            buttonPause.setText("Resume");
+        } else if (buttonPause.getText().equals("Start")) {
+            // first start
+
+            for (AlienSpecies as : engine.grid.speciesMap.values()) {
+                GameElementSpec element = new GameElementSpec("ALIEN", as.domainName, as.packageName, as.className,
+                        null, null); // state, constructor
+                engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
+            }
+            engine.queueCommand(new GameCommand(GameCommandCode.Resume));
+            buttonPause.setText("Pause");
+
+        } else {
+            // regular resume
+            engine.queueCommand(new GameCommand(GameCommandCode.Resume));
+            buttonPause.setText("Pause");
+        }
     }
 }
