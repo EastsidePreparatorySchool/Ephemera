@@ -182,10 +182,15 @@ class VisualizationGrid implements GameVisualizer {
 
                     if (cellWidth == 3) {
                         // hires displays, HD1080 or better
-                        for (int l = 0; l < 3; l++) {
-                            gc.setStroke(color[l]);
-                            gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth / 3 + 0.5, y + 0.5);
-                            x++;
+                        if (color[1] == Color.RED) {
+                            gc.setStroke(Color.RED);
+                            gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth + 0.5, y + 0.5);
+                        } else {
+                            for (int l = 0; l < 3; l++) {
+                                gc.setStroke(color[l]);
+                                gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth / 3 + 0.5, y + 0.5);
+                                x++;
+                            }
                         }
                     } else {
                         // lowres displays
@@ -209,7 +214,7 @@ class VisualizationGrid implements GameVisualizer {
         }
         gc.setStroke(Color.RED);
         gc.setLineWidth(1.0);
-        gc.strokeOval(0.5, 0.5, (width*cellWidth) - 0.5, heightPX - 0.5);
+        gc.strokeOval(0.5, 0.5, (width * cellWidth) - 0.5, heightPX - 0.5);
     }
 
     @Override
@@ -225,12 +230,13 @@ class VisualizationGrid implements GameVisualizer {
                 renderOnScreen2(gc);
                 String text = "Turns completed: " + paddedString(totalTurnCounter, 6)
                         + ", Total aliens: " + paddedString(numAliens, 7);
-                if (time > 100000000L) {
-                        text += ", time for turn: " + paddedTimeString(time)
+                //if (time > 100000000L) {
+                text += ", time for turn: " + paddedTimeString(time)
                         + ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens)))
                         + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)));
-                }
+                //}
                 GUIShell.turnCounterText.setText(text);
+                speciesSet.notifyListeners();
             }
         });
 
@@ -276,14 +282,13 @@ class VisualizationGrid implements GameVisualizer {
         int x = as.x;
         int y = as.y;
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                decrementCell(oldx, oldy, speciesName);
-                incrementCell(x, y, speciesName);
-            }
-        });
-        Thread.yield();
+    //    Utilities.runSafe(new Runnable() {
+        //        @Override
+        //        public void run() {
+        decrementCell(oldx, oldy, speciesName);
+        incrementCell(x, y, speciesName);
+    //        }
+        //    });
     }
 
     public void markFight(int x, int y) {
@@ -306,7 +311,6 @@ class VisualizationGrid implements GameVisualizer {
             }
         }
         markFight(x, y);
-        Thread.yield();
     }
 
     @Override
@@ -320,7 +324,6 @@ class VisualizationGrid implements GameVisualizer {
                 println("");
             }
         }
-        Thread.yield();
     }
 
     @Override
@@ -331,14 +334,13 @@ class VisualizationGrid implements GameVisualizer {
         } else {
             debugOut("Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
         }
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                speciesSet.addAlien(as.getFullSpeciesName());
-                incrementCell(as.x, as.y, as.getFullSpeciesName());
-            }
-        });
-        Thread.yield();
+      //  Platform.runLater(new Runnable() {
+        //      @Override
+        //      public void run() {
+        speciesSet.addAlien(as.getFullSpeciesName());
+        incrementCell(as.x, as.y, as.getFullSpeciesName());
+      //      }
+        //  });
     }
 
     public void showDeath(AlienSpec as) {
@@ -348,14 +350,14 @@ class VisualizationGrid implements GameVisualizer {
         } else {
             debugOut("Death: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
         }
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                decrementCell(as.x, as.y, as.getFullSpeciesName());
-                speciesSet.removeAlien(as.getFullSpeciesName());
-            }
-        });
-        Thread.yield();
+    //    Platform.runLater(new Runnable() {
+        //        @Override
+        //        public void run() {
+        decrementCell(as.x, as.y, as.getFullSpeciesName());
+        speciesSet.removeAlien(as.getFullSpeciesName());
+    //        }
+        //    });
+        //    Thread.yield();
     }
 
     @Override
@@ -404,7 +406,7 @@ class VisualizationGrid implements GameVisualizer {
          */
 
         // not done with number of turns before prompt, don't display anything, return "game not over"
-        Thread.yield();
+        //Thread.yield();
         return true;
     }
 

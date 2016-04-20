@@ -92,9 +92,6 @@ public class SpaceGrid {
     public void requestAlienMoves() {
         //vis.debugOut("Requesting moves for " + (aliens.size()) + " aliens");
         for (AlienContainer ac : aliens) {
-
-            Thread.yield();
-
             // get rid of stale views from prior moves
             ac.ctx.view = null;
 
@@ -118,9 +115,6 @@ public class SpaceGrid {
     public void performCommunications() {
         // phase 1: take outgoing messages and store in ac
         for (AlienContainer ac : aliens) {
-
-            Thread.yield();
-
             // get rid of stale views from prior phases
             ac.ctx.view = null;
 
@@ -139,7 +133,6 @@ public class SpaceGrid {
         // phase 2: route messages to gridpoints
         for (AlienContainer ac : aliens) {
             if (ac.outgoingMessage != null & ac.outgoingPower != 0) {
-                Thread.yield();
                 ac.ctx.routeMessages();
                 ac.outgoingMessage = null;
             }
@@ -150,8 +143,6 @@ public class SpaceGrid {
         // phase 3: receive messages
         for (AlienContainer ac : aliens) {
             if (ac.listening) {
-                Thread.yield();
-
                 // get rid of stale views from prior phases
                 ac.ctx.view = null;
 
@@ -230,8 +221,6 @@ public class SpaceGrid {
         //vis.debugOut("Processing actions for " + (aliens.size()) + " aliens");
         // first request all the actions from the aliens
         for (AlienContainer thisAlien : aliens) {
-            Thread.yield(); // be polite
-
             // get rid of stale views from prior phases
             thisAlien.ctx.view = null;
 

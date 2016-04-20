@@ -5,6 +5,7 @@
  */
 package guishell;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
@@ -25,34 +26,46 @@ public class SpeciesSet {
         return speciesList;
     }
 
-    public void notifyListeners(AlienSpecies as) {
-        int i = speciesList.indexOf(as);
-        speciesList.set(i, null);
-        speciesList.set(i, as);
+    public void notifyListeners() {
+        for (AlienSpecies as:speciesList) {
+            int i = speciesList.indexOf(as);
+            speciesList.set(i, null);
+            speciesList.set(i, as);
+        }
     }
 
     public void addAlien(String speciesName) {
         for (AlienSpecies as : speciesList) {
             if (as.speciesName.equalsIgnoreCase(speciesName)) {
                 as.count++;
-                notifyListeners(as);
                 return;
             }
         }
 
         // if we got here, no matching species found
-        speciesList.add(new AlienSpecies(speciesName));
+        AlienSpecies as = new AlienSpecies(speciesName);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                speciesList.add(as);
+            }
+        });
     }
 
     public void removeAlien(String speciesName) {
         for (AlienSpecies as : speciesList) {
             if (as.speciesName.equals(speciesName)) {
                 as.count--;
-                notifyListeners(as);
 
                 // if this is the last one, take it out
                 if (as.count == 0) {
-                    speciesList.remove(as);
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            speciesList.remove(as);
+                        }
+                    });
+
                 }
                 return;
             }
@@ -61,17 +74,15 @@ public class SpeciesSet {
         // if we got here, no matching species found
         // debugErr something
     }
-    
-    
+
     public Color getColor(String speciesName) {
         for (AlienSpecies as : speciesList) {
             if (as.speciesName.equals(speciesName)) {
                 return as.color;
             }
         }
-        
+
         return Color.SILVER;
     }
-
 
 }
