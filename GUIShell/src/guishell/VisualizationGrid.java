@@ -5,7 +5,7 @@
  */
 package guishell;
 
-import alieninterfaces.AlienSpec;
+import gameengineinterfaces.AlienSpec;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import gameengineinterfaces.*;
@@ -508,6 +508,11 @@ class VisualizationGrid implements GameVisualizer {
         } catch (InterruptedException e) {
             // ignore exception
         }
+    }
+
+    @Override
+    public void registerSpecies(AlienSpec as) {
+        speciesSet.addAlienSpecies(as.getFullSpeciesName(), as.speciesID);
     }
 
 }

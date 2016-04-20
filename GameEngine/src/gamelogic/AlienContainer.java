@@ -5,6 +5,7 @@
  */
 package gamelogic;
 
+import gameengineinterfaces.AlienSpec;
 import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
@@ -24,6 +25,7 @@ public class AlienContainer {
     public final String className;
     public String fullName;
     public String speciesName;
+    public AlienSpecies species;
     public final Constructor<?> constructor;
     public Alien alien;
     public final ContextImplementation ctx;
@@ -52,13 +54,14 @@ public class AlienContainer {
     // Heads up: This constructs an AlienContainer and contained Alien
     //
     public AlienContainer(SpaceGrid sg, GameVisualizer vis, int x, int y,
-            String alienDomainName, String alienPackageName, String alienClassName, Constructor<?> cns,
+            String alienDomainName, String alienPackageName, String alienClassName, Constructor<?> cns, AlienSpecies as,
             int energy, int tech, int parent, String message) {
 
         this.domainName = alienDomainName;
         this.packageName = alienPackageName;
         this.className = alienClassName;
         this.constructor = cns;
+        this.species = as;
         this.energy = energy;
         this.tech = tech;
         this.ctx = new ContextImplementation(this, vis);
@@ -110,12 +113,20 @@ public class AlienContainer {
     }
 
     public AlienSpec getFullAlienSpec() {
-        return new AlienSpec(this.domainName, this.packageName, this.className, this.alienHashCode, this.x, this.y,
+        return new AlienSpec(this.domainName, this.packageName, this.className, this.species.speciesID, this.alienHashCode, this.x, this.y,
                 this.tech, this.energy, this.fullName, this.speciesName, this.currentActionPower);
     }
 
     public AlienSpec getSimpleAlienSpec() {
-        return new AlienSpec(this.domainName, this.packageName, this.className, this.fullName, this.speciesName);
+        return new AlienSpec(this.domainName, this.packageName, this.className, this.species.speciesID, this.fullName, this.speciesName);
+    }
+
+    public AlienSpecies getAlienSpecies() {
+        if (this.species == null) {
+            species = new AlienSpecies(this.domainName, this.packageName, this.className, species.speciesID);
+        }
+        return species;
+        
     }
 
     public String toStringExpensive() {

@@ -5,6 +5,8 @@
  */
 package gamelogic;
 
+import alieninterfaces.AlienSpecies;
+import gameengineinterfaces.AlienSpec;
 import gameengineinterfaces.GameElementKind;
 import java.util.*;
 import java.lang.reflect.Constructor;
@@ -21,13 +23,15 @@ public class SpaceGrid {
     GameVisualizer vis;
     public AlienGrid aliens;    // Aliens are born and die, so our list needs to be able to grow and shrink
     List<SpaceObject> objects;  // Stars, planets, space stations, etc.
+    HashMap<String, AlienSpecies> speciesMap; // Maps alienSpeciesNames to indexes
     int width;
     int height;
     int currentTurn = 1;
+    int speciesCounter = 1; // starting with ID 1
 
     // this is the only approved random generator for the game. Leave it alone!
     public static Random rand;
-    public static int randSeed;
+    public static int randSeed = 0;
 
     public SpaceGrid(GameVisualizer vis, int width, int height) {
         this.vis = vis;
@@ -35,10 +39,9 @@ public class SpaceGrid {
         this.height = height;
         aliens = new AlienGrid(width, height); // AlienContainer type is inferred
         objects = new ArrayList<>();
+        speciesMap = new HashMap<>();
 
-        long randSeed = System.nanoTime();
-        rand = new Random(randSeed);
-        vis.debugOut("RandSeed: " + randSeed);
+        rand = new Random(0);
     }
 
     public boolean executeGameTurn() {
@@ -270,10 +273,10 @@ public class SpaceGrid {
                         }
 
                         Integer speciesCombinedPower = fightSpecies.get(fightingAlien.speciesName);
-                        if (speciesCombinedPower == null){
+                        if (speciesCombinedPower == null) {
                             speciesCombinedPower = 0;
                         }
-                            
+
                         speciesCombinedPower += fightingAlien.currentActionPower;
                         /*if (fightSpecies.containsKey(fightingAlien.speciesName)) {
                             fightSpecies.put(fightingAlien.speciesName,
@@ -406,6 +409,7 @@ public class SpaceGrid {
                             thisAlien.packageName,
                             thisAlien.className,
                             thisAlien.constructor,
+                            thisAlien.species,
                             power,
                             thisAlien.tech, // tech inherited undiminished from parent
                             thisAlien.alienHashCode,
@@ -552,10 +556,32 @@ public class SpaceGrid {
         return new MoveDir(dxi, dyi);
     }
 
+    void addSpecies(GameElementSpec element) {
+        AlienSpecies as = speciesMap.get(element.domainName + ":" + element.packageName + ":" + element.className);
+        if (as == null) {
+            as = new AlienSpecies(element.domainName, element.packageName, element.className, speciesCounter);
+            speciesMap.put(element.domainName + ":" + element.packageName + ":" + element.className, as);
+            speciesCounter++;
+        }
+
+        vis.registerSpecies(new AlienSpec(as));
+    }
+
+    // TODO: add spawn state, tech, energy
     void addAlien(int x, int y, String domainName, String alienPackageName, String alienClassName, Constructor<?> cns) {
-        AlienContainer ac = new AlienContainer(this, this.vis, x, y, domainName, alienPackageName, alienClassName, cns, 1, 1,
+        String speciesName = domainName + ":" + alienPackageName + ":" + alienClassName;
+        AlienSpecies as = speciesMap.get(speciesName);
+        if (as == null) {
+            as = new AlienSpecies(domainName, alienPackageName, alienClassName, speciesCounter);
+            speciesMap.put(speciesName, as);
+            speciesCounter++;
+        }
+
+        AlienContainer ac = new AlienContainer(this, this.vis, x, y, 
+                domainName, alienPackageName, alienClassName, cns, as, 
+                1, 1, // tech and power
                 0, // no parent
-                null); // no message
+                null); // no spawn state
         aliens.addAlienAndPlug(ac);
         vis.showSpawn(ac.getFullAlienSpec());
     }
@@ -589,6 +615,11 @@ public class SpaceGrid {
 
             // position (0,0) leads to random assignment
             addAlien(0, 0, "eastsideprep.org", element.packageName, element.className, element.cns);
+
+        } else if (element.kind == GameElementKind.SPECIES) {
+            debugMessage += "species";
+
+            addSpecies(element);
 
         } else if (element.kind == GameElementKind.PLANET) {
             debugMessage += "planet";

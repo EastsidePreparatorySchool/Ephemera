@@ -18,13 +18,13 @@ import javafx.util.Callback;
  *
  * @author gmein
  */
-public class SpeciesListCell extends CheckBoxListCell<AlienSpecies> {
+public class SpeciesListCell extends CheckBoxListCell<AlienSpeciesForDisplay> {
 
 
     public SpeciesListCell() {
-        this.setSelectedStateCallback(new Callback<AlienSpecies, ObservableValue<Boolean>>() {
+        this.setSelectedStateCallback(new Callback<AlienSpeciesForDisplay, ObservableValue<Boolean>>() {
             @Override
-            public ObservableValue<Boolean> call(AlienSpecies item) {
+            public ObservableValue<Boolean> call(AlienSpeciesForDisplay item) {
                 BooleanProperty observable = new SimpleBooleanProperty(true);
                 observable.addListener((obs, wasSelected, isNowSelected)
                         -> System.out.println("Check box for " + item + " changed from " + wasSelected + " to " + isNowSelected)
@@ -36,7 +36,7 @@ public class SpeciesListCell extends CheckBoxListCell<AlienSpecies> {
     }
 
     @Override
-    public void updateItem(AlienSpecies item, boolean empty) {
+    public void updateItem(AlienSpeciesForDisplay item, boolean empty) {
         super.updateItem(item, empty);
 
         if (item != null && !empty) {

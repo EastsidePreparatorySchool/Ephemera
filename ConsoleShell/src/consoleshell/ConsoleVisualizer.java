@@ -5,7 +5,7 @@
  */
 package consoleshell;
 
-import alieninterfaces.AlienSpec;
+import gameengineinterfaces.AlienSpec;
 import gameengineinterfaces.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -244,6 +244,11 @@ public class ConsoleVisualizer implements GameVisualizer {
 
     @Override
     public void showAliens(List<AlienSpec> aliens) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void registerSpecies(AlienSpec as) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

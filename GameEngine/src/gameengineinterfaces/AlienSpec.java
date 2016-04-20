@@ -3,7 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package alieninterfaces;
+package gameengineinterfaces;
+
+import alieninterfaces.AlienSpecies;
 
 /**
  *
@@ -14,6 +16,7 @@ public class AlienSpec {
     public String domainName;
     public String packageName;
     public String className;
+    public int speciesID;
     public int hashCode;
     public int x;
     public int y;
@@ -24,7 +27,7 @@ public class AlienSpec {
     public String speciesName;
 
     public AlienSpec(String domainName, String packageName, String className,
-            int hashCode, int x, int y, int tech, int energy,
+            int speciesID, int hashCode, int x, int y, int tech, int energy,
             String fullName, String speciesName) {
         this.domainName = domainName;
         this.packageName = packageName;
@@ -36,10 +39,11 @@ public class AlienSpec {
         this.energy = energy;
         this.fullName = fullName;
         this.speciesName = speciesName;
+        this.speciesID = speciesID;
     }
 
     public AlienSpec(String domainName, String packageName, String className,
-            int hashCode, int x, int y, int tech, int energy,
+            int speciesID, int hashCode, int x, int y, int tech, int energy,
             String fullName, String speciesName, int actionPower) {
         this.domainName = domainName;
         this.packageName = packageName;
@@ -49,19 +53,30 @@ public class AlienSpec {
         this.y = y;
         this.tech = tech;
         this.energy = energy;
-        this.actionPower = actionPower;
         this.fullName = fullName;
         this.speciesName = speciesName;
+        this.speciesID = speciesID;
+        this.actionPower = actionPower;
+
+    }
+    
+    public AlienSpec(AlienSpecies as) {
+        this.domainName = as.domainName;
+        this.packageName = as.packageName;
+        this.className = as.className;
+        this.speciesID = as.speciesID;
+        
     }
 
     // for purposes of describing a species of alien
-    public AlienSpec(String domainName, String packageName, String className,
+    public AlienSpec(String domainName, String packageName, String className, int speciesID,
             String fullName, String speciesName) {
         this.domainName = domainName;
         this.packageName = packageName;
         this.className = className;
         this.fullName = fullName;
         this.speciesName = speciesName;
+        this.speciesID = speciesID;
     }
 
     // helpers

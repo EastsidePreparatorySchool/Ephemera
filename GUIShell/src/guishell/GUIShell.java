@@ -31,6 +31,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import static javafx.application.Application.launch;
+import static javafx.application.Application.launch;
 
 /**
  *
@@ -228,10 +229,10 @@ public class GUIShell extends Application {
         return hbox;
     }
 
-    ListView<AlienSpecies> addAlienSpeciesList() {
-        ListView<AlienSpecies> speciesView = new ListView<>(species.getObservableList());
+    ListView<AlienSpeciesForDisplay> addAlienSpeciesList() {
+        ListView<AlienSpeciesForDisplay> speciesView = new ListView<>(species.getObservableList());
 
-        speciesView.setCellFactory((ListView<AlienSpecies> list) -> new SpeciesListCell());
+        speciesView.setCellFactory((ListView<AlienSpeciesForDisplay> list) -> new SpeciesListCell());
         speciesView.setStyle("-fx-background-color: black;");
 
         return speciesView;

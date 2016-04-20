@@ -66,14 +66,6 @@ public class GameEngineThread extends Thread {
                         }
                     } while (!continueGame && !endGame);
 
-                    // prepare the random generator seed number if not set from config file
-                    if (engine.grid.randSeed == 0) {
-                        engine.grid.randSeed = (int) System.nanoTime();
-                        engine.grid.rand.setSeed(engine.grid.randSeed);
-                        // output randSeed into logfile
-                        engine.vis.debugOut("RandSeed: " + engine.grid.randSeed);
-                    }
-
                     // Execute game turn
                     //
                     long startTurnTime = System.nanoTime();
@@ -114,6 +106,7 @@ public class GameEngineThread extends Thread {
                     endGame = processCommand(gc);
                     // endGame signifies that an "End" request has come through
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
                 engine.vis.debugErr("GameThread: Unknown exception: " + e.getMessage());
@@ -126,18 +119,15 @@ public class GameEngineThread extends Thread {
     private boolean processCommand(GameCommand gc) throws Exception {
         boolean gameOver = false;
         switch (gc.code) {
-            case RandSeed:
-                break;
-
             case AddElement:
                 GameElementSpec element = (GameElementSpec) gc.parameters[0];
 
-                engine.vis.debugOut("GameEngineThread: Processing GameElement " + element.packageName + ":" + element.className + ", " + element.state);
+                engine.vis.debugOut("GameEngineThread: Processing GameElement " + element.kind.name() + " "
+                        + element.packageName + ":" + element.className + ", " + element.state);
 
                 if (element.kind != GameElementKind.INVALID) {
                     if (element.kind == GameElementKind.ALIEN) {
                         // instantiate an actual alien
-                        element.cns = Load(element.packageName, element.className);
                         try {
                             element.cns = Load(element.packageName, element.className);
                         } catch (Exception e) {
@@ -149,14 +139,13 @@ public class GameEngineThread extends Thread {
 
                     // register a species for the click menu
                     if (element.kind == GameElementKind.SPECIES) {
-                        element.cns = Load(element.packageName, element.className);
                         try {
-                            element.cns = Load(element.packageName, element.className);
+                            //element.cns = Load(element.packageName, element.className);
                         } catch (Exception e) {
                             engine.vis.debugErr("GameEngineThread: Error loading game element");
                             throw (e);
                         }
-                        engine.grid.addElement(element);
+                        //engine.grid.addElement(element);
                     }
 
                     // If it is a SpaceObject (there could be a cleaner way to do this)
@@ -168,10 +157,10 @@ public class GameEngineThread extends Thread {
                     }
 
                     if (element.kind == GameElementKind.VARIABLE) {
-                        if (element.packageName.equalsIgnoreCase("RANDSEED")) {
-                            engine.grid.randSeed = Integer.parseInt(element.className);
-                            engine.grid.rand.setSeed(engine.grid.randSeed);
-                            engine.vis.debugOut("RandSeed: " + engine.grid.randSeed);
+                        if (element.className.equalsIgnoreCase("RANDSEED")) {
+                            SpaceGrid.randSeed = element.energy;
+                            SpaceGrid.rand.setSeed(SpaceGrid.randSeed);
+                            engine.vis.debugOut("RandSeed: " + SpaceGrid.randSeed);
                         }
                     }
 
@@ -202,6 +191,17 @@ public class GameEngineThread extends Thread {
             default:
                 break;
         }
+
+        // this is also a good spot to 
+        // prepare the random generator seed number
+        // if not set from config file
+        if (SpaceGrid.randSeed == 0) {
+            SpaceGrid.randSeed = (int) System.nanoTime();
+            SpaceGrid.rand.setSeed(SpaceGrid.randSeed);
+            // output randSeed into logfile
+            engine.vis.debugOut("RandSeed: " + SpaceGrid.randSeed);
+        }
+
         return gameOver;
     }
 

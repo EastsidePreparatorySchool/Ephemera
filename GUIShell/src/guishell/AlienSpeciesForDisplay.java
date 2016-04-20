@@ -21,7 +21,7 @@ import javafx.scene.paint.Color;
  *
  * @author gmein
  */
-public class AlienSpecies {
+public class AlienSpeciesForDisplay {
 
     String speciesName;
     int count;
@@ -34,7 +34,7 @@ public class AlienSpecies {
     static String[] alienStyles = {"lightblue", "yellow", "lightpink", "lightgreen", "orange"};
     static int colorCount = 0;
 
-    AlienSpecies(String speciesName) {
+    AlienSpeciesForDisplay(String speciesName) {
         this.speciesName = speciesName;
         this.count = 1; // if we create this object, there is at least one alien
         this.color = alienColors[colorCount % alienColors.length];

@@ -14,6 +14,8 @@ import java.util.List;
  */
 public interface GameVisualizer {
     
+    void registerSpecies(AlienSpec as);
+    
     void showCompletedTurn(int totalTurns, int numAliens, long timeTaken);
     
     void showAliens(List<AlienSpec> aliens);

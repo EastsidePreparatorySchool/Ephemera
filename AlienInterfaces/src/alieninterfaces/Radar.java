@@ -15,13 +15,13 @@ import java.util.ArrayList;
  */
 public interface Radar {
     
-    ArrayList<AlienSpec> getAliensAtPos(int x, int y) throws CantSeeSquareException;
-    ArrayList<AlienSpec> getAliensInView() throws CantSeeSquareException;
+    ArrayList<AlienSpecies> getAliensAtPos(int x, int y) throws CantSeeSquareException;
+    ArrayList<AlienSpecies> getAliensInView() throws CantSeeSquareException;
     
     SpaceObjectSpec getSpaceObjectAtPos(int x, int y) throws CantSeeSquareException;
     ArrayList<SpaceObjectSpec> getSpaceObjectsInView() throws CantSeeSquareException;
     
-    AlienSpec getClosestAlienToPos(int x, int y);
-    AlienSpec getClosestSpecificAlienToPos(AlienSpec as, int x, int y);
-    AlienSpec getClosestXenoToPos(AlienSpec as, int x, int y);
+    AlienSpecies getClosestAlienToPos(int x, int y);
+    AlienSpecies getClosestSpecificAlienToPos(AlienSpecies as, int x, int y);
+    AlienSpecies getClosestXenoToPos(AlienSpecies as, int x, int y);
 }

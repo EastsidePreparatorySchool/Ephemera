@@ -16,18 +16,18 @@ import javafx.scene.paint.Color;
  */
 public class SpeciesSet {
 
-    ObservableList<AlienSpecies> speciesList;
+    ObservableList<AlienSpeciesForDisplay> speciesList;
 
     SpeciesSet() {
         speciesList = FXCollections.observableArrayList();
     }
 
-    public ObservableList<AlienSpecies> getObservableList() {
+    public ObservableList<AlienSpeciesForDisplay> getObservableList() {
         return speciesList;
     }
 
     public void notifyListeners() {
-        for (AlienSpecies as:speciesList) {
+        for (AlienSpeciesForDisplay as : speciesList) {
             int i = speciesList.indexOf(as);
             speciesList.set(i, null);
             speciesList.set(i, as);
@@ -35,7 +35,7 @@ public class SpeciesSet {
     }
 
     public void addAlien(String speciesName) {
-        for (AlienSpecies as : speciesList) {
+        for (AlienSpeciesForDisplay as : speciesList) {
             if (as.speciesName.equalsIgnoreCase(speciesName)) {
                 as.count++;
                 return;
@@ -43,7 +43,17 @@ public class SpeciesSet {
         }
 
         // if we got here, no matching species found
-        AlienSpecies as = new AlienSpecies(speciesName);
+        AlienSpeciesForDisplay as = new AlienSpeciesForDisplay(speciesName);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                speciesList.add(as);
+            }
+        });
+    }
+
+    public void addAlienSpecies(String speciesName, int id) {
+        AlienSpeciesForDisplay as = new AlienSpeciesForDisplay(speciesName);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -53,7 +63,7 @@ public class SpeciesSet {
     }
 
     public void removeAlien(String speciesName) {
-        for (AlienSpecies as : speciesList) {
+        for (AlienSpeciesForDisplay as : speciesList) {
             if (as.speciesName.equals(speciesName)) {
                 as.count--;
 
@@ -76,7 +86,7 @@ public class SpeciesSet {
     }
 
     public Color getColor(String speciesName) {
-        for (AlienSpecies as : speciesList) {
+        for (AlienSpeciesForDisplay as : speciesList) {
             if (as.speciesName.equals(speciesName)) {
                 return as.color;
             }

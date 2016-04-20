@@ -16,6 +16,7 @@ import java.lang.reflect.Constructor;
 public class GameElementSpec {
 
     public GameElementKind kind;
+    public String domainName;
     public String packageName;
     public String className;
     public String state;
@@ -34,9 +35,10 @@ public class GameElementSpec {
         }
     }
 
-    public GameElementSpec(String kindString, String packageName, String className, String state, Constructor<?> cns) {
+    public GameElementSpec(String kindString, String domainName, String packageName, String className, String state, Constructor<?> cns) {
         try {
             this.kind = GameElementKind.valueOf(kindString.trim().toUpperCase());
+            this.domainName = domainName;
             this.packageName = packageName;
             this.className = className;
             this.state = state;

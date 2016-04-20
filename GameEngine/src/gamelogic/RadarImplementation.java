@@ -5,6 +5,7 @@
  */
 package gamelogic;
 
+import gameengineinterfaces.AlienSpec;
 import alieninterfaces.*;
 import java.util.ArrayList;
 
@@ -76,16 +77,16 @@ public class RadarImplementation implements Radar {
         return distance + (int) (y1 - y2) * (y1 - y2) ;
     }
 
-    public ArrayList<AlienSpec> getAliensAtPos(int x, int y) throws CantSeeSquareException {
-        ArrayList<AlienSpec> as = new ArrayList();
+    public ArrayList<AlienSpecies> getAliensAtPos(int x, int y) throws CantSeeSquareException {
+        ArrayList<AlienSpecies> as = new ArrayList();
         for (AlienContainer ac : ag.acGrid[x][y]) {
-            as.add(ac.getSimpleAlienSpec());
+            as.add(ac.getAlienSpecies());
         }
         return as;
     }
 
-    public ArrayList<AlienSpec> getAliensInView() throws CantSeeSquareException {
-        ArrayList<AlienSpec> as = new ArrayList();
+    public ArrayList<AlienSpecies> getAliensInView() throws CantSeeSquareException {
+        ArrayList<AlienSpecies> as = new ArrayList();
         int x1 = checkPosX(this.centerX - size);
         int x2 = checkPosX(this.centerX + size);
         int y1 = checkPosY(this.centerY - size);
@@ -94,7 +95,7 @@ public class RadarImplementation implements Radar {
         for (int x = x1; x <= x2; x++) {
             for (int y = y1; y <= y2; y++) {
                 for (AlienContainer ac : ag.acGrid[x][y]) {
-                    as.add(ac.getSimpleAlienSpec());
+                    as.add(ac.getAlienSpecies());
                 }
             }
         }
@@ -109,15 +110,15 @@ public class RadarImplementation implements Radar {
         return null;
     }
 
-    public AlienSpec getClosestAlienToPos(int x, int y) {
+    public AlienSpecies getClosestAlienToPos(int x, int y) {
         return null;
     }
 
-    public AlienSpec getClosestSpecificAlienToPos(AlienSpec as, int x, int y) {
+    public AlienSpecies getClosestSpecificAlienToPos(AlienSpecies as, int x, int y) {
         return null;
     }
 
-    public AlienSpec getClosestXenoToPos(AlienSpec as, int x, int y) {
+    public AlienSpecies getClosestXenoToPos(AlienSpecies as, int x, int y) {
         return null;
     }
 
