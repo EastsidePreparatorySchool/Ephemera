@@ -8,7 +8,6 @@ package guishell;
 import gameengineV1.GameEngineV1;
 import gameengineinterfaces.GameCommand;
 import gameengineinterfaces.GameCommandCode;
-import static javafx.application.Application.launch;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -17,15 +16,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Screen;
 
 import javafx.application.Application;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -36,7 +30,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import static javafx.application.Application.launch;
 
 /**
@@ -146,6 +139,7 @@ public class GUIShell extends Application {
 
         // set scene and stage
         Scene scene = new Scene(border);
+
         stage.setScene(scene);
         stage.show();
 
@@ -170,6 +164,7 @@ public class GUIShell extends Application {
     //
     // Visual helpers
     //
+
     public static void setSize(Stage stage, javafx.geometry.Rectangle2D bounds) {
         stage.setX(bounds.getMinX());
         stage.setY(bounds.getMinY());
