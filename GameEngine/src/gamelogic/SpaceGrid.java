@@ -27,6 +27,7 @@ public class SpaceGrid {
 
     // this is the only approved random generator for the game. Leave it alone!
     public static Random rand;
+    public static int randSeed;
 
     public SpaceGrid(GameVisualizer vis, int width, int height) {
         this.vis = vis;

@@ -1,4 +1,5 @@
 !GameElementKind,Package (jar file without .jar),Class (name),Parent (position will be relative to this),X,Y,"Energy (Mag equivalent for direct neighbor to star, 0-16)",Technology,State
+VARIABLE,randseed,1,,,,,,
 ALIEN,stockaliens,Dalek,,,,,,
 ALIEN,stockaliens,Martian,,,,,,
 ALIEN,stockaliens,Venusian,,,,,,

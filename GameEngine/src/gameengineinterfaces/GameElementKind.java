@@ -10,5 +10,5 @@ package gameengineinterfaces;
  * @author gmein
  */
 public enum GameElementKind {
-    STAR, PLANET, SPACESTATION, ALIEN, RESIDENT, INVALID
+    STAR, PLANET, SPACESTATION, SPECIES, ALIEN, RESIDENT, VARIABLE, INVALID
 }
