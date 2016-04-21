@@ -32,6 +32,9 @@ public class SpaceGrid {
     public HashMap<String, InternalAlienSpecies> speciesMap; // Maps alienSpeciesNames to indexes
     int width;
     int height;
+    int safeZoneSize = 5; // Number of tiles out of 0,0 that should be protected
+    // sZS = 0 gives a 1x1 sz, sZS = 1 gives a 3x3 sz, sZS = 5 gives a 11x11 sz
+    
     int currentTurn = 1;
     int speciesCounter = 1; // starting with ID 1
 
@@ -263,17 +266,20 @@ public class SpaceGrid {
             switch (thisAlien.currentActionCode) {
                 case Fight:
                     //vis.debugOut("SpaceGrid: Processing Fight");
-
+                    
+                    // If the alien is in the safe zone
+                    if (Math.abs(thisAlien.x) <= safeZoneSize &&
+                            Math.abs(thisAlien.y) <= safeZoneSize) {
+                        // Make them pay the energy they spent
+                        thisAlien.energy -= thisAlien.currentActionPower;
+                        break;
+                    }
                     List<AlienSpec> fightSpecs = new ArrayList<>();
                     HashMap<String, Integer> fightSpecies = new HashMap<>();
 
                     LinkedList<AlienContainer> fightingAliens = aliens.getAliensAt(thisAlien.x, thisAlien.y);
-
-                    thisAlien.fought = true;
-
+                    
                     for (AlienContainer fightingAlien : fightingAliens) {
-
-                        fightingAlien.fought = true;
 
                         if (fightingAlien.currentActionCode != ActionCode.Fight) {
                             fightingAlien.currentActionPower = 0;
@@ -299,6 +305,17 @@ public class SpaceGrid {
                                 fightingAlien.currentActionPower);
 
                         fightSpecs.add(fightingAlien.getFullAlienSpec());
+                    }
+                    
+                    if (fightSpecies.size() < 2) { // If only one species is fighting
+                        break; // No fight will take place
+                        // Aliens involved will lose their turns
+                    }
+                    
+                    // Deduct energy from all aliens and set their fought status
+                    for (AlienContainer fightingAlien : fightingAliens) {
+                        fightingAlien.fought = true;
+                        fightingAlien.energy -= fightingAlien.currentActionPower;
                     }
 
                     vis.showFightBefore(thisAlien.x, thisAlien.y, fightSpecs);
