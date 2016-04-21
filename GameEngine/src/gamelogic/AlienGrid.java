@@ -16,9 +16,13 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     AlienCell[][] acGrid;
     int centerX;
     int centerY;
+    int width;
+    int height;
 
     public AlienGrid(int width, int height) {
         acGrid = new AlienCell[width][height];
+        this.width = width;
+        this.height = height;
         centerX = width / 2;
         centerY = height / 2;
     }
@@ -54,7 +58,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         AlienCell acs = acGrid[oldX + centerX][oldY + centerY];
         //ac.debugOut("Grid: removing from list " + getXYString(oldX, oldY));
         acs.remove(ac);
-        if (acs.isEmpty()  && acs.object == null) {
+        if (acs.isEmpty() && acs.object == null) {
             acGrid[oldX + centerX][oldY + centerY] = null;
         }
 
@@ -72,7 +76,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         AlienCell acs = acGrid[ac.x + centerX][ac.y + centerY];
         //ac.debugOut("Grid: removing from list " + getXYString(ac.x, ac.y));
         acs.remove(ac);
-        if (acs.isEmpty() &&  acs.object == null) {
+        if (acs.isEmpty() && acs.object == null) {
             acGrid[ac.x + centerX][ac.y + centerY] = null;
         }
     }
@@ -95,8 +99,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         acs.object = st;
     }
 
-    
-       public void plugPlanet(Planet p) {
+    public void plugPlanet(Planet p) {
         // add alien to grid as well as to master list
         AlienCell acs = acGrid[p.x + centerX][p.y + centerY];
         if (acs == null) {
@@ -104,6 +107,56 @@ public class AlienGrid extends LinkedList<AlienContainer> {
             acGrid[p.x + centerX][p.y + centerY] = acs;
         }
         acs.object = p;
+        acs.energy = p.energy;
+        acs.tech = p.tech;
+    }
+
+    public void distributeStarEnergy(int x, int y, int energy) {
+        int[] pos = {Integer.MAX_VALUE, Integer.MAX_VALUE};
+
+        // probe around our current position,
+        // tracing an imaginary square of increasing size,
+        // starting from the midpoints of the sides
+        for (int d = 1; d <= energy; d++) {
+            // energy is multiplied by an arbitrary factor 16, but goes down by the square of the distance
+            // todo: make this properly depend on our metric
+            int pointEnergy = (int) ((double) (energy * 16) / (double) ((long) d * (long) d));
+
+            if (pointEnergy <= 1) {
+                break; // at the level of empty space, get out
+            }
+
+            for (int dd = 0; dd <= d; dd++) {
+                putEnergyAt(x - d, y - dd, pointEnergy);
+                putEnergyAt(x - d, y + dd, pointEnergy);
+                putEnergyAt(x + d, y - dd, pointEnergy);
+                putEnergyAt(x + d, y + dd, pointEnergy);
+                putEnergyAt(x - dd, y - d, pointEnergy);
+                putEnergyAt(x + dd, y - d, pointEnergy);
+                putEnergyAt(x - dd, y + d, pointEnergy);
+                putEnergyAt(x + dd, y + d, pointEnergy);
+
+            }
+        }
+    }
+
+    void putEnergyAt(int x, int y, int energy) {
+        if (((x + centerX) >= width)
+                || ((x + centerX) < 0)
+                || ((y + centerY) >= height)
+                || ((y + centerY) < 0)) {
+            return;
+        }
+
+        AlienCell acs = acGrid[x + centerX][y + centerY];
+        if (acs == null) {
+            acs = new AlienCell();
+            acGrid[x + centerX][y + centerY] = acs;
+        }
+        
+        if (energy > acs.energy) {
+            acs.energy = energy;
+        }
     }
 
 }

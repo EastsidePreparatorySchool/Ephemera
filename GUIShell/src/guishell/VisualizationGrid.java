@@ -12,6 +12,7 @@ import gameengineinterfaces.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -29,6 +30,8 @@ class VisualizationGrid implements GameVisualizer {
     public Cell[][] grid;
     public Canvas canvas;
     public SpeciesSet speciesSet;
+    public ArrayList<StarForDisplay> stars;
+    public ArrayList<PlanetForDisplay> planets;
 
     private int width;
     private int height;
@@ -80,6 +83,9 @@ class VisualizationGrid implements GameVisualizer {
                 grid[i][k] = new Cell(speciesSet);
             }
         }
+
+        stars = new ArrayList<>();
+        planets = new ArrayList<>();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
@@ -148,6 +154,17 @@ class VisualizationGrid implements GameVisualizer {
     public void renderOnScreen2(GraphicsContext gc) {
         Color[] color = {Color.BLACK, Color.BLACK, Color.BLACK};
 
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0.5, 0.5, widthPX - 0.5, heightPX - 0.5);
+
+        for (StarForDisplay st : stars) {
+            st.draw(gc, cellWidth, cellHeight);
+        }
+
+        for (PlanetForDisplay p : planets) {
+            p.draw(gc, cellWidth, cellHeight);
+        }
+
         gc.setLineCap(StrokeLineCap.SQUARE);
         gc.setLineWidth(1);
         for (int i = 0; i < height; i++) {
@@ -163,8 +180,8 @@ class VisualizationGrid implements GameVisualizer {
                     color[1] = (isFighting ? Color.RED : Color.BLACK);
                     if (cell.alienCount == 0) {
                         if (!isFighting) {
-                            gc.setStroke(Color.BLACK);
-                            gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth + 0.5, y + 0.5);
+                            //gc.setStroke(Color.BLACK);
+                            //gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth + 0.5, y + 0.5);
                             cell.cellChanged = false;
                             continue;
                         }
@@ -188,8 +205,10 @@ class VisualizationGrid implements GameVisualizer {
                             gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth + 0.5, y + 0.5);
                         } else {
                             for (int l = 0; l < 3; l++) {
-                                gc.setStroke(color[l]);
-                                gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth / 3 + 0.5, y + 0.5);
+                                if (color[l] != Color.BLACK) {
+                                    gc.setStroke(color[l]);
+                                    gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth / 3 + 0.5, y + 0.5);
+                                }
                                 x++;
                             }
                         }
@@ -213,9 +232,9 @@ class VisualizationGrid implements GameVisualizer {
                 }
             }
         }
-        gc.setStroke(Color.RED);
-        gc.setLineWidth(1.0);
-        gc.strokeOval(0.5, 0.5, (width * cellWidth) - 0.5, heightPX - 0.5);
+        //gc.setStroke(Color.RED);
+        //gc.setLineWidth(1.0);
+        //gc.strokeOval(0.5, 0.5, (width * cellWidth) - 0.5, heightPX - 0.5);
     }
 
     @Override
@@ -230,8 +249,8 @@ class VisualizationGrid implements GameVisualizer {
             String text = "Turns completed: " + paddedString(totalTurnCounter, 6)
                     + ", Total aliens: " + paddedString(numAliens, 7);
             //if (time > 100000000L) {
-            text += ", time for turn: " + paddedTimeString(time) 
-                    + (numAliens > 0 ?", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens))):"");
+            text += ", time for turn: " + paddedTimeString(time)
+                    + (numAliens > 0 ? ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens))) : "");
             //        + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)));
             //}
             GUIShell.turnCounterText.setText(text);
@@ -280,12 +299,12 @@ class VisualizationGrid implements GameVisualizer {
         int x = as.x;
         int y = as.y;
 
-    //    Utilities.runSafe(new Runnable() {
+        //    Utilities.runSafe(new Runnable() {
         //        @Override
         //        public void run() {
         decrementCell(oldx, oldy, speciesName);
         incrementCell(x, y, speciesName);
-    //        }
+        //        }
         //    });
     }
 
@@ -332,12 +351,12 @@ class VisualizationGrid implements GameVisualizer {
         } else {
             debugOut("Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
         }
-      //  Platform.runLater(new Runnable() {
+        //  Platform.runLater(new Runnable() {
         //      @Override
         //      public void run() {
         speciesSet.addAlien(as.getFullSpeciesName());
         incrementCell(as.x, as.y, as.getFullSpeciesName());
-      //      }
+        //      }
         //  });
     }
 
@@ -348,12 +367,12 @@ class VisualizationGrid implements GameVisualizer {
         } else {
             debugOut("Death: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
         }
-    //    Platform.runLater(new Runnable() {
+        //    Platform.runLater(new Runnable() {
         //        @Override
         //        public void run() {
         decrementCell(as.x, as.y, as.getFullSpeciesName());
         speciesSet.removeAlien(as.getFullSpeciesName());
-    //        }
+        //        }
         //    });
         //    Thread.yield();
     }
@@ -512,6 +531,16 @@ class VisualizationGrid implements GameVisualizer {
     @Override
     public void registerSpecies(AlienSpec as) {
         speciesSet.addAlienSpecies(as);
+    }
+
+    @Override
+    public void registerStar(int x, int y, String name, int magnitude) {
+        stars.add(new StarForDisplay(x + this.width / 2, y + this.height / 2, name, magnitude));
+    }
+
+    @Override
+    public void registerPlanet(int x, int y, String name, int energy, int tech) {
+        planets.add(new PlanetForDisplay(x + this.width / 2, y + this.height / 2, name, energy, tech));
     }
 
 }

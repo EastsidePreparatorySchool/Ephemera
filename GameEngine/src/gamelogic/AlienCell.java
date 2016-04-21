@@ -16,12 +16,14 @@ public class AlienCell extends LinkedList<AlienContainer> {
     public ArrayList<String> currentMessages;
     public SpaceObject object;
     int energy; // energy gain at this point in space
+    int tech; // for planets, this is technology gain rate, otherwise 0
     public boolean listening;
 
     public AlienCell() {
         currentMessages = null;
         object = null;
         energy = 1;
+        tech = 0;
         listening = false;
     }
 

@@ -617,12 +617,14 @@ public class SpaceGrid {
         Planet p = new Planet(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech, element.parent);
         objects.add(p);
         this.aliens.plugPlanet(p);
+        vis.registerPlanet(element.x, element.y, element.className, element.energy, element.tech);
     }
 
     void addStar(GameElementSpec element) {
         Star st = new Star(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech);
         objects.add(st);
         this.aliens.plugStar(st);
+        vis.registerStar(element.x, element.y, element.className, element.energy);
     }
 
     void addResident(GameElementSpec element) {

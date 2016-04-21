@@ -95,9 +95,9 @@ public class GUIShell extends Application {
         border.setCenter(canvas);
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setStroke(Color.RED);
-        gc.setLineWidth(1.0);
-        gc.strokeOval(0.5, 0.5, width * cellWidth - 0.5, height * cellHeight - 0.5);
+        //gc.setStroke(Color.RED);
+        //gc.setLineWidth(1.0);
+        //gc.strokeOval(0.5, 0.5, width * cellWidth - 0.5, height * cellHeight - 0.5);
 
         //
         // initialize Ephemera game engine and visualizer

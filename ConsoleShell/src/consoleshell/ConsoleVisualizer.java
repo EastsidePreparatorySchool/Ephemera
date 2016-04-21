@@ -251,4 +251,14 @@ public class ConsoleVisualizer implements GameVisualizer {
     public void registerSpecies(AlienSpec as) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public void registerStar(int x, int y, String name, int magnitude) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void registerPlanet(int x, int y, String name, int energy, int tech) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
