@@ -20,19 +20,22 @@ public class StarForDisplay {
     String name;
     int energy;
     int lastSize;
+    int lastTime;
 
     public StarForDisplay(int x, int y, String name, int energy) {
         this.x = x;
         this.y = y;
         this.name = name;
         this.energy = energy;
-        this.lastSize = energy;
+        this.lastSize = 0;
+        this.lastTime = 0;
     }
 
     public void draw(GraphicsContext gc, int cellWidth, int cellHeight) {
 
+        
         int flicker = ((int) Math.abs(System.nanoTime())) % 8;
-        flicker *= energy;
+        flicker *= Math.sqrt(energy);
         flicker /= 16;
         flicker += 1;
 

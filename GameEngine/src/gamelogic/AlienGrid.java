@@ -119,8 +119,8 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         // starting from the midpoints of the sides
         for (int d = 1; d <= energy; d++) {
             // energy is multiplied by an arbitrary factor 16, but goes down by the square of the distance
-            // todo: make this properly depend on our metric
-            int pointEnergy = (int) ((double) (energy * 16) / (double) ((long) d * (long) d));
+            // todo: make this properly depend on our rect metric
+            int pointEnergy = (int) ((double) (energy * 2) / (double) ((long) d * (long) d));
 
             if (pointEnergy <= 1) {
                 break; // at the level of empty space, get out

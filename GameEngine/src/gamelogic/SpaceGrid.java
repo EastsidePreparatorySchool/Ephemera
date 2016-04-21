@@ -653,36 +653,19 @@ public class SpaceGrid {
         // if you doubt that, uncomment this line:
         // switch (element.kind) {}
 
-        String debugMessage = "SpaceGrid: Loading and constructing ";
-
         if (element.kind == GameElementKind.ALIEN) {
-            debugMessage += "alien";
-
             // position (0,0) leads to random assignment
-            addAlien(0, 0, "eastsideprep.org", element.packageName, element.className);
+            addAlien(0, 0, element.domainName, element.packageName, element.className);
 
         } else if (element.kind == GameElementKind.SPECIES) {
-            debugMessage += "species";
-
             addSpecies(element);
-
         } else if (element.kind == GameElementKind.PLANET) {
-            debugMessage += "planet";
-
             addPlanet(element);
-
         } else if (element.kind == GameElementKind.STAR) {
-            debugMessage += "star";
-
             addStar(element);
         } else if (element.kind == GameElementKind.RESIDENT) {
-            debugMessage += "resident";
-
             addResident(element);
         }
-
-        debugMessage += " " + element.packageName + ":" + element.className;
-        vis.debugOut(debugMessage);
     }
 
     //
