@@ -14,5 +14,16 @@ import java.util.LinkedList;
  */
 public class AlienCell extends LinkedList<AlienContainer> {
     public ArrayList<String> currentMessages;
+    public SpaceObject object;
+    int energy; // energy gain at this point in space
     public boolean listening;
+
+    public AlienCell() {
+        currentMessages = null;
+        object = null;
+        energy = 1;
+        listening = false;
+    }
+
 }
+

@@ -24,8 +24,9 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     }
 
     private String getXYString(int x, int y) {
-        return ("(" + x +"," + y+")");
+        return ("(" + x + "," + y + ")");
     }
+
     public boolean addAlienAndPlug(AlienContainer ac) {
         // add alien to grid as well as to master list
         AlienCell acs = acGrid[ac.x + centerX][ac.y + centerY];
@@ -53,7 +54,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         AlienCell acs = acGrid[oldX + centerX][oldY + centerY];
         //ac.debugOut("Grid: removing from list " + getXYString(oldX, oldY));
         acs.remove(ac);
-        if (acs.isEmpty()) {
+        if (acs.isEmpty()  && acs.object == null) {
             acGrid[oldX + centerX][oldY + centerY] = null;
         }
 
@@ -68,10 +69,10 @@ public class AlienGrid extends LinkedList<AlienContainer> {
 
     public void unplug(AlienContainer ac) {
         // remove alien from grid as well as from master list
-        LinkedList<AlienContainer> acs = acGrid[ac.x + centerX][ac.y + centerY];
+        AlienCell acs = acGrid[ac.x + centerX][ac.y + centerY];
         //ac.debugOut("Grid: removing from list " + getXYString(ac.x, ac.y));
         acs.remove(ac);
-        if (acs.isEmpty()) {
+        if (acs.isEmpty() &&  acs.object == null) {
             acGrid[ac.x + centerX][ac.y + centerY] = null;
         }
     }
@@ -83,4 +84,26 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     public boolean isEmptyAt(int x, int y) {
         return acGrid[x + centerX][y + centerY] == null;
     }
+
+    public void plugStar(Star st) {
+        // add alien to grid as well as to master list
+        AlienCell acs = acGrid[st.x + centerX][st.y + centerY];
+        if (acs == null) {
+            acs = new AlienCell();
+            acGrid[st.x + centerX][st.y + centerY] = acs;
+        }
+        acs.object = st;
+    }
+
+    
+       public void plugPlanet(Planet p) {
+        // add alien to grid as well as to master list
+        AlienCell acs = acGrid[p.x + centerX][p.y + centerY];
+        if (acs == null) {
+            acs = new AlienCell();
+            acGrid[p.x + centerX][p.y + centerY] = acs;
+        }
+        acs.object = p;
+    }
+
 }

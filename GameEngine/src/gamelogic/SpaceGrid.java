@@ -5,7 +5,6 @@
  */
 package gamelogic;
 
-import alieninterfaces.AlienSpecies;
 import gameengineinterfaces.AlienSpec;
 import gameengineinterfaces.GameElementKind;
 import java.util.*;
@@ -617,11 +616,13 @@ public class SpaceGrid {
     void addPlanet(GameElementSpec element) {
         Planet p = new Planet(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech, element.parent);
         objects.add(p);
+        this.aliens.plugPlanet(p);
     }
 
     void addStar(GameElementSpec element) {
-        Star s = new Star(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech);
-        objects.add(s);
+        Star st = new Star(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech);
+        objects.add(st);
+        this.aliens.plugStar(st);
     }
 
     void addResident(GameElementSpec element) {

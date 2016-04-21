@@ -17,7 +17,7 @@ public class Planet extends SpaceObject {
     
     final String parent;
     
-    public Planet (GameVisualizer vis, int x, int y, String packageName, String className, int energy, int tech, String parent) {
+    public Planet (GameVisualizer vis, int x, int y, String className, String packageName, int energy, int tech, String parent) {
         super(vis, x, y, packageName, className, energy, tech);
         this.parent = parent;
     }
