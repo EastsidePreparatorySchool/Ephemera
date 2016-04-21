@@ -284,10 +284,12 @@ public class GUIShell extends Application {
         } else if (buttonPause.getText().equals("Start")) {
             // first start
 
-            for (AlienSpecies as : engine.grid.speciesMap.values()) {
-                GameElementSpec element = new GameElementSpec("ALIEN", as.domainName, as.packageName, as.className,
-                        null, null); // state, constructor
-                engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
+            for (AlienSpeciesForDisplay as : species.speciesList) {
+                if (true/*as.isOn()*/) {
+                    GameElementSpec element = new GameElementSpec("ALIEN", as.domainName, as.packageName, as.className,
+                            null); // state
+                    engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
+                }
             }
             engine.queueCommand(new GameCommand(GameCommandCode.Resume));
             buttonPause.setText("Pause");

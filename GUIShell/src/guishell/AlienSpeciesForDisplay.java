@@ -54,8 +54,7 @@ public class AlienSpeciesForDisplay {
         this.style = alienStyles[colorCount % alienColors.length];
         colorCount++;
 
-        on.setValue(true);
-
+        //on.setValue(true);
     }
 
     public final StringProperty nameProperty() {
@@ -79,6 +78,9 @@ public class AlienSpeciesForDisplay {
     }
 
     public final void setOn(final boolean on) {
+        if (on) {
+            System.out.println("Setting property");
+        }
         this.onProperty().set(on);
     }
 

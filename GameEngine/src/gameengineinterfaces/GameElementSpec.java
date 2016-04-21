@@ -34,7 +34,7 @@ public class GameElementSpec {
         }
     }
 
-    public GameElementSpec(String kindString, String domainName, String packageName, String className, String state, Constructor<?> cns) {
+    public GameElementSpec(String kindString, String domainName, String packageName, String className, String state) {
         try {
             this.kind = GameElementKind.valueOf(kindString.trim().toUpperCase());
             this.domainName = domainName;

@@ -28,10 +28,13 @@ public class SpeciesSet {
     }
 
     public void notifyListeners() {
+        boolean isOn;
         for (AlienSpeciesForDisplay as : speciesList) {
+            isOn = as.isOn();
             int i = speciesList.indexOf(as);
             speciesList.set(i, null);
             speciesList.set(i, as);
+            as.setOn(isOn);
         }
     }
 

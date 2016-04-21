@@ -229,8 +229,8 @@ class VisualizationGrid implements GameVisualizer {
             String text = "Turns completed: " + paddedString(totalTurnCounter, 6)
                     + ", Total aliens: " + paddedString(numAliens, 7);
             //if (time > 100000000L) {
-            text += ", time for turn: " + paddedTimeString(time)
-                    + ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens)));
+            text += ", time for turn: " + paddedTimeString(time) 
+                    + (numAliens > 0 ?", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens))):"");
             //        + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)));
             //}
             GUIShell.turnCounterText.setText(text);

@@ -20,19 +20,21 @@ import javafx.util.Callback;
  */
 public class SpeciesListCell extends CheckBoxListCell<AlienSpeciesForDisplay> {
 
-
     public SpeciesListCell() {
         this.setSelectedStateCallback(new Callback<AlienSpeciesForDisplay, ObservableValue<Boolean>>() {
             @Override
             public ObservableValue<Boolean> call(AlienSpeciesForDisplay item) {
                 BooleanProperty observable = new SimpleBooleanProperty(true);
                 observable.addListener((obs, wasSelected, isNowSelected)
-                        -> System.out.println("Check box for " + item + " changed from " + wasSelected + " to " + isNowSelected)
+                        -> {
+                    item.setOn(isNowSelected);
+                    System.out.println("Check box for " + item + " changed from " + wasSelected + " to " + isNowSelected);
+                }
                 );
                 return observable;
             }
         });
-        
+
     }
 
     @Override
@@ -42,10 +44,12 @@ public class SpeciesListCell extends CheckBoxListCell<AlienSpeciesForDisplay> {
         if (item != null && !empty) {
             this.setStyle(item.getStyle());
             setText(item.toString());
+            if (item.isOn()) {
+                item.setOn(false);
+            }
         } else {
             this.setStyle("-fx-background-color: black; -fx-text-fill:black;");
         }
     }
 
-    
 }
