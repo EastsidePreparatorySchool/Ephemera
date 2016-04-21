@@ -58,7 +58,6 @@ EphemeraWindowsShell/nbproject/jfx-impl.xml
 /GUIShell/dist/
 ConsoleShell/nbproject/private/private.xml
 
-Logs/game2016-04-19-09-15-48.txt
 ConsoleShell/nbproject/private/private.properties
 ConsoleShell/nbproject/private/private.xml
 GUIShell/nbproject/UPDATED.TXT
@@ -69,3 +68,5 @@ ConsoleShell/nbproject/private/private.xml
 ConsoleShell/nbproject/private/private.xml
 ConsoleShell/nbproject/private/private.properties
 ConsoleShell/nbproject/private/private.xml
+ConsoleShell/nbproject/private/private.xml
+GUIShell/nbproject/jfx-impl_backup_5.xml
