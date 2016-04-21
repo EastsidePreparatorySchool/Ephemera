@@ -19,10 +19,9 @@ public class Martian implements Alien {
     int Remainder;
     int fightStrength;
     //gets a random boolean to determine positive or negative move function.
-    static Random rnd = new Random(System.currentTimeMillis() * Martian.class.hashCode());
 
-    public static boolean getRandomBoolean() {
-        return rnd.nextBoolean();
+    public boolean getRandomBoolean() {
+        return (ctx.getRandomInt(2) == 0);
     }
 
     //empty constructor

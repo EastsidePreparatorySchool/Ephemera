@@ -14,7 +14,6 @@ import java.util.Random;
  */
 public class Dalek implements Alien {
 
-    static Random rand = new Random(System.currentTimeMillis() * Dalek.class.hashCode());
     Context ctx;
 
     final boolean debug = true;
@@ -46,11 +45,11 @@ public class Dalek implements Alien {
         move_energy = Math.min(move_energy, 10);
 
         // spend a random amount of that moving into x direction
-        int powerX = rand.nextInt(move_energy);
-        int x = powerX * (rand.nextInt(2) == 0 ? -1 : 1);
+        int powerX = ctx.getRandomInt(move_energy);
+        int x = powerX * (ctx.getRandomInt(2) == 0 ? -1 : 1);
         move_energy -= powerX;
         // and y takes the rest
-        int y = move_energy * (rand.nextInt(2) == 0 ? -1 : 1);
+        int y = move_energy * (ctx.getRandomInt(2) == 0 ? -1 : 1);
 
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
         return new MoveDir(x, y);

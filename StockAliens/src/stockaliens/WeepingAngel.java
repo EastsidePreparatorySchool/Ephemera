@@ -22,10 +22,9 @@ public class WeepingAngel implements Alien {
     int fightStrength;
     int turn = 0;
     //gets a random boolean to determine positive or negative move function.
-    private static Random rnd = new Random();
 
-    public static boolean getRandomBoolean() {
-        return rnd.nextBoolean();
+    public  boolean getRandomBoolean() {
+        return (ctx.getRandomInt(2) == 0);
     }
 
     //empty constructor
