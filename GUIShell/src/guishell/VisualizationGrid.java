@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.shape.StrokeLineCap;
 
@@ -364,6 +365,7 @@ class VisualizationGrid implements GameVisualizer {
             logFile.close();
         } catch (Exception e) {
         }
+        Utilities.runSafe(() -> GUIShell.startOrPauseGame(new ActionEvent()));
     }
 
     @Override

@@ -5,18 +5,19 @@
  */
 package guishell;
 
-import alieninterfaces.AlienSpecies;
+import com.sun.javaws.Main;
 import gameengineV1.GameEngineV1;
 import gameengineinterfaces.GameCommand;
 import gameengineinterfaces.GameCommandCode;
 import gameengineinterfaces.GameElementSpec;
+import java.io.File;
+import java.lang.management.ManagementFactory;
+import java.util.Iterator;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Screen;
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -33,7 +34,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
 
 /**
  *
@@ -48,6 +48,9 @@ public class GUIShell extends Application {
     public static SpeciesSet species;
     public static Text turnCounterText;
     public static Button buttonPause;
+    public static Button buttonQuit;
+    public static Button buttonRestart;
+    Stage stage;
 
     @Override
     public void start(Stage stage) {
@@ -55,6 +58,7 @@ public class GUIShell extends Application {
         // Constants from current Ephemera game
         int width = 500;
         int height = 500;
+        this.stage = stage;
 
         // get screen geometry
         javafx.geometry.Rectangle2D screenBounds;
@@ -182,34 +186,47 @@ public class GUIShell extends Application {
     /*
      * Creates an HBox with two buttons for the top region
      */
-    private VBox addTopBox() {
+    private HBox addTopBox() {
 
         VBox vbox = new VBox();
         vbox.setPadding(new Insets(15, 12, 15, 12));
         vbox.setSpacing(10);   // Gap between nodes
         vbox.setStyle("-fx-background-color: black;");
+        
+        HBox box = new HBox();
+        box.setPadding(new Insets(15, 12, 15, 12));
+        box.setSpacing(10);   // Gap between nodes
+        box.setStyle("-fx-background-color: black;");
 
         buttonPause = new Button("Start");
         buttonPause.setPrefSize(100, 20);
         buttonPause.setOnAction((ActionEvent e) -> startOrPauseGame(e));
 
-        //Button buttonProjected = new Button("Stop");
-        //buttonProjected.setPrefSize(100, 20);
-        vbox.getChildren().addAll(buttonPause);
+        buttonQuit = new Button("Quit");
+        buttonQuit.setVisible(false);
+        buttonQuit.setPrefSize(100, 20);
+        buttonQuit.setOnAction((ActionEvent e) -> quit());
+        
+        buttonRestart = new Button("Restart");
+        buttonRestart.setVisible(false);
+        buttonRestart.setPrefSize(100, 20);
+        buttonRestart.setOnAction((ActionEvent e) -> restart());
+
+        box.getChildren().addAll(buttonPause, buttonQuit, buttonRestart);
 
         GUIShell.turnCounterText = new Text("Turns completed: 0");
         GUIShell.turnCounterText.setFont(Font.font("Consolas", FontWeight.BOLD, 18));
         GUIShell.turnCounterText.setStyle("-fx-background-color: black;");
         GUIShell.turnCounterText.setFill(Color.WHITE);
 
-        vbox.getChildren().add(GUIShell.turnCounterText);
+        vbox.getChildren().addAll(box, GUIShell.turnCounterText);
 
-        return vbox;
+        return box;
     }
-
     /*     * Creates an HBox for the bottom region
 
      */
+
     private HBox addBottomBox() {
 
         HBox hbox = new HBox();
@@ -276,28 +293,60 @@ public class GUIShell extends Application {
         return tile;
     }
 
-    private static void startOrPauseGame(ActionEvent e) {
+    static void startOrPauseGame(ActionEvent e) {
         if (buttonPause.getText().equals("Pause")) {
             // pause
             engine.queueCommand(new GameCommand(GameCommandCode.Pause));
             buttonPause.setText("Resume");
+            buttonQuit.setVisible(true);
+            buttonRestart.setVisible(true);
         } else if (buttonPause.getText().equals("Start")) {
             // first start
 
-            for (AlienSpeciesForDisplay as : species.speciesList) {
-                if (true/*as.isOn()*/) {
+            Iterator<AlienSpeciesForDisplay> iter = species.speciesList.iterator();
+            while (iter.hasNext()) {
+                AlienSpeciesForDisplay as = iter.next();
+                if (as.isOn()) {
                     GameElementSpec element = new GameElementSpec("ALIEN", as.domainName, as.packageName, as.className,
                             null); // state
                     engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
+                } else {
+                    iter.remove();
                 }
             }
             engine.queueCommand(new GameCommand(GameCommandCode.Resume));
             buttonPause.setText("Pause");
+            buttonQuit.setVisible(false);
+            buttonRestart.setVisible(false);
 
         } else {
             // regular resume
             engine.queueCommand(new GameCommand(GameCommandCode.Resume));
             buttonPause.setText("Pause");
+            buttonQuit.setVisible(false);
+            buttonRestart.setVisible(false);
+        }
+    }
+
+    private void quit() {
+        engine.queueCommand(new GameCommand(GameCommandCode.End));
+        stage.close();
+    }
+
+    private void restart() {
+        engine.queueCommand(new GameCommand(GameCommandCode.End));
+        stage.close();
+        try {
+            StringBuilder cmd = new StringBuilder();
+            cmd.append(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java ");
+            for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
+                cmd.append(jvmArg + " ");
+            }
+            cmd.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
+            cmd.append(GUIShell.class.getName()).append(" ");
+            Runtime.getRuntime().exec(cmd.toString());
+            System.exit(0);
+        } catch (Exception e) {
         }
     }
 }

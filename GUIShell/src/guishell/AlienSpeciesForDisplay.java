@@ -35,7 +35,7 @@ public class AlienSpeciesForDisplay {
 
     AlienSpeciesForDisplay(String speciesName) {
         this.speciesName = speciesName;
-        this.count = 1; // if we create this object, there is at least one alien
+        this.count = 0; 
         this.color = alienColors[colorCount % alienColors.length];
         this.style = alienStyles[colorCount % alienColors.length];
         colorCount++;
@@ -49,7 +49,7 @@ public class AlienSpeciesForDisplay {
         this.packageName = as.packageName;
         this.className = as.className;
         this.speciesName = as.getFullSpeciesName();
-        this.count = 1; // if we create this object, there is at least one alien
+        this.count = 0; 
         this.color = alienColors[colorCount % alienColors.length];
         this.style = alienStyles[colorCount % alienColors.length];
         colorCount++;
@@ -78,9 +78,6 @@ public class AlienSpeciesForDisplay {
     }
 
     public final void setOn(final boolean on) {
-        if (on) {
-            System.out.println("Setting property");
-        }
         this.onProperty().set(on);
     }
 

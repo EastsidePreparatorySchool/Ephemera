@@ -6,6 +6,7 @@
 package guishell;
 
 import gameengineinterfaces.AlienSpec;
+import java.util.Iterator;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,11 +31,9 @@ public class SpeciesSet {
     public void notifyListeners() {
         boolean isOn;
         for (AlienSpeciesForDisplay as : speciesList) {
-            isOn = as.isOn();
             int i = speciesList.indexOf(as);
             speciesList.set(i, null);
             speciesList.set(i, as);
-            as.setOn(isOn);
         }
     }
 
@@ -48,27 +47,27 @@ public class SpeciesSet {
 
         // if we got here, no matching species found
         AlienSpeciesForDisplay as = new AlienSpeciesForDisplay(speciesName);
-        Utilities.runSafe(() -> {
-            speciesList.add(as);
-        });
+        Utilities.runSafe(() -> speciesList.add(as));
+        as.setOn(true);
+
     }
 
     public void addAlienSpecies(AlienSpec as) {
         AlienSpeciesForDisplay asfd = new AlienSpeciesForDisplay(as);
         Utilities.runSafe(() -> speciesList.add(asfd));
+        asfd.setOn(true);
     }
 
     public void removeAlien(String speciesName) {
-        for (AlienSpeciesForDisplay as : speciesList) {
+        Iterator<AlienSpeciesForDisplay> iter = speciesList.iterator();
+        while (iter.hasNext()) {
+            AlienSpeciesForDisplay as = iter.next();
             if (as.speciesName.equals(speciesName)) {
                 as.count--;
 
                 // if this is the last one, take it out
                 if (as.count == 0) {
-                    Utilities.runSafe(() -> {
-                        speciesList.remove(as);
-                    });
-
+                    Utilities.runSafe(() -> iter.remove());
                 }
                 return;
             }
@@ -76,6 +75,16 @@ public class SpeciesSet {
 
         // if we got here, no matching species found
         // debugErr something
+    }
+
+    public void removeAlienSpecies(String speciesName) {
+        Iterator<AlienSpeciesForDisplay> iter = speciesList.iterator();
+        while (iter.hasNext()) {
+            AlienSpeciesForDisplay as = iter.next();
+            if (as.speciesName.equals(speciesName)) {
+                Utilities.runSafe(() -> iter.remove());
+            }
+        }
     }
 
     public Color getColor(String speciesName) {

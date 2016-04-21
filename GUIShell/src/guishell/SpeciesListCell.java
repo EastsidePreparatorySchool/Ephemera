@@ -28,7 +28,7 @@ public class SpeciesListCell extends CheckBoxListCell<AlienSpeciesForDisplay> {
                 observable.addListener((obs, wasSelected, isNowSelected)
                         -> {
                     item.setOn(isNowSelected);
-                    System.out.println("Check box for " + item + " changed from " + wasSelected + " to " + isNowSelected);
+                    //System.out.println("Check box for " + item + " changed from " + wasSelected + " to " + isNowSelected);
                 }
                 );
                 return observable;
@@ -44,9 +44,6 @@ public class SpeciesListCell extends CheckBoxListCell<AlienSpeciesForDisplay> {
         if (item != null && !empty) {
             this.setStyle(item.getStyle());
             setText(item.toString());
-            if (item.isOn()) {
-                item.setOn(false);
-            }
         } else {
             this.setStyle("-fx-background-color: black; -fx-text-fill:black;");
         }
