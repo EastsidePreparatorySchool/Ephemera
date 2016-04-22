@@ -24,11 +24,11 @@ public class ContextImplementation implements Context {
         this.vis = vis;
     }
 
-    public int getEnergy() {
+    public double getEnergy() {
         return ac.energy;
     }
 
-    public int getTech() {
+    public double getTech() {
         return ac.tech;
     }
 

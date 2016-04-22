@@ -35,8 +35,8 @@ public class Alf implements Alien {
         ctx.debugOut("Initialized at "
                 + "(" + Integer.toString(ctx.getX())
                 + "," + Integer.toString(ctx.getY()) + ")"
-                + " E: " + Integer.toString(ctx.getEnergy())
-                + " T: " + Integer.toString(ctx.getTech()));
+                + " E: " + Double.toString(ctx.getEnergy())
+                + " T: " + Double.toString(ctx.getTech()));
 
     }
 
@@ -46,7 +46,7 @@ public class Alf implements Alien {
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
         // Venusians run away from the nearest alien
-        int techLevel = ctx.getTech();
+        double techLevel = ctx.getTech();
 
         int[] nearestAlienPos = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY());
 
@@ -55,15 +55,15 @@ public class Alf implements Alien {
 
         //always moves away from other aliens
         if (nearestAlienPos[0] > ctx.getX()) {
-            x = -techLevel / 2;
+            x = (int)(-techLevel / 2);
         } else if (nearestAlienPos[0] < ctx.getX()) {
-            x = techLevel / 2;
+            x = (int)(techLevel / 2);
         }
 
         if (nearestAlienPos[1] > ctx.getY()) {
-            y = -techLevel / 2;
+            y = (int)(-techLevel / 2);
         } else if (nearestAlienPos[1] < ctx.getY()) {
-            y = techLevel / 2;
+            y = (int)(techLevel / 2);
         }
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
 
@@ -91,7 +91,7 @@ public class Alf implements Alien {
 
                 // or, hit really hard then run again
                 ctx.debugOut("Fighting");
-                return new Action(ActionCode.Fight, ctx.getEnergy() - 10);
+                return new Action(ActionCode.Fight, (int)ctx.getEnergy() - 10);
             }
         } catch (Exception e) {
             // do something here to deal with errors

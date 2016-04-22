@@ -287,7 +287,7 @@ public class SpaceGrid {
                         break;
                     }
                     List<AlienSpec> fightSpecs = new ArrayList<>();
-                    HashMap<String, Integer> fightSpecies = new HashMap<>();
+                    HashMap<String, Double> fightSpecies = new HashMap<>();
 
                     LinkedList<AlienContainer> fightingAliens = aliens.getAliensAt(thisAlien.x, thisAlien.y);
 
@@ -297,9 +297,9 @@ public class SpaceGrid {
                             fightingAlien.currentActionPower = 0;
                         }
 
-                        Integer speciesCombinedPower = fightSpecies.get(fightingAlien.speciesName);
+                        Double speciesCombinedPower = fightSpecies.get(fightingAlien.speciesName);
                         if (speciesCombinedPower == null) {
-                            speciesCombinedPower = 0;
+                            speciesCombinedPower = 0.0;
                         }
 
                         speciesCombinedPower += fightingAlien.currentActionPower;
@@ -333,16 +333,16 @@ public class SpaceGrid {
                     vis.showFightBefore(thisAlien.x, thisAlien.y, fightSpecs);
 
                     // Determine the winning power in the fight
-                    int winningPower = 0; // The fight powers might tie
+                    double winningPower = 0; // The fight powers might tie
 
                     Set set = fightSpecies.entrySet();
                     Iterator iterator = set.iterator();
                     while (iterator.hasNext()) {
                         Map.Entry mentry = (Map.Entry) iterator.next();
-                        winningPower = Math.max(winningPower, (int) mentry.getValue());
+                        winningPower = Math.max(winningPower, (double) mentry.getValue());
                     }
 
-                    int maxTech = 0;
+                    double maxTech = 0;
 
                     for (AlienContainer candidateWinner : fightingAliens) {
                         // Max tech
@@ -367,7 +367,7 @@ public class SpaceGrid {
 
                     if (winningSpecies.size() == 1) { // If there is no tie
                         for (AlienContainer ac : fightingAliens) {
-                            if (ac.speciesName == winningSpecies.get(0)) {
+                            if (ac.speciesName.equals(winningSpecies.get(0))) {
                                 // The winning species's tech is brought up to the max in the group
                                 winner.tech = maxTech;
                             }
@@ -399,7 +399,7 @@ public class SpaceGrid {
                         acs.energyPerAlien = acs.energy / acs.size(); // aliens have to share harvest in one spot
                     }
 
-                    thisAlien.energy += Math.ceil(acs.energyPerAlien * thisAlien.tech / 10);
+                    thisAlien.energy += acs.energyPerAlien * thisAlien.tech / 10;
                     break;
 
                 case Research:
@@ -416,12 +416,13 @@ public class SpaceGrid {
 
                     // construct a random move for the new alien depending on power and send that move through drift correction
                     // spend thisAction.power randomly on x move, y move and initital power
-                    int power = Math.min(rand.nextInt(thisAlien.currentActionPower), thisAlien.currentActionPower / 2);
-                    int powerForX = rand.nextInt(thisAlien.currentActionPower - power);
-                    int powerForY = rand.nextInt(thisAlien.currentActionPower - power - powerForX);
+                    
+                    double power = Math.max(Math.min(rand.nextInt((int)thisAlien.currentActionPower), thisAlien.currentActionPower / 3), 1);
+                    double powerForX = rand.nextInt((int)(thisAlien.currentActionPower - power));
+                    double powerForY = rand.nextInt((int)(thisAlien.currentActionPower - power - powerForX));
 
-                    int x = powerForX * (rand.nextInt(2) == 0 ? 1 : -1);
-                    int y = powerForY * (rand.nextInt(2) == 0 ? 1 : -1);
+                    int x = (int)powerForX * (rand.nextInt(2) == 0 ? 1 : -1);
+                    int y = (int)powerForY * (rand.nextInt(2) == 0 ? 1 : -1);
 
                     thisAlien.energy -= power + powerForX + powerForY;
 

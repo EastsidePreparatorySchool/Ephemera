@@ -33,12 +33,12 @@ public class AlienContainer {
     public int alienHashCode;
 
     public ActionCode currentActionCode;
-    public int currentActionPower;
+    public double currentActionPower;
     public String currentActionMessage;
     public boolean listening;
 
-    int tech;
-    int energy;
+    double tech;
+    double energy;
     public static boolean chatter = false;
 
     boolean fought;
@@ -47,7 +47,7 @@ public class AlienContainer {
     public int nextX;
     public int nextY;
     public String outgoingMessage;
-    public int outgoingPower;
+    public double outgoingPower;
 
     // Declare stats here
     //
@@ -55,7 +55,7 @@ public class AlienContainer {
     //
     public AlienContainer(SpaceGrid sg, GameVisualizer vis, int x, int y,
             String alienDomainName, String alienPackageName, String alienClassName, Constructor<?> cns, AlienSpecies as,
-            int energy, int tech, int parent, String message) {
+            double energy, double tech, int parent, String message) {
 
         this.domainName = alienDomainName;
         this.packageName = alienPackageName;
@@ -261,7 +261,7 @@ public class AlienContainer {
 
     public ViewImplementation getFullView() {
         // Create the alien's view
-        int size = tech;
+        int size = (int) tech;
         int lowX = Math.max(x - size, (grid.width / -2));
         int lowY = Math.max(y - size, (grid.height / -2));
         int highX = Math.min(x + size, ((grid.width / 2) - 1));

@@ -25,6 +25,7 @@ public class ConsolePane extends BorderPane {
 
     protected final List<String> history = new ArrayList<>();
     protected int historyPointer = 0;
+    private int msgCounter = 0;
 
     private Consumer<String> onMessageReceivedHandler;
 
@@ -64,7 +65,7 @@ public class ConsolePane extends BorderPane {
                         break;
                     }
                     historyPointer++;
-                    Utilities.runSafe(() -> {
+                    Utilities.runAndWait(() -> {
                         textField.setText(history.get(historyPointer));
                         textField.selectAll();
                     });
@@ -88,19 +89,28 @@ public class ConsolePane extends BorderPane {
 
     public void clear() {
         Utilities.runSafe(() -> textArea.clear());
+        history.clear();
     }
 
     public void print(final String text) {
         Objects.requireNonNull(text, "text");
-        Utilities.runSafe(() -> textArea.appendText(text));
+        Utilities.runAndWait(() -> textArea.appendText(text));
     }
 
     public void println(final String text) {
+        if (++msgCounter > 1000) {
+            msgCounter = 0;
+            clear();
+        }
         Objects.requireNonNull(text, "text");
-        Utilities.runSafe(() -> textArea.appendText(text + System.lineSeparator()));
+        Utilities.runAndWait(() -> textArea.appendText(text + System.lineSeparator()));
     }
 
     public void println() {
-        Utilities.runSafe(() -> textArea.appendText(System.lineSeparator()));
+        if (++msgCounter > 500) {
+            msgCounter = 0;
+            clear();
+        }
+        Utilities.runAndWait(() -> textArea.appendText(System.lineSeparator()));
     }
 }

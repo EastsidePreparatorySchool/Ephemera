@@ -11,9 +11,9 @@ package alieninterfaces;
  */
 public interface Context {
 
-    int getEnergy();
+    double getEnergy();
 
-    int getTech();
+    double getTech();
 
     int getX();
 
