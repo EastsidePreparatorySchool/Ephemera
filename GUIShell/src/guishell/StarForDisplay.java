@@ -23,7 +23,7 @@ public class StarForDisplay {
     long lastTime;
     int lastFlicker;
 
-    public StarForDisplay(int y, int x, String name, int energy) {
+    public StarForDisplay(int x, int y, String name, int energy) {
         this.x = x;
         this.y = y;
         this.name = name;

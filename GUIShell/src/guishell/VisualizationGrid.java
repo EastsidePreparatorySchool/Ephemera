@@ -117,7 +117,7 @@ class VisualizationGrid implements GameVisualizer {
         for (int i = 0; i < height; i++) {
             for (int k = 0; k < width; k++) {
 
-                Cell cell = grid[i][k];
+                Cell cell = grid[k][i];
                 boolean isFighting = cell.isFighting();
 
                 if (cell.cellChanged) {
@@ -192,8 +192,8 @@ class VisualizationGrid implements GameVisualizer {
         for (int i = 0; i < height; i++) {
             for (int k = 0; k < width; k++) {
 
-                Cell cell = grid[i][k];
-                boolean isFighting = cell.isFighting();
+                Cell cell = grid[k][i];
+                boolean isFighting = cell.isFighting(); // doing this so fight counter goes down
 
                 //if (cell.cellChanged) {
                 int x = cellWidth * k;
@@ -204,7 +204,7 @@ class VisualizationGrid implements GameVisualizer {
                     color = new Color(0, 0, Math.min(cell.energy / (double) 12 + 0.05, 1), 1.0);
 
                     while (j + k < width) {
-                        if (grid[i][k + j].alienCount != 0 || grid[i][k + j].energy != cell.energy) {
+                        if (grid[k + j][i].alienCount != 0 || grid[k + j][i].energy != cell.energy) {
                             break;
                         }
                         j++;
@@ -542,7 +542,7 @@ class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void mapEnergy(int x, int y, int energy) {
-        this.grid[((y + height / 2))][(x + (width / 2))].energy = energy;
+        this.grid[(x + (width / 2))][((y + height / 2))].energy = energy;
     }
 
     @Override
