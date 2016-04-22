@@ -103,8 +103,9 @@ public class GUIShell extends Application {
         // add a center pane
         this.canvas = new Canvas(width * cellWidth + 2, height * cellHeight + 2);
         HBox hb = new HBox();
+        hb.setPadding(new Insets(15, 12, 15, 12));
         hb.getChildren().add(canvas);
-        hb.setAlignment(Pos.CENTER_RIGHT);
+        hb.setAlignment(Pos.TOP_LEFT);
         border.setCenter(hb);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
@@ -305,7 +306,7 @@ public class GUIShell extends Application {
         vbox.setSpacing(8);              // Gap between nodes
 
         vbox.setStyle("-fx-background-color: black; -fx-text-fill: white;");
-        vbox.setPrefWidth(350);
+        vbox.setPrefWidth(200);
 
         // add list of alien species
         vbox.getChildren().add(this.addAlienSpeciesList());
@@ -429,6 +430,7 @@ public class GUIShell extends Application {
         rb2.setToggleGroup(renderSelectorGroup);
 
         VBox vbox = new VBox();
+        vbox.setSpacing(5);
         vbox.getChildren().addAll(renderSelectorAliens, rb2);
         return vbox;
     }

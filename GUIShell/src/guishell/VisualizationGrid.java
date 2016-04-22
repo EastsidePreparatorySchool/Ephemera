@@ -212,6 +212,7 @@ class VisualizationGrid implements GameVisualizer {
 
                 } else {
                     color = Color.RED;
+                    color = new Color(Math.min(Math.max(cell.alienCount / (double) 8, 0.2), 1), 0, 0, 1.0);
                 }
 
                 gc.setStroke(color);
