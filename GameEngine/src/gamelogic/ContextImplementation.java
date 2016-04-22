@@ -17,13 +17,11 @@ public class ContextImplementation implements Context {
 
     private AlienContainer ac;
     public GameVisualizer vis;
-    public boolean chatter;
     public ViewImplementation view;
 
     ContextImplementation(AlienContainer ac, GameVisualizer vis) {
         this.ac = ac;
         this.vis = vis;
-        chatter = false;
     }
 
     public int getEnergy() {
@@ -60,7 +58,7 @@ public class ContextImplementation implements Context {
 
     // alien chatter is prefixed with full info, and only talks when chatter is on
     public void debugOut(String s) {
-        if (ac.chatter) {
+        if (ac.grid.chatter) {
             vis.debugOut(ac.getFullName() + ": " + s);
         }
     }
@@ -148,5 +146,25 @@ public class ContextImplementation implements Context {
     @Override
     public int getGameTurn() {
         return ac.grid.currentTurn;
+    }
+
+    @Override
+    public int getMinX() {
+        return -ac.grid.width / 2;
+    }
+
+    @Override
+    public int getMinY() {
+        return -ac.grid.height / 2;
+    }
+
+    @Override
+    public int getMaxX() {
+        return ac.grid.width / 2 - 1;
+    }
+
+    @Override
+    public int getMaxY() {
+        return ac.grid.height / 2 - 1;
     }
 }

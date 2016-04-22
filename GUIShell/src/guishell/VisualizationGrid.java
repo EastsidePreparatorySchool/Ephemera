@@ -98,60 +98,7 @@ class VisualizationGrid implements GameVisualizer {
         }
     }
 
-    public void renderOnScreen(GraphicsContext gc) {
-        for (int i = 0; i < grid.length; i++) {
-            for (int k = 0; k < grid[i].length; k++) {
-                Cell cell = grid[i][k];
-                boolean isFighting = cell.isFighting();
-                if (cell.cellChanged) {
-                    if (cell.alienCount == 0) {
-                        // no aliens, just paint fighting residue
-                        if (isFighting) {
-                            gc.setFill(Color.BLACK);
-                            gc.fillRect(cellWidth * k, cellHeight * i, cellWidth / 3, cellHeight);
-                            gc.setFill(Color.RED);
-                            gc.fillRect(cellWidth * k + 1, cellHeight * i, cellWidth / 3, cellHeight);
-                            gc.setFill(Color.BLACK);
-                            gc.fillRect(cellWidth * k + 2, cellHeight * i, cellWidth / 3, cellHeight);
-                        } else {
-                            gc.setFill(Color.BLACK);
-                            gc.fillRect(cellWidth * k, cellHeight * i, cellWidth, cellHeight);
-                        }
-                    } else if (cell.alienCount == 1) {
-                        // one alien, paint in color in center
-                        gc.setFill(cell.getColor(1));
-                        gc.fillRect(cellWidth * k + 1, cellHeight * i, cellWidth / 3, cellHeight);
-                        gc.setFill(isFighting ? Color.RED : Color.BLACK);
-                        gc.fillRect(cellWidth * k, cellHeight * i, cellWidth / 3, cellHeight);
-                        gc.setFill(Color.BLACK);
-                        gc.fillRect(cellWidth * k + 2, cellHeight * i, cellWidth / 3, cellHeight);
-                    } else if (cell.alienCount == 2) {
-                        // two aliens, paint left and right in their own color
-                        gc.setFill(cell.getColor(1));
-                        gc.fillRect(cellWidth * k, cellHeight * i, cellWidth / 3, cellHeight);
-                        gc.setFill(isFighting ? Color.RED : Color.BLACK);
-                        gc.fillRect(cellWidth * k + 1, cellHeight * i, cellWidth / 3, cellHeight);
-                        gc.setFill(cell.getColor(2));
-                        gc.fillRect(cellWidth * k + 2, cellHeight * i, cellWidth / 3, cellHeight);
-                    } else {
-                        // more than two aliens, paint left and right in white
-                        gc.setFill(Color.WHITE);
-                        gc.fillRect(cellWidth * k, cellHeight * i, cellWidth / 3, cellHeight);
-                        gc.setFill(isFighting ? Color.RED : Color.BLACK);
-                        gc.fillRect(cellWidth * k + 1, cellHeight * i, cellWidth / 3, cellHeight);
-                        gc.setFill(Color.WHITE);
-                        gc.fillRect(cellWidth * k + 2, cellHeight * i, cellWidth / 3, cellHeight);
-                    }
-                    cell.cellChanged = false;
-                }
-            }
-        }
-        gc.setStroke(Color.RED);
-        gc.setLineWidth(1.0);
-        gc.strokeOval(0.5, 0.5, widthPX - 0.5, heightPX - 0.5);
-    }
-
-    public void renderOnScreen2(GraphicsContext gc) {
+    public void renderAlienView(GraphicsContext gc) {
         Color[] color = {Color.BLACK, Color.BLACK, Color.BLACK};
 
         gc.setFill(Color.BLACK);
@@ -202,12 +149,12 @@ class VisualizationGrid implements GameVisualizer {
                         // hires displays, HD1080 or better
                         if (color[1] == Color.RED) {
                             gc.setStroke(Color.RED);
-                            gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth + 0.5, y + 0.5);
+                            gc.strokeLine(x + 1.5, y + 1.5, x + cellWidth + 1.5, y + 1.5);
                         } else {
                             for (int l = 0; l < 3; l++) {
                                 if (color[l] != Color.BLACK) {
                                     gc.setStroke(color[l]);
-                                    gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth / 3 + 0.5, y + 0.5);
+                                    gc.strokeLine(x + 1.5, y + 1.5, x + cellWidth / 3 + 1.5, y + 1.5);
                                 }
                                 x++;
                             }
@@ -221,10 +168,10 @@ class VisualizationGrid implements GameVisualizer {
                         }
 
                         gc.setStroke(color[0]);
-                        gc.strokeLine(x + 0.5, y + 0.5, x + 1.5, y + 0.5);
+                        gc.strokeLine(x + 1.5, y + 1.5, x + 2.5, y + 1.5);
                         x++;
                         gc.setStroke(color[2]);
-                        gc.strokeLine(x + 0.5, y + 0.5, x + 1.5, y + 0.5);
+                        gc.strokeLine(x + 1.5, y + 1.5, x + 2.5, y + 2.5);
                         x++;
                     }
 
@@ -232,9 +179,58 @@ class VisualizationGrid implements GameVisualizer {
                 }
             }
         }
-        //gc.setStroke(Color.RED);
-        //gc.setLineWidth(1.0);
-        //gc.strokeOval(0.5, 0.5, (width * cellWidth) - 0.5, heightPX - 0.5);
+        gc.setStroke(Color.RED);
+        gc.setLineWidth(1.0);
+        gc.strokeRect(0.5, 0.5, (width * cellWidth) + 1.5, heightPX + 1.5);
+    }
+
+    public void renderEnergyMap(GraphicsContext gc) {
+        Color color = Color.BLACK;
+
+        gc.setLineCap(StrokeLineCap.SQUARE);
+        gc.setLineWidth(1);
+        for (int i = 0; i < height; i++) {
+            for (int k = 0; k < width; k++) {
+
+                Cell cell = grid[i][k];
+                boolean isFighting = cell.isFighting();
+
+                //if (cell.cellChanged) {
+                int x = cellWidth * k;
+                int y = cellHeight * i;
+                int j = 1; // draw 1 cell
+
+                if (cell.alienCount == 0) {
+                    color = new Color(0, 0, Math.min(cell.energy / (double) 12 + 0.05, 1), 1.0);
+
+                    while (j + k < width) {
+                        if (grid[i][k + j].alienCount != 0 || grid[i][k + j].energy != cell.energy) {
+                            break;
+                        }
+                        j++;
+                    }
+
+                } else {
+                    color = Color.RED;
+                }
+
+                gc.setStroke(color);
+                gc.strokeLine(x + 1.5, y + 1.5, x + cellWidth * j + 1.5, y + 1.5);
+                k += j - 1;
+                //    cell.cellChanged = false;
+                //}
+            }
+        }
+        for (StarForDisplay st : stars) {
+            st.draw(gc, cellWidth, cellHeight);
+        }
+
+        for (PlanetForDisplay p : planets) {
+            p.draw(gc, cellWidth, cellHeight);
+        }
+        gc.setStroke(Color.BLUE);
+        gc.setLineWidth(1.0);
+        gc.strokeRect(0.5, 0.5, (width * cellWidth) + 1.5, heightPX + 1.5);
     }
 
     @Override
@@ -245,7 +241,8 @@ class VisualizationGrid implements GameVisualizer {
         debugOut("Turn #" + totalTurnCounter + " complete.");
         runAndWait(() -> {
             GraphicsContext gc = canvas.getGraphicsContext2D();
-            renderOnScreen2(gc);
+            renderField();
+
             String text = "Turns completed: " + paddedString(totalTurnCounter, 6)
                     + ", Total aliens: " + paddedString(numAliens, 7);
             //if (time > 100000000L) {
@@ -404,11 +401,11 @@ class VisualizationGrid implements GameVisualizer {
         if (filter != null) {
             if (s.toLowerCase().contains(filter.toLowerCase())) {
                 println(s);
+                Thread.yield();
             }
         } else {
             printlnLogOnly(s);
         }
-        Thread.yield();
     }
 
     @Override
@@ -535,12 +532,33 @@ class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void registerStar(int x, int y, String name, int magnitude) {
-        stars.add(new StarForDisplay(x + this.width / 2, y + this.height / 2, name, magnitude));
+        Utilities.runSafe(() -> stars.add(new StarForDisplay(x + this.width / 2, y + this.height / 2, name, magnitude)));
     }
 
     @Override
     public void registerPlanet(int x, int y, String name, int energy, int tech) {
-        planets.add(new PlanetForDisplay(x + this.width / 2, y + this.height / 2, name, energy, tech));
+        Utilities.runSafe(() -> planets.add(new PlanetForDisplay(x + this.width / 2, y + this.height / 2, name, energy, tech)));
+    }
+
+    @Override
+    public void mapEnergy(int x, int y, int energy) {
+        this.grid[((y + height / 2))][(x + (width / 2))].energy = energy;
+    }
+
+    @Override
+    public void showReady() {
+        runAndWait(() -> renderField());
+
+    }
+
+    public void renderField() {
+        if (GUIShell.renderSelectorAliens.isSelected()) {
+            renderAlienView(this.canvas.getGraphicsContext2D());
+        } else {
+
+            renderEnergyMap(this.canvas.getGraphicsContext2D());
+        }
+
     }
 
 }

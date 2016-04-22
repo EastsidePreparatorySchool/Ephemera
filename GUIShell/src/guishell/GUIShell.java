@@ -5,7 +5,6 @@
  */
 package guishell;
 
-import com.sun.javaws.Main;
 import gameengineV1.GameEngineV1;
 import gameengineinterfaces.GameCommand;
 import gameengineinterfaces.GameCommandCode;
@@ -13,6 +12,8 @@ import gameengineinterfaces.GameElementSpec;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
@@ -34,6 +35,15 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import static javafx.application.Application.launch;
+import javafx.geometry.Pos;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.shape.Box;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 
 /**
  *
@@ -50,6 +60,9 @@ public class GUIShell extends Application {
     public static Button buttonPause;
     public static Button buttonQuit;
     public static Button buttonRestart;
+    public static RadioButton renderSelectorAliens;
+    public static ConsolePane console;
+    public static Timer idleTimer;
     Stage stage;
 
     @Override
@@ -84,20 +97,16 @@ public class GUIShell extends Application {
         // add top, left and right boxes
         border.setTop(addTopBox());
         border.setLeft(addLeftBox());
-        border.setRight(addFlowPane());
-        //border.setBottom(addBottomBox());
-        ConsolePane console = new ConsolePane();
-        border.setBottom(console);
+        //border.setRight(addFlowPane());
+        border.setBottom(addBottomBox());
 
         // add a center pane
-        this.canvas = new Canvas(width * cellWidth, height * cellHeight);
-        canvas.setStyle("-fx-border-color: red;");
-        border.setCenter(canvas);
-
+        this.canvas = new Canvas(width * cellWidth + 2, height * cellHeight + 2);
+        HBox hb = new HBox();
+        hb.getChildren().add(canvas);
+        hb.setAlignment(Pos.CENTER_RIGHT);
+        border.setCenter(hb);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        //gc.setStroke(Color.RED);
-        //gc.setLineWidth(1.0);
-        //gc.strokeOval(0.5, 0.5, width * cellWidth - 0.5, height * cellHeight - 0.5);
 
         //
         // initialize Ephemera game engine and visualizer
@@ -150,9 +159,13 @@ public class GUIShell extends Application {
         stage.setScene(scene);
         stage.show();
 
-        //console.println("Test");
-        // give it a go - commented out because we start this with the start button
-        // engine.queueCommand(new GameCommand(GameCommandCode.Resume));
+        engine.queueCommand(new GameCommand(GameCommandCode.Ready));
+
+        TimerTask task = new ReadyTimer();
+        idleTimer = new Timer();
+
+        // scheduling the task at interval
+        idleTimer.schedule(task, 0, 200);
         // return to platform and wait for events
     }
     // handle shutdown gracefully
@@ -186,13 +199,13 @@ public class GUIShell extends Application {
     /*
      * Creates an HBox with two buttons for the top region
      */
-    private HBox addTopBox() {
+    private VBox addTopBox() {
 
         VBox vbox = new VBox();
         vbox.setPadding(new Insets(15, 12, 15, 12));
         vbox.setSpacing(10);   // Gap between nodes
         vbox.setStyle("-fx-background-color: black;");
-        
+
         HBox box = new HBox();
         box.setPadding(new Insets(15, 12, 15, 12));
         box.setSpacing(10);   // Gap between nodes
@@ -206,13 +219,13 @@ public class GUIShell extends Application {
         buttonQuit.setVisible(false);
         buttonQuit.setPrefSize(100, 20);
         buttonQuit.setOnAction((ActionEvent e) -> quit());
-        
+
         buttonRestart = new Button("Restart");
         buttonRestart.setVisible(false);
         buttonRestart.setPrefSize(100, 20);
         buttonRestart.setOnAction((ActionEvent e) -> restart());
 
-        box.getChildren().addAll(buttonPause, buttonQuit, buttonRestart);
+        box.getChildren().addAll(buttonPause, buttonQuit, buttonRestart, addRenderSelector());
 
         GUIShell.turnCounterText = new Text("Turns completed: 0");
         GUIShell.turnCounterText.setFont(Font.font("Consolas", FontWeight.BOLD, 18));
@@ -221,19 +234,56 @@ public class GUIShell extends Application {
 
         vbox.getChildren().addAll(box, GUIShell.turnCounterText);
 
-        return box;
+        return vbox;
     }
+
     /*     * Creates an HBox for the bottom region
 
      */
+    private VBox addBottomBox() {
 
-    private HBox addBottomBox() {
+        VBox vbox = new VBox();
+        vbox.setSpacing(10);   // Gap between nodes
+        vbox.setPadding(new Insets(15, 12, 15, 12));
 
         HBox hbox = new HBox();
+
         hbox.setPadding(new Insets(15, 12, 15, 12));
         hbox.setSpacing(10);   // Gap between nodes
         hbox.setStyle("-fx-background-color: black;");
-        return hbox;
+
+        HBox hb2 = new HBox();
+        hb2.setPadding(new Insets(15, 12, 15, 12));
+        hb2.setSpacing(10);   // Gap between nodes
+
+        CheckBox cb = new CheckBox("Chatter");
+        cb.setStyle("-fx-text-fill: white;");
+        cb.setOnAction((e) -> {
+            engine.queueCommand(
+                    new GameCommand(GameCommandCode.SetVariable, "CHATTER", cb.isSelected() ? "ON" : "OFF"));
+        });
+        TextField t = new TextField("");
+        //t.setStyle("-fx-text-fill: white;");
+        t.setEditable(true);
+        t.setOnAction((e) -> {
+            field.filter = t.getText();
+        });
+
+        Label l = new Label("Filter:");
+        l.setStyle("-fx-text-fill: white;");
+
+        hb2.getChildren().addAll(cb, l, t);
+
+        console = new ConsolePane();
+        HBox hb3 = new HBox();
+        console.setPrefWidth(1400);
+        hb3.setPrefWidth(1500);
+        hb3.getChildren().add(console);
+
+        vbox.getChildren().addAll(hb2, hb3);
+
+        return vbox;
+
     }
 
     ListView<AlienSpeciesForDisplay> addAlienSpeciesList() {
@@ -300,9 +350,16 @@ public class GUIShell extends Application {
             buttonPause.setText("Resume");
             buttonQuit.setVisible(true);
             buttonRestart.setVisible(true);
+
+            TimerTask task = new ReadyTimer();
+            idleTimer = new Timer();
+            // scheduling the task at interval
+            idleTimer.schedule(task, 0, 200);
+
         } else if (buttonPause.getText().equals("Start")) {
             // first start
-
+            idleTimer.cancel();
+            idleTimer = null;
             Iterator<AlienSpeciesForDisplay> iter = species.speciesList.iterator();
             while (iter.hasNext()) {
                 AlienSpeciesForDisplay as = iter.next();
@@ -321,6 +378,8 @@ public class GUIShell extends Application {
 
         } else {
             // regular resume
+            idleTimer.cancel();
+            idleTimer = null;
             engine.queueCommand(new GameCommand(GameCommandCode.Resume));
             buttonPause.setText("Pause");
             buttonQuit.setVisible(false);
@@ -329,6 +388,7 @@ public class GUIShell extends Application {
     }
 
     private void quit() {
+        idleTimer.cancel();
         engine.queueCommand(new GameCommand(GameCommandCode.End));
         stage.close();
     }
@@ -348,5 +408,28 @@ public class GUIShell extends Application {
             System.exit(0);
         } catch (Exception e) {
         }
+    }
+
+    private VBox addRenderSelector() {
+        ToggleGroup renderSelectorGroup = new ToggleGroup();
+
+        renderSelectorAliens = new RadioButton("Aliens");
+        renderSelectorAliens.setStyle("-fx-text-fill:white;");
+        renderSelectorAliens.setToggleGroup(renderSelectorGroup);
+        renderSelectorAliens.setSelected(true);
+
+        renderSelectorAliens.setOnAction((e) -> {
+            if (renderSelectorAliens.isSelected()) {
+                field.renderField();
+            }
+        });
+
+        RadioButton rb2 = new RadioButton("Energy");
+        rb2.setStyle("-fx-text-fill:white;");
+        rb2.setToggleGroup(renderSelectorGroup);
+
+        VBox vbox = new VBox();
+        vbox.getChildren().addAll(renderSelectorAliens, rb2);
+        return vbox;
     }
 }

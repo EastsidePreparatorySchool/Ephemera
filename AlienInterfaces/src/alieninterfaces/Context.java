@@ -30,6 +30,14 @@ public interface Context {
     int getRandomInt(int ceiling);
     
     int getGameTurn();
+    
+    int getMinX();
+    
+    int getMinY();
+    
+    int getMaxX();
+    
+    int getMaxY();
 
     void broadcastAndListen(String message, int power, boolean listen)
             throws NotEnoughTechException, NotEnoughEnergyException;

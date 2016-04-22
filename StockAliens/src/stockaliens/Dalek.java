@@ -34,13 +34,16 @@ public class Dalek implements Alien {
     // Martians move left, right, left, right
     public MoveDir getMove() {
 
-        //ctx.debugOut("Move requested,"
-        //        + " E:" + Integer.toString(ctx.getEnergy())
-        //        + " T:" + Integer.toString(ctx.getTech()));
+        ctx.debugOut("Move requested,"
+                + " E:" + Integer.toString(ctx.getEnergy())
+                + " T:" + Integer.toString(ctx.getTech()));
         int move_energy;
 
+        if (ctx.getEnergy() < 30) {
+            return new MoveDir(0,0);
+        }
         // don't move more than you have tech
-        move_energy = ctx.getTech();
+        move_energy = Math.min(ctx.getTech(), ctx.getEnergy());
         // don't move more than 5, leave energy for other stuff
         move_energy = Math.min(move_energy, 10);
 

@@ -14,14 +14,17 @@ import java.util.LinkedList;
  */
 public class AlienCell extends LinkedList<AlienContainer> {
     public ArrayList<String> currentMessages;
-    public SpaceObject object;
+    public Planet planet;
+    public Star star;
     int energy; // energy gain at this point in space
     int tech; // for planets, this is technology gain rate, otherwise 0
+    double energyPerAlien; // multiple in the same spot have to share
     public boolean listening;
 
     public AlienCell() {
         currentMessages = null;
-        object = null;
+        star = null;
+        planet = null;
         energy = 1;
         tech = 0;
         listening = false;

@@ -110,6 +110,20 @@ public class GameEngineThread extends Thread {
     private boolean processCommand(GameCommand gc) throws Exception {
         boolean gameOver = false;
         switch (gc.code) {
+            case SetVariable:
+                String variable = (String) gc.parameters[0];
+                String value = (String) gc.parameters[1];
+                if (variable.equalsIgnoreCase("RANDSEED")) {
+                    SpaceGrid.randSeed = Integer.parseInt(value);
+                    SpaceGrid.rand.setSeed(SpaceGrid.randSeed);
+                    engine.vis.debugOut("RandSeed: " + SpaceGrid.randSeed);
+                } else if (variable.equalsIgnoreCase("CHATTER")) {
+                    SpaceGrid.chatter = value.equalsIgnoreCase("on");
+                    engine.vis.debugOut("Chatter: " + value);
+                } 
+
+                break;
+
             case AddElement:
                 GameElementSpec element = (GameElementSpec) gc.parameters[0];
 
@@ -139,6 +153,9 @@ public class GameEngineThread extends Thread {
                             SpaceGrid.randSeed = element.energy;
                             SpaceGrid.rand.setSeed(SpaceGrid.randSeed);
                             engine.vis.debugOut("RandSeed: " + SpaceGrid.randSeed);
+                        } else if (element.className.equalsIgnoreCase("CHATTER")) {
+                            SpaceGrid.chatter = element.energy > 0;
+                            engine.vis.debugOut("Chatter: " + (element.energy > 0 ? "on" : "off"));
                         }
                     }
 
@@ -159,6 +176,10 @@ public class GameEngineThread extends Thread {
 
             case List:
                 engine.grid.listStatus();
+                break;
+
+            case Ready:
+                engine.grid.ready();
                 break;
 
             case End:

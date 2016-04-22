@@ -20,6 +20,10 @@ public interface GameVisualizer {
     
     void registerPlanet(int x, int y, String name, int energy, int tech);
     
+    void mapEnergy(int x, int y, int energy);
+    
+    void showReady();
+    
     void showCompletedTurn(int totalTurns, int numAliens, long timeTaken);
     
     void showAliens(List<AlienSpec> aliens);

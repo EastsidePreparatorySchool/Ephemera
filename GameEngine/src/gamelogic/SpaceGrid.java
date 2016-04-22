@@ -34,13 +34,14 @@ public class SpaceGrid {
     int height;
     int safeZoneSize = 5; // Number of tiles out of 0,0 that should be protected
     // sZS = 0 gives a 1x1 sz, sZS = 1 gives a 3x3 sz, sZS = 5 gives a 11x11 sz
-    
+
     int currentTurn = 1;
     int speciesCounter = 1; // starting with ID 1
 
     // this is the only approved random generator for the game. Leave it alone!
     public static Random rand;
     public static int randSeed = 0;
+    public static boolean chatter = false;
 
     public SpaceGrid(GameEngineV1 eng, GameVisualizer vis, int width, int height) {
         this.vis = vis;
@@ -52,6 +53,16 @@ public class SpaceGrid {
         speciesMap = new HashMap<>();
 
         rand = new Random(0);
+    }
+
+    public void ready() {
+        // send the whole energyMap to the display
+        for (int x = -aliens.centerX; x < aliens.centerX; x++) {
+            for (int y = -(aliens.centerY); y < (aliens.centerY); y++) {
+                vis.mapEnergy(x, y, aliens.getEnergyAt(x, y));
+            }
+        }
+        vis.showReady();
     }
 
     public boolean executeGameTurn() {
@@ -122,7 +133,7 @@ public class SpaceGrid {
                 }
                 ac.kill();
             }
-
+            ac.energy -= Math.abs(ac.x - oldX) + Math.abs(ac.y - oldY);
         }
     }
 
@@ -226,6 +237,7 @@ public class SpaceGrid {
             AlienCell acell = alien.grid.aliens.getAliensAt(alien.x, alien.y);
             acell.listening = false;
             acell.currentMessages = null;
+            acell.energyPerAlien = 0;
         });
     }
 
@@ -266,10 +278,10 @@ public class SpaceGrid {
             switch (thisAlien.currentActionCode) {
                 case Fight:
                     //vis.debugOut("SpaceGrid: Processing Fight");
-                    
+
                     // If the alien is in the safe zone
-                    if (Math.abs(thisAlien.x) <= safeZoneSize &&
-                            Math.abs(thisAlien.y) <= safeZoneSize) {
+                    if (Math.abs(thisAlien.x) <= safeZoneSize
+                            && Math.abs(thisAlien.y) <= safeZoneSize) {
                         // Make them pay the energy they spent
                         thisAlien.energy -= thisAlien.currentActionPower;
                         break;
@@ -278,7 +290,7 @@ public class SpaceGrid {
                     HashMap<String, Integer> fightSpecies = new HashMap<>();
 
                     LinkedList<AlienContainer> fightingAliens = aliens.getAliensAt(thisAlien.x, thisAlien.y);
-                    
+
                     for (AlienContainer fightingAlien : fightingAliens) {
 
                         if (fightingAlien.currentActionCode != ActionCode.Fight) {
@@ -306,12 +318,12 @@ public class SpaceGrid {
 
                         fightSpecs.add(fightingAlien.getFullAlienSpec());
                     }
-                    
+
                     if (fightSpecies.size() < 2) { // If only one species is fighting
                         break; // No fight will take place
                         // Aliens involved will lose their turns
                     }
-                    
+
                     // Deduct energy from all aliens and set their fought status
                     for (AlienContainer fightingAlien : fightingAliens) {
                         fightingAlien.fought = true;
@@ -382,11 +394,16 @@ public class SpaceGrid {
                     break;
 
                 case Gain:
-                    thisAlien.energy += Math.floor(thisAlien.tech / 10) + 1;
+                    AlienCell acs = aliens.getAliensAt(thisAlien.x, thisAlien.y);
+                    if (acs.energyPerAlien == 0) {
+                        acs.energyPerAlien = acs.energy / acs.size(); // aliens have to share harvest in one spot
+                    }
+
+                    thisAlien.energy += Math.ceil(acs.energyPerAlien * thisAlien.tech / 10);
                     break;
 
                 case Research:
-                    // there is an arbitrary bceiling at 32 to keep views under control
+                    // there is an arbitrary ceiling at 32 to keep views under control
                     // aliens can research up to 30, must buy tech beyond that from residents
                     if (thisAlien.tech < 30) {
                         thisAlien.energy -= thisAlien.tech;
@@ -456,130 +473,6 @@ public class SpaceGrid {
         }
     }
 
-    // this calculates inward drift based on location
-    // keeps aliens within 250 spaces of Earth
-    public MoveDir applyDrift2(int x, int y, MoveDir dir) {
-        double r;
-        double alpha;
-        double deltaAlpha;
-        double deltaR;
-        double dx;
-        double dy;
-        //double reduction;
-        int oldx, oldy;
-
-        oldx = dir.x();
-        oldy = dir.y();
-
-        // distance from Earth, and vector angle
-        r = Math.hypot((double) x, (double) y);
-        alpha = Math.atan2(x, y);
-
-        // no action under r = 10
-        if (r < 20) {
-            return dir;
-        }
-
-        // wormhole for escapees
-        if (r > 250) {
-            // return these people to Earth
-            vis.debugOut("Tunneled back to Earth");
-            return new MoveDir(0 - x, 0 - y);
-        }
-
-        // get angle of proposed move
-        deltaAlpha = Math.atan2(dir.x(), dir.y());
-        // no action if inward
-        if (getAngleDiff(deltaAlpha, alpha) >= Math.PI / 2 && getAngleDiff(deltaAlpha, alpha) <= 3 * Math.PI / 2) {
-            return dir;
-        }
-
-        // and magnitude
-        deltaR = Math.hypot((double) dir.x(), (double) dir.y());
-
-        /* 
-         //Approach 1:
-         // Apply gentle inward force
-         // cubic function of how close to border, modulated by angle
-         reduction = (1/Math.pow((250 - r), 3)) * (Math.abs(Math.abs(alpha - deltaAlpha) / Math.PI - 1)) + 1;
-
-         if (reduction > 5) {
-         //api.vis.debugOut("r: " + Double.toString(r));
-         //api.vis.debugOut(Double.toString(Math.abs(Math.abs(alpha - deltaAlpha) / Math.PI - 1)));
-         //api.vis.debugOut("Reduction: " + Double.toString(reduction));
-         }
-         deltaR /= reduction;
-         */
-        // Approach 2:
-        // Make the new move ever more tangential as the alien gets closer to the rim
-        //ctx.vis.debugOut("Drift: r              " + Double.toString(r));
-        //ctx.vis.debugOut("Drift: alpha          " + Double.toString(getAngleDiff(alpha, 0)));
-        //ctx.vis.debugOut("Drift: deltaAlpha     " + Double.toString(getAngleDiff(deltaAlpha, 0)));
-        //ctx.vis.debugOut("Drift: diff           " + Double.toString(getAngleDiff(deltaAlpha, alpha)));
-        if (getAngleDiff(deltaAlpha, alpha) < Math.PI / 2) {
-            // alien bearing slightly left, make it more left depending on r^3
-            deltaAlpha = alpha + (Math.PI / 2) - (((Math.PI / 2) - getAngleDiff(deltaAlpha, alpha)) * (1 - Math.pow(r / 250, 3)));
-        } else if (getAngleDiff(deltaAlpha, alpha) > 3 * Math.PI / 2) {
-            // alien bearing slightly right, make it more left depending on r^3
-            deltaAlpha = alpha + (Math.PI / 2) - (((Math.PI / 2) - getAngleDiff(deltaAlpha, alpha)) * (1 - Math.pow(r / 250, 3)));
-        }
-        deltaAlpha = getAngleDiff(deltaAlpha, 0);
-        //ctx.vis.debugOut("Drift: new deltaAlpha " + Double.toString(deltaAlpha));
-
-        //put the x,y back together
-        dx = deltaR * Math.cos(deltaAlpha);
-        dy = deltaR * Math.sin(deltaAlpha);
-
-        int dxi = (int) Math.round(dx);
-        int dyi = (int) Math.round(dy);
-
-        //ctx.vis.debugOut("Drift final: ("
-        //        + (x + oldx) + ","
-        //        + (y + oldy) + ") -> ("
-        //        + (x + dxi) + ","
-        //        + (y + dyi) + ")");
-        return new MoveDir(dxi, dyi);
-    }
-
-    // normalizes angle difference to fit in [0:2pi[
-    public double getAngleDiff(double alpha, double beta) {
-        alpha = alpha < 0 ? alpha + (Math.PI * 2) : alpha;
-        beta = beta < 0 ? beta + (Math.PI * 2) : beta;
-        double gamma = alpha - beta;
-        gamma = gamma >= Math.PI * 2 ? gamma - (Math.PI * 2) : gamma;
-        gamma = gamma <= 0 ? gamma + (Math.PI * 2) : gamma;
-        return gamma;
-    }
-
-    MoveDir inGrid(AlienContainer ac, MoveDir dir) {
-
-        int x = ac.x;
-        int y = ac.y;
-
-        int dxi = dir.x();
-        int dyi = dir.y();
-
-        // stop-gap-measure to keep things in grid
-        if (x + dxi > 249) {
-            dxi = 249 - x;
-            vis.debugOut("Drift stop: x: " + x + dxi);
-        }
-        if (x + dxi < -250) {
-            dxi = -250 - x;
-            vis.debugOut("Drift stop: x: " + x + dxi);
-        }
-        if (y + dyi > 249) {
-            dyi = 249 - y;
-            vis.debugOut("Drift stop: y: " + y + dyi);
-        }
-        if (y + dyi < -250) {
-            dyi = -250 - y;
-            vis.debugOut("Drift stop: y: " + y + dyi);
-        }
-
-        return new MoveDir(dxi, dyi);
-    }
-
     void addSpecies(GameElementSpec element) {
         String speciesName = element.domainName + ":" + element.packageName + ":" + element.className;
 
@@ -642,6 +535,7 @@ public class SpaceGrid {
         objects.add(st);
         this.aliens.plugStar(st);
         vis.registerStar(element.x, element.y, element.className, element.energy);
+        aliens.distributeStarEnergy(element.x, element.y, element.energy);
     }
 
     void addResident(GameElementSpec element) {

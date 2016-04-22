@@ -58,7 +58,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         AlienCell acs = acGrid[oldX + centerX][oldY + centerY];
         //ac.debugOut("Grid: removing from list " + getXYString(oldX, oldY));
         acs.remove(ac);
-        if (acs.isEmpty() && acs.object == null) {
+        if (canBeRemoved(acs)) {
             acGrid[oldX + centerX][oldY + centerY] = null;
         }
 
@@ -76,7 +76,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         AlienCell acs = acGrid[ac.x + centerX][ac.y + centerY];
         //ac.debugOut("Grid: removing from list " + getXYString(ac.x, ac.y));
         acs.remove(ac);
-        if (acs.isEmpty() && acs.object == null) {
+        if (canBeRemoved(acs)) {
             acGrid[ac.x + centerX][ac.y + centerY] = null;
         }
     }
@@ -89,6 +89,11 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         return acGrid[x + centerX][y + centerY] == null;
     }
 
+    public boolean canBeRemoved(AlienCell acs) {
+
+        return (acs.isEmpty() && acs.star == null && acs.planet == null && acs.energy <= 1);
+    }
+
     public void plugStar(Star st) {
         // add alien to grid as well as to master list
         AlienCell acs = acGrid[st.x + centerX][st.y + centerY];
@@ -96,7 +101,8 @@ public class AlienGrid extends LinkedList<AlienContainer> {
             acs = new AlienCell();
             acGrid[st.x + centerX][st.y + centerY] = acs;
         }
-        acs.object = st;
+        acs.star = st;
+        acs.energy = st.energy;
     }
 
     public void plugPlanet(Planet p) {
@@ -106,7 +112,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
             acs = new AlienCell();
             acGrid[p.x + centerX][p.y + centerY] = acs;
         }
-        acs.object = p;
+        acs.planet = p;
         acs.energy = p.energy;
         acs.tech = p.tech;
     }
@@ -120,7 +126,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         for (int d = 1; d <= energy; d++) {
             // energy is multiplied by an arbitrary factor 16, but goes down by the square of the distance
             // todo: make this properly depend on our rect metric
-            int pointEnergy = (int) ((double) (energy * 2) / (double) ((long) d * (long) d));
+            int pointEnergy = (int) ((double) (energy * 5) / (double) ((long) d * (long) d));
 
             if (pointEnergy <= 1) {
                 break; // at the level of empty space, get out
@@ -153,10 +159,18 @@ public class AlienGrid extends LinkedList<AlienContainer> {
             acs = new AlienCell();
             acGrid[x + centerX][y + centerY] = acs;
         }
-        
+
         if (energy > acs.energy) {
             acs.energy = energy;
         }
+    }
+    
+    public int getEnergyAt(int x, int y) {
+        AlienCell acs = acGrid[x + centerX][y + centerY];
+        if (acs == null) {
+            return 0;
+        }
+        return acs.energy;
     }
 
 }

@@ -19,31 +19,53 @@ public class StarForDisplay {
     int y;
     String name;
     int energy;
-    int lastSize;
-    int lastTime;
+    int flicker;
+    long lastTime;
+    int lastFlicker;
 
-    public StarForDisplay(int x, int y, String name, int energy) {
+    public StarForDisplay(int y, int x, String name, int energy) {
         this.x = x;
         this.y = y;
         this.name = name;
         this.energy = energy;
-        this.lastSize = 0;
+        this.flicker = 0;
         this.lastTime = 0;
+        this.lastFlicker = 0;
     }
 
     public void draw(GraphicsContext gc, int cellWidth, int cellHeight) {
 
-        
-        int flicker = ((int) Math.abs(System.nanoTime())) % 8;
-        flicker *= Math.sqrt(energy);
-        flicker /= 16;
-        flicker += 1;
-
-        gc.setStroke(Color.WHITE);
+        int maxFlicker = 12;
         gc.setLineWidth(0.5);
         gc.setLineCap(StrokeLineCap.SQUARE);
-        gc.strokeLine(x * cellWidth + 0.5, y * cellHeight - flicker + 0.5, x * cellWidth + 0.5, y * cellHeight + flicker + 0.5);
-        gc.strokeLine(x * cellWidth -flicker + 0.5, y * cellHeight  + 0.5, x * cellWidth + flicker+ 0.5, y * cellHeight  + 0.5);
+
+        if ((System.nanoTime() - lastTime) > 200000000) {
+            gc.setStroke(Color.BLACK);
+            gc.strokeLine(x * cellWidth + 1.5 + cellWidth/2,
+                    y * cellHeight - lastFlicker + 1.5 + cellHeight/2,
+                    x * cellWidth + 1.5 + cellWidth/2,
+                    y * cellHeight + lastFlicker + 1.5 + cellHeight/2);
+            gc.strokeLine(x * cellWidth - lastFlicker + 1.5 + cellWidth / 2,
+                    y * cellHeight + 1.5 + cellHeight / 2,
+                    x * cellWidth + lastFlicker + 1.5 + cellWidth / 2,
+                    y * cellHeight + 1.5 + cellHeight / 2);
+            flicker = ((int) Math.abs(System.nanoTime())) % maxFlicker;
+            flicker *= Math.sqrt(energy);
+            flicker /= 16;
+            flicker += 1;
+            lastTime = System.nanoTime();
+            lastFlicker = flicker;
+        }
+
+        gc.setStroke(Color.WHITE);
+             gc.strokeLine(x * cellWidth + 1.5 + cellWidth/2,
+                    y * cellHeight - lastFlicker + 1.5 + cellHeight/2,
+                    x * cellWidth + 1.5 + cellWidth/2,
+                    y * cellHeight + lastFlicker + 1.5 + cellHeight/2);
+            gc.strokeLine(x * cellWidth - lastFlicker + 1.5 + cellWidth / 2,
+                    y * cellHeight + 1.5 + cellHeight / 2,
+                    x * cellWidth + lastFlicker + 1.5 + cellWidth / 2,
+                    y * cellHeight + 1.5 + cellHeight / 2);
         gc.setLineWidth(1.0);
 
     }
