@@ -157,9 +157,9 @@ public class GameEngineThread extends Thread {
                         for (Field field : Constants.class.getDeclaredFields()) {
                             if (element.className.equalsIgnoreCase(field.getName())) {
                                 if (field.getType().getName().equals("String")) {
-                                    field.set(Constants.class, element.energy);
+                                    field.set(Constants.class, element.state);
                                 } else if (field.getType().getName().equals("int") || field.getType().getName().equals("Integer")) {
-                                    field.set(Constants.class, Integer.parseInt(element.state));
+                                    field.set(Constants.class, element.energy);
                                 } else if (field.getType().getName().equalsIgnoreCase("boolean")) {
                                     field.set(Constants.class, Boolean.parseBoolean(element.state));
                                 }
