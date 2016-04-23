@@ -44,12 +44,12 @@ public class ViewImplementation implements View {
     }
 
     @Override
-    public int getEnergyAtPos(int x, int y) throws CantSeeSquareException {
+    public int getEnergyAtPos(int x, int y) {
         return 0;
     }
 
     @Override
-    public int getAlienCountAtPos(int x, int y) throws CantSeeSquareException {
+    public int getAlienCountAtPos(int x, int y) {
         if (((x + ac.grid.aliens.centerX) >= ac.grid.width)
                 || ((x + ac.grid.aliens.centerX) < 0)
                 || ((y + ac.grid.aliens.centerY) >= ac.grid.height)

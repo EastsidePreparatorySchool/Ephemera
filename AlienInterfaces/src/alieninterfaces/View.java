@@ -11,8 +11,8 @@ package alieninterfaces;
  */
 public interface View {
     
-    int getEnergyAtPos(int x, int y) throws CantSeeSquareException;
-    int getAlienCountAtPos(int x, int y) throws CantSeeSquareException;
+    int getEnergyAtPos(int x, int y);
+    int getAlienCountAtPos(int x, int y);
     int[] getClosestAlienPos(int x, int y);
  }
 
