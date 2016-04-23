@@ -38,13 +38,14 @@ public class Dalek implements Alien {
                 + " T:" + Double.toString(ctx.getTech()));
         int move_energy;
 
-        if (ctx.getEnergy() < 30) {
-            return new MoveDir(0,0);
-        }
         // don't move more than you have tech
-        move_energy = (int)Math.min(ctx.getTech(), ctx.getEnergy());
+        move_energy = (int) Math.min(ctx.getTech(), ctx.getEnergy());
         // don't move more than 5, leave energy for other stuff
-        move_energy = Math.min(move_energy, 10);
+        move_energy = Math.min(move_energy, 5);
+
+        if (move_energy <= 1) {
+            return new MoveDir(0, 0);
+        }
 
         // spend a random amount of that moving into x direction
         int powerX = ctx.getRandomInt(move_energy / 2);
@@ -52,7 +53,7 @@ public class Dalek implements Alien {
         int x = powerX * (ctx.getRandomInt(2) == 0 ? -1 : 1);
         int y = powerY * (ctx.getRandomInt(2) == 0 ? -1 : 1);
 
-        //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
+        ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
         return new MoveDir(x, y);
     }
 
@@ -92,14 +93,15 @@ public class Dalek implements Alien {
             }
 
             // is there another alien on our position?
-            if (view.getAlienCountAtPos(ctx.getX(), ctx.getY()) > 1) {
+            if (view.getAlienCountAtPos(ctx.getX(), ctx.getY()) > 1
+                    && ctx.getEnergy() > ctx.getFightingCost() + 2) {
                 ctx.debugOut("EXTERMINATE!!!!!"
                         + " E:" + Double.toString(ctx.getEnergy())
                         + " T:" + Double.toString(ctx.getTech())
                         + " X:" + Double.toString(ctx.getX())
                         + " Y:" + Double.toString(ctx.getY()));
 
-                return new Action(ActionCode.Fight, (int)ctx.getEnergy() - 2);
+                return new Action(ActionCode.Fight, (int) ctx.getEnergy() - 2 - ctx.getFightingCost());
             }
 
             if (ctx.getEnergy() > (ctx.getSpawningCost() + 10)) {
@@ -115,6 +117,9 @@ public class Dalek implements Alien {
             ctx.debugOut("EXPLAIN??????");
         }
 
+        ctx.debugOut("Gaining energy"
+                + " E:" + Double.toString(ctx.getEnergy())
+                + " T:" + Double.toString(ctx.getTech()));
         return new Action(ActionCode.Gain);
     }
 
@@ -122,8 +127,9 @@ public class Dalek implements Alien {
     public void communicate() {
         if (ctx.getEnergy() > 10) {
             try {
-                if (ctx.getGameTurn() % 20 == 0)
-                ctx.broadcastAndListen("I say: Daleks rule supreme!!!!!", 1, true);
+                if (ctx.getGameTurn() % 20 == 0) {
+                    ctx.broadcastAndListen("I say: Daleks rule supreme!!!!!", 1, true);
+                }
             } catch (Exception e) {
             }
         }
@@ -131,7 +137,7 @@ public class Dalek implements Alien {
 
     @Override
     public void receive(String[] messages) {
-        for (String s:messages) {
+        for (String s : messages) {
             ctx.debugOut(s);
         }
     }

@@ -58,6 +58,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         AlienCell acs = acGrid[oldX + centerX][oldY + centerY];
         //ac.debugOut("Grid: removing from list " + getXYString(oldX, oldY));
         acs.remove(ac);
+        acs.energyPerAlien = 0;
         if (canBeRemoved(acs)) {
             acGrid[oldX + centerX][oldY + centerY] = null;
         }
@@ -68,6 +69,8 @@ public class AlienGrid extends LinkedList<AlienContainer> {
             acGrid[newX + centerX][newY + centerY] = acs;
         }
         acs.add(ac);
+        acs.energyPerAlien = 0;
+
         //ac.debugOut("Grid: added to list " + getXYString(newX, newY));
     }
 
@@ -164,7 +167,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
             acs.energy = energy;
         }
     }
-    
+
     public double getEnergyAt(int x, int y) {
         AlienCell acs = acGrid[x + centerX][y + centerY];
         if (acs == null) {

@@ -65,7 +65,8 @@ public class WeepingAngel implements Alien {
                         + " X:" + Double.toString(ctx.getX())
                         + " Y:" + Double.toString(ctx.getY()));
 
-                return new Action(ActionCode.Fight, (int)ctx.getEnergy() - 2);
+                if (ctx.getEnergy() > ctx.getFightingCost() + 2)
+                return new Action(ActionCode.Fight, (int)ctx.getEnergy() - ctx.getFightingCost() - 2);
                 
             }
             // always get energy
@@ -87,7 +88,7 @@ public class WeepingAngel implements Alien {
             }
             // every 
             turn = turn + 1;
-            if (ctx.getEnergy()>=40 ) {
+            if (ctx.getEnergy()>= ctx.getSpawningCost() + 40 ) {
                 ctx.debugOut("Spwaning"
                     + " E:" + Double.toString(ctx.getEnergy())
                     + " T:" + Double.toString(ctx.getTech()));

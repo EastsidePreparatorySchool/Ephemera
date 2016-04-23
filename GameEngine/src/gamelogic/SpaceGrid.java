@@ -54,7 +54,7 @@ public class SpaceGrid {
     public void ready() {
         vis.setFilter(Constants.filters);
         vis.setChatter(Constants.chatter);
-        
+
         // send the whole energyMap to the display
         for (int x = -aliens.centerX; x < aliens.centerX; x++) {
             for (int y = -(aliens.centerY); y < (aliens.centerY); y++) {
@@ -115,31 +115,6 @@ public class SpaceGrid {
         vis.debugErr("");
     }
 
-    public void requestAlienMoves() {
-        //vis.debugOut("Requesting moves for " + (aliens.size()) + " aliens");
-        for (AlienContainer ac : aliens) {
-            // get rid of stale views from prior moves
-            ac.ctx.view = null;
-
-            int oldX = ac.x;
-            int oldY = ac.y;
-
-            // call the alien to move
-            try {
-                ac.move();
-            } catch (UnsupportedOperationException e) {
-                // we'll let that go
-            } catch (Exception ex) {
-                ac.debugErr("Unhandled exception in getMove(): " + ex.toString());
-                for (StackTraceElement s : ex.getStackTrace()) {
-                    ac.debugErr(s.toString());
-                }
-                ac.kill("Death for unhandled exception in getMove(): " + ex.toString());
-            }
-            ac.energy -= Math.abs(ac.x - oldX) + Math.abs(ac.y - oldY);
-        }
-    }
-
     public void performCommunications() {
         // phase 1: take outgoing messages and store in ac
         for (AlienContainer ac : aliens) {
@@ -191,6 +166,30 @@ public class SpaceGrid {
                     }
                 }
             }
+        }
+    }
+
+    public void requestAlienMoves() {
+        //vis.debugOut("Requesting moves for " + (aliens.size()) + " aliens");
+        for (AlienContainer ac : aliens) {
+            // get rid of stale views from prior moves
+            ac.ctx.view = null;
+
+            int oldX = ac.x;
+            int oldY = ac.y;
+
+            // call the alien to move
+            try {
+                ac.move();
+            } catch (UnsupportedOperationException e) {
+                // we'll let that go
+            } catch (Exception ex) {
+                for (StackTraceElement s : ex.getStackTrace()) {
+                    ac.debugOut(s.toString());
+                }
+                ac.kill("Death for unhandled exception in getMove(): " + ex.toString());
+            }
+            ac.energy -= Math.abs(ac.x - oldX) + Math.abs(ac.y - oldY);
         }
     }
 
@@ -283,10 +282,9 @@ public class SpaceGrid {
                 thisAlien.currentActionCode = ActionCode.None;
                 thisAlien.currentActionPower = 0;
             } catch (Exception ex) {
-                // for all other expcetions, we'll kill it. 
+                // for all other exceptions, we'll kill it. 
                 thisAlien.currentActionCode = ActionCode.None;
                 thisAlien.currentActionPower = 0;
-                thisAlien.debugOut("Unhandled exception in getAction(): " + ex.toString());
                 for (StackTraceElement s : ex.getStackTrace()) {
                     thisAlien.debugOut(s.toString());
                 }
@@ -438,10 +436,9 @@ public class SpaceGrid {
 
                 case Spawn:
                     thisAlien.energy -= Constants.spawningCost;
-                    if (thisAlien.energy - thisAlien.currentActionPower < 0){
+                    if (thisAlien.energy - thisAlien.currentActionPower < 0) {
                         thisAlien.kill("Death by spawning exhaustion - not enough energy to complete.");
                     }
-                        
 
                     // construct a random move for the new alien depending on power and send that move through drift correction
                     // spend thisAction.power randomly on x move, y move and initital power
@@ -453,7 +450,7 @@ public class SpaceGrid {
                     int y = (int) powerForY * (rand.nextInt(2) == 0 ? 1 : -1);
 
                     thisAlien.energy -= power + powerForX + powerForY;
-                    if (thisAlien.energy <= 0){
+                    if (thisAlien.energy <= 0) {
                         thisAlien.kill("Death by spawning exhaustion - died in childbirth.");
                     }
 
