@@ -47,5 +47,9 @@ public interface GameVisualizer {
     void debugOut(String s);
 
     void debugErr(String s);
+    
+    void setFilter(String s);
+    
+    void setChatter(boolean f);
 
 }

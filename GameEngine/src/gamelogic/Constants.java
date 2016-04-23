@@ -33,5 +33,6 @@ public class Constants {
     public static double starEnergyPerLuminosity = 5; // factor for placing energy into space around star
 
     public static double deathThreshold = 5; // if you lose a fight by more than this much, you die
+    public static String filters = "death; violation";
 
 }

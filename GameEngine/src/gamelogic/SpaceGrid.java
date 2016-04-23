@@ -52,6 +52,9 @@ public class SpaceGrid {
     }
 
     public void ready() {
+        vis.setFilter(Constants.filters);
+        vis.setChatter(Constants.chatter);
+        
         // send the whole energyMap to the display
         for (int x = -aliens.centerX; x < aliens.centerX; x++) {
             for (int y = -(aliens.centerY); y < (aliens.centerY); y++) {

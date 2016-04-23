@@ -15,8 +15,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.shape.StrokeLineCap;
@@ -42,8 +40,6 @@ class VisualizationGrid implements GameVisualizer {
 
     public ConsolePane console;
 
-    private static final Color[] colors = {Color.BLACK, Color.SLATEBLUE, Color.DARKVIOLET, Color.MAGENTA, Color.PURPLE, Color.RED};
-
     int turnCounter = 1;
     int totalTurnCounter = 0;
     int numTurns = 1;
@@ -53,10 +49,10 @@ class VisualizationGrid implements GameVisualizer {
     boolean showSpawn = false;
     boolean showDeath = false;
     String filter = null;
+    String[] filters = null;
 
     BufferedWriter logFile;
     GameEngine engine;
-    private final Object monitor = new Object();
 
     public void init(GameEngine eng, ConsolePane console, SpeciesSet species, String logPath, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
         Date date = new Date();
@@ -373,9 +369,12 @@ class VisualizationGrid implements GameVisualizer {
     @Override
     public void debugOut(String s) {
         if (filter != null) {
-            if (s.toLowerCase().contains(filter.toLowerCase())) {
-                println(s);
-                Thread.yield();
+            for (String f : filters) {
+                if (s.toLowerCase().contains(f.toLowerCase())) {
+                    println(s);
+                    Thread.yield();
+                    break;
+                }
             }
         } else {
             printlnLogOnly(s);
@@ -384,30 +383,17 @@ class VisualizationGrid implements GameVisualizer {
 
     @Override
     public boolean showContinuePrompt() {
-        /*
-         --turnCounter;
-
-         // every numTurns, display prompt, wait for exit phrase or new number of turns
-         if (turnCounter == 0) {
-         turnCounter = numTurns;
-         engine.queueCommand(new GameCommand(GameCommandCode.Pause));
-         }
-         */
-
         // not done with number of turns before prompt, don't display anything, return "game not over"
-        //Thread.yield();
         return true;
     }
 
     @Override
     public void showEngineStateChange(GameState gs) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         Thread.yield();
     }
 
     @Override
     public void showAliens(List<AlienSpec> aliens) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private void print(String s) {
@@ -498,6 +484,19 @@ class VisualizationGrid implements GameVisualizer {
             renderEnergyMap(this.canvas.getGraphicsContext2D());
         }
 
+    }
+
+    public void setFilter(String s) {
+        filter = s;
+        GUIShell.filterText.setText(s);
+        filters = s.split(";");
+        for (int i = 0; i < filters.length; i++) {
+            filters[i] = filters[i].trim();
+        }
+    }
+    
+    public void setChatter(boolean f) {
+        GUIShell.chatter.setSelected(f);
     }
 
 }

@@ -3,6 +3,7 @@ CONSTANT,,,randseed,,,,,,1
 CONSTANT,,,chatter,,,,,,on
 CONSTANT,,,perSpeciesCap,,,,,,10000
 CONSTANT,,,safeZoneSize,,,,,,10
+CONSTANT,,,filters,,,,,,death; violation; dalek
 SPECIES,ephemera.eastsideprep.org,stockaliens,Dalek,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Martian,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Venusian,,,,,,

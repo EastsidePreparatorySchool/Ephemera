@@ -42,9 +42,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.shape.Box;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 
 /**
  *
@@ -58,11 +55,13 @@ public class GUIShell extends Application {
     public static VisualizationGrid field;
     public static SpeciesSet species;
     public static Text turnCounterText;
+    public static TextField filterText;
     public static Button buttonPause;
     public static Button buttonQuit;
     public static Button buttonRestart;
     public static RadioButton renderSelectorAliens;
     public static ConsolePane console;
+    public static CheckBox chatter;
     public static Timer idleTimer;
     Stage stage;
 
@@ -257,25 +256,25 @@ public class GUIShell extends Application {
         hb2.setPadding(new Insets(15, 12, 15, 12));
         hb2.setSpacing(10);   // Gap between nodes
 
-        CheckBox cb = new CheckBox("Chatter");
-        cb.setStyle("-fx-text-fill: white;");
-        cb.setOnAction((e) -> {
+        chatter = new CheckBox("Chatter");
+        chatter.setStyle("-fx-text-fill: white;");
+        chatter.setOnAction((e) -> {
             engine.queueCommand(
-                    new GameCommand(GameCommandCode.SetConstant, "CHATTER", cb.isSelected() ? "true" : "false"));
+                    new GameCommand(GameCommandCode.SetConstant, "CHATTER", chatter.isSelected() ? "true" : "false"));
         });
 
-        TextField t = new TextField("");
+        filterText = new TextField("");
         //t.setStyle("-fx-text-fill: white;");
-        t.setEditable(true);
-        t.setOnAction((e) -> field.filter = t.getText());
+        filterText.setEditable(true);
+        filterText.setOnAction((e) -> field.setFilter(filterText.getText()));
    
         Label l = new Label("   Filter:");
         l.setStyle("-fx-text-fill: white;");
         
         Button b1 = new Button("Set");
-        b1.setOnAction((e) -> field.filter = t.getText());
+        b1.setOnAction((e) -> field.setFilter(filterText.getText()));
 
-        hb2.getChildren().addAll(cb, l, t, b1);
+        hb2.getChildren().addAll(chatter, l, filterText, b1);
 
         console = new ConsolePane();
         HBox hb3 = new HBox();
