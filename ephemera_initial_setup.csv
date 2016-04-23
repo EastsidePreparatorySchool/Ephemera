@@ -1,8 +1,8 @@
 !GameElementKind,Domain,Package (jar file without .jar),Class (name),Parent (position will be relative to this),X,Y,Energy (Luminosity for stars),Technology,State
-VARIABLE,,,randseed,,,,1,,
-VARIABLE,,,chatter,,,,,,FALSE
-VARIABLE,,,perSpeciesCap,,,,10000,,
-VARIABLE,,,safeZoneSize,,,,10,,
+CONSTANT,,,randseed,,,,,,1
+CONSTANT,,,chatter,,,,,,on
+CONSTANT,,,perSpeciesCap,,,,,,10000
+CONSTANT,,,safeZoneSize,,,,,,10
 SPECIES,ephemera.eastsideprep.org,stockaliens,Dalek,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Martian,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Venusian,,,,,,

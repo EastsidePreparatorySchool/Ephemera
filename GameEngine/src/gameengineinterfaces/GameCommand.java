@@ -18,10 +18,10 @@ public class GameCommand {
         this.code = newcode;
     }
 
-    public GameCommand(GameCommandCode newcode, String variable, String value) {
+    public GameCommand(GameCommandCode newcode, String constant, String value) {
         this.code = newcode;
         this.parameters = new Object[2];
-        this.parameters[0] = variable;
+        this.parameters[0] = constant;
         this.parameters[1] = value;
     }
 

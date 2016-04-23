@@ -261,7 +261,7 @@ public class GUIShell extends Application {
         cb.setStyle("-fx-text-fill: white;");
         cb.setOnAction((e) -> {
             engine.queueCommand(
-                    new GameCommand(GameCommandCode.SetVariable, "CHATTER", cb.isSelected() ? "true" : "false"));
+                    new GameCommand(GameCommandCode.SetConstant, "CHATTER", cb.isSelected() ? "true" : "false"));
         });
 
         TextField t = new TextField("");

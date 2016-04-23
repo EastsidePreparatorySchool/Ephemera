@@ -9,6 +9,13 @@ package gamelogic;
  *
  * @author gmein
  */
+
+//
+// to set these from ephemera_initial_config.csv, use
+// element type CONSTANT
+// element class for name
+// element state for value
+//
 public class Constants {
     public static int randSeed = 1; // rand seed, controls random decision sequence in the game, set to 0 for fresh
     public static int width = 500; // grid width 

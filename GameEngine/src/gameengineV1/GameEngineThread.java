@@ -111,7 +111,7 @@ public class GameEngineThread extends Thread {
     private boolean processCommand(GameCommand gc) throws Exception {
         boolean gameOver = false;
         switch (gc.code) {
-            case SetVariable:
+            case SetConstant:
                 String variable = (String) gc.parameters[0];
                 String value = (String) gc.parameters[1];
 
@@ -155,15 +155,15 @@ public class GameEngineThread extends Thread {
                         engine.grid.addElement(element);
                     }
 
-                    if (element.kind == GameElementKind.VARIABLE) {
+                    if (element.kind == GameElementKind.CONSTANT) {
                         for (Field field : Constants.class.getDeclaredFields()) {
                             if (element.className.equalsIgnoreCase(field.getName())) {
                                 if (field.getType().getName().equals("String")) {
                                     field.set(Constants.class, element.state);
                                 } else if (field.getType().getName().equals("int") || field.getType().getName().equals("Integer")) {
-                                    field.set(Constants.class, (int)element.energy);
+                                    field.set(Constants.class, Integer.parseInt(element.state));
                                 } else if (field.getType().getName().equalsIgnoreCase("double")) {
-                                    field.set(Constants.class, element.energy);
+                                    field.set(Constants.class, Double.parseDouble(element.state));
                                 } else if (field.getType().getName().equalsIgnoreCase("boolean")) {
                                     element.state = element.state.equalsIgnoreCase("on") ? "true" : element.state;
                                     element.state = element.state.equalsIgnoreCase("off") ? "false" : element.state;
