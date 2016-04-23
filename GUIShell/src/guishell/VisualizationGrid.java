@@ -343,36 +343,15 @@ class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void showSpawn(AlienSpec as) {
-        if (showSpawn) {
-
-            print("Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
-        } else {
-            debugOut("Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
-        }
-        //  Platform.runLater(new Runnable() {
-        //      @Override
-        //      public void run() {
+        debugOut("Engine reporting Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
         speciesSet.addAlien(as.getFullSpeciesName());
         incrementCell(as.x, as.y, as.getFullSpeciesName());
-        //      }
-        //  });
     }
 
     public void showDeath(AlienSpec as) {
-        if (showDeath) {
-
-            print("Death: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
-        } else {
-            debugOut("Death: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
-        }
-        //    Platform.runLater(new Runnable() {
-        //        @Override
-        //        public void run() {
+        debugOut("Engine reporting death: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
         decrementCell(as.x, as.y, as.getFullSpeciesName());
         speciesSet.removeAlien(as.getFullSpeciesName());
-        //        }
-        //    });
-        //    Thread.yield();
     }
 
     @Override
@@ -388,13 +367,7 @@ class VisualizationGrid implements GameVisualizer {
     @Override
     public void debugErr(String s) {
         println(s);
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                engine.queueCommand(new GameCommand(GameCommandCode.Pause));
-            }
-        });
-        Thread.yield();
+        Utilities.runAndWait(() -> engine.queueCommand(new GameCommand(GameCommandCode.Pause)));
     }
 
     @Override
@@ -491,7 +464,6 @@ class VisualizationGrid implements GameVisualizer {
         return ns + "ns";
     }
 
- 
     @Override
     public void registerSpecies(AlienSpec as) {
         speciesSet.addAlienSpecies(as);

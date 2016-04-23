@@ -101,6 +101,6 @@ public class AlienSpec {
     }
 
     public String getTechEnergyString() {
-        return "(" + tech + "," + energy + ")";
+        return "(" + Math.round(tech*10)/10 + "," + Math.round(energy*10)/10 + ")";
     }
 }

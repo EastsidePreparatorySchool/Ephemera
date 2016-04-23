@@ -189,21 +189,19 @@ public class AlienContainer {
         int y = (int) Math.abs((long) direction.y());
         int moveLength = x + y;
 
-         // If the move is farther than the alien has the power to move
+        // If the move is farther than the alien has the power to move
         if (moveLength > tech) {
             debugErr("Illegal move: " + (direction.x()) + "," + (direction.y()) + " tech " + tech);
             throw new NotEnoughTechException();
         }
-        
-         // If the move is farther than the alien has the tech to move
-        if(moveLength   >  tech) {
+
+        // If the move is farther than the alien has the tech to move
+        if (moveLength > tech) {
             debugErr("Illegal move: " + (direction.x()) + "," + (direction.y()) + " tech " + tech);
             throw new NotEnoughTechException();
         }
     }
-    
-    
-    
+
     public MoveDir applyDrift(int x, int y, MoveDir dir) {
         int dxi, dyi;
 
@@ -226,7 +224,8 @@ public class AlienContainer {
     }
 
     // easy way to kill an alien
-    public void kill() {
+    public void kill(String s) {
+        debugOut(s+ " with T:" + (Math.round(tech*10)/10) + " and E:" + (Math.round(energy*10)/10));
         energy = 0;
     }
 
@@ -246,20 +245,20 @@ public class AlienContainer {
             case Research:
                 if (tech >= energy) {
                     // If the tech can't be researched due to lack of energy
-                    debugOut("AC: Research fail with T:" + (tech) + " and E:" + (energy));
+                    debugOut("AC: Research violation with T:" + (tech) + " and E:" + (energy));
                     throw new NotEnoughEnergyException();
                 }
                 break;
 
             case Spawn:
                 if (a.power + ctx.getSpawningCost() > energy) {
-                    debugOut("AC: Spawn fail with P:" + a.power + " T:" + (tech) + " and E:" + (energy));
+                    debugOut("AC: Spawn violation with P:" + a.power + " T:" + (tech) + " and E:" + (energy));
                     throw new NotEnoughEnergyException();
                 }
                 break;
             case Fight:
                 if (energy < (a.power + ctx.getFightingCost())) {
-                    debugOut("AC: Fight fail with P:" + a.power + " T:" + (tech) + " and E:" + (energy));
+                    debugOut("AC: Fight violation with P:" + a.power + " T:" + (tech) + " and E:" + (energy));
                     throw new NotEnoughEnergyException();
                 }
 

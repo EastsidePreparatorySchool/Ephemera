@@ -131,7 +131,7 @@ public class SpaceGrid {
                 for (StackTraceElement s : ex.getStackTrace()) {
                     ac.debugErr(s.toString());
                 }
-                ac.kill();
+                ac.kill("Death for unhandled exception in getMove(): " + ex.toString());
             }
             ac.energy -= Math.abs(ac.x - oldX) + Math.abs(ac.y - oldY);
         }
@@ -153,7 +153,7 @@ public class SpaceGrid {
                 for (StackTraceElement s : ex.getStackTrace()) {
                     ac.debugErr(s.toString());
                 }
-                ac.kill();
+                ac.kill("Death for unhandled exception in communicate(): " + ex.toString());
             }
         }
 
@@ -184,7 +184,7 @@ public class SpaceGrid {
                         for (StackTraceElement s : ex.getStackTrace()) {
                             ac.debugErr(s.toString());
                         }
-                        ac.kill();
+                        ac.kill("Death for unhandled exception in receive(): " + ex.toString());
                     }
                 }
             }
@@ -253,11 +253,11 @@ public class SpaceGrid {
                 ac.beThoughtful();
             } catch (Exception ex) {
                 // any exceptions except NotSupported get the alien killed here
-                ac.debugErr("Unhandled exception in getMove(): " + ex.toString());
+                ac.debugErr("Unhandled exception in beThoughtful(): " + ex.toString());
                 for (StackTraceElement s : ex.getStackTrace()) {
                     ac.debugErr(s.toString());
                 }
-                ac.kill();
+                ac.kill("Death for unhandled exception in beThoughtful(): " + ex.toString());
             }
         }
     }
@@ -287,7 +287,7 @@ public class SpaceGrid {
                 for (StackTraceElement s : ex.getStackTrace()) {
                     thisAlien.debugOut(s.toString());
                 }
-                thisAlien.kill();
+                thisAlien.kill("Death for unhandled exception in getAction(): " + ex.toString());
             }
         }
 
@@ -345,6 +345,9 @@ public class SpaceGrid {
                         fightingAlien.fought = true;
                         fightingAlien.energy -= Constants.fightingCost;
                         fightingAlien.energy -= fightingAlien.currentActionPower;
+                        if (fightingAlien.energy <= 0) {
+                            fightingAlien.kill("Death for investing too much in fighting");
+                        }
                     }
 
                     vis.showFightBefore(thisAlien.x, thisAlien.y, fightSpecs);
@@ -396,10 +399,10 @@ public class SpaceGrid {
                         if (fightSpecies.get(ac.speciesName) != winningPower) {
 
                             // If the alien was beaten by more than five energy points
-                            if (winningPower > fightSpecies.get(ac.speciesName) + 5) {
+                            if (winningPower > fightSpecies.get(ac.speciesName) + Constants.deathThreshold) {
 
                                 // The alien will then be killed
-                                ac.kill();
+                                ac.kill("Death in fight by losing by more than " + Constants.deathThreshold + " energy points");
 
                             } else { // If the alien was beaten by less than 5 points
                                 // They go down to two technology
@@ -431,7 +434,11 @@ public class SpaceGrid {
                     break;
 
                 case Spawn:
-                    thisAlien.energy -= Constants.spawningCost + thisAlien.currentActionPower;
+                    thisAlien.energy -= Constants.spawningCost;
+                    if (thisAlien.energy - thisAlien.currentActionPower < 0){
+                        thisAlien.kill("Death by spawning exhaustion - not enough energy to complete.");
+                    }
+                        
 
                     // construct a random move for the new alien depending on power and send that move through drift correction
                     // spend thisAction.power randomly on x move, y move and initital power
@@ -443,6 +450,9 @@ public class SpaceGrid {
                     int y = (int) powerForY * (rand.nextInt(2) == 0 ? 1 : -1);
 
                     thisAlien.energy -= power + powerForX + powerForY;
+                    if (thisAlien.energy <= 0){
+                        thisAlien.kill("Death by spawning exhaustion - died in childbirth.");
+                    }
 
                     MoveDir dir = new MoveDir(x, y);
                     dir = thisAlien.applyDrift(thisAlien.x, thisAlien.y, dir);
@@ -531,16 +541,16 @@ public class SpaceGrid {
 
         if (as.counter < Constants.perSpeciesCap) {
             try {
-            AlienContainer ac = new AlienContainer(this, this.vis, x, y,
-                    domainName, alienPackageName, alienClassName, as.cns, as,
-                    tech, power, // tech and power
-                    parent, // no parent
-                    spawnMsg); // no spawn state
+                AlienContainer ac = new AlienContainer(this, this.vis, x, y,
+                        domainName, alienPackageName, alienClassName, as.cns, as,
+                        tech, power, // tech and power
+                        parent, // no parent
+                        spawnMsg); // no spawn state
 
-            aliens.addAlienAndPlug(ac);
-            vis.showSpawn(ac.getFullAlienSpec());
-            as.counter++;
-            } catch (InstantiationException e) { 
+                aliens.addAlienAndPlug(ac);
+                vis.showSpawn(ac.getFullAlienSpec());
+                as.counter++;
+            } catch (InstantiationException e) {
                 vis.debugErr("sg: could not instantiate new " + domainName + ":" + alienPackageName + ":" + alienClassName);
             }
         }
