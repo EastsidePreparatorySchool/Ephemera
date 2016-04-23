@@ -211,7 +211,7 @@ class VisualizationGrid implements GameVisualizer {
                     }
 
                 } else {
-                    color = Color.RED;
+                    //color = Color.RED;
                     color = new Color(Math.min(Math.max(cell.alienCount / (double) 8, 0.2), 1), 0, 0, 1.0);
                 }
 
@@ -240,7 +240,7 @@ class VisualizationGrid implements GameVisualizer {
         ++totalTurnCounter;
         this.numAliens = numAliens;
         debugOut("Turn #" + totalTurnCounter + " complete.");
-        runAndWait(() -> {
+        Utilities.runAndWait(() -> {
             GraphicsContext gc = canvas.getGraphicsContext2D();
             renderField();
 
@@ -491,41 +491,7 @@ class VisualizationGrid implements GameVisualizer {
         return ns + "ns";
     }
 
-    /**
-     * Runs the specified {@link Runnable} on the JavaFX application thread and
-     * waits for completion.
-     *
-     * @param action the {@link Runnable} to run
-     * @throws NullPointerException if {@code action} is {@code null}
-     */
-    public static void runAndWait(Runnable action) {
-        if (action == null) {
-            throw new NullPointerException("action");
-        }
-
-        // run synchronously on JavaFX thread
-        if (Platform.isFxApplicationThread()) {
-            action.run();
-            return;
-        }
-
-        // queue on JavaFX thread and wait for completion
-        final CountDownLatch doneLatch = new CountDownLatch(1);
-        Platform.runLater(() -> {
-            try {
-                action.run();
-            } finally {
-                doneLatch.countDown();
-            }
-        });
-
-        try {
-            doneLatch.await();
-        } catch (InterruptedException e) {
-            // ignore exception
-        }
-    }
-
+ 
     @Override
     public void registerSpecies(AlienSpec as) {
         speciesSet.addAlienSpecies(as);
@@ -548,7 +514,7 @@ class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void showReady() {
-        runAndWait(() -> renderField());
+        Utilities.runAndWait(() -> renderField());
 
     }
 

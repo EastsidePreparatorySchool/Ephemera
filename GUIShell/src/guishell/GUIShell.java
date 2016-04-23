@@ -263,17 +263,19 @@ public class GUIShell extends Application {
             engine.queueCommand(
                     new GameCommand(GameCommandCode.SetVariable, "CHATTER", cb.isSelected() ? "ON" : "OFF"));
         });
+
         TextField t = new TextField("");
         //t.setStyle("-fx-text-fill: white;");
         t.setEditable(true);
-        t.setOnAction((e) -> {
-            field.filter = t.getText();
-        });
-
-        Label l = new Label("Filter:");
+        t.setOnAction((e) -> field.filter = t.getText());
+   
+        Label l = new Label("   Filter:");
         l.setStyle("-fx-text-fill: white;");
+        
+        Button b1 = new Button("Set");
+        b1.setOnAction((e) -> field.filter = t.getText());
 
-        hb2.getChildren().addAll(cb, l, t);
+        hb2.getChildren().addAll(cb, l, t, b1);
 
         console = new ConsolePane();
         HBox hb3 = new HBox();

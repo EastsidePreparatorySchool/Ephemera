@@ -31,8 +31,8 @@ public class TemplateAlien implements Alien {
         ctx.debugOut("Initialized at "
                 + "(" + Integer.toString(ctx.getX())
                 + "," + Integer.toString(ctx.getY()) + ")"
-                + " E: " + Integer.toString(ctx.getEnergy())
-                + " T: " + Integer.toString(ctx.getTech()));
+                + " E: " + Double.toString(ctx.getEnergy())
+                + " T: " + Double.toString(ctx.getTech()));
 
     }
 
@@ -60,8 +60,8 @@ public class TemplateAlien implements Alien {
         //ctx.debugOut("Move requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
-        int techLevel = ctx.getTech();
-        int energy = ctx.getEnergy();
+        int techLevel = (int)ctx.getTech();
+        int energy = (int)ctx.getEnergy();
         View view = ctx.getView();
         int[] nearestAlienPos = view.getClosestAlienPos(ctx.getX(), ctx.getY());
 
@@ -91,6 +91,11 @@ public class TemplateAlien implements Alien {
         ctx.debugOut("Gaining");
 
         return new Action(ActionCode.Gain);
+    }
+
+    @Override
+    public void beThoughtful() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

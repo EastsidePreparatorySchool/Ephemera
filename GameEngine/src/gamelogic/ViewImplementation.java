@@ -29,7 +29,7 @@ public class ViewImplementation implements View {
         this.sOs = null;
         this.bottomX = 0;
         this.bottomY = 0;
-        this.size = ac.tech;
+        this.size = (int)ac.tech;
         fullyInstantiated = false;
     }
 

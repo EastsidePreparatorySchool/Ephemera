@@ -114,14 +114,6 @@ public class GameEngineThread extends Thread {
             case SetVariable:
                 String variable = (String) gc.parameters[0];
                 String value = (String) gc.parameters[1];
-//                if (variable.equalsIgnoreCase("RANDSEED")) {
-//                    SpaceGrid.randSeed = Integer.parseInt(value);
-//                    SpaceGrid.rand.setSeed(SpaceGrid.randSeed);
-//                    engine.vis.debugOut("RandSeed: " + SpaceGrid.randSeed);
-//                } else if (variable.equalsIgnoreCase("CHATTER")) {
-//                    SpaceGrid.chatter = value.equalsIgnoreCase("on");
-//                    engine.vis.debugOut("Chatter: " + value);
-//                } 
 
                 for (Field field : Constants.class.getDeclaredFields()) {
                     if (variable.equalsIgnoreCase(field.getName())) {
@@ -162,13 +154,18 @@ public class GameEngineThread extends Thread {
                     }
 
                     if (element.kind == GameElementKind.VARIABLE) {
-                        if (element.className.equalsIgnoreCase("RANDSEED")) {
-                            Constants.randSeed = element.energy;
-                            engine.vis.debugOut("RandSeed: " + Constants.randSeed);
-                        } else if (element.className.equalsIgnoreCase("CHATTER")) {
-                            Constants.chatter = element.energy > 0;
-                            engine.vis.debugOut("Chatter: " + (element.energy > 0 ? "on" : "off"));
+                        for (Field field : Constants.class.getDeclaredFields()) {
+                            if (element.className.equalsIgnoreCase(field.getName())) {
+                                if (field.getType().getName().equals("String")) {
+                                    field.set(Constants.class, element.energy);
+                                } else if (field.getType().getName().equals("int") || field.getType().getName().equals("Integer")) {
+                                    field.set(Constants.class, Integer.parseInt(element.state));
+                                } else if (field.getType().getName().equalsIgnoreCase("boolean")) {
+                                    field.set(Constants.class, Boolean.parseBoolean(element.state));
+                                }
+                            }
                         }
+
                     }
 
                 }
@@ -209,7 +206,7 @@ public class GameEngineThread extends Thread {
         if (Constants.randSeed == 0) {
             Constants.randSeed = (int) System.nanoTime();
         }
-        
+
         SpaceGrid.rand.setSeed(Constants.randSeed);
         // output randSeed into logfile
         engine.vis.debugOut("RandSeed: " + Constants.randSeed);

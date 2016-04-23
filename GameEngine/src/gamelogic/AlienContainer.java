@@ -33,12 +33,12 @@ public class AlienContainer {
     public int alienHashCode;
 
     public ActionCode currentActionCode;
-    public int currentActionPower;
+    public double currentActionPower;
     public String currentActionMessage;
     public boolean listening;
 
-    int tech;
-    int energy;
+    double tech;
+    double energy;
     public static boolean chatter = false;
 
     boolean fought;
@@ -47,7 +47,7 @@ public class AlienContainer {
     public int nextX;
     public int nextY;
     public String outgoingMessage;
-    public int outgoingPower;
+    public double outgoingPower;
 
     // Declare stats here
     //
@@ -55,7 +55,7 @@ public class AlienContainer {
     //
     public AlienContainer(SpaceGrid sg, GameVisualizer vis, int x, int y,
             String alienDomainName, String alienPackageName, String alienClassName, Constructor<?> cns, AlienSpecies as,
-            int energy, int tech, int parent, String message) {
+            double energy, double tech, int parent, String message) {
 
         this.domainName = alienDomainName;
         this.packageName = alienPackageName;
@@ -126,7 +126,7 @@ public class AlienContainer {
             species = new AlienSpecies(this.domainName, this.packageName, this.className, species.speciesID);
         }
         return species;
-        
+
     }
 
     public String toStringExpensive() {
@@ -138,11 +138,26 @@ public class AlienContainer {
                 + " r:" + ((int) Math.floor(Math.hypot((double) x, (double) y)));
     }
 
+    public void beThoughtful() {
+        try {
+            this.alien.beThoughtful();
+        } catch (UnsupportedOperationException e) {
+        }
+
+    }
+
     // checked moves
     public void move() throws NotEnoughTechException {
         // Whether the move goes off the board will be determined by the grid
 
-        MoveDir direction = alien.getMove();
+        MoveDir direction = null;
+        try {
+            direction = alien.getMove();
+        } catch (UnsupportedOperationException e) {
+            // we'll let that go
+            direction = new MoveDir(0,0);
+        }
+
         this.checkMove(direction); // Throws an exception if illegal
 
         // we want to contain aliens in the 250 sphere, so apply the "cosmic drift"
@@ -197,8 +212,7 @@ public class AlienContainer {
         }
         return new MoveDir(dxi, dyi);
     }
-    
-    
+
     // easy way to kill an alien
     public void kill() {
         energy = 0;
@@ -228,7 +242,7 @@ public class AlienContainer {
             case Spawn:
                 if (a.power + ctx.getSpawningCost() > energy) {
                     debugOut("AC: Spawn fail with P:" + a.power + " T:" + (tech) + " and E:" + (energy));
-                   throw new NotEnoughEnergyException();
+                    throw new NotEnoughEnergyException();
                 }
                 break;
             case Fight:
@@ -236,7 +250,7 @@ public class AlienContainer {
                     debugOut("AC: Fight fail with P:" + a.power + " T:" + (tech) + " and E:" + (energy));
                     throw new NotEnoughEnergyException();
                 }
-                
+
                 // limit power by tech
                 if (a.power > tech) {
                     this.currentActionPower = tech;
@@ -261,7 +275,7 @@ public class AlienContainer {
 
     public ViewImplementation getFullView() {
         // Create the alien's view
-        int size = tech;
+        int size = (int) tech;
         int lowX = Math.max(x - size, (grid.width / -2));
         int lowY = Math.max(y - size, (grid.height / -2));
         int highX = Math.min(x + size, ((grid.width / 2) - 1));

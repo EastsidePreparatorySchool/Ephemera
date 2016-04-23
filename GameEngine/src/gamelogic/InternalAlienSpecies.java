@@ -13,7 +13,8 @@ import java.lang.reflect.Constructor;
  * @author gunnar
  */
 public class InternalAlienSpecies extends AlienSpecies {
-    Constructor<?> cns;
+    public Constructor<?> cns;
+    public long counter;
 
     public InternalAlienSpecies(String domainName, String packageName, String className, int id) {
         super(domainName, packageName, className, id);

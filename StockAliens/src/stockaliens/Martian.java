@@ -32,10 +32,10 @@ public class Martian implements Alien {
     public void init(Context ctx,int id, int parent, String message) {
         this.ctx = ctx;
         ctx.debugOut("Initialized at "
-                + "(" + Integer.toString(ctx.getX())
-                + "," + Integer.toString(ctx.getY()) + ")"
-                + " E: " + Integer.toString(ctx.getEnergy())
-                + " T: " + Integer.toString(ctx.getTech()));
+                + "(" + Double.toString(ctx.getX())
+                + "," + Double.toString(ctx.getY()) + ")"
+                + " E: " + Double.toString(ctx.getEnergy())
+                + " T: " + Double.toString(ctx.getTech()));
         ctx.debugOut("Pancakes taste like styrofoam");
 
     }
@@ -46,9 +46,9 @@ public class Martian implements Alien {
         //            + " T:" + Integer.toString(ctx.getTech()));
 
         //splits in two whole numbers
-        Remainder = ctx.getTech() % 2;
-        HorizontalMove = (ctx.getTech() - Remainder) / 2;
-        VerticalMove = ctx.getTech() - HorizontalMove;
+        Remainder = (int)ctx.getTech() % 2;
+        HorizontalMove = (int)(ctx.getTech() - Remainder) / 2;
+        VerticalMove = (int)ctx.getTech() - HorizontalMove;
         if (getRandomBoolean() == true) {
             HorizontalMove *= -1;
         }
@@ -72,9 +72,9 @@ public class Martian implements Alien {
         //sets the amount of energy to fight with by how much energy, and how muc technology
         fightStrength = 1;
         if (ctx.getEnergy() > 3) {
-            fightStrength = ctx.getEnergy() - 2;
+            fightStrength = (int)ctx.getEnergy() - 2;
             if (ctx.getEnergy() > ctx.getTech()) {
-                fightStrength = ctx.getTech();
+                fightStrength = (int)ctx.getTech();
             }
 
         }
@@ -96,7 +96,7 @@ public class Martian implements Alien {
             }
         } catch (Exception e) {
             ctx.debugOut("Fighting");
-            return new Action(ActionCode.Fight, ctx.getEnergy()-1);
+            return new Action(ActionCode.Fight, (int)ctx.getEnergy()-1);
         }
         //if it doesnt fight, it chooses a item to do depending on how much energy it has.
         if (ctx.getEnergy() < 2) {
@@ -122,6 +122,11 @@ public class Martian implements Alien {
     @Override
     public void receive(String[] messages) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void beThoughtful() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

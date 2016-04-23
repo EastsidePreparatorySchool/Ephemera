@@ -20,15 +20,16 @@ public class AlienSpec {
     public int hashCode;
     public int x;
     public int y;
-    public int tech;
-    public int energy;
-    public int actionPower;
+    public double tech;
+    public double energy;
+    public double actionPower;
     public String fullName;
     public String speciesName;
+    public String msg;
 
     public AlienSpec(String domainName, String packageName, String className,
-            int speciesID, int hashCode, int x, int y, int tech, int energy,
-            String fullName, String speciesName) {
+            int speciesID, int hashCode, int x, int y, double tech, double energy,
+            String fullName, String speciesName, String msg) {
         this.domainName = domainName;
         this.packageName = packageName;
         this.className = className;
@@ -40,11 +41,12 @@ public class AlienSpec {
         this.fullName = fullName;
         this.speciesName = speciesName;
         this.speciesID = speciesID;
+        this.msg = msg;
     }
 
     public AlienSpec(String domainName, String packageName, String className,
-            int speciesID, int hashCode, int x, int y, int tech, int energy,
-            String fullName, String speciesName, int actionPower) {
+            int speciesID, int hashCode, int x, int y, double tech, double energy,
+            String fullName, String speciesName, double actionPower) {
         this.domainName = domainName;
         this.packageName = packageName;
         this.className = className;

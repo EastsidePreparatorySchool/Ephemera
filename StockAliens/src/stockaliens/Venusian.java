@@ -24,8 +24,8 @@ public class Venusian implements Alien {
         ctx.debugOut("Initialized at "
                 + "(" + Integer.toString(ctx.getX())
                 + "," + Integer.toString(ctx.getY()) + ")"
-                + " E: " + Integer.toString(ctx.getEnergy())
-                + " T: " + Integer.toString(ctx.getTech()));
+                + " E: " + Double.toString(ctx.getEnergy())
+                + " T: " + Double.toString(ctx.getTech()));
 
     }
 
@@ -79,7 +79,7 @@ public class Venusian implements Alien {
 
                 // or, hit really hard then run again
                 ctx.debugOut("Fighting");
-                return new Action(ActionCode.Fight, ctx.getEnergy() - 10);
+                return new Action(ActionCode.Fight, (int)ctx.getEnergy() - 10);
             }
         } catch (Exception e) {
             // do something here to deal with errors
@@ -115,5 +115,10 @@ public class Venusian implements Alien {
     @Override
     public void receive(String[] messages) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void beThoughtful() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
