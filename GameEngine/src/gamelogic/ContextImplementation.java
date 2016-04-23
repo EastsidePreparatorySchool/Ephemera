@@ -74,7 +74,7 @@ public class ContextImplementation implements Context {
         return SpaceGrid.rand.nextInt(ceiling);
     }
 
-    // messsagin API: record that this alien wants to send, and whether to receive
+    // messsaging API: record that this alien wants to send, and whether to receive
     @Override
     public void broadcastAndListen(String message, int power, boolean listen)
             throws NotEnoughTechException, NotEnoughEnergyException {
@@ -105,18 +105,13 @@ public class ContextImplementation implements Context {
         // tracing an imaginary square of increasing size,
         // in 8 line segments, hopefully without overlap
         for (int d = 1; d <= ac.outgoingPower; d++) {
-            for (int dd = 0; dd <= d; dd++) {
-                depositMessageAt(ac.x - d + dd, ac.y - d, ac.outgoingMessage); // lower left horizontal, excludes middle
-                depositMessageAt(ac.x + dd, ac.y - d, ac.outgoingMessage);     // lower right horizontal, excludes corner
-                depositMessageAt(ac.x + d - dd, ac.y + d, ac.outgoingMessage); // upper right corner, excludes middle
-                depositMessageAt(ac.x - dd, ac.y + d, ac.outgoingMessage);     // upper left horizontal, excludes corner
-                depositMessageAt(ac.x - d, ac.y + dd, ac.outgoingMessage);     // upper left vertical, excludes corner
-                depositMessageAt(ac.x - d, ac.y - d + dd, ac.outgoingMessage); // lower left vertical, excludes middle
-                depositMessageAt(ac.x + d, ac.y + d - dd, ac.outgoingMessage); // upper right vertical, excludes middle
-                depositMessageAt(ac.x + d, ac.y - dd, ac.outgoingMessage);     // lower right vertical, excludes middle
+            GridCircle c = new GridCircle(ac.x, ac.y, d);
+            for (int[] point : c) {
+                if (point != null) {
+                    depositMessageAt(point[0], point[1], ac.outgoingMessage);
+                }
             }
         }
-
     }
 
     // put a message at one grid point ONLY if someone is listening

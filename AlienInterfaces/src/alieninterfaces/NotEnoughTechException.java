@@ -9,6 +9,5 @@ package alieninterfaces;
  *
  * @author gmein
  */
-public class NotEnoughTechException extends Exception{
-    
+public class NotEnoughTechException extends Exception {
 }

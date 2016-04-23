@@ -135,16 +135,11 @@ public class AlienGrid extends LinkedList<AlienContainer> {
                 break; // at the level of empty space, get out
             }
 
-            for (int dd = 0; dd <= d; dd++) {
-                putEnergyAt(x - d, y - dd, pointEnergy);
-                putEnergyAt(x - d, y + dd, pointEnergy);
-                putEnergyAt(x + d, y - dd, pointEnergy);
-                putEnergyAt(x + d, y + dd, pointEnergy);
-                putEnergyAt(x - dd, y - d, pointEnergy);
-                putEnergyAt(x + dd, y - d, pointEnergy);
-                putEnergyAt(x - dd, y + d, pointEnergy);
-                putEnergyAt(x + dd, y + d, pointEnergy);
-
+            GridCircle g = new GridCircle(x, y, d);
+            for (int[] point : g) {
+                if (point != null) {
+                    putEnergyAt(point[0], point[1], pointEnergy);
+                }
             }
         }
     }

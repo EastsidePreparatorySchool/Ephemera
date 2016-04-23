@@ -9,6 +9,5 @@ package alieninterfaces;
  *
  * @author gmein
  */
-public class UnknownActionException extends Exception{
-    
+public class UnknownActionException extends Exception {
 }

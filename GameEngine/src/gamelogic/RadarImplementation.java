@@ -5,9 +5,11 @@
  */
 package gamelogic;
 
-import gameengineinterfaces.AlienSpec;
 import alieninterfaces.*;
+import static gamelogic.GridCircle.isValidX;
+import static gamelogic.GridCircle.isValidY;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  *
@@ -39,66 +41,35 @@ public class RadarImplementation implements Radar {
         this.size = size;
     }
 
-    public int checkPosX(int x) throws CantSeeSquareException {
-        if (x < this.centerX - size
-                || x > this.centerX + size) {
-            throw new CantSeeSquareException();
-        }
-        if (x < 0) {
-            return 0;
-        }
-        if (x > ag.acGrid.length - 1) {
-            return ag.acGrid.length - 1;
-        }
-        return x;
-    }
-
-    public int checkPosY(int y) throws CantSeeSquareException {
-        if (y < this.centerY - size
-                || y > this.centerY + size) {
-            throw new CantSeeSquareException();
-        }
-        if (y < 0) {
-            return 0;
-        }
-        if (y > ag.acGrid[0].length - 1) {
-            return ag.acGrid[0].length - 1;
-        }
-        return y;
-    }
-
-    private int getPointDistanceProxy(int x1, int y1, int x2, int y2) {
-        // Square roots are expensive, and we only need to determine
-        // which of two distances is the greatest, so we use the distance
-        // formula but don't square root it because we can simply compare
-        // the sum of squares of distances instead
-
-        int distance = (int) (x1 - x2) * (x1 - x2);
-        return distance + (int) (y1 - y2) * (y1 - y2) ;
-    }
-
     public ArrayList<AlienSpecies> getAliensAtPos(int x, int y) throws CantSeeSquareException {
+        x = checkPosX(x);
+        y = checkPosY(y);
+
         ArrayList<AlienSpecies> as = new ArrayList();
-        for (AlienContainer ac : ag.acGrid[x][y]) {
-            as.add(ac.getAlienSpecies());
+        AlienCell acs = ag.getAliensAt(x, y);
+        if (ag != null) {
+            for (AlienContainer ac : ag.acGrid[x][y]) {
+                as.add(ac.getAlienSpecies());
+            }
         }
         return as;
     }
 
-    public ArrayList<AlienSpecies> getAliensInView() throws CantSeeSquareException {
+    public ArrayList<AlienSpecies> getAliensInView() {
         ArrayList<AlienSpecies> as = new ArrayList();
-        int x1 = checkPosX(this.centerX - size);
-        int x2 = checkPosX(this.centerX + size);
-        int y1 = checkPosY(this.centerY - size);
-        int y2 = checkPosY(this.centerY + size);
 
-        for (int x = x1; x <= x2; x++) {
-            for (int y = y1; y <= y2; y++) {
-                for (AlienContainer ac : ag.acGrid[x][y]) {
-                    as.add(ac.getAlienSpecies());
+        for (int d = 1; d <= size; d++) {
+            GridCircle c = new GridCircle(centerX, centerY, d);
+            for (int[] point : c) {
+                AlienCell acs = ag.getAliensAt(point[0], point[1]);
+                if (acs != null) {
+                    for (AlienContainer ac : acs) {
+                        as.add(ac.getAlienSpecies());
+                    }
                 }
             }
         }
+
         return as;
     }
 
@@ -106,20 +77,35 @@ public class RadarImplementation implements Radar {
         return null;
     }
 
-    public ArrayList<SpaceObjectSpec> getSpaceObjectsInView() throws CantSeeSquareException {
+    public ArrayList<SpaceObjectSpec> getSpaceObjectsInView() {
         return null;
     }
 
-    public AlienSpecies getClosestAlienToPos(int x, int y) {
+    public AlienSpecies getClosestAlienToPos(int x, int y) throws CantSeeSquareException {
         return null;
     }
 
-    public AlienSpecies getClosestSpecificAlienToPos(AlienSpecies as, int x, int y) {
+    public AlienSpecies getClosestSpecificAlienToPos(AlienSpecies as, int x, int y) throws CantSeeSquareException {
         return null;
     }
 
-    public AlienSpecies getClosestXenoToPos(AlienSpecies as, int x, int y) {
+    public AlienSpecies getClosestXenoToPos(AlienSpecies as, int x, int y) throws CantSeeSquareException {
         return null;
+    }
+
+    // helpers
+    public int checkPosX(int x) throws CantSeeSquareException {
+        if (!isValidX(x)) {
+            throw new CantSeeSquareException();
+        }
+        return x;
+    }
+
+    public int checkPosY(int y) throws CantSeeSquareException {
+        if (isValidY(y)) {
+            throw new CantSeeSquareException();
+        }
+        return y;
     }
 
 }
