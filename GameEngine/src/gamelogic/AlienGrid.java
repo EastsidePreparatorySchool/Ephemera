@@ -117,7 +117,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         acs.tech = p.tech;
     }
 
-    public void distributeStarEnergy(int x, int y, int energy) {
+    public void distributeStarEnergy(int x, int y, double energy) {
         int[] pos = {Integer.MAX_VALUE, Integer.MAX_VALUE};
 
         // probe around our current position,
@@ -126,7 +126,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         for (int d = 1; d <= energy; d++) {
             // energy is multiplied by an arbitrary factor 16, but goes down by the square of the distance
             // todo: make this properly depend on our rect metric
-            int pointEnergy = (int) ((double) (energy * 5) / (double) ((long) d * (long) d));
+            double pointEnergy = ((double) (energy * Constants.starEnergyPerLuminosity) / (double) ((long) d * (long) d));
 
             if (pointEnergy <= 1) {
                 break; // at the level of empty space, get out
@@ -146,7 +146,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         }
     }
 
-    void putEnergyAt(int x, int y, int energy) {
+    void putEnergyAt(int x, int y, double energy) {
         if (((x + centerX) >= width)
                 || ((x + centerX) < 0)
                 || ((y + centerY) >= height)
@@ -165,7 +165,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         }
     }
     
-    public int getEnergyAt(int x, int y) {
+    public double getEnergyAt(int x, int y) {
         AlienCell acs = acGrid[x + centerX][y + centerY];
         if (acs == null) {
             return 0;

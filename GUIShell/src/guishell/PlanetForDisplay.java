@@ -15,10 +15,10 @@ public class PlanetForDisplay {
     int x;
     int y;
     String name;
-    int energy;
-    int tech;
+    double energy;
+    double tech;
     
-    public PlanetForDisplay(int x, int y, String name, int energy, int tech) {
+    public PlanetForDisplay(int x, int y, String name, double energy, double tech) {
         this.x = x;
         this.y = y;
         this.name = name;

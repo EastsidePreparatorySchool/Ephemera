@@ -23,8 +23,8 @@ public class GameElementSpec {
     public String parent;
     public int x;
     public int y;
-    public int energy;
-    public int tech;
+    public double energy;
+    public double tech;
 
     public GameElementSpec(String kindString) {
         try {

@@ -1,12 +1,14 @@
 !GameElementKind,Domain,Package (jar file without .jar),Class (name),Parent (position will be relative to this),X,Y,Energy (Luminosity for stars),Technology,State
 VARIABLE,,,randseed,,,,1,,
-VARIABLE,,,chatter,,,,,,off
-VARIABLE,,,perSpeciesCap,,,,1000,,
+VARIABLE,,,chatter,,,,,,FALSE
+VARIABLE,,,perSpeciesCap,,,,10000,,
+VARIABLE,,,safeZoneSize,,,,10,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Dalek,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Martian,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Venusian,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,WeepingAngel,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Alf,,,,,,
+SPECIES,ephemera.eastsideprep.org,stockaliens,EmptyAlien,,,,,,
 STAR,ephemera.eastsideprep.org,stockelements,Sol,,0,0,38,,
 STAR,ephemera.eastsideprep.org,stockelements,ProximaCentauri,,-34,-20,15.45,,
 PLANET,ephemera.eastsideprep.org,stockelements,Slathri,stockelements:ProximaCentauri,-1,-1,5,10,"notes:""Gravity on planet is strong. Takes a bunch of energy when you first go to planet"""

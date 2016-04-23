@@ -9,6 +9,7 @@ import gameengineV1.GameEngineV1;
 import gameengineinterfaces.GameCommand;
 import gameengineinterfaces.GameCommandCode;
 import gameengineinterfaces.GameElementSpec;
+import gamelogic.Constants;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.util.Iterator;
@@ -69,8 +70,8 @@ public class GUIShell extends Application {
     public void start(Stage stage) {
 
         // Constants from current Ephemera game
-        int width = 500;
-        int height = 500;
+        int width = Constants.width;
+        int height = Constants.height;
         this.stage = stage;
 
         // get screen geometry
@@ -78,8 +79,7 @@ public class GUIShell extends Application {
         double w = Screen.getPrimary().getDpi();
         screenBounds = Screen.getPrimary().getVisualBounds();
 
-        // for most screens, 1500x500 will display nicely
-        // TODO: Make this adapt to available space (from bounds)
+        // TODO: Make this adapt better to available space (from bounds)
         int cellWidth = screenBounds.getWidth() < 1900 ? 2 : 3;
         int cellHeight = 1;
 
@@ -261,7 +261,7 @@ public class GUIShell extends Application {
         cb.setStyle("-fx-text-fill: white;");
         cb.setOnAction((e) -> {
             engine.queueCommand(
-                    new GameCommand(GameCommandCode.SetVariable, "CHATTER", cb.isSelected() ? "ON" : "OFF"));
+                    new GameCommand(GameCommandCode.SetVariable, "CHATTER", cb.isSelected() ? "true" : "false"));
         });
 
         TextField t = new TextField("");

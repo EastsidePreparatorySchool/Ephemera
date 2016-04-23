@@ -18,12 +18,12 @@ public class StarForDisplay {
     int x;
     int y;
     String name;
-    int energy;
+    double energy;
     int flicker;
     long lastTime;
     int lastFlicker;
 
-    public StarForDisplay(int x, int y, String name, int energy) {
+    public StarForDisplay(int x, int y, String name, double energy) {
         this.x = x;
         this.y = y;
         this.name = name;

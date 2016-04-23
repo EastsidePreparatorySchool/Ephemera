@@ -122,6 +122,8 @@ public class GameEngineThread extends Thread {
                         } else if (field.getType().getName().equals("int") || field.getType().getName().equals("Integer")) {
                             field.set(Constants.class, Integer.parseInt(value));
                         } else if (field.getType().getName().equalsIgnoreCase("boolean")) {
+                            value = value.equalsIgnoreCase("on") ? "true" : value;
+                            value = value.equalsIgnoreCase("off") ? "false" : value;
                             field.set(Constants.class, Boolean.parseBoolean(value));
                         }
                     }
@@ -159,17 +161,18 @@ public class GameEngineThread extends Thread {
                                 if (field.getType().getName().equals("String")) {
                                     field.set(Constants.class, element.state);
                                 } else if (field.getType().getName().equals("int") || field.getType().getName().equals("Integer")) {
+                                    field.set(Constants.class, (int)element.energy);
+                                } else if (field.getType().getName().equalsIgnoreCase("double")) {
                                     field.set(Constants.class, element.energy);
                                 } else if (field.getType().getName().equalsIgnoreCase("boolean")) {
+                                    element.state = element.state.equalsIgnoreCase("on") ? "true" : element.state;
+                                    element.state = element.state.equalsIgnoreCase("off") ? "false" : element.state;
                                     field.set(Constants.class, Boolean.parseBoolean(element.state));
                                 }
                             }
                         }
-
                     }
-
                 }
-
                 break;
 
             case Pause:

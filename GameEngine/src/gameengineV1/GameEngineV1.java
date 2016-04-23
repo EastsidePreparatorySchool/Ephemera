@@ -125,7 +125,7 @@ public class GameEngineV1 implements GameEngine {
 
                     // get energy TODO: Deal with real doubles here if we want them
                     if (strElement.length > 7 && strElement[7] != null && !strElement[7].trim().isEmpty()) {
-                        element.energy = (int) Double.parseDouble(strElement[7].trim());
+                        element.energy = Double.parseDouble(strElement[7].trim());
                     } else {
                         element.energy = 0;
                     }

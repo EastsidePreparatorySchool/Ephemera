@@ -16,11 +16,11 @@ public interface GameVisualizer {
     
     void registerSpecies(AlienSpec as);
     
-    void registerStar(int x, int y, String name, int magnitude);
+    void registerStar(int x, int y, String name, double luminosity);
     
-    void registerPlanet(int x, int y, String name, int energy, int tech);
+    void registerPlanet(int x, int y, String name, double energy, double tech);
     
-    void mapEnergy(int x, int y, int energy);
+    void mapEnergy(int x, int y, double energy);
     
     void showReady();
     

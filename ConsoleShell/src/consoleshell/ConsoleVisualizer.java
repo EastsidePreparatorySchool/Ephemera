@@ -253,17 +253,17 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void registerStar(int x, int y, String name, int magnitude) {
+    public void registerStar(int x, int y, String name, double magnitude) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void registerPlanet(int x, int y, String name, int energy, int tech) {
+    public void registerPlanet(int x, int y, String name, double energy, double tech) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void mapEnergy(int x, int y, int energy) {
+    public void mapEnergy(int x, int y, double energy) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

@@ -47,11 +47,10 @@ public class Dalek implements Alien {
         move_energy = Math.min(move_energy, 10);
 
         // spend a random amount of that moving into x direction
-        int powerX = ctx.getRandomInt(move_energy);
+        int powerX = ctx.getRandomInt(move_energy / 2);
+        int powerY = ctx.getRandomInt(move_energy / 2);
         int x = powerX * (ctx.getRandomInt(2) == 0 ? -1 : 1);
-        move_energy -= powerX;
-        // and y takes the rest
-        int y = move_energy * (ctx.getRandomInt(2) == 0 ? -1 : 1);
+        int y = powerY * (ctx.getRandomInt(2) == 0 ? -1 : 1);
 
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
         return new MoveDir(x, y);

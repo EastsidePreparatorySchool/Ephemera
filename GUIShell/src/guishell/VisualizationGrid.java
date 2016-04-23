@@ -498,17 +498,17 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void registerStar(int x, int y, String name, int magnitude) {
-        Utilities.runSafe(() -> stars.add(new StarForDisplay(x + this.width / 2, y + this.height / 2, name, magnitude)));
+    public void registerStar(int x, int y, String name, double luminosity) {
+        Utilities.runSafe(() -> stars.add(new StarForDisplay(x + this.width / 2, y + this.height / 2, name, luminosity)));
     }
 
     @Override
-    public void registerPlanet(int x, int y, String name, int energy, int tech) {
+    public void registerPlanet(int x, int y, String name, double energy, double tech) {
         Utilities.runSafe(() -> planets.add(new PlanetForDisplay(x + this.width / 2, y + this.height / 2, name, energy, tech)));
     }
 
     @Override
-    public void mapEnergy(int x, int y, int energy) {
+    public void mapEnergy(int x, int y, double energy) {
         this.grid[(x + (width / 2))][((y + height / 2))].energy = energy;
     }
 

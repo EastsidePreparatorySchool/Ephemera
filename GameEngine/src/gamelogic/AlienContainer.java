@@ -55,7 +55,7 @@ public class AlienContainer {
     //
     public AlienContainer(SpaceGrid sg, GameVisualizer vis, int x, int y,
             String alienDomainName, String alienPackageName, String alienClassName, Constructor<?> cns, AlienSpecies as,
-            double energy, double tech, int parent, String message) {
+            double energy, double tech, int parent, String message) throws InstantiationException {
 
         this.domainName = alienDomainName;
         this.packageName = alienPackageName;
@@ -68,13 +68,13 @@ public class AlienContainer {
         this.grid = sg;
         this.listening = false;
 
-        Alien a;
+        Alien a = null;
 
-        // if position = (0,0) assign random position
+        // if position = (0,0) assign random position in safe zone
         if (x == 0 && y == 0) {
 
-            this.x = ctx.getRandomInt(20) - 10; // TODO: get these hardcoded constants from spacegrid instead
-            this.y = ctx.getRandomInt(20) - 10;
+            this.x = ctx.getRandomInt(Constants.safeZoneSize + 1) - Constants.safeZoneSize / 2;
+            this.y = ctx.getRandomInt(Constants.safeZoneSize + 1) - Constants.safeZoneSize / 2;
         } else {
             this.x = x;
             this.y = y;
@@ -87,17 +87,24 @@ public class AlienContainer {
             a = (Alien) cns.newInstance();
             this.alien = a;
             this.alienHashCode = ++currentID;
-            a.init(this.ctx, alienHashCode, parent, message);
         } catch (Throwable t) {
             this.alien = null;
             debugOut("ac: Error constructing Alien");
+            throw new InstantiationException();
+        }
+
+        try {
+            a.init(this.ctx, alienHashCode, parent, message);
+        } catch (UnsupportedOperationException e) {
+            // let this go
         }
 
         fullName = this.getFullName();
         speciesName = this.getFullSpeciesName();
-    }
 
+    }
     // class-related helpers
+
     public String getFullSpeciesName() {
         if (speciesName == null) {
             speciesName = domainName + ":" + packageName + ":" + className;
@@ -155,7 +162,7 @@ public class AlienContainer {
             direction = alien.getMove();
         } catch (UnsupportedOperationException e) {
             // we'll let that go
-            direction = new MoveDir(0,0);
+            direction = new MoveDir(0, 0);
         }
 
         this.checkMove(direction); // Throws an exception if illegal
@@ -168,8 +175,8 @@ public class AlienContainer {
         nextX = x + direction.x();
         nextY = y + direction.y();
 
-        int width = 500;
-        int height = 500;
+        int width = Constants.width;
+        int height = Constants.height;
         if (nextX >= (width / 2) || nextX < (0 - width / 2) || nextY >= (height / 2) || nextY < (0 - height / 2)) {
             debugErr("ac.move: Out of bounds: (" + x + ":" + y + ")");
         }
@@ -178,20 +185,25 @@ public class AlienContainer {
     // this does the actual checking
     private void checkMove(MoveDir direction) throws NotEnoughTechException {
         // for immediate vicinity, just let this go
-        if (Math.abs((long) direction.x()) + Math.abs((long) direction.y()) <= 2) {
-            return;
+        int x = (int) Math.abs((long) direction.x());
+        int y = (int) Math.abs((long) direction.y());
+        int moveLength = x + y;
+
+         // If the move is farther than the alien has the power to move
+        if (moveLength > tech) {
+            debugErr("Illegal move: " + (direction.x()) + "," + (direction.y()) + " tech " + tech);
+            throw new NotEnoughTechException();
         }
-        // If the move is farther than the alien has the tech to move
-        // distance |x|+|y|, easier to program.
-        if (Math.abs((long) direction.x()) + Math.abs((long) direction.y())
-                > (long) tech) {
+        
+         // If the move is farther than the alien has the tech to move
+        if(moveLength   >  tech) {
             debugErr("Illegal move: " + (direction.x()) + "," + (direction.y()) + " tech " + tech);
             throw new NotEnoughTechException();
         }
     }
-
-    // this calculates inward drift based on location
-    // keeps aliens within 250 spaces of Earth
+    
+    
+    
     public MoveDir applyDrift(int x, int y, MoveDir dir) {
         int dxi, dyi;
 
@@ -251,7 +263,7 @@ public class AlienContainer {
                     throw new NotEnoughEnergyException();
                 }
 
-                // limit power by tech
+                // limit fight power by tech
                 if (a.power > tech) {
                     this.currentActionPower = tech;
                 }

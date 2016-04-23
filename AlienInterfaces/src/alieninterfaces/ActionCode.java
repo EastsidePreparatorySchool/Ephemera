@@ -11,6 +11,6 @@ package alieninterfaces;
  */
 public enum ActionCode
 {
-   None, Gain, Research, Spawn, Trade, Fight 
+   None, Gain, Research, Spawn, TradeOrDefend, Fight 
 }
 

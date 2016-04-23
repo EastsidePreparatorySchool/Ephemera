@@ -16,7 +16,7 @@ class Cell {
 
     int alienCount;
     int fightCountDown;
-    int energy;
+    double energy;
     HashMap<String, CellInfo> speciesMap;
     SpeciesSet speciesSet;  // master set of species
     boolean cellChanged;

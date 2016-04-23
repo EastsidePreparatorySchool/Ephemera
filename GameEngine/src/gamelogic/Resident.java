@@ -12,7 +12,7 @@ public class Resident extends SpaceObject {
     // are defined here yet.
     String parent;
     
-    public Resident (GameVisualizer vis, int x, int y, String packageName, String className, int energy, int tech, String parent) {
+    public Resident (GameVisualizer vis, int x, int y, String packageName, String className, double energy, double tech, String parent) {
         super(vis, x, y, packageName, className, energy, tech);
         this.parent = parent;
     }

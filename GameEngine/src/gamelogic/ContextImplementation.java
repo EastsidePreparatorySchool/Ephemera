@@ -49,11 +49,11 @@ public class ContextImplementation implements Context {
     }
 
     public int getSpawningCost() {
-        return 100;
+        return Constants.spawningCost;
     }
 
     public int getFightingCost() {
-        return 0;
+        return Constants.fightingCost;
     }
 
     // alien chatter is prefixed with full info, and only talks when chatter is on

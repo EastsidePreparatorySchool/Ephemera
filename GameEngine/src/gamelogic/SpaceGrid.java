@@ -32,8 +32,6 @@ public class SpaceGrid {
     public HashMap<String, InternalAlienSpecies> speciesMap; // Maps alienSpeciesNames to indexes
     int width;
     int height;
-    int safeZoneSize = 5; // Number of tiles out of 0,0 that should be protected
-    // sZS = 0 gives a 1x1 sz, sZS = 1 gives a 3x3 sz, sZS = 5 gives a 11x11 sz
 
     int currentTurn = 1;
     int speciesCounter = 1; // starting with ID 1
@@ -307,8 +305,8 @@ public class SpaceGrid {
                     //vis.debugOut("SpaceGrid: Processing Fight");
 
                     // If the alien is in the safe zone
-                    if (Math.abs(thisAlien.x) <= safeZoneSize
-                            && Math.abs(thisAlien.y) <= safeZoneSize) {
+                    if (Math.abs(thisAlien.x) <= Constants.safeZoneSize
+                            && Math.abs(thisAlien.y) <= Constants.safeZoneSize) {
                         // Make them pay the energy they spent
                         thisAlien.energy -= thisAlien.currentActionPower;
                         break;
@@ -330,15 +328,6 @@ public class SpaceGrid {
                         }
 
                         speciesCombinedPower += fightingAlien.currentActionPower;
-                        /*if (fightSpecies.containsKey(fightingAlien.speciesName)) {
-                         fightSpecies.put(fightingAlien.speciesName,
-                         fightSpecies.get(fightingAlien.speciesName) +
-                         fightingAlien.currentActionPower);
-                         } else {
-                         fightSpecies.put(
-                         fightingAlien.speciesName,
-                         fightingAlien.currentActionPower);
-                         }*/
                         fightSpecies.put(
                                 fightingAlien.speciesName,
                                 fightingAlien.currentActionPower);
@@ -354,6 +343,7 @@ public class SpaceGrid {
                     // Deduct energy from all aliens and set their fought status
                     for (AlienContainer fightingAlien : fightingAliens) {
                         fightingAlien.fought = true;
+                        fightingAlien.energy -= Constants.fightingCost;
                         fightingAlien.energy -= fightingAlien.currentActionPower;
                     }
 
@@ -421,25 +411,27 @@ public class SpaceGrid {
                     break;
 
                 case Gain:
-                    AlienCell acs = aliens.getAliensAt(thisAlien.x, thisAlien.y);
-                    if (acs.energyPerAlien == 0) {
-                        acs.energyPerAlien = acs.energy / acs.size(); // aliens have to share harvest in one spot
-                    }
+                    if (thisAlien.energy < Constants.energyCap) {
+                        AlienCell acs = aliens.getAliensAt(thisAlien.x, thisAlien.y);
+                        if (acs.energyPerAlien == 0) {
+                            acs.energyPerAlien = acs.energy / acs.size(); // aliens have to share harvest in one spot
+                        }
 
-                    thisAlien.energy += acs.energyPerAlien * thisAlien.tech / 30;
+                        thisAlien.energy += acs.energyPerAlien * thisAlien.tech / Constants.energyGainReducer;
+                    }
                     break;
 
                 case Research:
-                    // there is an arbitrary ceiling at 32 to keep views under control
-                    // aliens can research up to 30, must buy tech beyond that from residents
-                    if (thisAlien.tech < 30) {
+                    // aliens can research up to Constants.researchTechCap, must buy tech beyond that from residents
+                    if (thisAlien.tech < Constants.researchTechCap) {
+                        // TODO: rewrite this to be able to save fractional energy towards technology
                         thisAlien.energy -= thisAlien.tech;
                         thisAlien.tech++; // you only gain 1 tech regardless of energy invested
                     }
                     break;
 
                 case Spawn:
-                    thisAlien.energy -= thisAlien.ctx.getSpawningCost() + thisAlien.currentActionPower;
+                    thisAlien.energy -= Constants.spawningCost + thisAlien.currentActionPower;
 
                     // construct a random move for the new alien depending on power and send that move through drift correction
                     // spend thisAction.power randomly on x move, y move and initital power
@@ -458,8 +450,6 @@ public class SpaceGrid {
                     x = thisAlien.x + dir.x();
                     y = thisAlien.y + dir.y();
 
-                    int width = 500;
-                    int height = 500;
                     if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
                         vis.debugErr("sg.spawn: Out of bounds: (" + x + ":" + y + ")");
                         vis.debugErr("sg.spawn: Out of bounds: old(" + thisAlien.x + ":" + thisAlien.y + ")");
@@ -514,7 +504,6 @@ public class SpaceGrid {
         addAlienWithParams(x, y, domainName, alienPackageName, alienClassName, 0, 1, 1, null);
     }
 
-    // TODO: add spawn state, tech, energy
     void addAlienWithParams(int x, int y, String domainName, String alienPackageName, String alienClassName,
             int parent, double tech, double power, String spawnMsg) {
 
@@ -540,7 +529,8 @@ public class SpaceGrid {
 
         }
 
-        if (as.counter < Constants.perSpeciesCap) {// Load constructor
+        if (as.counter < Constants.perSpeciesCap) {
+            try {
             AlienContainer ac = new AlienContainer(this, this.vis, x, y,
                     domainName, alienPackageName, alienClassName, as.cns, as,
                     tech, power, // tech and power
@@ -550,6 +540,9 @@ public class SpaceGrid {
             aliens.addAlienAndPlug(ac);
             vis.showSpawn(ac.getFullAlienSpec());
             as.counter++;
+            } catch (InstantiationException e) { 
+                vis.debugErr("sg: could not instantiate new " + domainName + ":" + alienPackageName + ":" + alienClassName);
+            }
         }
     }
 

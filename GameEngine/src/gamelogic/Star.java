@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class Star extends SpaceObject{
     
-    public Star (GameVisualizer vis, int x, int y, String packageName, String className, int energy, int tech) {
+    public Star (GameVisualizer vis, int x, int y, String packageName, String className, double energy, double tech) {
         super(vis, x, y, packageName, className, energy, tech);
     }
     
