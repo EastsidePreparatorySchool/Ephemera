@@ -93,4 +93,9 @@ public class TemplateAlien implements Alien {
         return new Action(ActionCode.Gain);
     }
 
+    @Override
+    public void beThoughtful() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

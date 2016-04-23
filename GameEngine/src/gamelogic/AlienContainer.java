@@ -126,7 +126,7 @@ public class AlienContainer {
             species = new AlienSpecies(this.domainName, this.packageName, this.className, species.speciesID);
         }
         return species;
-        
+
     }
 
     public String toStringExpensive() {
@@ -138,11 +138,26 @@ public class AlienContainer {
                 + " r:" + ((int) Math.floor(Math.hypot((double) x, (double) y)));
     }
 
+    public void beThoughtful() {
+        try {
+            this.alien.beThoughtful();
+        } catch (UnsupportedOperationException e) {
+        }
+
+    }
+
     // checked moves
     public void move() throws NotEnoughTechException {
         // Whether the move goes off the board will be determined by the grid
 
-        MoveDir direction = alien.getMove();
+        MoveDir direction = null;
+        try {
+            direction = alien.getMove();
+        } catch (UnsupportedOperationException e) {
+            // we'll let that go
+            direction = new MoveDir(0,0);
+        }
+
         this.checkMove(direction); // Throws an exception if illegal
 
         // we want to contain aliens in the 250 sphere, so apply the "cosmic drift"
@@ -197,8 +212,7 @@ public class AlienContainer {
         }
         return new MoveDir(dxi, dyi);
     }
-    
-    
+
     // easy way to kill an alien
     public void kill() {
         energy = 0;
@@ -228,7 +242,7 @@ public class AlienContainer {
             case Spawn:
                 if (a.power + ctx.getSpawningCost() > energy) {
                     debugOut("AC: Spawn fail with P:" + a.power + " T:" + (tech) + " and E:" + (energy));
-                   throw new NotEnoughEnergyException();
+                    throw new NotEnoughEnergyException();
                 }
                 break;
             case Fight:
@@ -236,7 +250,7 @@ public class AlienContainer {
                     debugOut("AC: Fight fail with P:" + a.power + " T:" + (tech) + " and E:" + (energy));
                     throw new NotEnoughEnergyException();
                 }
-                
+
                 // limit power by tech
                 if (a.power > tech) {
                     this.currentActionPower = tech;

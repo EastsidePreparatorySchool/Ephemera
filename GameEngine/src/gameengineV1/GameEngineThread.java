@@ -120,7 +120,7 @@ public class GameEngineThread extends Thread {
                 } else if (variable.equalsIgnoreCase("CHATTER")) {
                     SpaceGrid.chatter = value.equalsIgnoreCase("on");
                     engine.vis.debugOut("Chatter: " + value);
-                } 
+                }
 
                 break;
 
@@ -156,7 +156,11 @@ public class GameEngineThread extends Thread {
                         } else if (element.className.equalsIgnoreCase("CHATTER")) {
                             SpaceGrid.chatter = element.energy > 0;
                             engine.vis.debugOut("Chatter: " + (element.energy > 0 ? "on" : "off"));
+                        } else if (element.className.equalsIgnoreCase("SPECIESCAP")) {
+                            SpaceGrid.speciesCap = element.energy;
+                            engine.vis.debugOut("SpeciesCap: " + (element.energy));
                         }
+
                     }
 
                 }
