@@ -5,10 +5,7 @@
  */
 package stockaliens;
 
-import alieninterfaces.Action;
-import alieninterfaces.Alien;
-import alieninterfaces.Context;
-import alieninterfaces.MoveDir;
+import alieninterfaces.*;
 
 /**
  *

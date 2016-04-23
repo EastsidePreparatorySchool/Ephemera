@@ -279,11 +279,11 @@ public class SpaceGrid {
                 //thisAlien.api.debugOut(thisAlien.currentAction.name());
             } catch (UnsupportedOperationException e) {
                 // we'll let that go, but it sits idle
-                thisAlien.currentActionCode = ActionCode.None;
+                thisAlien.currentActionCode = Action.ActionCode.None;
                 thisAlien.currentActionPower = 0;
             } catch (Exception ex) {
                 // for all other exceptions, we'll kill it. 
-                thisAlien.currentActionCode = ActionCode.None;
+                thisAlien.currentActionCode = Action.ActionCode.None;
                 thisAlien.currentActionPower = 0;
                 for (StackTraceElement s : ex.getStackTrace()) {
                     thisAlien.debugOut(s.toString());
@@ -319,7 +319,7 @@ public class SpaceGrid {
 
                     for (AlienContainer fightingAlien : fightingAliens) {
 
-                        if (fightingAlien.currentActionCode != ActionCode.Fight) {
+                        if (fightingAlien.currentActionCode != Action.ActionCode.Fight) {
                             fightingAlien.currentActionPower = 0;
                         }
 

@@ -80,7 +80,7 @@ public class Dalek implements Alien {
                 ctx.debugOut("Choosing to gain energy,"
                         + " E:" + Double.toString(ctx.getEnergy())
                         + " T:" + Double.toString(ctx.getTech()));
-                return new Action(ActionCode.Gain);
+                return new Action(Action.ActionCode.Gain);
             }
 
             // do we have enough tech?
@@ -89,7 +89,7 @@ public class Dalek implements Alien {
                 ctx.debugOut("Choosing to research"
                         + " E:" + Double.toString(ctx.getEnergy())
                         + " T:" + Double.toString(ctx.getTech()));
-                return new Action(ActionCode.Research);
+                return new Action(Action.ActionCode.Research);
             }
 
             // is there another alien on our position?
@@ -101,7 +101,7 @@ public class Dalek implements Alien {
                         + " X:" + Double.toString(ctx.getX())
                         + " Y:" + Double.toString(ctx.getY()));
 
-                return new Action(ActionCode.Fight, (int) ctx.getEnergy() - 2 - ctx.getFightingCost());
+                return new Action(Action.ActionCode.Fight, (int) ctx.getEnergy() - 2 - ctx.getFightingCost());
             }
 
             if (ctx.getEnergy() > (ctx.getSpawningCost() + 10)) {
@@ -110,7 +110,7 @@ public class Dalek implements Alien {
                         + " E:" + Double.toString(ctx.getEnergy())
                         + " T:" + Double.toString(ctx.getTech()));
 
-                return new Action(ActionCode.Spawn, 5);
+                return new Action(Action.ActionCode.Spawn, 5);
             }
         } catch (Exception e) {
             // do something here to deal with errors
@@ -120,7 +120,7 @@ public class Dalek implements Alien {
         ctx.debugOut("Gaining energy"
                 + " E:" + Double.toString(ctx.getEnergy())
                 + " T:" + Double.toString(ctx.getTech()));
-        return new Action(ActionCode.Gain);
+        return new Action(Action.ActionCode.Gain);
     }
 
     @Override

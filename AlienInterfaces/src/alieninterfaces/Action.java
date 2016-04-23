@@ -53,4 +53,7 @@ public class Action {
         this.buyPrice = buyPrice;
     }
 
+    public enum ActionCode {
+        None, Gain, Research, Spawn, TradeOrDefend, Fight
+    }
 }

@@ -6,7 +6,6 @@
 package stockaliens;
 
 import alieninterfaces.*;
-import java.util.Random;
 
 /**
  *
@@ -66,7 +65,7 @@ public class WeepingAngel implements Alien {
                         + " Y:" + Double.toString(ctx.getY()));
 
                 if (ctx.getEnergy() > ctx.getFightingCost() + 2)
-                return new Action(ActionCode.Fight, (int)ctx.getEnergy() - ctx.getFightingCost() - 2);
+                return new Action(Action.ActionCode.Fight, (int)ctx.getEnergy() - ctx.getFightingCost() - 2);
                 
             }
             // always get energy
@@ -75,7 +74,7 @@ public class WeepingAngel implements Alien {
                 ctx.debugOut("Choosing to gain Energy,"
                         + " E:" + Double.toString(ctx.getEnergy())
                         + " T:" + Double.toString(ctx.getTech()));
-                return new Action(ActionCode.Gain);
+                return new Action(Action.ActionCode.Gain);
             } 
            
              // do we have enough tech?
@@ -84,7 +83,7 @@ public class WeepingAngel implements Alien {
                 ctx.debugOut("Choosing to research"
                         + " E:" + Double.toString(ctx.getEnergy())
                         + " T:" + Double.toString(ctx.getTech()));
-                return new Action(ActionCode.Research);
+                return new Action(Action.ActionCode.Research);
             }
             // every 
             turn = turn + 1;
@@ -93,7 +92,7 @@ public class WeepingAngel implements Alien {
                     + " E:" + Double.toString(ctx.getEnergy())
                     + " T:" + Double.toString(ctx.getTech()));
 
-            return new Action(ActionCode.Spawn,(int)ctx.getEnergy()/2) ;
+            return new Action(Action.ActionCode.Spawn,(int)ctx.getEnergy()/2) ;
             }
             
         } catch (Exception e) {
@@ -103,7 +102,7 @@ public class WeepingAngel implements Alien {
         ctx.debugOut("Weeping Angels: Must gain energy"
                 + " E:" + Double.toString(ctx.getEnergy())
                 + " T:" + Double.toString(ctx.getTech()));
-        return new Action(ActionCode.Gain);
+        return new Action(Action.ActionCode.Gain);
     }
 
     public void processResults() {

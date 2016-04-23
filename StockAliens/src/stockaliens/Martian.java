@@ -3,7 +3,6 @@
  */
 package stockaliens;
 
-import java.util.Random;
 import alieninterfaces.*;
 
 /**
@@ -92,25 +91,25 @@ public class Martian implements Alien {
         try {
             if (ctx.getView().getAlienCountAtPos(ctx.getX(), ctx.getY()) > 1) {
                 ctx.debugOut("Fighting");
-                return new Action(ActionCode.Fight, (fightStrength));
+                return new Action(Action.ActionCode.Fight, (fightStrength));
             }
         } catch (Exception e) {
             ctx.debugOut("Fighting");
-            return new Action(ActionCode.Fight, (int)ctx.getEnergy()-1);
+            return new Action(Action.ActionCode.Fight, (int)ctx.getEnergy()-1);
         }
         //if it doesnt fight, it chooses a item to do depending on how much energy it has.
         if (ctx.getEnergy() < 2) {
             ctx.debugOut("Gaining");
-            return new Action(ActionCode.Gain);
+            return new Action(Action.ActionCode.Gain);
         } else if (ctx.getEnergy() < 3 && ctx.getEnergy() > ctx.getTech() && ctx.getTech() < 30) {
             ctx.debugOut("Researching");
-            return new Action(ActionCode.Research);
+            return new Action(Action.ActionCode.Research);
         } else if (ctx.getEnergy() > ctx.getSpawningCost() + 2) {
             ctx.debugOut("Spawning");
-            return new Action(ActionCode.Spawn, 2);
+            return new Action(Action.ActionCode.Spawn, 2);
         } 
         
-        return new Action (ActionCode.Gain);
+        return new Action (Action.ActionCode.Gain);
     }
 
 

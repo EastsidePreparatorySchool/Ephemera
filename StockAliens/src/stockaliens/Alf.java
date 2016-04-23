@@ -5,12 +5,8 @@
  */
 package stockaliens;
 
-import alieninterfaces.Action;
-import alieninterfaces.ActionCode;
-import alieninterfaces.Alien;
-import alieninterfaces.Context;
-import alieninterfaces.MoveDir;
-import alieninterfaces.View;
+import alieninterfaces.*;
+
 
 /**
  *
@@ -86,12 +82,12 @@ public class Alf implements Alien {
                 // if so, do we have any energy?
                 if (ctx.getEnergy() < 10) {
                     // no, keep moving.
-                    return new Action(ActionCode.Gain);
+                    return new Action(Action.ActionCode.Gain);
                 }
 
                 // or, hit really hard then run again
                 ctx.debugOut("Fighting");
-                return new Action(ActionCode.Fight, (int)ctx.getEnergy() - 10);
+                return new Action(Action.ActionCode.Fight, (int)ctx.getEnergy() - 10);
             }
         } catch (Exception e) {
             // do something here to deal with errors
@@ -105,16 +101,16 @@ public class Alf implements Alien {
             if (ctx.getEnergy() > ctx.getSpawningCost() + 10) {
                 //should spawn fast at the beggining,
                 ctx.debugOut("Spawning");
-                return new Action(ActionCode.Spawn, 5);
+                return new Action(Action.ActionCode.Spawn, 5);
             }
             if (ctx.getTech() < 30) {
                 ctx.debugOut("Researching");
-                return new Action(ActionCode.Research);
+                return new Action(Action.ActionCode.Research);
             }
         }
         ctx.debugOut("Gaining");
 
-        return new Action(ActionCode.Gain);
+        return new Action(Action.ActionCode.Gain);
     }
 
     public void processResults() {

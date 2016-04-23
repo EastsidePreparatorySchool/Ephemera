@@ -32,7 +32,7 @@ public class AlienContainer {
     public final SpaceGrid grid;
     public int alienHashCode;
 
-    public ActionCode currentActionCode;
+    public Action.ActionCode currentActionCode;
     public double currentActionPower;
     public String currentActionMessage;
     public boolean listening;

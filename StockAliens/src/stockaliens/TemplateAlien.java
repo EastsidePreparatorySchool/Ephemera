@@ -5,12 +5,7 @@
  */
 package stockaliens;
 
-import alieninterfaces.Action;
-import alieninterfaces.ActionCode;
-import alieninterfaces.Alien;
-import alieninterfaces.Context;
-import alieninterfaces.MoveDir;
-import alieninterfaces.View;
+import alieninterfaces.*;
 
 /**
  *
@@ -85,12 +80,12 @@ public class TemplateAlien implements Alien {
         if (ctx.getEnergy() > (ctx.getTech() + 5)) {
             if (ctx.getTech() < 30) {
                 ctx.debugOut("Researching");
-                return new Action(ActionCode.Research);
+                return new Action(Action.ActionCode.Research);
             }
         }
         ctx.debugOut("Gaining");
 
-        return new Action(ActionCode.Gain);
+        return new Action(Action.ActionCode.Gain);
     }
 
     @Override
