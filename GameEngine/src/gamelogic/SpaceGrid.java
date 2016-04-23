@@ -40,8 +40,6 @@ public class SpaceGrid {
 
     // this is the only approved random generator for the game. Leave it alone!
     public static Random rand;
-    public static int randSeed = 0;
-    public static boolean chatter = false;
 
     public SpaceGrid(GameEngineV1 eng, GameVisualizer vis, int width, int height) {
         this.vis = vis;

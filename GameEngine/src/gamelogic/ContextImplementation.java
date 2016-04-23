@@ -58,7 +58,7 @@ public class ContextImplementation implements Context {
 
     // alien chatter is prefixed with full info, and only talks when chatter is on
     public void debugOut(String s) {
-        if (ac.grid.chatter) {
+        if (Constants.chatter) {
             vis.debugOut(ac.getFullName() + ": " + s);
         }
     }

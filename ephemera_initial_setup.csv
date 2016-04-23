@@ -1,5 +1,7 @@
 !GameElementKind,Domain,Package (jar file without .jar),Class (name),Parent (position will be relative to this),X,Y,Energy (Luminosity for stars),Technology,State
 VARIABLE,,,randseed,,,,1,,
+VARIABLE,,,chatter,,,,,,off
+VARIABLE,,,perSpeciesCap,,,,1000,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Dalek,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Martian,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Venusian,,,,,,
