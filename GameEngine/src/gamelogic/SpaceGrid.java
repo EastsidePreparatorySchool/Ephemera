@@ -28,7 +28,7 @@ public class SpaceGrid {
     GameEngineV1 engine;
     GameVisualizer vis;
     public AlienGrid aliens;    // Aliens are born and die, so our list needs to be able to grow and shrink
-    List<SpaceObject> objects;  // Stars, planets, space stations, etc.
+    List<InternalSpaceObject> objects;  // Stars, planets, space stations, etc.
     public HashMap<String, InternalAlienSpecies> speciesMap; // Maps alienSpeciesNames to indexes
     int width;
     int height;
@@ -556,7 +556,7 @@ public class SpaceGrid {
         }
     }
 
-    // Note: Having a seperate method for each SpaceObject seems a little gross,
+    // Note: Having a seperate method for each InternalSpaceObject seems a little gross,
     // as there is already a large if statement in addElement and the code in
     // addPlanet and addStar is nearly identical
     void addPlanet(GameElementSpec element) {

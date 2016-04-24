@@ -6,8 +6,8 @@ import gameengineinterfaces.GameVisualizer;
  *
  * @author guberti
  */
-public class Resident extends SpaceObject {
-    // Residents are stored in an array held by the SpaceObject they inhabit
+public class Resident extends InternalSpaceObject {
+    // Residents are stored in an array held by the InternalSpaceObject they inhabit
     // Nothing else about residents is known, so no constructors/variables
     // are defined here yet.
     String parent;

@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author guberti
  */
-public class Planet extends SpaceObject {
+public class Planet extends InternalSpaceObject {
     
     final String parent;
     

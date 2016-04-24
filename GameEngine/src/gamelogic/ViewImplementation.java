@@ -17,7 +17,7 @@ public class ViewImplementation implements View {
 
     private final AlienContainer ac;
     private final List<AlienContainer> aCs;
-    private final List<SpaceObject> sOs;
+    private final List<InternalSpaceObject> sOs;
     private final int bottomX;
     private final int bottomY;
     private final int size;
@@ -33,7 +33,7 @@ public class ViewImplementation implements View {
         fullyInstantiated = false;
     }
 
-    public ViewImplementation(AlienContainer ac, List<AlienContainer> aCs, List<SpaceObject> sOs, int bottomX, int bottomY, int size) {
+    public ViewImplementation(AlienContainer ac, List<AlienContainer> aCs, List<InternalSpaceObject> sOs, int bottomX, int bottomY, int size) {
         this.ac = ac;
         this.aCs = aCs;
         this.sOs = sOs;

@@ -19,15 +19,15 @@ public interface Radar {
 
     ArrayList<AlienSpecies> getAliensInView();
 
-    SpaceObjectSpec getSpaceObjectAtPos(int x, int y) throws CantSeeSquareException;
+    SpaceObject getSpaceObjectAtPos(int x, int y) throws CantSeeSquareException;
 
-    ArrayList<SpaceObjectSpec> getSpaceObjectsInView();
+    ArrayList<SpaceObject> getSpaceObjectsInView();
 
-    AlienSpecies getClosestAlienToPos(int x, int y) throws CantSeeSquareException;
+    ArrayList<AlienSpecies> getClosestAliensToPos(int x, int y) throws CantSeeSquareException;
 
-    AlienSpecies getClosestSpecificAlienToPos(AlienSpecies as, int x, int y) throws CantSeeSquareException;
+    ArrayList<AlienSpecies> getClosestSpecificAliensToPos(AlienSpecies thisOne, int x, int y) throws CantSeeSquareException;
 
-    AlienSpecies getClosestXenoToPos(AlienSpecies as, int x, int y) throws CantSeeSquareException;
+    ArrayList<AlienSpecies> getClosestXenosToPos(AlienSpecies notThisOne, int x, int y) throws CantSeeSquareException;
 
     public class CantSeeSquareException extends Exception {
     }

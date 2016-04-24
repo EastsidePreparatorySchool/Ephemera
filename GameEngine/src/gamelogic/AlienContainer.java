@@ -293,7 +293,7 @@ public class AlienContainer {
         int highY = Math.min(y + size, ((grid.height / 2) - 1));
 
         List<AlienContainer> visibleAliens = new LinkedList<>();
-        List<SpaceObject> visibleObjects = new LinkedList<>();
+        List<InternalSpaceObject> visibleObjects = new LinkedList<>();
 
         for (int x = lowX; x <= highX; x++) {
             for (int y = lowY; y <= highY; y++) {

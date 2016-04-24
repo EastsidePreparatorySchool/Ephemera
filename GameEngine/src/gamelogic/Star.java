@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author guberti
  */
-public class Star extends SpaceObject{
+public class Star extends InternalSpaceObject{
     
     public Star (GameVisualizer vis, int x, int y, String packageName, String className, double energy, double tech) {
         super(vis, x, y, packageName, className, energy, tech);

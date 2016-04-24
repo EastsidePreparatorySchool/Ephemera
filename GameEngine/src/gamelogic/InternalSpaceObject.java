@@ -14,7 +14,7 @@ import java.util.*;
  *
  * @author guberti
  */
-public abstract class SpaceObject {
+public abstract class InternalSpaceObject {
     
     public int x;
     public int y;
@@ -24,7 +24,7 @@ public abstract class SpaceObject {
     public double energy; // Energy that aliens gain every turn from the planet
     public double tech; // Tech boost for the planet
     
-    public SpaceObject (GameVisualizer vis, int x, int y, String packageName, String className, double energy, double tech) {
+    public InternalSpaceObject (GameVisualizer vis, int x, int y, String packageName, String className, double energy, double tech) {
         this.x = x;
         this.y = y;
         this.energy = energy;

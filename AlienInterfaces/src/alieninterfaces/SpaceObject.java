@@ -9,7 +9,12 @@ package alieninterfaces;
  *
  * @author gmein
  */
-public class SpaceObjectSpec {
-    String kind;
-    String name;
+public class SpaceObject {
+    final public String kind;
+    final public String name;
+    
+    public SpaceObject(String kind, String name) {
+        this.name = name;
+        this.kind = kind;
+    }
 }
