@@ -175,8 +175,8 @@ public class AlienContainer {
 
         int oldx = x;
         int oldy = y;
-        nextX = x + direction.x();
-        nextY = y + direction.y();
+        nextX = x + direction.x;
+        nextY = y + direction.y;
 
         int width = Constants.width;
         int height = Constants.height;
@@ -187,7 +187,7 @@ public class AlienContainer {
 
     // this does the actual checking
     private void checkMove(MoveDir direction) throws NotEnoughTechException {
-        int moveLength = distance(0, 0, direction.x(), direction.y());
+        int moveLength = distance(0, 0, direction.x, direction.y);
 
         // leet onexone moves go
         
@@ -197,13 +197,13 @@ public class AlienContainer {
         
         // If the move is farther than the alien has the power to move
         if (moveLength > tech) {
-           debugErr("Illegal move(" + moveLength + "): " + (direction.x()) + "," + (direction.y()) + " tech " + tech);
+           debugErr("Illegal move(" + moveLength + "): " + (direction.x) + "," + (direction.y) + " tech " + tech);
             throw new NotEnoughTechException();
         }
 
         // If the move is farther than the alien has the tech to move
         if (moveLength > tech) {
-            debugErr("Illegal move: " + (direction.x()) + "," + (direction.y()) + " tech " + tech);
+            debugErr("Illegal move: " + (direction.x) + "," + (direction.y) + " tech " + tech);
             throw new NotEnoughTechException();
         }
     }
@@ -211,8 +211,8 @@ public class AlienContainer {
     public MoveDir applyDrift(int x, int y, MoveDir dir) {
         int dxi, dyi;
 
-        dxi = dir.x();
-        dyi = dir.y();
+        dxi = dir.x;
+        dyi = dir.y;
 
         if (x + dxi > 249) {
             dxi = 249 - x;

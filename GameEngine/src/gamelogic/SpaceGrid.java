@@ -543,8 +543,8 @@ public class SpaceGrid {
                     MoveDir dir = new MoveDir(x, y);
                     dir = thisAlien.applyDrift(thisAlien.x, thisAlien.y, dir);
 
-                    x = thisAlien.x + dir.x();
-                    y = thisAlien.y + dir.y();
+                    x = thisAlien.x + dir.x;
+                    y = thisAlien.y + dir.y;
 
                     // Add in the alien spec to a new arraylist
                     // to be processed later so the master list is not disrupted
@@ -554,8 +554,8 @@ public class SpaceGrid {
                             thisAlien.className,
                             thisAlien.species.speciesID,
                             thisAlien.alienHashCode, // ugly, overloading the use to communicate parentage
-                            thisAlien.x + dir.x(),
-                            thisAlien.y + dir.y(),
+                            x,
+                            y,
                             power,
                             thisAlien.tech, // tech inherited undiminished from parent, TODO: This is questionable
                             null,

@@ -9,12 +9,12 @@ package alieninterfaces;
  *
  * @author gmein
  */
-public class MoveDir {
+public class Position {
     public int x;
     public int y;
     
-    public MoveDir(int xChange, int yChange) {
-        this.x = xChange;
-        this.y = yChange;
+    public Position(int x, int y) {
+        this.x = x;
+        this.y = y;
     }    
 }
