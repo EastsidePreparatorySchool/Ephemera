@@ -21,8 +21,6 @@ public interface Context {
 
     View getView();
 
-    Radar getRadar();
-
     int getSpawningCost();
 
     int getFightingCost();

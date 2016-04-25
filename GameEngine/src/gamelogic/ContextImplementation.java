@@ -42,7 +42,7 @@ public class ContextImplementation implements Context {
 
     public View getView() {
         if (this.view == null) {
-            this.view = new ViewImplementation(ac);
+            this.view = new ViewImplementation(ac.grid.aliens, ac.x, ac.y, (int) ac.tech);
             // full object: this.view = this.aC.getFullView();
         }
         return this.view;
@@ -61,12 +61,6 @@ public class ContextImplementation implements Context {
         if (Constants.chatter) {
             vis.debugOut(ac.getFullName() + ": " + s);
         }
-    }
-
-    @Override
-    public Radar getRadar() {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        return null;
     }
 
     @Override

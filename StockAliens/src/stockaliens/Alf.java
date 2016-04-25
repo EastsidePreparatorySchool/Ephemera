@@ -6,7 +6,7 @@
 package stockaliens;
 
 import alieninterfaces.*;
-
+import java.util.List;
 
 /**
  *
@@ -44,22 +44,31 @@ public class Alf implements Alien {
         // Venusians run away from the nearest alien
         double techLevel = ctx.getTech();
 
-        int[] nearestAlienPos = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY());
-
         int x = 0;
         int y = 0;
 
-        //always moves away from other aliens
-        if (nearestAlienPos[0] > ctx.getX()) {
-            x = (int)(-techLevel / 2);
-        } else if (nearestAlienPos[0] < ctx.getX()) {
-            x = (int)(techLevel / 2);
-        }
+        try {
+            List<AlienSpecies> nearestAliens = ctx.getView().getClosestXenosToPos(
+                    new AlienSpecies("eastsideprep.org", "stockaliens","Alf", 0),
+                    ctx.getX(), ctx.getY());
+            if (!nearestAliens.isEmpty()) {
+                int nearestX = nearestAliens.get(0).x;
+                int nearestY = nearestAliens.get(0).y;
 
-        if (nearestAlienPos[1] > ctx.getY()) {
-            y = (int)(-techLevel / 2);
-        } else if (nearestAlienPos[1] < ctx.getY()) {
-            y = (int)(techLevel / 2);
+                //always moves away from other aliens
+                if (nearestX > ctx.getX()) {
+                    x = (int) (-techLevel / 2);
+                } else if (nearestX < ctx.getX()) {
+                    x = (int) (techLevel / 2);
+                }
+
+                if (nearestX > ctx.getY()) {
+                    y = (int) (-techLevel / 2);
+                } else if (nearestY < ctx.getY()) {
+                    y = (int) (techLevel / 2);
+                }
+            }
+        } catch (Exception e) {
         }
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
 
@@ -77,7 +86,7 @@ public class Alf implements Alien {
         // catch and shenanigans
         try {
             // is there another alien on our position?
-            if (view.getAlienCountAtPos(ctx.getX(), ctx.getY()) > 1) {
+            if (view.getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1) {
                 ctx.debugOut("Others are here");
                 // if so, do we have any energy?
                 if (ctx.getEnergy() < 10) {
@@ -87,7 +96,7 @@ public class Alf implements Alien {
 
                 // or, hit really hard then run again
                 ctx.debugOut("Fighting");
-                return new Action(Action.ActionCode.Fight, (int)ctx.getEnergy() - 10);
+                return new Action(Action.ActionCode.Fight, (int) ctx.getEnergy() - 10);
             }
         } catch (Exception e) {
             // do something here to deal with errors

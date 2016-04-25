@@ -5,143 +5,207 @@
  */
 package gamelogic;
 
-import java.util.List;
 import alieninterfaces.*;
+import static gamelogic.GridCircle.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
- * @author guberti
+ * @author gmein
+ *
+ * This replaces "ViewImplementation"
  */
 public class ViewImplementation implements View {
 
-    private final AlienContainer ac;
-    private final List<AlienContainer> aCs;
-    private final List<InternalSpaceObject> sOs;
-    private final int bottomX;
-    private final int bottomY;
-    private final int size;
-    public boolean fullyInstantiated;
+    private AlienGrid ag;
+    private int centerX;
+    private int centerY;
+    private int size;
 
-    public ViewImplementation(AlienContainer ac) {
-        this.ac = ac;
-        this.aCs = null;
-        this.sOs = null;
-        this.bottomX = 0;
-        this.bottomY = 0;
-        this.size = (int)ac.tech;
-        fullyInstantiated = false;
+    public ViewImplementation(AlienGrid ag) {
+        this.ag = ag;
+        this.centerX = 0;
+        this.centerY = 0;
+        this.size = 0;
     }
 
-    public ViewImplementation(AlienContainer ac, List<AlienContainer> aCs, List<InternalSpaceObject> sOs, int bottomX, int bottomY, int size) {
-        this.ac = ac;
-        this.aCs = aCs;
-        this.sOs = sOs;
-        this.bottomX = bottomX;
-        this.bottomY = bottomY;
+    public ViewImplementation(AlienGrid ag, int centerX, int centerY, int size) {
+        this.ag = ag;
+        this.centerX = centerX;
+        this.centerY = centerY;
         this.size = size;
-        this.fullyInstantiated = true;
     }
 
-    @Override
-    public int getEnergyAtPos(int x, int y) {
-        return 0;
-    }
+    public List<AlienSpecies> getAliensAtPos(int x, int y) throws CantSeeSquareException {
+        checkPos(x, y);
 
-    @Override
-    public int getAlienCountAtPos(int x, int y) {
-        if (((x + ac.grid.aliens.centerX) >= ac.grid.width)
-                || ((x + ac.grid.aliens.centerX) < 0)
-                || ((y + ac.grid.aliens.centerY) >= ac.grid.height)
-                || ((y + ac.grid.aliens.centerY) < 0)) {
-            return 0;
-        }
-
-        if (ac.grid.aliens.isEmptyAt(x, y)) {
-            return 0;
-        }
-
-        return ac.grid.aliens.acGrid[x + ac.grid.aliens.centerX][y + ac.grid.aliens.centerY].size()
-                - ((ac.x == x && ac.y == y) ? 1 : 0);
-    }
-
-    @Override
-    public int[] getClosestAlienPos(int x, int y) {
-        int[] pos = {Integer.MAX_VALUE, Integer.MAX_VALUE};
-
-        if (fullyInstantiated) {
-            if (aCs.isEmpty()) { // If there are no visible aliens
-                //throw new NoVisibleAliensException();
-                int[] invalid_pos = {Integer.MAX_VALUE, Integer.MAX_VALUE};
-                return invalid_pos;
+        ArrayList<AlienSpecies> as = new ArrayList();
+        AlienCell acs = ag.getAliensAt(x, y);
+        if (acs != null) {
+            for (AlienContainer ac : acs) {
+                as.add(ac.getAlienSpecies());
             }
+        }
+        return as;
+    }
 
-            // Returns an array of two numbers corresponding to the x and y of the alien
-            int alienX = aCs.get(0).x;
-            int alienY = aCs.get(0).y;
+    public List<AlienSpecies> getAliensInView() {
+        ArrayList<AlienSpecies> as = new ArrayList();
 
-            for (AlienContainer aC : aCs) {
-                if (getPointDistanceSquare(x, y, aC.x, aC.y)
-                        < getPointDistanceSquare(x, y, alienX, alienY)) {
-                    alienX = aC.x;
-                    alienY = aC.y;
-                }
-            }
-
-            pos[0] = alienX;
-            pos[1] = alienY;
-
-            return pos;
-        } else {
-            // probe around our current position,
-            // tracing an imaginary square of increasing size,
-            // starting from the midpoints of the sides
-            for (int d = 1; d <= size; d++) {
-                for (int dd = 0; dd <= d; dd++) {
-                    probe(pos, ac.x - d, ac.y - dd);
-                    probe(pos, ac.x - d, ac.y + dd);
-                    probe(pos, ac.x + d, ac.y - dd);
-                    probe(pos, ac.x + d, ac.y + dd);
-                    probe(pos, ac.x - dd, ac.y - d);
-                    probe(pos, ac.x + dd, ac.y - d);
-                    probe(pos, ac.x - dd, ac.y + d);
-                    probe(pos, ac.x + dd, ac.y + d);
-
-                    // if we found one coinciding with our x OR y position, 
-                    // there cannot be a closer one in our search pattern
-                    if ((pos[0] == ac.x) || (pos[1] == ac.y)) {
-                        return pos;
+        for (int d = 0; d <= size; d++) {
+            GridCircle c = new GridCircle(centerX, centerY, d);
+            for (int[] point : c) {
+                AlienCell acs = ag.getAliensAt(point[0], point[1]);
+                if (acs != null) {
+                    for (AlienContainer ac : acs) {
+                        as.add(ac.getAlienSpecies());
                     }
                 }
             }
         }
-        return pos;
+
+        return as;
     }
 
-    void probe(int[] pos, int x, int y) {
-        if (((x + ac.grid.aliens.centerX) >= ac.grid.width)
-                || ((x + ac.grid.aliens.centerX) < 0)
-                || ((y + ac.grid.aliens.centerY) >= ac.grid.height)
-                || ((y + ac.grid.aliens.centerY) < 0)) {
-            return;
-        }
+    public SpaceObject getSpaceObjectAtPos(int x, int y) throws CantSeeSquareException {
+        checkPos(x, y);
 
-        if (!ac.grid.aliens.isEmptyAt(x, y)) {
-            // there are aliens there
-            if (getPointDistanceSquare(x, y, ac.x, ac.y) < getPointDistanceSquare(pos[0], pos[1], ac.x, ac.y)) {
-                // this is the closest one so far
-                pos[0] = x;
-                pos[1] = y;
+        AlienCell acs = ag.getAliensAt(x, y);
+        if (acs != null) {
+            if (acs.star != null) {
+                return new SpaceObject("Star", acs.star.className);
+            } else if (acs.planet != null) {
+                return new SpaceObject("Planet", acs.planet.className);
             }
         }
+        return null;
     }
 
-    private int getPointDistanceSquare(int x1, int y1, int x2, int y2) {
-        // Square roots are expensive, and we only need to determine
-        // which of two distances is the greatest, so we use the distance
-        // formula but don't square root it because we can simply compare
-        // the squares of distances instead
+    public List<SpaceObject> getSpaceObjectsInView() {
+        ArrayList<SpaceObject> sos = new ArrayList();
+        SpaceObject so = null;
 
-        return ((y1 - y2) * (y1 - y2)) + (x1 - x2) * (x1 - x2);
+        for (int d = 0; d <= size; d++) {
+            GridCircle c = new GridCircle(centerX, centerY, d);
+            for (int[] point : c) {
+                AlienCell acs = ag.getAliensAt(point[0], point[1]);
+                if (acs != null) {
+                    if (acs.star != null) {
+                        so = new SpaceObject("Star", acs.star.className);
+                    } else if (acs.planet != null) {
+                        so = new SpaceObject("Planet", acs.planet.className);
+                    }
+                }
+
+                if (so != null) {
+                    sos.add(so);
+                }
+            }
+        }
+
+        return sos;
+    }
+
+    public List<AlienSpecies> getClosestAliensToPos(int x, int y) throws CantSeeSquareException {
+        checkPos(x, y);
+
+        ArrayList<AlienSpecies> as = new ArrayList<>();
+
+        for (int d = 0; d <= size; d++) {
+            GridCircle c = new GridCircle(x, y, d, centerX, centerY);
+            for (int[] point : c) {
+                AlienCell acs = ag.getAliensAt(point[0], point[1]);
+                if (acs != null) {
+                    for (AlienContainer ac : acs) {
+                        if (as == null) {
+                            as = new ArrayList();
+                        }
+                        as.add(ac.getAlienSpecies());
+                    }
+                }
+                // if any added in this circle, return
+                if (as != null && as.size() > 0) {
+                    return as;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public List<AlienSpecies> getClosestSpecificAliensToPos(AlienSpecies thisOne, int x, int y) throws CantSeeSquareException {
+        checkPos(x, y);
+
+        ArrayList<AlienSpecies> as = null;
+
+        for (int d = 0; d <= size; d++) {
+            GridCircle c = new GridCircle(x, y, d, centerX, centerY);
+            for (int[] point : c) {
+                AlienCell acs = ag.getAliensAt(point[0], point[1]);
+                if (acs != null) {
+                    for (AlienContainer ac : acs) {
+                        if (ac.getFullSpeciesName().equalsIgnoreCase(thisOne.getFullSpeciesName())) {
+                            if (as == null) {
+                                as = new ArrayList<>();
+                            }
+
+                            as.add(ac.getAlienSpecies());
+                        }
+                    }
+                }
+                // if any added in this circle, return
+                if (as != null && as.size() > 0) {
+                    return as;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public List<AlienSpecies> getClosestXenosToPos(AlienSpecies notThisOne, int x, int y) throws CantSeeSquareException {
+        checkPos(x, y);
+
+        ArrayList<AlienSpecies> as = null;
+
+        for (int d = 0; d <= size; d++) {
+            GridCircle c = new GridCircle(x, y, d, centerX, centerY);
+            for (int[] point : c) {
+                AlienCell acs = ag.getAliensAt(point[0], point[1]);
+                if (acs != null) {
+                    for (AlienContainer ac : acs) {
+                        if (!ac.getFullSpeciesName().equalsIgnoreCase(notThisOne.getFullSpeciesName())) {
+                            if (as == null) {
+                                as = new ArrayList<>();
+
+                            }
+                            as.add(ac.getAlienSpecies());
+                        }
+                    }
+                }
+                // if any added in this circle, return
+                if (as != null && as.size() > 0) {
+                    return as;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // helpers
+    public void checkPos(int x, int y) throws CantSeeSquareException {
+        if (!isValidX(x)) {
+            throw new CantSeeSquareException();
+        }
+
+        if (!isValidY(y)) {
+            throw new CantSeeSquareException();
+        }
+
+        if (distance(x, y, this.centerX, this.centerY) > this.size) {
+            throw new CantSeeSquareException();
+        }
     }
 }

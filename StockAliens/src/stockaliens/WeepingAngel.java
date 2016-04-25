@@ -57,7 +57,7 @@ public class WeepingAngel implements Alien {
         try {
            
             
-            if (view.getAlienCountAtPos(ctx.getX(), ctx.getY()) > 1) {
+            if (view.getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1) {
                 ctx.debugOut("Don't Blink!!!!!"
                         + " E:" + Double.toString(ctx.getEnergy())
                         + " T:" + Double.toString(ctx.getTech())

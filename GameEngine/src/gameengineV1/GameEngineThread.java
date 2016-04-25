@@ -203,16 +203,6 @@ public class GameEngineThread extends Thread {
                 break;
         }
 
-        // this is also a good spot to 
-        // prepare the random generator seed number
-        // if not set from config file
-        if (Constants.randSeed == 0) {
-            Constants.randSeed = (int) System.nanoTime();
-        }
-
-        SpaceGrid.rand.setSeed(Constants.randSeed);
-        // output randSeed into logfile
-        engine.vis.debugOut("RandSeed: " + Constants.randSeed);
 
         return gameOver;
     }

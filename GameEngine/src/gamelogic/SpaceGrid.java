@@ -52,6 +52,17 @@ public class SpaceGrid {
     }
 
     public void ready() {
+        // this is also a good spot to 
+        // prepare the random generator seed number
+        // if not set from config file
+        if (Constants.randSeed == 0) {
+            Constants.randSeed = (int) System.nanoTime();
+        }
+
+        SpaceGrid.rand.setSeed(Constants.randSeed);
+        // output randSeed into logfile
+        vis.debugOut("RandSeed: " + Constants.randSeed);
+
         vis.setFilter(Constants.filters);
         vis.setChatter(Constants.chatter);
 
@@ -89,7 +100,7 @@ public class SpaceGrid {
         for (AlienContainer a : aliens) {
             if (a != null) {
                 if (aUniqueAlien != null) {
-                    if (aUniqueAlien.constructor != a.constructor) {
+                    if (!aUniqueAlien.speciesName.equalsIgnoreCase(a.speciesName)) {
                         // more than one species active, game not over
                         return false;
                     }
@@ -104,15 +115,15 @@ public class SpaceGrid {
     }
 
     public void listStatus() {
-        vis.debugErr("");
-        vis.debugErr("Current Aliens:");
+        vis.debugOut("");
+        vis.debugOut("Current Aliens:");
 
         for (AlienContainer ac : aliens) {
             if (ac != null) {
-                vis.debugErr("Alien " + ac.toString());
+                vis.debugOut("Alien " + ac.toString());
             }
         }
-        vis.debugErr("");
+        vis.debugOut("");
     }
 
     public void performCommunications() {
@@ -127,10 +138,7 @@ public class SpaceGrid {
             } catch (UnsupportedOperationException e) {
                 // we'll let that go
             } catch (Exception ex) {
-                ac.debugErr("Unhandled exception in communicate(): " + ex.toString());
-                for (StackTraceElement s : ex.getStackTrace()) {
-                    ac.debugErr(s.toString());
-                }
+                displayException("communicate()", ex);
                 ac.kill("Death for unhandled exception in communicate(): " + ex.toString());
             }
         }
@@ -158,10 +166,7 @@ public class SpaceGrid {
                     try {
                         ac.alien.receive(acell.currentMessages.toArray(messages));
                     } catch (Exception ex) {
-                        ac.debugErr("Unhandled exception in receive(): " + ex.toString());
-                        for (StackTraceElement s : ex.getStackTrace()) {
-                            ac.debugErr(s.toString());
-                        }
+                        displayException("Unhandled exception in receive(): ", ex);
                         ac.kill("Death for unhandled exception in receive(): " + ex.toString());
                     }
                 }
@@ -184,9 +189,7 @@ public class SpaceGrid {
             } catch (UnsupportedOperationException e) {
                 // we'll let that go
             } catch (Exception ex) {
-                for (StackTraceElement s : ex.getStackTrace()) {
-                    ac.debugOut(s.toString());
-                }
+                displayException("Unhandled exception in getMove(): ", ex);
                 ac.kill("Death for unhandled exception in getMove(): " + ex.toString());
             }
             ac.energy -= Math.abs(ac.x - oldX) + Math.abs(ac.y - oldY);
@@ -212,10 +215,8 @@ public class SpaceGrid {
             try {
                 vis.showMove(ac.getFullAlienSpec(), oldX, oldY);
             } catch (Exception e) {
-                vis.debugErr("Unhandled exception in visualize: showMove");
-                for (StackTraceElement s : e.getStackTrace()) {
-                    vis.debugErr(s.toString());
-                }
+                displayException("Unhandled exception in showMove(): ", e);
+
             }
         }
     }
@@ -255,10 +256,8 @@ public class SpaceGrid {
                 ac.beThoughtful();
             } catch (Exception ex) {
                 // any exceptions except NotSupported get the alien killed here
-                ac.debugErr("Unhandled exception in beThoughtful(): " + ex.toString());
-                for (StackTraceElement s : ex.getStackTrace()) {
-                    ac.debugErr(s.toString());
-                }
+                displayException("Unhandled exception in beThoughtful(): ", ex);
+
                 ac.kill("Death for unhandled exception in beThoughtful(): " + ex.toString());
             }
         }
@@ -285,9 +284,7 @@ public class SpaceGrid {
                 // for all other exceptions, we'll kill it. 
                 thisAlien.currentActionCode = Action.ActionCode.None;
                 thisAlien.currentActionPower = 0;
-                for (StackTraceElement s : ex.getStackTrace()) {
-                    thisAlien.debugOut(s.toString());
-                }
+                displayException("Unhandled exception in getAction(): ", ex);
                 thisAlien.kill("Death for unhandled exception in getAction(): " + ex.toString());
             }
         }
@@ -460,13 +457,6 @@ public class SpaceGrid {
                     x = thisAlien.x + dir.x();
                     y = thisAlien.y + dir.y();
 
-                    if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
-                        vis.debugErr("sg.spawn: Out of bounds: (" + x + ":" + y + ")");
-                        vis.debugErr("sg.spawn: Out of bounds: old(" + thisAlien.x + ":" + thisAlien.y + ")");
-                        vis.debugErr("sg.spawn: Out of bounds: dir(" + dir.x() + ":" + dir.y() + ")");
-                        vis.debugErr("sg.spawn: Out of bounds: power " + thisAlien.currentActionPower);
-                    }
-
                     // Add in the alien spec to a new arraylist
                     // to be processed later so the master list is not disrupted
                     newAliens.add(new AlienSpec(
@@ -531,9 +521,8 @@ public class SpaceGrid {
         if (as.cns == null) {
             try {
                 as.cns = Load(engine, alienPackageName, alienClassName);
-                as.counter++;
             } catch (Exception e) {
-                vis.debugErr("sg.addAlien: Error loading contructor for " + speciesName);
+                gridDebugErr("sg.addAlien: Error loading contructor for " + speciesName);
                 //throw (e);
             }
 
@@ -551,7 +540,7 @@ public class SpaceGrid {
                 vis.showSpawn(ac.getFullAlienSpec());
                 as.counter++;
             } catch (InstantiationException e) {
-                vis.debugErr("sg: could not instantiate new " + domainName + ":" + alienPackageName + ":" + alienClassName);
+                gridDebugErr("sg: could not instantiate new " + domainName + ":" + alienPackageName + ":" + alienClassName);
             }
         }
     }
@@ -656,6 +645,25 @@ public class SpaceGrid {
             throw e;
         }
         return cs;
+    }
+
+    // this debugOut is not sensitive to chatter control
+    public void gridDebugOut(String s) {
+        vis.debugOut(s);
+    }
+
+    public void gridDebugErr(String s) {
+        vis.debugErr(s);
+        if (Constants.pauseOnError) {
+            engine.queueCommand(new GameCommand(GameCommandCode.Pause));
+        }
+    }
+
+    public void displayException(String msg, Exception ex) {
+        gridDebugErr(msg + ex.toString());
+    //    for (StackTraceElement s : ex.getStackTrace()) {
+    //        vis.debugErr(s.toString());
+    //    }
     }
 
 }

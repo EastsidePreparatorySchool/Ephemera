@@ -4,6 +4,7 @@
 package stockaliens;
 
 import alieninterfaces.*;
+import java.util.List;
 
 /**
  *
@@ -33,24 +34,35 @@ public class Venusian implements Alien {
         //ctx.debugOut("Move requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
-
-        // Venusians run away from the nearest alien
-        int[] nearestAlienPos = ctx.getView().getClosestAlienPos(ctx.getX(), ctx.getY());
-
         int x = 0;
         int y = 0;
 
-        //always moves away from other aliens
-        if (nearestAlienPos[0] > ctx.getX()) {
-            x = -1;
-        } else if (nearestAlienPos[0] < ctx.getX()) {
-            x = 1;
-        }
+        try {
+            List<AlienSpecies> nearestAliens = ctx.getView().getClosestXenosToPos(
+                    new AlienSpecies("eastsideprep.org", "stockaliens", "Alf", 0),
+                    ctx.getX(), ctx.getY());
+            if (!nearestAliens.isEmpty()) {
+                int nearestX = nearestAliens.get(0).x;
+                int nearestY = nearestAliens.get(0).y;
 
-        if (nearestAlienPos[1] > ctx.getY()) {
-            y = -1;
-        } else if (nearestAlienPos[1] < ctx.getY()) {
-            y = 1;
+                if (nearestX > ctx.getX()) {
+                    x = -1;
+                } else if (nearestX < ctx.getX()) {
+                    x = 1;
+                }
+
+                if (nearestY > ctx.getY()) {
+                    y = -1;
+                } else if (nearestY < ctx.getY()) {
+                    y = 1;
+                }
+                
+                // guard against tech fail
+                //if (ctx.getTech() < 2.0) {
+                //    y = 0;
+                //}
+            }
+        } catch (Exception e) {
         }
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
 
@@ -62,14 +74,13 @@ public class Venusian implements Alien {
         //ctx.debugOut("Action requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
-
         View view = ctx.getView();
 
         //goal is to make a ton of Venusians fast and be good at hiding
         // catch and shenanigans
         try {
             // is there another alien on our position?
-            if (view.getAlienCountAtPos(ctx.getX(), ctx.getY()) > 1) {
+            if (view.getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1) {
                 // if so, do we have any energy?
                 if (ctx.getEnergy() < 10) {
                     // no, keep moving.
@@ -78,7 +89,7 @@ public class Venusian implements Alien {
 
                 // or, hit really hard then run again
                 ctx.debugOut("Fighting");
-                return new Action(Action.ActionCode.Fight, (int)ctx.getEnergy() - 10);
+                return new Action(Action.ActionCode.Fight, (int) ctx.getEnergy() - 10);
             }
         } catch (Exception e) {
             // do something here to deal with errors
@@ -104,7 +115,6 @@ public class Venusian implements Alien {
 
         return new Action(Action.ActionCode.Gain);
     }
-
 
     @Override
     public void communicate() {

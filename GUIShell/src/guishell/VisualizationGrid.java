@@ -98,7 +98,7 @@ class VisualizationGrid implements GameVisualizer {
         Color[] color = {Color.BLACK, Color.BLACK, Color.BLACK};
 
         gc.setFill(Color.BLACK);
-        gc.fillRect(0.5, 0.5, widthPX - 0.5, heightPX - 0.5);
+        gc.fillRect(1.5, 1.5, widthPX, heightPX);
 
         for (StarForDisplay st : stars) {
             st.draw(gc, cellWidth, cellHeight);
@@ -357,13 +357,13 @@ class VisualizationGrid implements GameVisualizer {
             logFile.close();
         } catch (Exception e) {
         }
+        debugOut("Game Over");
         Utilities.runSafe(() -> GUIShell.startOrPauseGame(new ActionEvent()));
     }
 
     @Override
     public void debugErr(String s) {
         println(s);
-        Utilities.runAndWait(() -> engine.queueCommand(new GameCommand(GameCommandCode.Pause)));
     }
 
     @Override
@@ -372,7 +372,6 @@ class VisualizationGrid implements GameVisualizer {
             for (String f : filters) {
                 if (s.toLowerCase().contains(f.toLowerCase())) {
                     println(s);
-                    Thread.yield();
                     break;
                 }
             }

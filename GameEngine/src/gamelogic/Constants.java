@@ -34,5 +34,6 @@ public class Constants {
 
     public static double deathThreshold = 5; // if you lose a fight by more than this much, you die
     public static String filters = "death; violation";
+    public static boolean pauseOnError = false; // debugErr stops the show
 
 }

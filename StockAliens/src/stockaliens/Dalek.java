@@ -66,7 +66,7 @@ public class Dalek implements Alien {
 
         // catch any shenanigans
         try {
-            if (view.getAlienCountAtPos(ctx.getX(), ctx.getY()) > 1) {
+            if (view.getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1) {
                 ctx.debugOut("Uh-oh.There is someone else here."
                         + " E:" + Double.toString(ctx.getEnergy())
                         + " T:" + Double.toString(ctx.getTech())
@@ -93,7 +93,7 @@ public class Dalek implements Alien {
             }
 
             // is there another alien on our position?
-            if (view.getAlienCountAtPos(ctx.getX(), ctx.getY()) > 1
+            if (view.getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1
                     && ctx.getEnergy() > ctx.getFightingCost() + 2) {
                 ctx.debugOut("EXTERMINATE!!!!!"
                         + " E:" + Double.toString(ctx.getEnergy())
@@ -114,7 +114,7 @@ public class Dalek implements Alien {
             }
         } catch (Exception e) {
             // do something here to deal with errors
-            ctx.debugOut("EXPLAIN??????");
+            ctx.debugOut("EXPLAIN?????? " + e.toString());
         }
 
         ctx.debugOut("Gaining energy"

@@ -40,6 +40,7 @@ public class GridCircle implements Iterable<int[]> {
         this.viewX = viewX;
         this.viewY = viewY;
     }
+
     @Override
     public Iterator<int[]> iterator() {
         return new PointIterator();
@@ -55,7 +56,11 @@ public class GridCircle implements Iterable<int[]> {
 
         @Override
         public boolean hasNext() {
-            if (radius == 0 || phase >= 4) {
+            if (phase >= 4) {
+                return false;
+            }
+
+            if (phase == 1 && radius == 0) {
                 return false;
             }
 
@@ -100,7 +105,7 @@ public class GridCircle implements Iterable<int[]> {
                     point[1] = centerY + counter;
                 }
 
-                if (++counter == radius) {
+                if (++counter >= radius) {
                     counter = 0;
                     ++phase;
                 }
@@ -115,13 +120,14 @@ public class GridCircle implements Iterable<int[]> {
         return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
 
-    public boolean outOfView(int [] point) {
+    public boolean outOfView(int[] point) {
         return (distance(point[0], point[1], viewX, viewY) > radius);
     }
-    
-    public static boolean isValidPoint(int [] point) {
+
+    public static boolean isValidPoint(int[] point) {
         return isValidX(point[0]) && isValidY(point[1]);
     }
+
     public static boolean isValidX(int x) {
         if (x < -Constants.width / 2) {
             return false;
