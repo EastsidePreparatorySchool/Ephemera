@@ -8,6 +8,7 @@ package gamelogic;
 import gameengineinterfaces.AlienSpec;
 import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
+import static gamelogic.GridCircle.distance;
 import java.lang.reflect.Constructor;
 import java.util.LinkedList;
 import java.util.List;
@@ -72,9 +73,10 @@ public class AlienContainer {
 
         // if position = (0,0) assign random position in safe zone
         if (x == 0 && y == 0) {
-
-            this.x = ctx.getRandomInt(Constants.safeZoneSize + 1) - Constants.safeZoneSize / 2;
-            this.y = ctx.getRandomInt(Constants.safeZoneSize + 1) - Constants.safeZoneSize / 2;
+            this.x = ctx.getRandomInt(Constants.safeZoneSize + 1);
+            this.x *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
+            this.y = ctx.getRandomInt(Constants.safeZoneSize + 1);
+            this.y *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
         } else {
             this.x = x;
             this.y = y;
@@ -130,7 +132,7 @@ public class AlienContainer {
 
     public AlienSpecies getAlienSpecies() {
         if (this.species == null) {
-            species = new AlienSpecies(this.domainName, this.packageName, this.className, species.speciesID);
+            species = new AlienSpecies(this.domainName, this.packageName, this.className, species.speciesID, this.x, this.y);
         }
         return species;
 
@@ -184,14 +186,17 @@ public class AlienContainer {
 
     // this does the actual checking
     private void checkMove(MoveDir direction) throws NotEnoughTechException {
-        // for immediate vicinity, just let this go
-        int x = (int) Math.abs((long) direction.x());
-        int y = (int) Math.abs((long) direction.y());
-        int moveLength = x + y;
+        int moveLength = distance(0, 0, direction.x(), direction.y());
 
+        // leet onexone moves go
+        
+        if (moveLength <= 2) {
+            return;
+        }
+        
         // If the move is farther than the alien has the power to move
         if (moveLength > tech) {
-            debugErr("Illegal move: " + (direction.x()) + "," + (direction.y()) + " tech " + tech);
+           debugErr("Illegal move(" + moveLength + "): " + (direction.x()) + "," + (direction.y()) + " tech " + tech);
             throw new NotEnoughTechException();
         }
 
@@ -225,7 +230,7 @@ public class AlienContainer {
 
     // easy way to kill an alien
     public void kill(String s) {
-        debugOut(s+ " with T:" + (Math.round(tech*10)/10) + " and E:" + (Math.round(energy*10)/10));
+        debugOut(s + " with T:" + (Math.round(tech * 10) / 10) + " and E:" + (Math.round(energy * 10) / 10));
         energy = 0;
     }
 
@@ -283,31 +288,4 @@ public class AlienContainer {
     public void debugErr(String s) {
         ctx.vis.debugErr("Alien " + getFullName() + ": " + s);
     }
-
-    public ViewImplementation getFullView() {
-        // Create the alien's view
-        int size = (int) tech;
-        int lowX = Math.max(x - size, (grid.width / -2));
-        int lowY = Math.max(y - size, (grid.height / -2));
-        int highX = Math.min(x + size, ((grid.width / 2) - 1));
-        int highY = Math.min(y + size, ((grid.height / 2) - 1));
-
-        List<AlienContainer> visibleAliens = new LinkedList<>();
-        List<InternalSpaceObject> visibleObjects = new LinkedList<>();
-
-        for (int x = lowX; x <= highX; x++) {
-            for (int y = lowY; y <= highY; y++) {
-                if (!grid.aliens.isEmptyAt(x, y)) {
-                    visibleAliens.addAll(grid.aliens.getAliensAt(x, y));
-                }
-                //visibleObjects.add()..
-            }
-        }
-
-        // excluse thyself
-        visibleAliens.remove(this);
-
-        return new ViewImplementation(this, visibleAliens, visibleObjects, lowX, lowY, size);
-    }
-
 }
