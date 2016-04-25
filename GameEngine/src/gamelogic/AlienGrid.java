@@ -164,9 +164,15 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     }
 
     public double getEnergyAt(int x, int y) {
+        // off grid?
+        if (x + centerX >= width || x + centerX < 0
+            || y + centerY >= height || y + centerY < 0)
+            return 0;
+        
+        //
         AlienCell acs = acGrid[x + centerX][y + centerY];
         if (acs == null) {
-            return 0;
+            return 1;
         }
         return acs.energy;
     }

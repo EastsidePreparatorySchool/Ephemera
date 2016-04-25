@@ -4,6 +4,7 @@ CONSTANT,,,chatter,,,,,,on
 CONSTANT,,,perSpeciesCap,,,,,,100
 CONSTANT,,,safeZoneSize,,,,,,10
 CONSTANT,,,filters,,,,,,death; violation; 
+CONSTANT,,,pauseOnError,,,,,,off
 SPECIES,ephemera.eastsideprep.org,stockaliens,Dalek,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Martian,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Venusian,,,,,,

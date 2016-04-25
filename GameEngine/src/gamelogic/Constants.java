@@ -29,11 +29,12 @@ public class Constants {
     public static int fightingCost = 5; // fighting will cost you 5 on top of invested power
     public static int spawningCost = 100; // spawning cost + 100
     public static int defenseCost = 2; // defending costs + 2
+    public static int viewCost = 2; // views cost 2 + size
     public static double energyGainReducer = 30; // harvested energy will be divided by this factor
     public static double starEnergyPerLuminosity = 5; // factor for placing energy into space around star
 
     public static double deathThreshold = 5; // if you lose a fight by more than this much, you die
     public static String filters = "death; violation";
-    public static boolean pauseOnError = false; // debugErr stops the show
+    public static boolean pauseOnError = true; // debugErr stops the show
 
 }

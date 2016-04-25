@@ -38,7 +38,7 @@ public class Venusian implements Alien {
         int y = 0;
 
         try {
-            List<AlienSpecies> nearestAliens = ctx.getView().getClosestXenosToPos(
+            List<AlienSpecies> nearestAliens = ctx.getView((int)ctx.getTech()).getClosestXenosToPos(
                     new AlienSpecies("eastsideprep.org", "stockaliens", "Alf", 0),
                     ctx.getX(), ctx.getY());
             if (!nearestAliens.isEmpty()) {
@@ -74,7 +74,11 @@ public class Venusian implements Alien {
         //ctx.debugOut("Action requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
-        View view = ctx.getView();
+        View view = null;
+        try {
+            view = ctx.getView((int)ctx.getTech());
+        } catch (Exception e) {
+        }
 
         //goal is to make a ton of Venusians fast and be good at hiding
         // catch and shenanigans

@@ -51,7 +51,11 @@ public class WeepingAngel implements Alien {
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
 
-        View view = ctx.getView();
+        View view = null;
+        try {
+            view = ctx.getView((int)ctx.getTech());
+        } catch (Exception e) {
+        }
 
         // if there is someone at our position fight
         try {

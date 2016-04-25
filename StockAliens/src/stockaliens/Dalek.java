@@ -43,7 +43,7 @@ public class Dalek implements Alien {
         // don't move more than 5, leave energy for other stuff
         move_energy = Math.min(move_energy, 5);
 
-        if (move_energy <= 1) {
+        if (move_energy <= 2) {
             return new MoveDir(0, 0);
         }
 
@@ -62,61 +62,62 @@ public class Dalek implements Alien {
         ctx.debugOut("Action requested,"
                 + " E:" + Double.toString(ctx.getEnergy())
                 + " T:" + Double.toString(ctx.getTech()));
-        View view = ctx.getView();
 
         // catch any shenanigans
-        try {
-            if (view.getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1) {
-                ctx.debugOut("Uh-oh.There is someone else here."
-                        + " E:" + Double.toString(ctx.getEnergy())
-                        + " T:" + Double.toString(ctx.getTech())
-                        + " X:" + Double.toString(ctx.getX())
-                        + " Y:" + Double.toString(ctx.getY()));
+        if (ctx.getEnergy() > 100) {
+            try {
+                View view = ctx.getView((int) ctx.getTech());
+                if (view.getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1) {
+                    ctx.debugOut("Uh-oh.There is someone else here."
+                            + " E:" + Double.toString(ctx.getEnergy())
+                            + " T:" + Double.toString(ctx.getTech())
+                            + " X:" + Double.toString(ctx.getX())
+                            + " Y:" + Double.toString(ctx.getY()));
+                }
+
+                // do we have enough energy?
+                if (ctx.getEnergy() < 10) {
+                    // no, charge
+                    ctx.debugOut("Choosing to gain energy,"
+                            + " E:" + Double.toString(ctx.getEnergy())
+                            + " T:" + Double.toString(ctx.getTech()));
+                    return new Action(Action.ActionCode.Gain);
+                }
+
+                // do we have enough tech?
+                if (ctx.getTech() < 30 && ctx.getEnergy() > ctx.getTech()) {
+                    // no, research
+                    ctx.debugOut("Choosing to research"
+                            + " E:" + Double.toString(ctx.getEnergy())
+                            + " T:" + Double.toString(ctx.getTech()));
+                    return new Action(Action.ActionCode.Research);
+                }
+
+                // is there another alien on our position?
+                if (view.getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1
+                        && ctx.getEnergy() > ctx.getFightingCost() + 2) {
+                    ctx.debugOut("EXTERMINATE!!!!!"
+                            + " E:" + Double.toString(ctx.getEnergy())
+                            + " T:" + Double.toString(ctx.getTech())
+                            + " X:" + Double.toString(ctx.getX())
+                            + " Y:" + Double.toString(ctx.getY()));
+
+                    return new Action(Action.ActionCode.Fight, (int) ctx.getEnergy() - 2 - ctx.getFightingCost());
+                }
+
+                if (ctx.getEnergy() > (ctx.getSpawningCost() + 10)) {
+                    // no other aliens here, have enough stuff, spawn!
+                    ctx.debugOut("DALEKS RULE SUPREME! SPAWNING!"
+                            + " E:" + Double.toString(ctx.getEnergy())
+                            + " T:" + Double.toString(ctx.getTech()));
+
+                    return new Action(Action.ActionCode.Spawn, 5);
+                }
+            } catch (Exception e) {
+                // do something here to deal with errors
+                ctx.debugOut("EXPLAIN?????? " + e.toString());
             }
-
-            // do we have enough energy?
-            if (ctx.getEnergy() < 10) {
-                // no, charge
-                ctx.debugOut("Choosing to gain energy,"
-                        + " E:" + Double.toString(ctx.getEnergy())
-                        + " T:" + Double.toString(ctx.getTech()));
-                return new Action(Action.ActionCode.Gain);
-            }
-
-            // do we have enough tech?
-            if (ctx.getTech() < 30 && ctx.getEnergy() > ctx.getTech()) {
-                // no, research
-                ctx.debugOut("Choosing to research"
-                        + " E:" + Double.toString(ctx.getEnergy())
-                        + " T:" + Double.toString(ctx.getTech()));
-                return new Action(Action.ActionCode.Research);
-            }
-
-            // is there another alien on our position?
-            if (view.getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1
-                    && ctx.getEnergy() > ctx.getFightingCost() + 2) {
-                ctx.debugOut("EXTERMINATE!!!!!"
-                        + " E:" + Double.toString(ctx.getEnergy())
-                        + " T:" + Double.toString(ctx.getTech())
-                        + " X:" + Double.toString(ctx.getX())
-                        + " Y:" + Double.toString(ctx.getY()));
-
-                return new Action(Action.ActionCode.Fight, (int) ctx.getEnergy() - 2 - ctx.getFightingCost());
-            }
-
-            if (ctx.getEnergy() > (ctx.getSpawningCost() + 10)) {
-                // no other aliens here, have enough stuff, spawn!
-                ctx.debugOut("DALEKS RULE SUPREME! SPAWNING!"
-                        + " E:" + Double.toString(ctx.getEnergy())
-                        + " T:" + Double.toString(ctx.getTech()));
-
-                return new Action(Action.ActionCode.Spawn, 5);
-            }
-        } catch (Exception e) {
-            // do something here to deal with errors
-            ctx.debugOut("EXPLAIN?????? " + e.toString());
         }
-
         ctx.debugOut("Gaining energy"
                 + " E:" + Double.toString(ctx.getEnergy())
                 + " T:" + Double.toString(ctx.getTech()));
@@ -125,7 +126,7 @@ public class Dalek implements Alien {
 
     @Override
     public void communicate() {
-        if (ctx.getEnergy() > 10) {
+        if (ctx.getEnergy() > 100) {
             try {
                 if (ctx.getGameTurn() % 20 == 0) {
                     ctx.broadcastAndListen("I say: Daleks rule supreme!!!!!", 1, true);

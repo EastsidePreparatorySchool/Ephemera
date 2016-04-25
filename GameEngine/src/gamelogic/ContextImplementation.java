@@ -40,12 +40,27 @@ public class ContextImplementation implements Context {
         return ac.y;
     }
 
-    public View getView() {
-        if (this.view == null) {
-            this.view = new ViewImplementation(ac.grid.aliens, ac.x, ac.y, (int) ac.tech);
-            // full object: this.view = this.aC.getFullView();
+    public View getView(int size) throws NotEnoughEnergyException, NotEnoughTechException {
+        // not more than tech
+        if (size > (int) ac.tech) {
+            throw new NotEnoughTechException();
+        }
+
+        // if we don't have one or they want a bigger one
+        if (this.view == null || this.view.size < size) {
+            // enough energy?
+            if (size >= ((int)ac.energy) - Constants.viewCost) {
+                throw new NotEnoughEnergyException();
+            }
+            // make them pay
+            this.ac.energy -= size + Constants.viewCost;
+            this.view = new ViewImplementation(ac.grid.aliens, ac.x, ac.y, size);
         }
         return this.view;
+    }
+
+    public double getPresentEnergy(){
+        return ac.grid.aliens.getEnergyAt(ac.x, ac.y);
     }
 
     public int getSpawningCost() {

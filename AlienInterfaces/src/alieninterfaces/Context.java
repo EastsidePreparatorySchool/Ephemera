@@ -19,7 +19,7 @@ public interface Context {
 
     int getY();
 
-    View getView();
+    View getView(int size) throws NotEnoughEnergyException, NotEnoughTechException;
 
     int getSpawningCost();
 
@@ -36,6 +36,8 @@ public interface Context {
     int getMaxX();
     
     int getMaxY();
+    
+    double getPresentEnergy();
 
     void broadcastAndListen(String message, int power, boolean listen)
             throws NotEnoughTechException, NotEnoughEnergyException;

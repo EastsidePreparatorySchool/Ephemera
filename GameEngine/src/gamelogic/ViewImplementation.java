@@ -21,7 +21,7 @@ public class ViewImplementation implements View {
     private AlienGrid ag;
     private int centerX;
     private int centerY;
-    private int size;
+    public int size;
 
     public ViewImplementation(AlienGrid ag) {
         this.ag = ag;

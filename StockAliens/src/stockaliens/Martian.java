@@ -61,7 +61,7 @@ public class Martian implements Alien {
         int ClosestAlienYCoordinate = 0;
 
         try {
-            List<AlienSpecies> l = ctx.getView().getClosestXenosToPos(
+            List<AlienSpecies> l = ctx.getView((int)ctx.getTech()).getClosestXenosToPos(
                     new AlienSpecies("eastsideprep.org", "stockaliens", "Martian", 0),
                     ctx.getX(), ctx.getY());
             if (l.size() > 1) {
@@ -99,7 +99,7 @@ public class Martian implements Alien {
 
         //checks if alien is on the same position, if so, then fights with the priorly designated amount of energy
         try {
-            if (ctx.getView().getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1) {
+            if (ctx.getView((int)ctx.getTech()).getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1) {
                 ctx.debugOut("Fighting");
                 return new Action(Action.ActionCode.Fight, (fightStrength));
             }
