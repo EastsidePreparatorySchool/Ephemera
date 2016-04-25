@@ -259,16 +259,16 @@ class VisualizationGrid implements GameVisualizer {
         }
     }
 
-    public void incrementCell(int x, int y, String speciesName) {
+    public void incrementCell(int x, int y, String speciesName, double energy) {
         if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
             debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
             return;
         }
         Cell cell = grid[x + (width / 2)][y + (height / 2)];
-        cell.addSpecies(speciesName);
+        cell.addSpecies(speciesName, energy);
     }
 
-    public void decrementCell(int x, int y, String speciesName) {
+    public void decrementCell(int x, int y, String speciesName, double energy) {
         if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
             debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
             return;
@@ -276,14 +276,14 @@ class VisualizationGrid implements GameVisualizer {
 
         Cell cell = grid[x + (width / 2)][y + (height / 2)];
         if (cell.alienCount > 0) {
-            cell.removeSpecies(speciesName);
+            cell.removeSpecies(speciesName, energy);
         } else {
             debugOut("winvis: cell underflow at (" + x + "," + y + ")");
         }
     }
 
     @Override
-    public void showMove(AlienSpec as, int oldx, int oldy) {
+    public void showMove(AlienSpec as, int oldx, int oldy, double energyAtNew, double energyAtOld) {
         if (showMove) {
             print("Vis.showMove: " + as.toString() + ",  moved from (");
             print(oldx + "," + oldy + ")");
@@ -293,13 +293,8 @@ class VisualizationGrid implements GameVisualizer {
         int x = as.x;
         int y = as.y;
 
-        //    Utilities.runSafe(new Runnable() {
-        //        @Override
-        //        public void run() {
-        decrementCell(oldx, oldy, speciesName);
-        incrementCell(x, y, speciesName);
-        //        }
-        //    });
+        decrementCell(oldx, oldy, speciesName, energyAtOld);
+        incrementCell(x, y, speciesName, energyAtNew);
     }
 
     public void markFight(int x, int y) {
@@ -338,15 +333,16 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showSpawn(AlienSpec as) {
+    public void showSpawn(AlienSpec as, double energyAtPos) {
         debugOut("Engine reporting Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
         speciesSet.addAlien(as.getFullSpeciesName());
-        incrementCell(as.x, as.y, as.getFullSpeciesName());
+        incrementCell(as.x, as.y, as.getFullSpeciesName(), energyAtPos);
     }
 
-    public void showDeath(AlienSpec as) {
+    @Override
+    public void showDeath(AlienSpec as, double energyAtPos) {
         debugOut("Engine reporting death: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
-        decrementCell(as.x, as.y, as.getFullSpeciesName());
+        decrementCell(as.x, as.y, as.getFullSpeciesName(), energyAtPos);
         speciesSet.removeAlien(as.getFullSpeciesName());
     }
 

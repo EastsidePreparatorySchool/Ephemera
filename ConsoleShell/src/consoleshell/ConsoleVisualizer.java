@@ -75,7 +75,7 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showMove(AlienSpec as, int oldx, int oldy) {
+    public void showMove(AlienSpec as, int oldx, int oldy, double newEnergy, double oldEnergy) {
         if (showMove) {
             print("Vis.showMove: " + as.toString() + ",  moved from (");
             print(oldx + "," + oldy + ")");
@@ -228,12 +228,12 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showSpawn(AlienSpec as) {
+    public void showSpawn(AlienSpec as, double energy) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void showDeath(AlienSpec as) {
+    public void showDeath(AlienSpec as, double energy) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

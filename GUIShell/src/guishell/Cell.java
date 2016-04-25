@@ -30,7 +30,7 @@ class Cell {
         this.speciesSet = s;
     }
 
-    public int addSpecies(String speciesName) {
+    public int addSpecies(String speciesName, double energy) {
         CellInfo ci;
 
         if (speciesMap == null) {
@@ -46,6 +46,7 @@ class Cell {
 
         ci.count++;
         alienCount++;
+        this.energy = energy;
         cellChanged = true;
 
         if (color1 == null) {
@@ -57,7 +58,7 @@ class Cell {
         return ci.count;
     }
 
-    public boolean removeSpecies(String speciesName) {
+    public boolean removeSpecies(String speciesName, double energy) {
         CellInfo ci = speciesMap.get(speciesName);
         if (ci != null) {
             if (ci.count > 1) {
@@ -68,6 +69,7 @@ class Cell {
             }
         }
         alienCount--;
+        this.energy = energy;
         boolean empty = speciesMap.isEmpty();
         if (empty) {
             speciesMap = null;

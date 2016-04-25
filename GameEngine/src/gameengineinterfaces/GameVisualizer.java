@@ -28,15 +28,15 @@ public interface GameVisualizer {
     
     void showAliens(List<AlienSpec> aliens);
     
-    void showMove(AlienSpec as, int oldX, int oldY);
+    void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition);
 
     void showFightBefore(int x, int y, List<AlienSpec> aiens);
 
     void showFightAfter(int x, int y, List<AlienSpec> aliens);
 
-    void showSpawn(AlienSpec as);
+    void showSpawn(AlienSpec as, double energyAtPos);
             
-    void showDeath(AlienSpec as);
+    void showDeath(AlienSpec as, double energyAtPos);
     
     boolean showContinuePrompt();
 
