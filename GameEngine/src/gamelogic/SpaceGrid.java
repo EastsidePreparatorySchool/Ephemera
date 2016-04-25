@@ -263,7 +263,7 @@ public class SpaceGrid {
 
     public void resetAliens() {
         aliens.stream().forEach((alien) -> {
-            alien.fought = false;
+            alien.participatedInAction = false;
             alien.ctx.view = null;
             alien.outgoingMessage = null;
             alien.listening = false;
@@ -323,7 +323,7 @@ public class SpaceGrid {
             //thisAlien.debugOut(thisAlien.currentActionCode.toString());
 
             // if this guy was part of a fight, don't bother with more actions
-            if (thisAlien.fought) {
+            if (thisAlien.participatedInAction) {
                 continue;
             }
 
@@ -345,7 +345,8 @@ public class SpaceGrid {
 
                     for (AlienContainer fightingAlien : fightingAliens) {
 
-                        if (fightingAlien.currentActionCode != Action.ActionCode.Fight) {
+                        if (fightingAlien.currentActionCode != Action.ActionCode.Fight &&
+                                fightingAlien.currentActionCode != Action.ActionCode.TradeOrDefend) {
                             fightingAlien.currentActionPower = 0;
                         }
 
@@ -367,9 +368,9 @@ public class SpaceGrid {
                         // Aliens involved will lose their turns
                     }
 
-                    // Deduct energy from all aliens and set their fought status
+                    // Deduct energy from all aliens and set their participatedInAction status
                     for (AlienContainer fightingAlien : fightingAliens) {
-                        fightingAlien.fought = true;
+                        fightingAlien.participatedInAction = true;
                         fightingAlien.energy -= Constants.fightingCost;
                         fightingAlien.energy -= fightingAlien.currentActionPower;
                         if (fightingAlien.energy <= 0) {
@@ -439,7 +440,66 @@ public class SpaceGrid {
                         vis.showFightAfter(thisAlien.x, thisAlien.y, fightSpecs);
                     }
                     break;
-
+                case TradeOrDefend:
+                    // If a trade or fight has already occurred
+                    if (thisAlien.participatedInAction) {
+                        break;
+                    }
+                    // Make a SHALLOW copy of the aliens at the given position
+                    // As long as we don't mutilate the aliens, we can mutilate
+                    // the list as much as we want
+                    List<AlienContainer> aliensAtPos = (List<AlienContainer>) aliens.getAliensAt(thisAlien.x, thisAlien.y).clone();
+                    for (AlienContainer ac : aliensAtPos) {
+                        if (ac.currentActionCode == Action.ActionCode.Fight) {
+                            break; // No trades can take place if there is war
+                        }
+                    }
+                    // A trade will now take place
+                    // Everyone who activated defenses now pays to keep them active
+                    for (AlienContainer ac : aliensAtPos) {
+                        ac.energy -= 2;
+                    }
+                    // Trading will now commence
+                    // First sort aliens by tech
+                    Comparator c = new Comparator<AlienContainer>() {
+                        @Override
+                        public int compare(AlienContainer ac1, AlienContainer ac2) {
+                            return (int) (ac1.tech - ac2.tech);
+                        }
+                    };
+                    Collections.sort(aliensAtPos, c);
+                    // aliensAtPos is now sorted by tech
+                    while (aliensAtPos.size() > 0) {
+                        AlienContainer buyingAlien = aliensAtPos.get(0);
+                        // Lowest tech alien is at position 0
+                        for (int i = aliensAtPos.size() - 1; i >= 1; i--) {
+                            AlienContainer sellingAlien = aliensAtPos.get(i);
+                            // Iterate through the aliens with highest tech first
+                            if (buyingAlien.tech == sellingAlien.tech) {
+                                // No trading with people of same/lower tech
+                                aliensAtPos.remove(0);
+                                break;
+                            }
+                            
+                            // If the trade and buy prices are compatible
+                            if (buyingAlien.currentAction.buyPrice >= 
+                                    sellingAlien.currentAction.sellPrice &&
+                                    buyingAlien.energy >= 
+                                    sellingAlien.currentAction.sellPrice) {
+                                
+                                // Perform the trade
+                                buyingAlien.energy -= sellingAlien.currentAction.sellPrice;
+                                sellingAlien.energy += sellingAlien.currentAction.sellPrice;
+                                buyingAlien.tech++;
+                                
+                                // Remove both aliens from aliensAtPos
+                                aliensAtPos.remove(0);
+                                aliensAtPos.remove(i);
+                            }
+                        } 
+                    }
+                    
+                    break;
                 case Gain:
                     if (thisAlien.energy < Constants.energyCap) {
                         AlienCell acs = aliens.getAliensAt(thisAlien.x, thisAlien.y);

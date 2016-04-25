@@ -36,13 +36,14 @@ public class AlienContainer {
     public Action.ActionCode currentActionCode;
     public double currentActionPower;
     public String currentActionMessage;
+    public Action currentAction;
     public boolean listening;
 
     double tech;
     double energy;
     public static boolean chatter = false;
 
-    boolean fought;
+    boolean participatedInAction;
     public int x;
     public int y;
     public int nextX;
