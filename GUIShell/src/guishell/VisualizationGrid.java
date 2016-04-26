@@ -37,6 +37,7 @@ class VisualizationGrid implements GameVisualizer {
     private int cellHeight;
     public int widthPX;
     public int heightPX;
+    public int safeZoneSize = 10;
 
     public ConsolePane console;
 
@@ -178,11 +179,17 @@ class VisualizationGrid implements GameVisualizer {
         gc.setStroke(Color.RED);
         gc.setLineWidth(1.0);
         gc.strokeRect(0.5, 0.5, (width * cellWidth) + 1.5, heightPX + 1.5);
+
+        Color scolor = new Color(0.0, 1.0, 0.0, 0.3); // translucent green
+        gc.setFill(scolor);
+        gc.fillRect(0.5 + (width * cellWidth) / 2 - safeZoneSize * cellWidth,
+                0.5 + (height * cellHeight) / 2 - safeZoneSize * cellHeight,
+                (2 * safeZoneSize + 1) * cellWidth,
+                (2 * safeZoneSize + 1) * cellHeight);
     }
 
     public void renderEnergyMap(GraphicsContext gc) {
         Color color = Color.BLACK;
-
         gc.setLineCap(StrokeLineCap.SQUARE);
         gc.setLineWidth(1);
         for (int i = 0; i < height; i++) {
@@ -196,19 +203,16 @@ class VisualizationGrid implements GameVisualizer {
                 int y = cellHeight * i;
                 int j = 1; // draw 1 cell
 
-                if (cell.alienCount == 0) {
-                    color = new Color(0, 0, Math.min(cell.energy / (double) 12 + 0.05, 1), 1.0);
+                color = GUIShell.spectrum.getColor((int) cell.energy - 1);
+                if (cell.energy > 750) {
+                    x = x;
+                }
 
-                    while (j + k < width) {
-                        if (grid[k + j][i].alienCount != 0 || grid[k + j][i].energy != cell.energy) {
-                            break;
-                        }
-                        j++;
+                while (j + k < width) {
+                    if (grid[k + j][i].alienCount != 0 || grid[k + j][i].energy != cell.energy) {
+                        break;
                     }
-
-                } else {
-                    //color = Color.RED;
-                    color = new Color(Math.min(Math.max(cell.alienCount / (double) 8, 0.2), 1), 0, 0, 1.0);
+                    j++;
                 }
 
                 gc.setStroke(color);
@@ -225,9 +229,18 @@ class VisualizationGrid implements GameVisualizer {
         for (PlanetForDisplay p : planets) {
             p.draw(gc, cellWidth, cellHeight);
         }
+
+        // draw boundary
         gc.setStroke(Color.BLUE);
         gc.setLineWidth(1.0);
-        gc.strokeRect(0.5, 0.5, (width * cellWidth) + 1.5, heightPX + 1.5);
+        gc.strokeRect(0.5, 0.5, widthPX + 1, heightPX + 1);
+
+        color = new Color(0.0, 1.0, 0.0, 0.3); // translucent green
+        gc.setFill(color);
+        gc.fillRect(1.5 + (width * cellWidth) / 2 - safeZoneSize * cellWidth,
+                1.5 + (height * cellHeight) / 2 - safeZoneSize * cellHeight,
+                (2 * safeZoneSize + 1) * cellWidth,
+                (2 * safeZoneSize + 1) * cellHeight);
     }
 
     @Override
@@ -489,7 +502,7 @@ class VisualizationGrid implements GameVisualizer {
             filters[i] = filters[i].trim();
         }
     }
-    
+
     public void setChatter(boolean f) {
         GUIShell.chatter.setSelected(f);
     }

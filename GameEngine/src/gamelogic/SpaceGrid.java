@@ -209,7 +209,7 @@ public class SpaceGrid {
                 ac.y = ac.nextY;
                 aliens.move(ac, oldX, oldY, ac.x, ac.y);
             }
-            
+
             // need to go through all the rest to mark cell fresh for display, 
             // TODO: Fix this in visualizer instead, go away from fillRect and to painting individual cells.
             double oldEnergy = 0;
@@ -221,12 +221,10 @@ public class SpaceGrid {
 
             double newEnergy = 0;
             acs = aliens.getAliensAt(ac.x, ac.y);
-            if (acs != null) {
-                newEnergy = acs.stream().map((alien) -> alien.energy).reduce(newEnergy, (accumulator, _item) -> accumulator + _item);
-            }
+            newEnergy = acs.stream().map((alien) -> alien.energy).reduce(newEnergy, (accumulator, _item) -> accumulator + _item);
             newEnergy += aliens.getEnergyAt(ac.x, ac.y);
 
-                // call shell visualizer
+            // call shell visualizer
             // just make sure we don't blow up the alien beacuse of an exception in the shell
             try {
                 vis.showMove(ac.getFullAlienSpec(),
@@ -236,6 +234,11 @@ public class SpaceGrid {
                         oldEnergy);
             } catch (Exception e) {
                 displayException("Unhandled exception in showMove(): ", e);
+
+            }
+
+            if (acs.star != null) {
+                ac.kill("Death for moving into a star");
 
             }
         }
@@ -345,8 +348,8 @@ public class SpaceGrid {
 
                     for (AlienContainer fightingAlien : fightingAliens) {
 
-                        if (fightingAlien.currentActionCode != Action.ActionCode.Fight &&
-                                fightingAlien.currentActionCode != Action.ActionCode.TradeOrDefend) {
+                        if (fightingAlien.currentActionCode != Action.ActionCode.Fight
+                                && fightingAlien.currentActionCode != Action.ActionCode.TradeOrDefend) {
                             fightingAlien.currentActionPower = 0;
                         }
 
@@ -480,25 +483,25 @@ public class SpaceGrid {
                                 aliensAtPos.remove(0);
                                 break;
                             }
-                            
+
                             // If the trade and buy prices are compatible
-                            if (buyingAlien.currentAction.buyPrice >= 
-                                    sellingAlien.currentAction.sellPrice &&
-                                    buyingAlien.energy >= 
-                                    sellingAlien.currentAction.sellPrice) {
-                                
+                            if (buyingAlien.currentAction.buyPrice
+                                    >= sellingAlien.currentAction.sellPrice
+                                    && buyingAlien.energy
+                                    >= sellingAlien.currentAction.sellPrice) {
+
                                 // Perform the trade
                                 buyingAlien.energy -= sellingAlien.currentAction.sellPrice;
                                 sellingAlien.energy += sellingAlien.currentAction.sellPrice;
                                 buyingAlien.tech++;
-                                
+
                                 // Remove both aliens from aliensAtPos
                                 aliensAtPos.remove(0);
                                 aliensAtPos.remove(i);
                             }
-                        } 
+                        }
                     }
-                    
+
                     break;
                 case Gain:
                     if (thisAlien.energy < Constants.energyCap) {

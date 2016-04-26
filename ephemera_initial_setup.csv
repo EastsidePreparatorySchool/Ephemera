@@ -1,7 +1,7 @@
 !GameElementKind,Domain,Package (jar file without .jar),Class (name),Parent (position will be relative to this),X,Y,Energy (Luminosity for stars),Technology,State
 CONSTANT,,,randseed,,,,,,1
 CONSTANT,,,chatter,,,,,,on
-CONSTANT,,,perSpeciesCap,,,,,,100
+CONSTANT,,,perSpeciesCap,,,,,,100000
 CONSTANT,,,safeZoneSize,,,,,,10
 CONSTANT,,,filters,,,,,,death; violation; 
 CONSTANT,,,pauseOnError,,,,,,off

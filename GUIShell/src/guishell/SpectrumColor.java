@@ -5,22 +5,42 @@
  */
 package guishell;
 
+import javafx.scene.paint.Color;
+
 /**
  *
  * @author gmein
  */
 public class SpectrumColor {
 
-    static private double Gamma = 0.80;
+    static private double Gamma = 1.00;
     static private double IntensityMax = 255;
+
+    final static private Color[] colors = new Color[755];
+
+    public SpectrumColor() {
+        for (int i = 0; i < colors.length; i++) {
+            colors[i] = waveLengthToRGB(380 + (Math.cbrt(1/(double)(i+1))*(780-380)));
+        }
+    }
+
+    public Color getColor(int i) {
+        if (i < 0) {
+            i = 0;
+        }
+        if (i >= colors.length) {
+            i = colors.length - 1;
+        }
+        return colors[i];
+    }
 
     /**
      * Taken from Earl F. Glynn's web page:
      * <a href="http://www.efg2.com/Lab/ScienceAndEngineering/Spectra.htm">Spectra
      * Lab Report</a>
-*
+     *
      */
-    public static int[] waveLengthToRGB(double Wavelength) {
+    public static Color waveLengthToRGB(double Wavelength) {
         double factor;
         double Red, Green, Blue;
 
@@ -54,25 +74,24 @@ public class SpectrumColor {
             Blue = 0.0;
         };
 
-    // Let the intensity fall off near the vision limits
+        // Let the intensity fall off near the vision limits GM : only towards the red end
         if ((Wavelength >= 380) && (Wavelength < 420)) {
-            factor = 0.3 + 0.7 * (Wavelength - 380) / (420 - 380);
-        } else if ((Wavelength >= 420) && (Wavelength < 701)) {
+            factor = 1.0; // 0.3 + 0.7 * (Wavelength - 380) / (420 - 380);
+        } else if ((Wavelength >= 420) && (Wavelength < 601)) {
             factor = 1.0;
-        } else if ((Wavelength >= 701) && (Wavelength < 781)) {
-            factor = 0.3 + 0.7 * (780 - Wavelength) / (780 - 700);
+        } else if ((Wavelength >= 601) && (Wavelength < 781)) {
+            factor = 0.1 + 0.5 * (780 - Wavelength) / (780 - 600);
         } else {
             factor = 0.0;
         };
 
-        int[] rgb = new int[3];
-
         // Don't want 0^x = 1 for x <> 0
-        rgb[0] = Red == 0.0 ? 0 : (int) Math.round(IntensityMax * Math.pow(Red * factor, Gamma));
-        rgb[1] = Green == 0.0 ? 0 : (int) Math.round(IntensityMax * Math.pow(Green * factor, Gamma));
-        rgb[2] = Blue == 0.0 ? 0 : (int) Math.round(IntensityMax * Math.pow(Blue * factor, Gamma));
+        Color color = new Color((Red == 0.0 ? 0 : IntensityMax * Math.pow(Red * factor, Gamma)/255),
+                (Green == 0.0 ? 0 : IntensityMax * Math.pow(Green * factor, Gamma)/255),
+                (Blue == 0.0 ? 0 : IntensityMax * Math.pow(Blue * factor, Gamma)/255),
+                1.0);
 
-        return rgb;
+        return color;
     }
 
 }

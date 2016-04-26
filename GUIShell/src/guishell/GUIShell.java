@@ -63,6 +63,7 @@ public class GUIShell extends Application {
     public static ConsolePane console;
     public static CheckBox chatter;
     public static Timer idleTimer;
+    public static SpectrumColor spectrum = new SpectrumColor();
     Stage stage;
 
     @Override
