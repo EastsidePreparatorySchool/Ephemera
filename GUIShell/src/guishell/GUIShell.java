@@ -11,6 +11,7 @@ import gameengineinterfaces.GameCommandCode;
 import gameengineinterfaces.GameElementSpec;
 import gamelogic.Constants;
 import java.io.File;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Iterator;
 import java.util.Timer;
@@ -67,8 +68,9 @@ public class GUIShell extends Application {
     Stage stage;
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws IOException {
 
+        try {
         // Constants from current Ephemera game
         int width = Constants.width;
         int height = Constants.height;
@@ -140,7 +142,7 @@ public class GUIShell extends Application {
         Utilities.createFolder(alienPath);
         Utilities.createFolder(logPath);
 
-        gamePath += System.getProperty("file.separator");
+        //gamePath += System.getProperty("file.separator");
         alienPath += System.getProperty("file.separator");
         logPath += System.getProperty("file.separator");
 
@@ -168,6 +170,10 @@ public class GUIShell extends Application {
         // scheduling the task at interval
         idleTimer.schedule(task, 0, 200);
         // return to platform and wait for events
+        } catch (Exception e) {
+            System.out.println(e.toString());
+            System.in.read();
+        }
     }
     // handle shutdown gracefully
 

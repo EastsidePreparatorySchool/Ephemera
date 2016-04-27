@@ -36,7 +36,7 @@ public class StarForDisplay {
     public void draw(GraphicsContext gc, int cellWidth, int cellHeight) {
 
         int maxFlicker = 12;
-        gc.setLineWidth(0.5);
+        gc.setLineWidth(1.0);
         gc.setLineCap(StrokeLineCap.SQUARE);
 
         if ((System.nanoTime() - lastTime) > 200000000) {

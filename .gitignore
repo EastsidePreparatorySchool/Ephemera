@@ -75,3 +75,6 @@ ConsoleShell/nbproject/private/private.properties
 GUIShell/nbproject/jfx-impl.xml
 GUIShell/nbproject/jfx-impl_backup_7.xml
 GUIShell/nbproject/UPDATED.TXT
+/CustomAlien/nbproject/private/
+/CustomAlien/dist/
+/CustomAlien/build/
