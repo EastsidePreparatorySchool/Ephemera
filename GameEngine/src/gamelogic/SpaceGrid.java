@@ -13,11 +13,14 @@ import alieninterfaces.*;
 import gameengineV1.GameEngineV1;
 import gameengineinterfaces.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  *
@@ -72,6 +75,7 @@ public class SpaceGrid {
                 vis.mapEnergy(x, y, aliens.getEnergyAt(x, y));
             }
         }
+
         vis.showReady();
     }
 
@@ -504,6 +508,7 @@ public class SpaceGrid {
 
                     break;
                 case Gain:
+                    // todo: dshare power only among those gaining
                     if (thisAlien.energy < Constants.energyCap) {
                         AlienCell acs = aliens.getAliensAt(thisAlien.x, thisAlien.y);
                         if (acs.energyPerAlien == 0) {
@@ -612,7 +617,7 @@ public class SpaceGrid {
 
         if (as.cns == null) {
             try {
-                as.cns = Load(engine, alienPackageName, alienClassName);
+                as.cns = LoadConstructor(engine, domainName, alienPackageName, alienClassName);
             } catch (Exception e) {
                 gridDebugErr("sg.addAlien: Error loading contructor for " + speciesName);
                 //throw (e);
@@ -692,54 +697,38 @@ public class SpaceGrid {
     // Dynamic class loader (.jar files)
     // stolen from StackOverflow, considered dark voodoo magic
     //
-    /**
-     * Parameters of the method to add an URL to the System classes.
-     */
-    private static final Class<?>[] parameters = new Class[]{URL.class
-    };
 
-    /**
-     * Adds the content pointed by the file to the class path.
-     *
-     */
-    public static void addClassPathFile(String gamePath, String alienPath, String packageName) throws IOException {
+    public Constructor<?> LoadConstructor(GameEngineV1 engine, String domainName, String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Constructor<?> cs = null;
         String fullName;
+        File file;
+        URL url;
+        Object[] parameters;
 
         if (packageName.equalsIgnoreCase("stockaliens")
                 || packageName.equalsIgnoreCase("alieninterfaces")) {
-            fullName = gamePath
-                    + System.getProperty("file.separator")
+            fullName = engine.gameJarPath
                     + packageName
                     + System.getProperty("file.separator")
                     + "dist"
                     + System.getProperty("file.separator")
                     + packageName + ".jar";
         } else {
-            fullName = alienPath + packageName + ".jar";
+            fullName = engine.alienPath + domainName + System.getProperty("file.separator") + packageName + ".jar";
         }
 
-        URL url = new File(fullName).toURI().toURL();
-        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        Class<?> sysclass = URLClassLoader.class;
-
         try {
-            Method method = sysclass.getDeclaredMethod("addURL", parameters);
+            file = new File(fullName);
+            url = file.toURI().toURL();
+            parameters = new Object[1];
+            parameters[0] = url;
+
+            URLClassLoader classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+            Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
             method.setAccessible(true);
-            method.invoke(sysloader, new Object[]{url});
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("GameElementThread: Error, could not add URL to system classloader");
-        }
-        //engine.vis.debugOut("GameElementThread: package " + packageName + " added as " + fullName);
+            Object result = method.invoke(classLoader, parameters);
 
-    }
-
-    public static Constructor<?> Load(GameEngineV1 engine, String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        Constructor<?> cs = null;
-
-        try {
-            addClassPathFile(engine.gameJarPath, engine.alienPath, packageName);
-            cs = ClassLoader.getSystemClassLoader().loadClass(packageName + "." + className).getConstructor();
+           cs = ClassLoader.getSystemClassLoader().loadClass(packageName + "." + className).getConstructor();
         } catch (Exception e) {
             e.printStackTrace();
             //vis.debugErr("GameElementThread: Error: Could not get constructor");
@@ -767,4 +756,35 @@ public class SpaceGrid {
         //    }
     }
 
+    public void addAllCustomAliens() {
+        addCustomAliens(engine.alienPath, "<unknown>");
+    }
+
+    public void addCustomAliens(String folder, String domain) {
+        File[] files = new File(folder).listFiles();
+
+        for (File f : files) {
+            if (f.isDirectory()) {
+                // recurse
+                addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), f.getName());
+            } else if (f.getName().toLowerCase().endsWith(".jar")) {
+                try {
+                    // look for jar files and process
+                    List<String> classNames = new ArrayList<String>();
+                    ZipInputStream zip = new ZipInputStream(new FileInputStream(f));
+                    for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                        if (!entry.isDirectory() && entry.getName().toLowerCase().endsWith("alien.class")) {
+                            addSpecies(new GameElementSpec("SPECIES",
+                                    domain,
+                                    f.getName().replace(".jar", "").toLowerCase(),
+                                    entry.getName().substring(entry.getName().indexOf('/') + 1).replace(".class", ""),
+                                    "")
+                            );
+                        }
+                    }
+                } catch (Exception e) {
+                }
+            }
+        }
+    }
 }
