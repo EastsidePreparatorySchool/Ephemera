@@ -661,10 +661,11 @@ public class SpaceGrid {
     // as there is already a large if statement in addElement and the code in
     // addPlanet and addStar is nearly identical
     void addPlanet(GameElementSpec element) {
-        Planet p = new Planet(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech, element.parent);
-        objects.add(p);
-        this.aliens.plugPlanet(p);
-        vis.registerPlanet(element.x, element.y, element.className, element.energy, element.tech);
+        // Todo: adjust position by parent star
+        //Planet p = new Planet(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech, element.parent);
+        //objects.add(p);
+        //this.aliens.plugPlanet(p);
+        //vis.registerPlanet(element.x, element.y, element.className, element.energy, element.tech);
     }
 
     void addStar(GameElementSpec element) {

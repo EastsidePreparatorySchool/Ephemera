@@ -116,13 +116,11 @@ public class AlienGrid extends LinkedList<AlienContainer> {
             acGrid[p.x + centerX][p.y + centerY] = acs;
         }
         acs.planet = p;
-        acs.energy = p.energy;
+        acs.energy += p.energy;
         acs.tech = p.tech;
     }
 
     public void distributeStarEnergy(int x, int y, double energy) {
-        int[] pos = {Integer.MAX_VALUE, Integer.MAX_VALUE};
-
         // probe around our current position,
         // tracing an imaginary square of increasing size,
         // starting from the midpoints of the sides
@@ -159,7 +157,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         }
 
         if (energy > acs.energy) {
-            acs.energy = energy;
+            acs.energy += energy;
         }
     }
 

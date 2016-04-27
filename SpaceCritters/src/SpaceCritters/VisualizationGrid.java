@@ -184,8 +184,8 @@ class VisualizationGrid implements GameVisualizer {
         gc.setFill(scolor);
         gc.fillRect(0.5 + (width * cellWidth) / 2 - safeZoneSize * cellWidth,
                 0.5 + (height * cellHeight) / 2 - safeZoneSize * cellHeight,
-                (2 * safeZoneSize + 1) * cellWidth,
-                (2 * safeZoneSize + 1) * cellHeight);
+                (2 * safeZoneSize ) * cellWidth,
+                (2 * safeZoneSize) * cellHeight);
     }
 
     public void renderEnergyMap(GraphicsContext gc) {
@@ -239,8 +239,8 @@ class VisualizationGrid implements GameVisualizer {
         gc.setFill(color);
         gc.fillRect(1.5 + (width * cellWidth) / 2 - safeZoneSize * cellWidth,
                 1.5 + (height * cellHeight) / 2 - safeZoneSize * cellHeight,
-                (2 * safeZoneSize + 1) * cellWidth,
-                (2 * safeZoneSize + 1) * cellHeight);
+                (2 * safeZoneSize) * cellWidth,
+                (2 * safeZoneSize) * cellHeight);
     }
 
     @Override
