@@ -74,9 +74,9 @@ public class AlienContainer {
 
         // if position = (0,0) assign random position in safe zone
         if (x == 0 && y == 0) {
-            this.x = ctx.getRandomInt(Constants.safeZoneSize + 1);
+            this.x = ctx.getRandomInt(Constants.safeZoneRadius + 1);
             this.x *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
-            this.y = ctx.getRandomInt(Constants.safeZoneSize + 1);
+            this.y = ctx.getRandomInt(Constants.safeZoneRadius + 1);
             this.y *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
         } else {
             this.x = x;
@@ -180,7 +180,7 @@ public class AlienContainer {
 
         int width = Constants.width;
         int height = Constants.height;
-        if (nextX >= (width / 2) || nextX < (0 - width / 2) || nextY >= (height / 2) || nextY < (0 - height / 2)) {
+        if (nextX > (width / 2) || nextX < (0 - width / 2) || nextY > (height / 2) || nextY < (0 - height / 2)) {
             debugErr("ac.move: Out of bounds: (" + x + ":" + y + ")");
         }
     }
@@ -213,24 +213,27 @@ public class AlienContainer {
         dxi = dir.x;
         dyi = dir.y;
 
-        if (x + dxi > 249) {
-            dxi = 249 - x;
+        if (x + dxi > Constants.width / 2) {
+            dxi = Constants.width / 2 - x;
         }
-        if (x + dxi < -250) {
-            dxi = -250 - x;
+        if (x + dxi < -Constants.width / 2) {
+            dxi = -Constants.width / 2 - x;
         }
-        if (y + dyi > 249) {
-            dyi = 249 - y;
+        if (y + dyi > Constants.width / 2) {
+            dyi = Constants.width / 2 - y;
         }
-        if (y + dyi < -250) {
-            dyi = -250 - y;
+        if (y + dyi < -Constants.width / 2) {
+            dyi = -Constants.width / 2 - y;
         }
         return new MoveDir(dxi, dyi);
     }
 
     // easy way to kill an alien
     public void kill(String s) {
-        debugOut(s + " with T:" + (Math.round(tech * 10) / 10) + " and E:" + (Math.round(energy * 10) / 10));
+        debugOut(s + " with T:" + (Math.round(tech * 10) / 10)
+                + " and E:" + (Math.round(energy * 10) / 10)
+                + " during turn:" + grid.currentTurn
+        );
         energy = 0;
     }
 

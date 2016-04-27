@@ -32,7 +32,7 @@ public class GameEngineThread extends Thread {
         int totalTurns = 0;
 
         //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-        engine.grid = new SpaceGrid(engine, engine.vis, 500, 500);
+        engine.grid = new SpaceGrid(engine, engine.vis, Constants.width, Constants.height);
 
         engine.vis.debugOut("GameEngineThread: Started");
         do {

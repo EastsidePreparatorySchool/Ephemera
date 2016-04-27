@@ -18,13 +18,11 @@ package gamelogic;
 public class Constants {
 
     public static int randSeed = 1; // rand seed, controls random decision sequence in the game, set to 0 for fresh
-    public static int width = 500; // grid width 
-    public static int height = 500; // grid height
     public static int researchTechCap = 30; // can't attain more tech than this by research alone
-    public static int energyCap = 500; // can't accumulate more energy than this
+    public static int energyCap = 1000; // can't accumulate more energy than this
     public static int perSpeciesCap = 1000; // won't allow more spawns than this
     public static boolean chatter = false; // false suppresses alien debugOut
-    public static int safeZoneSize = 10; // Number of tiles out of 0,0 that should be protected
+    public static int safeZoneRadius = 10; // Number of tiles out of 0,0 that should be protected
     // sZS = 0 gives a 1x1 sz, sZS = 1 gives a 3x3 sz, sZS = 5 gives a 11x11 sz
     public static int fightingCost = 5; // fighting will cost you 5 on top of invested power
     public static int spawningCost = 100; // spawning cost + 100
@@ -36,5 +34,11 @@ public class Constants {
     public static double deathThreshold = 5; // if you lose a fight by more than this much, you die
     public static String filters = "death; violation";
     public static boolean pauseOnError = true; // debugErr stops the show
+
+    /*
+    ** Not truly adjustable yet - do not change these, do not put in config file
+    */
+    final public static int width = 501; // grid width 
+    final public static int height = 501; // grid height
 
 }

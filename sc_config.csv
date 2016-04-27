@@ -2,7 +2,7 @@
 CONSTANT,,,randseed,,,,,,1
 CONSTANT,,,chatter,,,,,,on
 CONSTANT,,,perSpeciesCap,,,,,,100000
-CONSTANT,,,safeZoneSize,,,,,,10
+CONSTANT,,,safeZoneRadius,,,,,,10
 CONSTANT,,,filters,,,,,,death; violation; 
 CONSTANT,,,pauseOnError,,,,,,off
 SPECIES,ephemera.eastsideprep.org,stockaliens,Dalek,,,,,,

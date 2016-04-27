@@ -104,7 +104,7 @@ public class SpaceCritters extends Application {
         border.setBottom(addBottomBox());
 
         // add a center pane
-        this.canvas = new Canvas(width * cellWidth + 2, height * cellHeight + 2);
+        this.canvas = new Canvas(width * cellWidth + 2/*Border*/, height * cellHeight + 2);
         HBox hb = new HBox();
         hb.setPadding(new Insets(15, 12, 15, 12));
         hb.getChildren().add(canvas);

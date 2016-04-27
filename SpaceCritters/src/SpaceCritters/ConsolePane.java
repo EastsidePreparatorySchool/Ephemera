@@ -43,7 +43,7 @@ public class ConsolePane extends BorderPane {
                 case ENTER:
                     String text = textField.getText();
                     textArea.appendText(text + System.lineSeparator());
-                    textArea.setText (textField.getText().substring(0, 4000));
+                    textArea.setText (textField.getText().substring(0, 10000));
                     history.add(text);
                     historyPointer++;
                     if (onMessageReceivedHandler != null) {
@@ -108,10 +108,6 @@ public class ConsolePane extends BorderPane {
     }
 
     public void println() {
-        if (++msgCounter > 500) {
-            msgCounter = 0;
-            clear();
-        }
         Utilities.runAndWait(() -> textArea.appendText(System.lineSeparator()));
     }
 }

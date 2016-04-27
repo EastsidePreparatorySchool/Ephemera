@@ -273,7 +273,7 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     public void incrementCell(int x, int y, String speciesName, double energy) {
-        if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
+        if (x > (width / 2) || x < (0 - width / 2) || y > (height / 2) || y < (0 - height / 2)) {
             debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
             return;
         }
@@ -282,7 +282,7 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     public void decrementCell(int x, int y, String speciesName, double energy) {
-        if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
+        if (x > (width / 2) || x < (0 - width / 2) || y > (height / 2) || y < (0 - height / 2)) {
             debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
             return;
         }
@@ -311,7 +311,7 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     public void markFight(int x, int y) {
-        if (x >= (width / 2) || x < (0 - width / 2) || y >= (height / 2) || y < (0 - height / 2)) {
+        if (x  > (width / 2) || x < (0 - width / 2) || y > (height / 2) || y < (0 - height / 2)) {
             debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
             return;
         }

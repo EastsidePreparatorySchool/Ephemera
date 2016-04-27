@@ -344,10 +344,11 @@ public class SpaceGrid {
                     //vis.debugOut("SpaceGrid: Processing Fight");
 
                     // If the alien is in the safe zone
-                    if (Math.abs(thisAlien.x) <= Constants.safeZoneSize
-                            && Math.abs(thisAlien.y) <= Constants.safeZoneSize) {
+                    if (Math.abs(thisAlien.x) <= Constants.safeZoneRadius
+                            && Math.abs(thisAlien.y) <= Constants.safeZoneRadius) {
                         // Make them pay the energy they spent
-                        thisAlien.energy -= thisAlien.currentActionPower;
+                        thisAlien.energy -= thisAlien.currentActionPower + Constants.fightingCost;
+                        // but don't let them fight
                         break;
                     }
                     List<AlienSpec> fightSpecs = new ArrayList<>();
