@@ -196,7 +196,12 @@ public class SpaceGrid {
                 displayException("Unhandled exception in getMove(): ", ex);
                 ac.kill("Death for unhandled exception in getMove(): " + ex.toString());
             }
-            ac.energy -= Math.abs(ac.x - oldX) + Math.abs(ac.y - oldY);
+            
+            // charge only for moves > 1 in either direction
+            int moveLength = GridCircle.distance(ac.x, ac.y, oldX, oldY - oldX);
+            if (Math.abs(ac.x - oldX) > 1 || Math.abs(ac.y - oldY) >1) {
+                ac.energy -= moveLength;
+            }
         }
     }
 
@@ -549,7 +554,7 @@ public class SpaceGrid {
                     }
 
                     MoveDir dir = new MoveDir(x, y);
-                    dir = thisAlien.applyDrift(thisAlien.x, thisAlien.y, dir);
+                    dir = thisAlien.containMove(thisAlien.x, thisAlien.y, dir);
 
                     x = thisAlien.x + dir.x;
                     y = thisAlien.y + dir.y;

@@ -171,7 +171,7 @@ public class AlienContainer {
         this.checkMove(direction); // Throws an exception if illegal
 
         // we want to contain aliens in the 250 sphere, so apply the "cosmic drift"
-        direction = this.applyDrift(x, y, direction);
+        direction = this.containMove(x, y, direction);
 
         int oldx = x;
         int oldy = y;
@@ -189,15 +189,14 @@ public class AlienContainer {
     private void checkMove(MoveDir direction) throws NotEnoughTechException {
         int moveLength = distance(0, 0, direction.x, direction.y);
 
-        // leet onexone moves go
-        
-        if (moveLength <= 2) {
+        // let one x one moves go
+        if (Math.abs(direction.x) <= 1 && Math.abs(direction.y) <= 1) {
             return;
         }
-        
+
         // If the move is farther than the alien has the power to move
         if (moveLength > tech) {
-           debugErr("Illegal move(" + moveLength + "): " + (direction.x) + "," + (direction.y) + " tech " + tech);
+            debugErr("Illegal move(" + moveLength + "): " + (direction.x) + "," + (direction.y) + " tech " + tech);
             throw new NotEnoughTechException();
         }
 
@@ -208,7 +207,7 @@ public class AlienContainer {
         }
     }
 
-    public MoveDir applyDrift(int x, int y, MoveDir dir) {
+    public MoveDir containMove(int x, int y, MoveDir dir) {
         int dxi, dyi;
 
         dxi = dir.x;

@@ -49,17 +49,22 @@ public class ContextImplementation implements Context {
         // if we don't have one or they want a bigger one
         if (this.view == null || this.view.size < size) {
             // enough energy?
-            if (size >= ((int)ac.energy) - Constants.viewCost) {
+            if (size != 0 && size >= ((int) ac.energy) - Constants.viewCost) {
                 throw new NotEnoughEnergyException();
             }
-            // make them pay
-            this.ac.energy -= size + Constants.viewCost;
+
+            if (size == 0) {
+                // seeing what is at your own spot is free
+            } else {
+                // make them pay
+                this.ac.energy -= size + Constants.viewCost;
+            }
             this.view = new ViewImplementation(ac.grid.aliens, ac.x, ac.y, size);
         }
         return this.view;
     }
 
-    public double getPresentEnergy(){
+    public double getPresentEnergy() {
         return ac.grid.aliens.getEnergyAt(ac.x, ac.y);
     }
 
