@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package guishell;
+package SpaceCritters;
 
 import gameengineinterfaces.AlienSpec;
 import javafx.scene.canvas.GraphicsContext;
@@ -203,7 +203,7 @@ class VisualizationGrid implements GameVisualizer {
                 int y = cellHeight * i;
                 int j = 1; // draw 1 cell
 
-                color = GUIShell.spectrum.getColor((int) cell.energy - 1);
+                color = SpaceCritters.spectrum.getColor((int) cell.energy - 1);
                 if (cell.energy > 750) {
                     x = x;
                 }
@@ -260,7 +260,7 @@ class VisualizationGrid implements GameVisualizer {
                     + (numAliens > 0 ? ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens))) : "");
             //        + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)));
             //}
-            GUIShell.turnCounterText.setText(text);
+            SpaceCritters.turnCounterText.setText(text);
             speciesSet.notifyListeners();
         });
 
@@ -361,13 +361,13 @@ class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void showGameOver() {
-        GUIShell.gameOver = true;
+        SpaceCritters.gameOver = true;
         try {
             logFile.close();
         } catch (Exception e) {
         }
         debugOut("Game Over");
-        Utilities.runSafe(() -> GUIShell.startOrPauseGame(new ActionEvent()));
+        Utilities.runSafe(() -> SpaceCritters.startOrPauseGame(new ActionEvent()));
     }
 
     @Override
@@ -485,7 +485,7 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     public void renderField() {
-        if (GUIShell.renderSelectorAliens.isSelected()) {
+        if (SpaceCritters.renderSelectorAliens.isSelected()) {
             renderAlienView(this.canvas.getGraphicsContext2D());
         } else {
 
@@ -496,7 +496,7 @@ class VisualizationGrid implements GameVisualizer {
 
     public void setFilter(String s) {
         filter = s;
-        GUIShell.filterText.setText(s);
+        SpaceCritters.filterText.setText(s);
         filters = s.split(";");
         for (int i = 0; i < filters.length; i++) {
             filters[i] = filters[i].trim();
@@ -504,7 +504,7 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     public void setChatter(boolean f) {
-        GUIShell.chatter.setSelected(f);
+        SpaceCritters.chatter.setSelected(f);
     }
 
 }

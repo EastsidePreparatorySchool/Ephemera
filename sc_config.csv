@@ -1,0 +1,45 @@
+!GameElementKind,Domain,Package (jar file without .jar),Class (name),Parent (position will be relative to this),X,Y,Energy (Luminosity for stars),Technology,State
+CONSTANT,,,randseed,,,,,,1
+CONSTANT,,,chatter,,,,,,on
+CONSTANT,,,perSpeciesCap,,,,,,100000
+CONSTANT,,,safeZoneSize,,,,,,10
+CONSTANT,,,filters,,,,,,death; violation; 
+CONSTANT,,,pauseOnError,,,,,,off
+SPECIES,ephemera.eastsideprep.org,stockaliens,Dalek,,,,,,
+SPECIES,ephemera.eastsideprep.org,stockaliens,Martian,,,,,,
+SPECIES,ephemera.eastsideprep.org,stockaliens,Venusian,,,,,,
+SPECIES,ephemera.eastsideprep.org,stockaliens,WeepingAngel,,,,,,
+SPECIES,ephemera.eastsideprep.org,stockaliens,Alf,,,,,,
+SPECIES,ephemera.eastsideprep.org,stockaliens,EmptyAlien,,,,,,
+STAR,ephemera.eastsideprep.org,stockelements,Sol,,0,0,38,,
+STAR,ephemera.eastsideprep.org,stockelements,ProximaCentauri,,-34,-20,15.45,,
+PLANET,ephemera.eastsideprep.org,stockelements,Slathri,stockelements:ProximaCentauri,-1,-1,5,10,"notes:""Gravity on planet is strong. Takes a bunch of energy when you first go to planet"""
+PLANET,ephemera.eastsideprep.org,stockelements,Kukaro,stockelements:ProximaCentauri,0,1,20,5,"notes:""Very peaceful. Energy refreshes twice as fast"""
+RESIDENT,ephemera.eastsideprep.org,stockelements,Elbubbians,stockelements:Kukaro,0,0,255,5,"notes:""Elbbubians: low tech. Planet bound but spread throughout multiple planets. Always willing to trade but will fight if technology is over 10."""
+STAR,ephemera.eastsideprep.org,stockelements,AlphaCentauriA,,-38,-23,4.34,,
+STAR,ephemera.eastsideprep.org,stockelements,AlphaCentauriB,,-38,-23,5.7,,
+STAR,ephemera.eastsideprep.org,stockelements,Barnard'sStar,,-28,-114,13.24,,
+STAR,ephemera.eastsideprep.org,stockelements,Wolf359,,-135,75,16.56,,
+STAR,ephemera.eastsideprep.org,stockelements,Lalande21185,,-129,34,10.46,,
+PLANET,ephemera.eastsideprep.org,stockelements,Liloso,stockelements:Lalande21185,0,1,8,30,"notes:""Ruins of an ancient race are present on this planet, technology research is doubled on this planet."""
+RESIDENT,ephemera.eastsideprep.org,stockelements,Elbubbians,stockelements:Liloso,0,0,255,5,"notes:""Elbbubians: low tech. Planet bound but spread throughout multiple planets. Always willing to trade but will fight if technology is over 10."""
+PLANET,ephemera.eastsideprep.org,stockelements,Cerile,stockelements:Lalande21186,1,0,12,5,"notes:""Nothing special happens here"""
+PLANET,ephemera.eastsideprep.org,stockelements,Vorium,stockelements:Lalande21187,-1,1,10,3,"notes:""It is beautiful at night on this planet, gain 3 energy every 2 turns spent on the planet."""
+STAR,ephemera.eastsideprep.org,stockelements,Sirius,,-2,165,151.1,,
+STAR,ephemera.eastsideprep.org,stockelements,L 726-8,,161,45,1,,
+STAR,ephemera.eastsideprep.org,stockelements,Ross 154,,2,-179,1.4,,
+STAR,ephemera.eastsideprep.org,stockelements,Ross 248,,143,-36,0.7,,
+STAR,ephemera.eastsideprep.org,stockelements,Epsilon Eridani,,145,148,22.2,,
+STAR,ephemera.eastsideprep.org,stockelements,Lacaille 9352,,171,-45,5.3,,
+STAR,ephemera.eastsideprep.org,stockelements,Ross 128,,-211,53,1.2,,
+STAR,ephemera.eastsideprep.org,stockelements,L 789-6,,186,-105,1.4,,
+STAR,ephemera.eastsideprep.org,stockelements,Procyon,,-61,218,92.8,,
+STAR,ephemera.eastsideprep.org,stockelements,61 Cygni,,126,-125,22.5,,
+STAR,ephemera.eastsideprep.org,stockelements,Struve 2398,,1,-117,5.2,,
+STAR,ephemera.eastsideprep.org,stockelements,Groombridge 34,,167,0,5.5,,
+STAR,ephemera.eastsideprep.org,stockelements,G51-15,,-107,181,1,,
+STAR,ephemera.eastsideprep.org,stockelements,Epsilon Indi,,116,-67,16.7,,
+STAR,ephemera.eastsideprep.org,stockelements,Tau Ceti,,222,62,27.1,,
+STAR,ephemera.eastsideprep.org,stockelements,L 372-58,,122,125,0.6,,
+STAR,ephemera.eastsideprep.org,stockelements,L 725-32,,223,60,0.9,,
+STAR,ephemera.eastsideprep.org,stockelements,Luyten's Star,,-65,237,2.2,,

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package guishell;
+package SpaceCritters;
 
 import java.util.TimerTask;
 
@@ -15,7 +15,7 @@ public class ReadyTimer extends TimerTask{
    // this method performs the task
    @Override
    public void run() {
-       Utilities.runSafe(()->GUIShell.field.renderField());
+       Utilities.runSafe(()->SpaceCritters.field.renderField());
    }    
 
 }

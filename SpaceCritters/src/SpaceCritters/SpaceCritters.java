@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package guishell;
+package SpaceCritters;
 
 import gameengineV1.GameEngineV1;
 import gameengineinterfaces.GameCommand;
@@ -43,12 +43,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import static javafx.application.Application.launch;
 
 /**
  *
  * @author gmein
  */
-public class GUIShell extends Application {
+public class SpaceCritters extends Application {
 
     public static boolean gameOver = false;
     public static Canvas canvas;
@@ -89,7 +90,7 @@ public class GUIShell extends Application {
         species = new SpeciesSet();
 
         // set up main window
-        stage.setTitle("Ephemera GUI Shell V0.1");
+        stage.setTitle("SpaceCritters V0.90");
         setSize(stage, screenBounds);
 
         // Use a border pane as the root for scene
@@ -121,9 +122,9 @@ public class GUIShell extends Application {
         String gamePath = System.getProperty("user.dir");
         gamePath = gamePath.toLowerCase();
 
-        if (gamePath.contains("ephemera" + System.getProperty("file.separator") + "guishell")) {
+        if (gamePath.contains("ephemera" + System.getProperty("file.separator") + "spacecritters")) {
             // probably started from netbeans
-            gamePath = gamePath.substring(0, gamePath.indexOf("guishell"));
+            gamePath = gamePath.substring(0, gamePath.toLowerCase().indexOf("spacecritters"));
         } else {
             // probably started from other folder
             gamePath = System.getProperty("user.dir");
@@ -148,7 +149,7 @@ public class GUIShell extends Application {
         this.field.init(engine, console, species, logPath, width, height, cellWidth, cellHeight, canvas);
 
         // get engine up and running
-        engine.initFromFile(field, gamePath, alienPath, "ephemera_initial_setup.csv");
+        engine.initFromFile(field, gamePath, alienPath, "sc_config.csv");
 
         // set a hook to shut down engine on game exit
         stage.setOnCloseRequest(e -> handleExit());
@@ -231,12 +232,12 @@ public class GUIShell extends Application {
 
         box.getChildren().addAll(buttonPause, buttonQuit, buttonRestart, addRenderSelector());
 
-        GUIShell.turnCounterText = new Text("Turns completed: 0");
-        GUIShell.turnCounterText.setFont(Font.font("Consolas", FontWeight.BOLD, 18));
-        GUIShell.turnCounterText.setStyle("-fx-background-color: black;");
-        GUIShell.turnCounterText.setFill(Color.WHITE);
+        SpaceCritters.turnCounterText = new Text("Turns completed: 0");
+        SpaceCritters.turnCounterText.setFont(Font.font("Consolas", FontWeight.BOLD, 18));
+        SpaceCritters.turnCounterText.setStyle("-fx-background-color: black;");
+        SpaceCritters.turnCounterText.setFill(Color.WHITE);
 
-        vbox.getChildren().addAll(box, GUIShell.turnCounterText);
+        vbox.getChildren().addAll(box, SpaceCritters.turnCounterText);
 
         return vbox;
     }
@@ -409,7 +410,7 @@ public class GUIShell extends Application {
                 cmd.append(jvmArg + " ");
             }
             cmd.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
-            cmd.append(GUIShell.class.getName()).append(" ");
+            cmd.append(SpaceCritters.class.getName()).append(" ");
             Runtime.getRuntime().exec(cmd.toString());
             System.exit(0);
         } catch (Exception e) {
