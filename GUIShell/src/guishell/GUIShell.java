@@ -126,10 +126,9 @@ public class GUIShell extends Application {
             gamePath = gamePath.substring(0, gamePath.indexOf("guishell"));
         } else {
             // probably started from other folder
-            gamePath = System.getProperty("user.home");
+            gamePath = System.getProperty("user.dir");
             gamePath = gamePath.toLowerCase();
-            gamePath += System.getProperty("file.separator")
-                    + "ephemera";
+            gamePath += System.getProperty("file.separator");
         }
 
         String alienPath = gamePath
@@ -138,8 +137,6 @@ public class GUIShell extends Application {
         String logPath = gamePath
                 + "logs";
 
-        Utilities.createFolder(gamePath);
-        Utilities.createFolder(alienPath);
         Utilities.createFolder(logPath);
 
         //gamePath += System.getProperty("file.separator");
