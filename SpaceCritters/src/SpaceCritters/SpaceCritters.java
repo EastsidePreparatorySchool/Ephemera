@@ -81,16 +81,24 @@ public class SpaceCritters extends Application {
             dialog.setTitle("About SpaceCritters");
             dialog.initStyle(StageStyle.UNDECORATED);
             dialog.initModality(Modality.APPLICATION_MODAL);
-            
+            dialog.setAlwaysOnTop(true);
+
             Image image = new Image(getClass().getResourceAsStream("splash.png"));
             ImageView v = new ImageView();
             v.setImage(image);
-            v.setFitWidth(400);
+            v.setFitWidth(500);
             v.setPreserveRatio(true);
             v.setSmooth(true);
             v.setCache(true);
-            Scene dscene = new Scene(new Group(v));
-            
+
+            Text t = new Text("SpaceCritters");
+            t.setStyle("-fx-background-color: black;");
+            t.setFont(Font.font("Consolas", FontWeight.BOLD, 32));
+            t.setFill(Color.WHITE);
+
+            Scene dscene = new Scene(new Group(v, t));
+            dscene.setOnMouseClicked((e) -> dialog.close());
+
             dialog.setScene(dscene);
             dialog.show();
 
