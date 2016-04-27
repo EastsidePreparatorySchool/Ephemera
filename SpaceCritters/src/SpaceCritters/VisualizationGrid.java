@@ -176,9 +176,9 @@ class VisualizationGrid implements GameVisualizer {
                 }
             }
         }
-        gc.setStroke(Color.RED);
+        gc.setStroke(Color.BLUE);
         gc.setLineWidth(1.0);
-        gc.strokeRect(0.5, 0.5, (width * cellWidth) + 1.5, heightPX + 1.5);
+        gc.strokeRect(0.5, 0.5, widthPX + 1, heightPX + 1);
 
         Color scolor = new Color(0.0, 1.0, 0.0, 0.3); // translucent green
         gc.setFill(scolor);
@@ -231,7 +231,7 @@ class VisualizationGrid implements GameVisualizer {
         }
 
         // draw boundary
-        gc.setStroke(Color.BLUE);
+        gc.setStroke(Color.RED);
         gc.setLineWidth(1.0);
         gc.strokeRect(0.5, 0.5, widthPX + 1, heightPX + 1);
 
