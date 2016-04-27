@@ -36,7 +36,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import static javafx.application.Application.launch;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -44,9 +43,11 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import static javafx.application.Application.launch;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.Group;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.Modality;
 import javafx.stage.StageStyle;
-import javax.swing.JFrame;
 
 /**
  *
@@ -75,7 +76,23 @@ public class SpaceCritters extends Application {
     public void start(Stage stage) throws IOException {
 
         try {
-            Button btn = new Button("Say 'Hello World'");
+
+            Stage dialog = new Stage();
+            dialog.setTitle("About SpaceCritters");
+            dialog.initStyle(StageStyle.UNDECORATED);
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            
+            Image image = new Image(getClass().getResourceAsStream("splash.png"));
+            ImageView v = new ImageView();
+            v.setImage(image);
+            v.setFitWidth(400);
+            v.setPreserveRatio(true);
+            v.setSmooth(true);
+            v.setCache(true);
+            Scene dscene = new Scene(new Group(v));
+            
+            dialog.setScene(dscene);
+            dialog.show();
 
             // Constants from current Ephemera game
             int width = Constants.width;
