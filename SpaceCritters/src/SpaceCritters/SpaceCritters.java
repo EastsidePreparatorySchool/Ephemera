@@ -44,6 +44,9 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import static javafx.application.Application.launch;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.StageStyle;
+import javax.swing.JFrame;
 
 /**
  *
@@ -72,102 +75,104 @@ public class SpaceCritters extends Application {
     public void start(Stage stage) throws IOException {
 
         try {
-        // Constants from current Ephemera game
-        int width = Constants.width;
-        int height = Constants.height;
-        this.stage = stage;
+            Button btn = new Button("Say 'Hello World'");
 
-        // get screen geometry
-        javafx.geometry.Rectangle2D screenBounds;
-        double w = Screen.getPrimary().getDpi();
-        screenBounds = Screen.getPrimary().getVisualBounds();
+            // Constants from current Ephemera game
+            int width = Constants.width;
+            int height = Constants.height;
+            this.stage = stage;
 
-        // TODO: Make this adapt better to available space (from bounds)
-        int cellWidth = screenBounds.getWidth() < 1900 ? 2 : 3;
-        int cellHeight = 1;
+            // get screen geometry
+            javafx.geometry.Rectangle2D screenBounds;
+            double w = Screen.getPrimary().getDpi();
+            screenBounds = Screen.getPrimary().getVisualBounds();
 
-        // keep track of species, need this before constructing UI
-        species = new SpeciesSet();
+            // TODO: Make this adapt better to available space (from bounds)
+            int cellWidth = screenBounds.getWidth() < 1900 ? 2 : 3;
+            int cellHeight = 1;
 
-        // set up main window
-        stage.setTitle("SpaceCritters V0.90");
-        setSize(stage, screenBounds);
+            // keep track of species, need this before constructing UI
+            species = new SpeciesSet();
 
-        // Use a border pane as the root for scene
-        BorderPane border = new BorderPane();
-        border.setStyle("-fx-background-color: black;");
+            // set up main window
+            stage.setTitle("SpaceCritters V0.90");
+            setSize(stage, screenBounds);
 
-        // add top, left and right boxes
-        border.setTop(addTopBox());
-        border.setLeft(addLeftBox());
-        //border.setRight(addFlowPane());
-        border.setBottom(addBottomBox());
+            // Use a border pane as the root for scene
+            BorderPane border = new BorderPane();
+            border.setStyle("-fx-background-color: black;");
 
-        // add a center pane
-        this.canvas = new Canvas(width * cellWidth + 2/*Border*/, height * cellHeight + 2);
-        HBox hb = new HBox();
-        hb.setPadding(new Insets(15, 12, 15, 12));
-        hb.getChildren().add(canvas);
-        hb.setAlignment(Pos.TOP_LEFT);
-        border.setCenter(hb);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+            // add top, left and right boxes
+            border.setTop(addTopBox());
+            border.setLeft(addLeftBox());
+            //border.setRight(addFlowPane());
+            border.setBottom(addBottomBox());
 
-        //
-        // initialize Ephemera game engine and visualizer
-        //
-        //get some objects created (not initialized, nothing important happens here)
-        engine = new GameEngineV1();
+            // add a center pane
+            this.canvas = new Canvas(width * cellWidth + 2/*Border*/, height * cellHeight + 2);
+            HBox hb = new HBox();
+            hb.setPadding(new Insets(15, 12, 15, 12));
+            hb.getChildren().add(canvas);
+            hb.setAlignment(Pos.TOP_LEFT);
+            border.setCenter(hb);
+            GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        // can override the path for class jar files in arguments
-        String gamePath = System.getProperty("user.dir");
-        gamePath = gamePath.toLowerCase();
+            //
+            // initialize Ephemera game engine and visualizer
+            //
+            //get some objects created (not initialized, nothing important happens here)
+            engine = new GameEngineV1();
 
-        if (gamePath.contains("ephemera" + System.getProperty("file.separator") + "spacecritters")) {
-            // probably started from netbeans
-            gamePath = gamePath.substring(0, gamePath.toLowerCase().indexOf("spacecritters"));
-        } else {
-            // probably started from other folder
-            gamePath = System.getProperty("user.dir");
+            // can override the path for class jar files in arguments
+            String gamePath = System.getProperty("user.dir");
             gamePath = gamePath.toLowerCase();
-            gamePath += System.getProperty("file.separator");
-        }
 
-        String alienPath = gamePath
-                + "aliens";
+            if (gamePath.contains("ephemera" + System.getProperty("file.separator") + "spacecritters")) {
+                // probably started from netbeans
+                gamePath = gamePath.substring(0, gamePath.toLowerCase().indexOf("spacecritters"));
+            } else {
+                // probably started from other folder
+                gamePath = System.getProperty("user.dir");
+                gamePath = gamePath.toLowerCase();
+                gamePath += System.getProperty("file.separator");
+            }
 
-        String logPath = gamePath
-                + "logs";
+            String alienPath = gamePath
+                    + "aliens";
 
-        Utilities.createFolder(logPath);
+            String logPath = gamePath
+                    + "logs";
 
-        //gamePath += System.getProperty("file.separator");
-        alienPath += System.getProperty("file.separator");
-        logPath += System.getProperty("file.separator");
+            Utilities.createFolder(logPath);
 
-        // init visualizer
-        this.field = new VisualizationGrid();
-        this.field.init(engine, console, species, logPath, width, height, cellWidth, cellHeight, canvas);
+            //gamePath += System.getProperty("file.separator");
+            alienPath += System.getProperty("file.separator");
+            logPath += System.getProperty("file.separator");
 
-        // get engine up and running
-        engine.initFromFile(field, gamePath, alienPath, "sc_config.csv");
+            // init visualizer
+            this.field = new VisualizationGrid();
+            this.field.init(engine, console, species, logPath, width, height, cellWidth, cellHeight, canvas);
 
-        // set a hook to shut down engine on game exit
-        stage.setOnCloseRequest(e -> handleExit());
+            // get engine up and running
+            engine.initFromFile(field, gamePath, alienPath, "sc_config.csv");
 
-        // set scene and stage
-        Scene scene = new Scene(border);
+            // set a hook to shut down engine on game exit
+            stage.setOnCloseRequest(e -> handleExit());
 
-        stage.setScene(scene);
-        stage.show();
+            // set scene and stage
+            Scene scene = new Scene(border);
 
-        engine.queueCommand(new GameCommand(GameCommandCode.Ready));
+            stage.setScene(scene);
+            stage.show();
 
-        TimerTask task = new ReadyTimer();
-        idleTimer = new Timer();
+            engine.queueCommand(new GameCommand(GameCommandCode.Ready));
 
-        // scheduling the task at interval
-        idleTimer.schedule(task, 0, 200);
-        // return to platform and wait for events
+            TimerTask task = new ReadyTimer();
+            idleTimer = new Timer();
+
+            // scheduling the task at interval
+            idleTimer.schedule(task, 0, 200);
+            // return to platform and wait for events
         } catch (Exception e) {
             System.out.println(e.toString());
             System.in.read();
@@ -272,10 +277,10 @@ public class SpaceCritters extends Application {
         //t.setStyle("-fx-text-fill: white;");
         filterText.setEditable(true);
         filterText.setOnAction((e) -> field.setFilter(filterText.getText()));
-   
+
         Label l = new Label("   Filter:");
         l.setStyle("-fx-text-fill: white;");
-        
+
         Button b1 = new Button("Set");
         b1.setOnAction((e) -> field.setFilter(filterText.getText()));
 
