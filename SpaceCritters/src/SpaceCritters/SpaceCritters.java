@@ -16,6 +16,7 @@ import java.lang.management.ManagementFactory;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
@@ -43,11 +44,13 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import static javafx.application.Application.launch;
-import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 /**
  *
@@ -70,42 +73,25 @@ public class SpaceCritters extends Application {
     public static CheckBox chatter;
     public static Timer idleTimer;
     public static SpectrumColor spectrum = new SpectrumColor();
+    public static Stage dstage;
     Stage stage;
 
     @Override
     public void start(Stage stage) throws IOException {
 
         try {
-
-            Stage dialog = new Stage();
-            dialog.setTitle("About SpaceCritters");
-            dialog.initStyle(StageStyle.UNDECORATED);
-            dialog.initModality(Modality.APPLICATION_MODAL);
-            dialog.setAlwaysOnTop(true);
-
-            Image image = new Image(getClass().getResourceAsStream("splash.png"));
-            ImageView v = new ImageView();
-            v.setImage(image);
-            v.setFitWidth(500);
-            v.setPreserveRatio(true);
-            v.setSmooth(true);
-            v.setCache(true);
-
-            Text t = new Text("SpaceCritters");
-            t.setStyle("-fx-background-color: black;");
-            t.setFont(Font.font("Consolas", FontWeight.BOLD, 32));
-            t.setFill(Color.WHITE);
-
-            Scene dscene = new Scene(new Group(v, t));
-            dscene.setOnMouseClicked((e) -> dialog.close());
-
-            dialog.setScene(dscene);
-            dialog.show();
+            dstage = createSplashScreen();
+            /*
+            if (true) {
+                return;
+            }
+            */
 
             // Constants from current Ephemera game
             int width = Constants.width;
             int height = Constants.height;
             this.stage = stage;
+            
 
             // get screen geometry
             javafx.geometry.Rectangle2D screenBounds;
@@ -189,6 +175,7 @@ public class SpaceCritters extends Application {
 
             stage.setScene(scene);
             stage.show();
+            dstage.show(); 
 
             engine.queueCommand(new GameCommand(GameCommandCode.Ready));
 
@@ -203,8 +190,84 @@ public class SpaceCritters extends Application {
             System.in.read();
         }
     }
-    // handle shutdown gracefully
 
+    private Stage createSplashScreen() {
+        Stage dialog = new Stage();
+        dialog.setTitle("About SpaceCritters");
+        dialog.initStyle(StageStyle.UNDECORATED);
+        dialog.initModality(Modality.NONE);
+        dialog.setAlwaysOnTop(true);
+
+        javafx.geometry.Rectangle2D screenBounds;
+        screenBounds = Screen.getPrimary().getBounds();
+
+        final Rectangle rect1 = new Rectangle(0, 0, screenBounds.getWidth(), screenBounds.getHeight());
+        rect1.setFill(new Color(0, 0, 0, 0.9));
+        FadeTransition ft1 = new FadeTransition(Duration.millis(10000), rect1);
+        ft1.setFromValue(1.0);
+        ft1.setToValue(0.1);
+        ft1.setCycleCount(1);
+        ft1.setAutoReverse(false);
+        //ft1.play();
+
+        Image image = new Image(getClass().getResourceAsStream("splash.png"));
+        ImageView v = new ImageView();
+        v.setImage(image);
+        v.setFitWidth(500);
+        v.setPreserveRatio(true);
+        v.setSmooth(true);
+        v.setCache(true);
+
+        Text t1 = new Text("SpaceCritters");
+        t1.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        t1.setFill(Color.GOLD);
+
+        Text tw = new Text("www.spacecritters.org");
+        tw.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
+        tw.setFill(Color.GOLD);
+
+        Text t2 = new Text("Design and code by GM, GU, MM, SFK");
+        t2.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
+        t2.setFill(Color.GOLD);
+
+        Text t3 = new Text("Aliens by AB, JB");
+        t3.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
+        t3.setFill(Color.GOLD);
+
+        Text t4 = new Text("Artwork " + '\u00A9' + " 2016 Lara Lewison");
+        t4.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
+        t4.setFill(Color.GOLD);
+
+        VBox vb1 = new VBox();
+        vb1.setStyle("-fx-background-color: rgba(0,0,0,0.0)");
+        vb1.getChildren().addAll(t1, tw, t2, t3, t4);
+        vb1.setPadding(new Insets(15, 12, 15, 12));
+        vb1.setSpacing(8);
+        vb1.setAlignment(Pos.BOTTOM_RIGHT);
+
+        FadeTransition ft2 = new FadeTransition(Duration.millis(10000), vb1);
+        ft2.setFromValue(1.0);
+        ft2.setToValue(0.0);
+        ft2.setCycleCount(1);
+        ft2.setAutoReverse(false);
+        //ft2.play();
+        
+        StackPane sp1 = new StackPane();
+        sp1.getChildren().addAll(v, vb1);
+        
+        StackPane sp2 = new StackPane();
+        sp2.getChildren().addAll(rect1, sp1);
+
+        Scene dscene = new Scene(sp2);
+        dscene.setOnMouseClicked((e) -> dialog.close());
+        dscene.setFill(null);
+
+        dialog.initStyle(StageStyle.TRANSPARENT);
+        dialog.setScene(dscene);
+        return dialog;
+    }
+
+    // handle shutdown gracefully
     public void handleExit() {
         engine.queueCommand(new GameCommand(GameCommandCode.End));
         field.showGameOver(); // closes logfile
