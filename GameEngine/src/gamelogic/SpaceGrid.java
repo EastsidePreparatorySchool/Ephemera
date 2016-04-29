@@ -196,10 +196,10 @@ public class SpaceGrid {
                 displayException("Unhandled exception in getMove(): ", ex);
                 ac.kill("Death for unhandled exception in getMove(): " + ex.toString());
             }
-            
+
             // charge only for moves > 1 in either direction
             int moveLength = GridCircle.distance(ac.x, ac.y, oldX, oldY - oldX);
-            if (Math.abs(ac.x - oldX) > 1 || Math.abs(ac.y - oldY) >1) {
+            if (Math.abs(ac.x - oldX) > 1 || Math.abs(ac.y - oldY) > 1) {
                 ac.energy -= moveLength;
             }
         }
@@ -538,6 +538,7 @@ public class SpaceGrid {
                     thisAlien.energy -= Constants.spawningCost;
                     if (thisAlien.energy - thisAlien.currentActionPower < 0) {
                         thisAlien.kill("Death by spawning exhaustion - not enough energy to complete.");
+                        break;
                     }
 
                     // construct a random move for the new alien depending on power and send that move through drift correction
@@ -704,7 +705,6 @@ public class SpaceGrid {
     // Dynamic class loader (.jar files)
     // stolen from StackOverflow, considered dark voodoo magic
     //
-
     public Constructor<?> LoadConstructor(GameEngineV1 engine, String domainName, String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Constructor<?> cs = null;
         String fullName;
@@ -735,7 +735,7 @@ public class SpaceGrid {
             method.setAccessible(true);
             Object result = method.invoke(classLoader, parameters);
 
-           cs = ClassLoader.getSystemClassLoader().loadClass(packageName + "." + className).getConstructor();
+            cs = ClassLoader.getSystemClassLoader().loadClass(packageName + "." + className).getConstructor();
         } catch (Exception e) {
             e.printStackTrace();
             //vis.debugErr("GameElementThread: Error: Could not get constructor");
