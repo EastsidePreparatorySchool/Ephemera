@@ -773,7 +773,7 @@ public class SpaceGrid {
         for (File f : files) {
             if (f.isDirectory()) {
                 // recurse
-                addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), f.getName()+ System.getProperty("file.separator"));
+                addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), domain + f.getName()+ System.getProperty("file.separator"));
             } else if (f.getName().toLowerCase().endsWith(".jar")) {
                 try {
                     // look for jar files and process
