@@ -721,7 +721,7 @@ public class SpaceGrid {
                     + System.getProperty("file.separator")
                     + packageName + ".jar";
         } else {
-            fullName = engine.alienPath + domainName + System.getProperty("file.separator") + packageName + ".jar";
+            fullName = engine.alienPath + domainName;
         }
 
         try {
@@ -764,7 +764,7 @@ public class SpaceGrid {
     }
 
     public void addAllCustomAliens() {
-        addCustomAliens(engine.alienPath, "<unknown>");
+        addCustomAliens(engine.alienPath, "");
     }
 
     public void addCustomAliens(String folder, String domain) {
@@ -773,7 +773,7 @@ public class SpaceGrid {
         for (File f : files) {
             if (f.isDirectory()) {
                 // recurse
-                addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), f.getName());
+                addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), f.getName()+ System.getProperty("file.separator"));
             } else if (f.getName().toLowerCase().endsWith(".jar")) {
                 try {
                     // look for jar files and process
@@ -782,9 +782,9 @@ public class SpaceGrid {
                     for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
                         if (!entry.isDirectory() && entry.getName().toLowerCase().endsWith("alien.class")) {
                             addSpecies(new GameElementSpec("SPECIES",
-                                    domain,
-                                    f.getName().replace(".jar", "").toLowerCase(),
-                                    entry.getName().substring(entry.getName().indexOf('/') + 1).replace(".class", ""),
+                                    domain + f.getName(),
+                                    entry.getName().substring(0, entry.getName().lastIndexOf('/')),
+                                    entry.getName().substring(entry.getName().lastIndexOf('/') + 1).replace(".class", ""),
                                     "")
                             );
                         }

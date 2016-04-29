@@ -81,11 +81,11 @@ public class SpaceCritters extends Application {
 
         try {
             dstage = createSplashScreen();
-/*
+            /*
             if (true) {
                 return;
             }
-*/
+             */
             // Constants from current Ephemera game
             int width = Constants.width;
             int height = Constants.height;
@@ -202,25 +202,18 @@ public class SpaceCritters extends Application {
         final Rectangle rect1 = new Rectangle(0, 0, screenBounds.getWidth(), screenBounds.getHeight());
         rect1.setFill(Color.BLACK);
 
-        /*
-        FadeTransition ft1 = new FadeTransition(Duration.millis(10000), rect1);
-        ft1.setFromValue(1.0);
-        ft1.setToValue(0.1);
-        ft1.setCycleCount(1);
-        ft1.setAutoReverse(false);
-        ft1.play();
-         */
         final Rectangle clip = new Rectangle(0, 0, screenBounds.getWidth(), screenBounds.getHeight());
-        Image images = new Image(getClass().getResourceAsStream("rift.jpg"));
+        Image images = new Image(getClass().getResourceAsStream("backdrop" + System.nanoTime() % 4 + ".jpg"));
         ImageView vs = new ImageView();
         vs.setImage(images);
         vs.setFitWidth(screenBounds.getWidth());
-        //vs.setFitHeight(screenBounds.getHeight());
+        vs.setFitHeight(screenBounds.getHeight());
         vs.setPreserveRatio(true);
         vs.setSmooth(true);
         vs.setCache(true);
         vs.setOpacity(0.4);
         vs.setClip(clip);
+        
 
         Image image = new Image(getClass().getResourceAsStream("splash.png"));
         ImageView v = new ImageView();
@@ -269,31 +262,23 @@ public class SpaceCritters extends Application {
 
         VBox vb2 = new VBox();
         vb2.setStyle("-fx-background-color: rgba(0,0,0,0.0)");
-        vb2.getChildren().addAll(sp1);
-        vb2.setPadding(new Insets(15, 12, 15, 12));
-        vb2.setSpacing(8);
-        vb2.setPrefHeight(v.getFitHeight());
-
-        /*
-        FadeTransition ft2 = new FadeTransition(Duration.millis(10000), vb1);
-        ft2.setFromValue(1.0);
-        ft2.setToValue(0.0);
-        ft2.setCycleCount(1);
-        ft2.setAutoReverse(false);
-        ft2.play();
-         */
+        vb2.getChildren().addAll(rect1);
+        vb2.setPrefSize(screenBounds.getWidth(), screenBounds.getHeight());
+        
         StackPane sp2 = new StackPane();
-        sp2.getChildren().addAll(rect1, vs, sp1);
+        sp2.getChildren().addAll(vb2, vs, sp1);
 
         Scene dscene = new Scene(sp2);
+        //dialog.setFullScreen(true);
         dscene.setOnMouseClicked((e) -> dialog.close());
-        dscene.setOnKeyTyped((e) -> dialog.close());
+        //dscene.setOnKeyPressed((e) -> dialog.close()); //doesn't work
 
-        dscene.setFill(null);
+        //dscene.setFill(null);
 
         dialog.initStyle(StageStyle.TRANSPARENT);
         dialog.setScene(dscene);
         dialog.show();
+        //dialog.setFullScreen(true);
         return dialog;
     }
 
