@@ -734,8 +734,10 @@ public class SpaceGrid {
             Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
             method.setAccessible(true);
             Object result = method.invoke(classLoader, parameters);
+            
+            String fullClassName = packageName.equals("") ? className:(packageName + "." + className);
 
-            cs = ClassLoader.getSystemClassLoader().loadClass(packageName + "." + className).getConstructor();
+            cs = ClassLoader.getSystemClassLoader().loadClass(fullClassName).getConstructor();
         } catch (Exception e) {
             e.printStackTrace();
             //vis.debugErr("GameElementThread: Error: Could not get constructor");
@@ -768,12 +770,14 @@ public class SpaceGrid {
     }
 
     public void addCustomAliens(String folder, String domain) {
+        String packageName;
+        String className;
         File[] files = new File(folder).listFiles();
 
         for (File f : files) {
             if (f.isDirectory()) {
                 // recurse
-                addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), domain + f.getName()+ System.getProperty("file.separator"));
+                addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), domain + f.getName() + System.getProperty("file.separator"));
             } else if (f.getName().toLowerCase().endsWith(".jar")) {
                 try {
                     // look for jar files and process
@@ -781,10 +785,21 @@ public class SpaceGrid {
                     ZipInputStream zip = new ZipInputStream(new FileInputStream(f));
                     for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
                         if (!entry.isDirectory() && entry.getName().toLowerCase().endsWith("alien.class")) {
+                            // handle classes in the default package differently
+                            if (entry.getName().lastIndexOf('/') != -1) {
+                                // named package
+                                packageName = entry.getName().substring(0, entry.getName().lastIndexOf('/'));
+                                className = entry.getName().substring(entry.getName().lastIndexOf('/') + 1).replace(".class", "");
+                            } else {
+                                //default package
+                                packageName = "";
+                                className = entry.getName().replace(".class", "");
+                            }
+
                             addSpecies(new GameElementSpec("SPECIES",
                                     domain + f.getName(),
-                                    entry.getName().substring(0, entry.getName().lastIndexOf('/')),
-                                    entry.getName().substring(entry.getName().lastIndexOf('/') + 1).replace(".class", ""),
+                                    packageName,
+                                    className,
                                     "")
                             );
                         }
