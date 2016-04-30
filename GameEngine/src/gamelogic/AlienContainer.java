@@ -12,6 +12,7 @@ import static gamelogic.GridCircle.distance;
 import java.lang.reflect.Constructor;
 import java.util.LinkedList;
 import java.util.List;
+import static gamelogic.GridCircle.distance;
 
 /**
  *
@@ -148,16 +149,16 @@ public class AlienContainer {
                 + " r:" + ((int) Math.floor(Math.hypot((double) x, (double) y)));
     }
 
-    public void beThoughtful() {
+    public void processResults() {
         try {
-            this.alien.beThoughtful();
+            this.alien.processResults();
         } catch (UnsupportedOperationException e) {
         }
 
     }
 
-    // checked moves
     public void move() throws NotEnoughTechException {
+ 
         // Whether the move goes off the board will be determined by the grid
 
         MoveDir direction = null;

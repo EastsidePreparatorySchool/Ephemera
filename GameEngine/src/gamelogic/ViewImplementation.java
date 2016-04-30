@@ -37,11 +37,12 @@ public class ViewImplementation implements View {
         this.size = size;
     }
 
-    public List<AlienSpecies> getAliensAtPos(int x, int y) throws CantSeeSquareException {
-        checkPos(x, y);
+    @Override
+    public List<AlienSpecies> getAliensAtPos(Position p) throws CantSeeSquareException {
+        checkPos(p);
 
         ArrayList<AlienSpecies> as = new ArrayList();
-        AlienCell acs = ag.getAliensAt(x, y);
+        AlienCell acs = ag.getAliensAt(p);
         if (acs != null) {
             for (AlienContainer ac : acs) {
                 as.add(ac.getAlienSpecies());
@@ -50,13 +51,14 @@ public class ViewImplementation implements View {
         return as;
     }
 
+    @Override
     public List<AlienSpecies> getAliensInView() {
         ArrayList<AlienSpecies> as = new ArrayList();
 
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
-            for (int[] point : c) {
-                AlienCell acs = ag.getAliensAt(point[0], point[1]);
+            for (Position point : c) {
+                AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     for (AlienContainer ac : acs) {
                         as.add(ac.getAlienSpecies());
@@ -68,10 +70,11 @@ public class ViewImplementation implements View {
         return as;
     }
 
-    public SpaceObject getSpaceObjectAtPos(int x, int y) throws CantSeeSquareException {
-        checkPos(x, y);
+    @Override
+    public SpaceObject getSpaceObjectAtPos(Position p) throws CantSeeSquareException {
+        checkPos(p);
 
-        AlienCell acs = ag.getAliensAt(x, y);
+        AlienCell acs = ag.getAliensAt(p);
         if (acs != null) {
             if (acs.star != null) {
                 return new SpaceObject("Star", acs.star.className);
@@ -82,14 +85,15 @@ public class ViewImplementation implements View {
         return null;
     }
 
+    @Override
     public List<SpaceObject> getSpaceObjectsInView() {
         ArrayList<SpaceObject> sos = new ArrayList();
         SpaceObject so = null;
 
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
-            for (int[] point : c) {
-                AlienCell acs = ag.getAliensAt(point[0], point[1]);
+            for (Position point : c) {
+                AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     if (acs.star != null) {
                         so = new SpaceObject("Star", acs.star.className);
@@ -107,94 +111,91 @@ public class ViewImplementation implements View {
         return sos;
     }
 
-    public List<AlienSpecies> getClosestAliensToPos(int x, int y) throws CantSeeSquareException {
-        checkPos(x, y);
+    @Override
+    public List<AlienSpecies> getClosestAliensToPos(Position p) throws CantSeeSquareException {
+        checkPos(p);
 
         ArrayList<AlienSpecies> as = new ArrayList<>();
 
         for (int d = 0; d <= size; d++) {
-            GridCircle c = new GridCircle(x, y, d, centerX, centerY);
-            for (int[] point : c) {
-                AlienCell acs = ag.getAliensAt(point[0], point[1]);
+            GridCircle c = new GridCircle(p.x, p.y, d, centerX, centerY);
+            for (Position point : c) {
+                AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     for (AlienContainer ac : acs) {
-                        if (as == null) {
-                            as = new ArrayList();
-                        }
                         as.add(ac.getAlienSpecies());
                     }
                 }
                 // if any added in this circle, return
-                if (as != null && as.size() > 0) {
+                if (as.size() > 0) {
                     return as;
                 }
             }
         }
 
-        return null;
+        return as;
     }
 
-    public List<AlienSpecies> getClosestSpecificAliensToPos(AlienSpecies thisOne, int x, int y) throws CantSeeSquareException {
-        checkPos(x, y);
+    @Override
+    public List<AlienSpecies> getClosestSpecificAliensToPos(AlienSpecies thisOne, Position p) throws CantSeeSquareException {
+        checkPos(p);
 
-        ArrayList<AlienSpecies> as = null;
+        ArrayList<AlienSpecies> as = new ArrayList();
 
         for (int d = 0; d <= size; d++) {
-            GridCircle c = new GridCircle(x, y, d, centerX, centerY);
-            for (int[] point : c) {
-                AlienCell acs = ag.getAliensAt(point[0], point[1]);
+            GridCircle c = new GridCircle(p.x, p.y, d, centerX, centerY);
+            for (Position point : c) {
+                AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     for (AlienContainer ac : acs) {
                         if (ac.getFullSpeciesName().equalsIgnoreCase(thisOne.getFullSpeciesName())) {
-                            if (as == null) {
-                                as = new ArrayList<>();
-                            }
-
                             as.add(ac.getAlienSpecies());
                         }
                     }
                 }
                 // if any added in this circle, return
-                if (as != null && as.size() > 0) {
+                if (as.size() > 0) {
                     return as;
                 }
             }
         }
 
-        return null;
+        return as;
     }
 
-    public List<AlienSpecies> getClosestXenosToPos(AlienSpecies notThisOne, int x, int y) throws CantSeeSquareException {
-        checkPos(x, y);
+    @Override
+    public List<AlienSpecies> getClosestXenosToPos(AlienSpecies notThisOne, Position p) throws CantSeeSquareException {
+        checkPos(p);
 
-        ArrayList<AlienSpecies> as = null;
+        ArrayList<AlienSpecies> as = new ArrayList<>();
 
         for (int d = 0; d <= size; d++) {
-            GridCircle c = new GridCircle(x, y, d, centerX, centerY);
-            for (int[] point : c) {
-                AlienCell acs = ag.getAliensAt(point[0], point[1]);
+            GridCircle c = new GridCircle(p.x, p.y, d, centerX, centerY);
+            for (Position point : c) {
+                AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     for (AlienContainer ac : acs) {
                         if (!ac.getFullSpeciesName().equalsIgnoreCase(notThisOne.getFullSpeciesName())) {
-                            if (as == null) {
-                                as = new ArrayList<>();
-
-                            }
                             as.add(ac.getAlienSpecies());
                         }
                     }
                 }
                 // if any added in this circle, return
-                if (as != null && as.size() > 0) {
+                if (as.size() > 0) {
                     return as;
                 }
             }
         }
 
-        return null;
+        return as;
     }
 
     // helpers
+    
+    public void checkPos(Position p) throws CantSeeSquareException {
+        checkPos(p.x, p.y);
+    }
+    
     public void checkPos(int x, int y) throws CantSeeSquareException {
         if (!isValidX(x)) {
             throw new CantSeeSquareException();

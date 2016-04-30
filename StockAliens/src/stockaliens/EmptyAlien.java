@@ -39,7 +39,7 @@ public class EmptyAlien implements Alien {
     }
 
     @Override
-    public void beThoughtful() {
+    public void processResults() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

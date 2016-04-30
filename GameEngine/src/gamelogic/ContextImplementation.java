@@ -24,22 +24,22 @@ public class ContextImplementation implements Context {
         this.vis = vis;
     }
 
+    @Override
     public double getEnergy() {
         return ac.energy;
     }
 
+    @Override
     public double getTech() {
         return ac.tech;
     }
 
-    public int getX() {
-        return ac.x;
+    @Override
+    public Position getPosition() {
+        return new Position(ac.x, ac.y);
     }
 
-    public int getY() {
-        return ac.y;
-    }
-
+    @Override
     public View getView(int size) throws NotEnoughEnergyException, NotEnoughTechException {
         // not more than tech
         if (size > (int) ac.tech) {
@@ -64,19 +64,23 @@ public class ContextImplementation implements Context {
         return this.view;
     }
 
+    @Override
     public double getPresentEnergy() {
         return ac.grid.aliens.getEnergyAt(ac.x, ac.y);
     }
 
+    @Override
     public int getSpawningCost() {
         return Constants.spawningCost;
     }
 
+    @Override
     public int getFightingCost() {
         return Constants.fightingCost;
     }
 
     // alien chatter is prefixed with full info, and only talks when chatter is on
+    @Override
     public void debugOut(String s) {
         if (Constants.chatter) {
             vis.debugOut(ac.getFullName() + ": " + s);
@@ -120,16 +124,19 @@ public class ContextImplementation implements Context {
         // in 8 line segments, hopefully without overlap
         for (int d = 1; d <= ac.outgoingPower; d++) {
             GridCircle c = new GridCircle(ac.x, ac.y, d);
-            for (int[] point : c) {
+            for (Position point : c) {
                 if (point != null) {
-                    depositMessageAt(point[0], point[1], ac.outgoingMessage);
+                    depositMessageAt(point, ac.outgoingMessage);
                 }
             }
         }
     }
 
     // put a message at one grid point ONLY if someone is listening
-    public void depositMessageAt(int x, int y, String message) {
+    public void depositMessageAt(Position p, String message) {
+        int x = p.x;
+        int y = p.y;
+
         if (((x + ac.grid.aliens.centerX) >= ac.grid.width)
                 || ((x + ac.grid.aliens.centerX) < 0)
                 || ((y + ac.grid.aliens.centerY) >= ac.grid.height)
@@ -158,22 +165,31 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public int getMinX() {
-        return -ac.grid.width / 2;
+    public Position getMinPosition() {
+        return new Position(-ac.grid.width / 2, -ac.grid.height / 2);
     }
 
     @Override
-    public int getMinY() {
-        return -ac.grid.height / 2;
+    public Position getMaxPosition() {
+        return new Position(ac.grid.width / 2 - 1, ac.grid.height / 2 - 1);
     }
 
     @Override
-    public int getMaxX() {
-        return ac.grid.width / 2 - 1;
+    public String getStateString() {
+        return getPosition().toString()
+                + " E:" + Double.toString(Math.round(ac.energy*100)/100)
+                + " T:" + Double.toString(Math.round(ac.tech*100)/100);
+
     }
 
     @Override
-    public int getMaxY() {
-        return ac.grid.height / 2 - 1;
+    public int getDistance(Position p1, Position p2) {
+        return GridCircle.distance(p1, p2);
     }
+
+    @Override
+    public MoveDir getVector(Position p1, Position p2) {
+        return new MoveDir (p2.x - p1.x, p2.y - p1.y);
+    }
+
 }

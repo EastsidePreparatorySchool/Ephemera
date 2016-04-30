@@ -184,7 +184,7 @@ class VisualizationGrid implements GameVisualizer {
         gc.setFill(scolor);
         gc.fillRect(0.5 + (width * cellWidth) / 2 - safeZoneSize * cellWidth,
                 0.5 + (height * cellHeight) / 2 - safeZoneSize * cellHeight,
-                (2 * safeZoneSize ) * cellWidth,
+                (2 * safeZoneSize) * cellWidth,
                 (2 * safeZoneSize) * cellHeight);
     }
 
@@ -311,7 +311,7 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     public void markFight(int x, int y) {
-        if (x  > (width / 2) || x < (0 - width / 2) || y > (height / 2) || y < (0 - height / 2)) {
+        if (x > (width / 2) || x < (0 - width / 2) || y > (height / 2) || y < (0 - height / 2)) {
             debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
             return;
         }
@@ -494,6 +494,7 @@ class VisualizationGrid implements GameVisualizer {
 
     }
 
+    @Override
     public void setFilter(String s) {
         filter = s;
         SpaceCritters.filterText.setText(s);
@@ -503,8 +504,38 @@ class VisualizationGrid implements GameVisualizer {
         }
     }
 
+    @Override
     public void setChatter(boolean f) {
         SpaceCritters.chatter.setSelected(f);
+    }
+
+    @Override
+    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, double energy, double tech) {
+        Utilities.runSafe(() -> updatePlanet(
+                oldx + this.width / 2,
+                oldy + this.height / 2,
+                x + this.width / 2,
+                y + this.height / 2,
+                name, energy, tech));
+
+    }
+
+    void updatePlanet(int oldxindex, int oldyindex, int xindex, int yindex, String name, double energy, double tech) {
+        for (PlanetForDisplay p : planets) {
+            if (p.name.equalsIgnoreCase(name)) {
+                p.x = xindex;
+                p.y = yindex;
+                p.energy = energy;
+                p.tech = tech;
+
+                this.grid[xindex][yindex].energy += energy;
+                this.grid[oldxindex][oldyindex].energy -= energy;
+                
+                this.grid[xindex][yindex].cellChanged = true;
+                this.grid[oldxindex][oldyindex].cellChanged = true;
+
+            }
+        }
     }
 
 }

@@ -1,7 +1,5 @@
 package gamelogic;
 
-import gameengineinterfaces.GameVisualizer;
-
 /**
  *
  * @author guberti
@@ -12,8 +10,8 @@ public class Resident extends InternalSpaceObject {
     // are defined here yet.
     String parent;
     
-    public Resident (GameVisualizer vis, int x, int y, String packageName, String className, double energy, double tech, String parent) {
-        super(vis, x, y, packageName, className, energy, tech);
+    public Resident (SpaceGrid grid, int x, int y, String domainName, String packageName, String className, double energy, double tech, String parent) {
+        super(grid, x, y, domainName, packageName, className, energy, tech);
         this.parent = parent;
     }
 }

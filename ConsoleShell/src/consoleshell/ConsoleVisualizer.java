@@ -281,4 +281,9 @@ public class ConsoleVisualizer implements GameVisualizer {
     public void setChatter(boolean f) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, double energy, double tech) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

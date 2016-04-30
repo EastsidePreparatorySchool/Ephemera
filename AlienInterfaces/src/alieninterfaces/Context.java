@@ -15,9 +15,7 @@ public interface Context {
 
     double getTech();
 
-    int getX();
-
-    int getY();
+    Position getPosition();
 
     View getView(int size) throws NotEnoughEnergyException, NotEnoughTechException;
 
@@ -29,19 +27,20 @@ public interface Context {
     
     int getGameTurn();
     
-    int getMinX();
+    Position getMinPosition();
     
-    int getMinY();
+    Position getMaxPosition();
     
-    int getMaxX();
+    int getDistance(Position p1, Position p2);
     
-    int getMaxY();
+    MoveDir getVector(Position p1, Position p2);
     
     double getPresentEnergy();
 
     void broadcastAndListen(String message, int power, boolean listen)
             throws NotEnoughTechException, NotEnoughEnergyException;
 
-    void debugOut(String s
-    );
+    void debugOut(String s);
+    
+    String getStateString ();
 }

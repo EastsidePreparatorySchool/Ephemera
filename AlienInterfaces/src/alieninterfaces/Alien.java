@@ -16,5 +16,5 @@ public interface Alien
     void receive(String[] messages);
     MoveDir getMove();
     Action getAction();
-    void beThoughtful();
+    void processResults();
 }

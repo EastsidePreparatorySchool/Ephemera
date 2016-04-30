@@ -6,6 +6,8 @@
 package SpaceCritters;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.StrokeLineCap;
 
 /**
  *
@@ -27,7 +29,18 @@ public class PlanetForDisplay {
     }
     
     public void draw(GraphicsContext gc, int cellWidth, int cellHeight) {
+        double offset = cellWidth == 3? 1.0:0.5;
+        gc.setLineWidth(cellWidth == 3? 1.0:0.5);
         
+        gc.setLineCap(StrokeLineCap.ROUND);
+
+        gc.setStroke(Color.GREEN);
+             gc.strokeLine(x * cellWidth + 1.5 + offset,
+                    y * cellHeight  + 1.5,
+                    x * cellWidth + 1.5 + offset,
+                    y * cellHeight  + 1.5);
+        gc.setLineWidth(1.0);
+
     }
     
 }

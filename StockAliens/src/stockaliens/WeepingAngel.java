@@ -34,10 +34,7 @@ public class WeepingAngel implements Alien {
     public void init(Context ctx, int id, int parent, String message) {
         this.ctx = ctx;
         ctx.debugOut("Initialized at "
-                + "(" + Integer.toString(ctx.getX())
-                + "," + Integer.toString(ctx.getY()) + ")"
-                + " E: " + Double.toString(ctx.getEnergy())
-                + " T: " + Double.toString(ctx.getTech()));
+                + ctx.getStateString());
 
     }
 
@@ -61,12 +58,9 @@ public class WeepingAngel implements Alien {
         try {
            
             
-            if (view.getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1) {
+            if (view.getAliensAtPos(ctx.getPosition()).size() > 1) {
                 ctx.debugOut("Don't Blink!!!!!"
-                        + " E:" + Double.toString(ctx.getEnergy())
-                        + " T:" + Double.toString(ctx.getTech())
-                        + " X:" + Double.toString(ctx.getX())
-                        + " Y:" + Double.toString(ctx.getY()));
+                        + ctx.getStateString());
 
                 if (ctx.getEnergy() > ctx.getFightingCost() + 2)
                 return new Action(Action.ActionCode.Fight, (int)ctx.getEnergy() - ctx.getFightingCost() - 2);
@@ -76,8 +70,7 @@ public class WeepingAngel implements Alien {
             if (ctx.getEnergy() < 25) {
                 // no, charge
                 ctx.debugOut("Choosing to gain Energy,"
-                        + " E:" + Double.toString(ctx.getEnergy())
-                        + " T:" + Double.toString(ctx.getTech()));
+                                                + ctx.getStateString());
                 return new Action(Action.ActionCode.Gain);
             } 
            
@@ -85,16 +78,14 @@ public class WeepingAngel implements Alien {
             if (ctx.getTech() < 20) {
                 // no, research
                 ctx.debugOut("Choosing to research"
-                        + " E:" + Double.toString(ctx.getEnergy())
-                        + " T:" + Double.toString(ctx.getTech()));
+                                                + ctx.getStateString());
                 return new Action(Action.ActionCode.Research);
             }
             // every 
             turn = turn + 1;
             if (ctx.getEnergy()>= ctx.getSpawningCost() + 40 ) {
                 ctx.debugOut("Spwaning"
-                    + " E:" + Double.toString(ctx.getEnergy())
-                    + " T:" + Double.toString(ctx.getTech()));
+                                                + ctx.getStateString());
 
             return new Action(Action.ActionCode.Spawn,(int)ctx.getEnergy()/2) ;
             }
@@ -104,16 +95,9 @@ public class WeepingAngel implements Alien {
         
         // always gains energy
         ctx.debugOut("Weeping Angels: Must gain energy"
-                + " E:" + Double.toString(ctx.getEnergy())
-                + " T:" + Double.toString(ctx.getTech()));
+                                        + ctx.getStateString());
         return new Action(Action.ActionCode.Gain);
     }
-
-    public void processResults() {
-        ctx.debugOut("Processing results");
-        return;
-    }
-
 
     @Override
     public void communicate() {
@@ -126,7 +110,7 @@ public class WeepingAngel implements Alien {
     }
 
     @Override
-    public void beThoughtful() {
+    public void processResults() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

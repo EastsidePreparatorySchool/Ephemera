@@ -22,10 +22,7 @@ public class Venusian implements Alien {
     public void init(Context game_ctx, int id, int parent, String message) {
         ctx = game_ctx;
         ctx.debugOut("Initialized at "
-                + "(" + Integer.toString(ctx.getX())
-                + "," + Integer.toString(ctx.getY()) + ")"
-                + " E: " + Double.toString(ctx.getEnergy())
-                + " T: " + Double.toString(ctx.getTech()));
+                + ctx.getStateString());
 
     }
 
@@ -40,20 +37,19 @@ public class Venusian implements Alien {
         try {
             List<AlienSpecies> nearestAliens = ctx.getView((int)ctx.getTech()).getClosestXenosToPos(
                     new AlienSpecies("eastsideprep.org", "stockaliens", "Alf", 0),
-                    ctx.getX(), ctx.getY());
+                    ctx.getPosition());
             if (!nearestAliens.isEmpty()) {
-                int nearestX = nearestAliens.get(0).x;
-                int nearestY = nearestAliens.get(0).y;
+                Position nearest = nearestAliens.get(0).position;
 
-                if (nearestX > ctx.getX()) {
+                if (nearest.x > ctx.getPosition().x) {
                     x = -1;
-                } else if (nearestX < ctx.getX()) {
+                } else if (nearest.x < ctx.getPosition().x) {
                     x = 1;
                 }
 
-                if (nearestY > ctx.getY()) {
+                if (nearest.y > ctx.getPosition().x) {
                     y = -1;
-                } else if (nearestY < ctx.getY()) {
+                } else if (nearest.y < ctx.getPosition().y) {
                     y = 1;
                 }
                 
@@ -69,12 +65,14 @@ public class Venusian implements Alien {
         return new MoveDir(x, y);
     }
 
+    @Override
     public Action getAction() {
 
         //ctx.debugOut("Action requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
         View view = null;
+        
         try {
             view = ctx.getView((int)ctx.getTech());
         } catch (Exception e) {
@@ -84,7 +82,7 @@ public class Venusian implements Alien {
         // catch and shenanigans
         try {
             // is there another alien on our position?
-            if (view.getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1) {
+            if (view.getAliensAtPos(ctx.getPosition()).size() > 1) {
                 // if so, do we have any energy?
                 if (ctx.getEnergy() < 10) {
                     // no, keep moving.
@@ -131,7 +129,7 @@ public class Venusian implements Alien {
     }
 
     @Override
-    public void beThoughtful() {
+    public void processResults() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -34,7 +34,7 @@ public class CustomAlien implements Alien{
     }
 
     @Override
-    public void beThoughtful() {
+    public void processResults() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     

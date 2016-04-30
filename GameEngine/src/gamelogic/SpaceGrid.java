@@ -72,7 +72,7 @@ public class SpaceGrid {
         // send the whole energyMap to the display
         for (int x = -aliens.centerX; x < aliens.centerX; x++) {
             for (int y = -(aliens.centerY); y < (aliens.centerY); y++) {
-                vis.mapEnergy(x, y, aliens.getEnergyAt(x, y));
+                vis.mapEnergy(x, y, aliens.getEnergyAt(new Position(x, y)));
             }
         }
 
@@ -96,7 +96,7 @@ public class SpaceGrid {
         resetAliens();
         Thread.yield();
 
-        beThoughtful();
+        processResults();
 
         currentTurn++;
 
@@ -209,49 +209,60 @@ public class SpaceGrid {
     // record the moves in AlienContainers and the grid
     public void recordAlienMoves() {
         //vis.debugOut("Recording moves for " + (aliens.size()) + " aliens");
-        for (AlienContainer ac : aliens) {
-            int oldX = ac.x;
-            int oldY = ac.y;
 
-            if (oldX != ac.nextX || oldY != ac.nextY) {
-                ac.x = ac.nextX;
-                ac.y = ac.nextY;
-                aliens.move(ac, oldX, oldY, ac.x, ac.y);
-            }
-
-            // need to go through all the rest to mark cell fresh for display, 
-            // TODO: Fix this in visualizer instead, go away from fillRect and to painting individual cells.
-            double oldEnergy = 0;
-            AlienCell acs = aliens.getAliensAt(oldX, oldY);
-            if (acs != null) {
-                oldEnergy = acs.stream().map((alien) -> alien.energy).reduce(oldEnergy, (accumulator, _item) -> accumulator + _item);
-            }
-            oldEnergy += aliens.getEnergyAt(oldX, oldY);
-
-            double newEnergy = 0;
-            acs = aliens.getAliensAt(ac.x, ac.y);
-            newEnergy = acs.stream().map((alien) -> alien.energy).reduce(newEnergy, (accumulator, _item) -> accumulator + _item);
-            newEnergy += aliens.getEnergyAt(ac.x, ac.y);
-
-            // call shell visualizer
-            // just make sure we don't blow up the alien beacuse of an exception in the shell
-            try {
-                vis.showMove(ac.getFullAlienSpec(),
-                        oldX,
-                        oldY,
-                        newEnergy,
-                        oldEnergy);
-            } catch (Exception e) {
-                displayException("Unhandled exception in showMove(): ", e);
-
-            }
-
-            if (acs.star != null) {
-                ac.kill("Death for moving into a star");
-
+        // move planets first
+        for (InternalSpaceObject so : this.objects) {
+            if (so.isPlanet) {
+                Planet p = (Planet) so;
+                p.move();
             }
         }
 
+        // now for all the aliens
+        for (AlienContainer ac : aliens) {
+            if (ac.energy > 0) {// not accidentally killed by moving planet in this phase
+                int oldX = ac.x;
+                int oldY = ac.y;
+
+                if (oldX != ac.nextX || oldY != ac.nextY) {
+                    ac.x = ac.nextX;
+                    ac.y = ac.nextY;
+                    aliens.move(ac, oldX, oldY, ac.x, ac.y);
+                }
+
+                // need to go through all the rest to mark cell fresh for display, 
+                // TODO: Fix this in visualizer instead, go away from fillRect and to painting individual cells.
+                double oldEnergy = 0;
+                AlienCell acs = aliens.getAliensAt(oldX, oldY);
+                if (acs != null) {
+                    oldEnergy = acs.stream().map((alien) -> alien.energy).reduce(oldEnergy, (accumulator, _item) -> accumulator + _item);
+                }
+                oldEnergy += aliens.getEnergyAt(oldX, oldY);
+
+                double newEnergy = 0;
+                acs = aliens.getAliensAt(ac.x, ac.y);
+                newEnergy = acs.stream().map((alien) -> alien.energy).reduce(newEnergy, (accumulator, _item) -> accumulator + _item);
+                newEnergy += aliens.getEnergyAt(ac.x, ac.y);
+
+                // call shell visualizer
+                // just make sure we don't blow up the alien beacuse of an exception in the shell
+                try {
+                    vis.showMove(ac.getFullAlienSpec(),
+                            oldX,
+                            oldY,
+                            newEnergy,
+                            oldEnergy);
+                } catch (Exception e) {
+                    displayException("Unhandled exception in showMove(): ", e);
+
+                }
+
+                if (acs.star != null) {
+                    ac.kill("Death for moving into a star");
+
+                }
+            }
+        }
     }
 
     public void removeDeadAliens() {
@@ -287,19 +298,19 @@ public class SpaceGrid {
         });
     }
 
-    public void beThoughtful() {
+    public void processResults() {
         for (AlienContainer ac : aliens) {
             // get rid of stale views from prior moves
             ac.ctx.view = null;
 
             // call the alien to think on the state of the universe
             try {
-                ac.beThoughtful();
+                ac.processResults();
             } catch (Exception ex) {
                 // any exceptions except NotSupported get the alien killed here
-                displayException("Unhandled exception in beThoughtful(): ", ex);
+                displayException("Unhandled exception in processResults(): ", ex);
 
-                ac.kill("Death for unhandled exception in beThoughtful(): " + ex.toString());
+                ac.kill("Death for unhandled exception in processResults(): " + ex.toString());
             }
         }
     }
@@ -662,15 +673,28 @@ public class SpaceGrid {
     // as there is already a large if statement in addElement and the code in
     // addPlanet and addStar is nearly identical
     void addPlanet(GameElementSpec element) {
-        // Todo: adjust position by parent star
-        //Planet p = new Planet(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech, element.parent);
-        //objects.add(p);
-        //this.aliens.plugPlanet(p);
-        //vis.registerPlanet(element.x, element.y, element.className, element.energy, element.tech);
+        InternalSpaceObject soParent = null;
+
+        for (InternalSpaceObject o : this.objects) {
+            if (element.parent.equalsIgnoreCase(o.getFullName())) {
+                soParent = o;
+                break;
+            }
+        }
+        if (soParent != null) {
+            Planet p = new Planet(this, soParent.position.x, soParent.position.y,
+                    GridCircle.distance(element.x, element.y, 0, 0),
+                    element.domainName, element.packageName, element.className,
+                    element.energy, element.tech, element.parent);
+            p.startOrbit();
+            objects.add(p);
+            this.aliens.plugPlanet(p);
+            vis.registerPlanet(p.position.x, p.position.y, element.className, element.energy, element.tech);
+        }
     }
 
     void addStar(GameElementSpec element) {
-        Star st = new Star(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech);
+        Star st = new Star(this, element.x, element.y, element.domainName, element.packageName, element.className, element.energy, element.tech);
         objects.add(st);
         this.aliens.plugStar(st);
         vis.registerStar(element.x, element.y, element.className, element.energy);
@@ -678,7 +702,7 @@ public class SpaceGrid {
     }
 
     void addResident(GameElementSpec element) {
-        Resident r = new Resident(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech, element.parent);
+        Resident r = new Resident(this, element.x, element.y, element.domainName, element.packageName, element.className, element.energy, element.tech, element.parent);
     }
 
     public void addElement(GameElementSpec element) throws IOException {
@@ -734,8 +758,8 @@ public class SpaceGrid {
             Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
             method.setAccessible(true);
             Object result = method.invoke(classLoader, parameters);
-            
-            String fullClassName = packageName.equals("") ? className:(packageName + "." + className);
+
+            String fullClassName = packageName.equals("") ? className : (packageName + "." + className);
 
             cs = ClassLoader.getSystemClassLoader().loadClass(fullClassName).getConstructor();
         } catch (Exception e) {
