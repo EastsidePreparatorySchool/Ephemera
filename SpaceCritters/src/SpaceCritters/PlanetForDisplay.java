@@ -28,7 +28,7 @@ public class PlanetForDisplay {
         this.tech = tech;
     }
     
-    public void draw(GraphicsContext gc, int cellWidth, int cellHeight) {
+    public void draw(GraphicsContext gc, int cellWidth, int cellHeight, int heightPX) {
         double offset = cellWidth == 3? 1.0:0.5;
         gc.setLineWidth(cellWidth == 3? 1.0:0.5);
         
@@ -36,9 +36,9 @@ public class PlanetForDisplay {
 
         gc.setStroke(Color.LIGHTBLUE);
              gc.strokeLine(x * cellWidth + 1.5 + offset,
-                    y * cellHeight  + 1.5,
+                    heightPX - y * cellHeight  + 1.5,
                     x * cellWidth + 1.5 + offset,
-                    y * cellHeight  + 1.5);
+                    heightPX - y * cellHeight  + 1.5);
         gc.setLineWidth(1.0);
 
     }

@@ -57,18 +57,17 @@ public class AggressiveAlien implements Alien {
 
         int x = powerX * (ctx.getRandomInt(2) == 0 ? -1 : 1);
         int y = powerY * (ctx.getRandomInt(2) == 0 ? -1 : 1);
-        
+
         Direction dir = new Direction(x, y);
         try {
             if (ctx.getView(move_energy).getSpaceObjectAtPos(ctx.getPosition().add(dir)) != null) {
                 // don't be a dumbass, don't move into a star
-                dir = new Direction (0,0);
+                dir = new Direction(0, 0);
             }
         } catch (Exception e) {
         }
 
-        ctx.debugOut(
-                "Moving " + ctx.getStateString() +" dir " +dir.toString());
+        ctx.debugOut("Moving to " + ctx.getPosition().add(dir).toString() + ctx.getStateString());
         return dir;
     }
 

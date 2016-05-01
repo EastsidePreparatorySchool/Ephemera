@@ -167,7 +167,7 @@ public class SpaceCritters extends Application {
             this.field = new VisualizationGrid();
             this.field.init(engine, console, species, logPath, width, height, cellWidth, cellHeight, canvas);
 
-            zoom = new ZoomView(field, 200, 200, 101,101, cellWidth, cellHeight);
+            zoom = new ZoomView(field, 200, 200, 101,101, cellWidth, cellHeight, field.heightPX);
 
             // get engine up and running
             engine.initFromFile(field, gamePath, alienPath, "sc_config.csv");

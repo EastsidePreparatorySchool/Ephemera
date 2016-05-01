@@ -33,7 +33,7 @@ public class StarForDisplay {
         this.lastFlicker = 0;
     }
 
-    public void draw(GraphicsContext gc, int cellWidth, int cellHeight) {
+    public void draw(GraphicsContext gc, int cellWidth, int cellHeight, int heightPX) {
 
         int maxFlicker = 12;
         double offset = cellWidth == 3? 1.0:0.5;
@@ -44,13 +44,13 @@ public class StarForDisplay {
         if ((System.nanoTime() - lastTime) > 200000000) {
             gc.setStroke(Color.BLACK);
             gc.strokeLine(x * cellWidth + 1.5 + offset,
-                    y * cellHeight - lastFlicker + 1.5,
+                    heightPX - y * cellHeight - lastFlicker + 1.5,
                     x * cellWidth + 1.5 + offset,
-                    y * cellHeight + lastFlicker + 1.5);
+                    heightPX - y * cellHeight + lastFlicker + 1.5);
             gc.strokeLine(x * cellWidth - lastFlicker + 1.5 + offset,
-                    y * cellHeight + 1.5,
+                    heightPX - y * cellHeight + 1.5,
                     x * cellWidth + lastFlicker + 1.5 + offset,
-                    y * cellHeight + 1.5);
+                    heightPX - y * cellHeight + 1.5);
             flicker = ((int) Math.abs(System.nanoTime())) % maxFlicker;
             flicker *= Math.sqrt(energy);
             flicker /= 16;
@@ -61,13 +61,13 @@ public class StarForDisplay {
 
         gc.setStroke(Color.WHITE);
              gc.strokeLine(x * cellWidth + 1.5 + offset,
-                    y * cellHeight - lastFlicker + 1.5,
+                    heightPX - y * cellHeight - lastFlicker + 1.5,
                     x * cellWidth + 1.5 + offset,
-                    y * cellHeight + lastFlicker + 1.5);
+                    heightPX - y * cellHeight + lastFlicker + 1.5);
             gc.strokeLine(x * cellWidth - lastFlicker + 1.5 + offset,
-                    y * cellHeight + 1.5,
+                    heightPX - y * cellHeight + 1.5,
                     x * cellWidth + lastFlicker + 1.5 + offset,
-                    y * cellHeight + 1.5);
+                    heightPX - y * cellHeight + 1.5);
         gc.setLineWidth(1.0);
 
     }

@@ -102,11 +102,11 @@ class VisualizationGrid implements GameVisualizer {
         gc.fillRect(1.5, 1.5, widthPX, heightPX);
 
         for (StarForDisplay st : stars) {
-            st.draw(gc, cellWidth, cellHeight);
+            st.draw(gc, cellWidth, cellHeight, heightPX);
         }
 
         for (PlanetForDisplay p : planets) {
-            p.draw(gc, cellWidth, cellHeight);
+            p.draw(gc, cellWidth, cellHeight, heightPX);
         }
 
         gc.setLineCap(StrokeLineCap.SQUARE);
@@ -146,12 +146,12 @@ class VisualizationGrid implements GameVisualizer {
                         // hires displays, HD1080 or better
                         if (color[1] == Color.RED) {
                             gc.setStroke(Color.RED);
-                            gc.strokeLine(x + 1.5, y + 1.5, x + cellWidth + 1.5, y + 1.5);
+                            gc.strokeLine(x + 1.5, this.heightPX - y + 1.5, x + cellWidth + 1.5, this.heightPX - y + 1.5);
                         } else {
                             for (int l = 0; l < 3; l++) {
                                 if (color[l] != Color.BLACK) {
                                     gc.setStroke(color[l]);
-                                    gc.strokeLine(x + 1.5, y + 1.5, x + cellWidth / 3 + 1.5, y + 1.5);
+                                    gc.strokeLine(x + 1.5, this.heightPX - y + 1.5, x + cellWidth / 3 + 1.5, this.heightPX - y + 1.5);
                                 }
                                 x++;
                             }
@@ -165,10 +165,10 @@ class VisualizationGrid implements GameVisualizer {
                         }
 
                         gc.setStroke(color[0]);
-                        gc.strokeLine(x + 1.5, y + 1.5, x + 2.5, y + 1.5);
+                        gc.strokeLine(x + 1.5, this.heightPX - y + 1.5, x + 2.5, this.heightPX - y + 1.5);
                         x++;
                         gc.setStroke(color[2]);
-                        gc.strokeLine(x + 1.5, y + 1.5, x + 2.5, y + 2.5);
+                        gc.strokeLine(x + 1.5, this.heightPX - y + 1.5, x + 2.5, this.heightPX - y + 2.5);
                         x++;
                     }
 
@@ -216,18 +216,18 @@ class VisualizationGrid implements GameVisualizer {
                 }
 
                 gc.setStroke(color);
-                gc.strokeLine(x + 1.5, y + 1.5, x + cellWidth * j + 1.5, y + 1.5);
+                gc.strokeLine(x + 1.5, this.heightPX - y + 1.5, x + cellWidth * j + 1.5, this.heightPX - y + 1.5);
                 k += j - 1;
                 //    cell.cellChanged = false;
                 //}
             }
         }
         for (StarForDisplay st : stars) {
-            st.draw(gc, cellWidth, cellHeight);
+            st.draw(gc, cellWidth, cellHeight, heightPX);
         }
 
         for (PlanetForDisplay p : planets) {
-            p.draw(gc, cellWidth, cellHeight);
+            p.draw(gc, cellWidth, cellHeight, heightPX);
         }
 
         // draw boundary

@@ -35,20 +35,19 @@ public class Planet extends InternalSpaceObject {
         // slight random eccentricity
         position.x += grid.rand.nextInt(3) - 1;
         position.y += grid.rand.nextInt(3) - 1;
-        
+
         // make the orbit
         gc = new GridCircle(position.x, position.y, radius);
         gcIterator = gc.iterator();
         this.orbitalVelocityCounter = radius;
-        
+
         // randomize position in orbit
         for (int randomShift = grid.rand.nextInt(4 * radius); randomShift > 0; randomShift--) {
             this.position = gcIterator.next();
         }
-        
+
         // if we somehow exhausted the circle (shouldn't happen, but you know)
         // create another iterator
-        
         if (!gcIterator.hasNext()) {
             gcIterator = gc.iterator();
         }

@@ -555,6 +555,10 @@ public class SpaceGrid {
                         break;
                     }
 
+                    if (thisAlien.currentActionPower <= 0) {
+                        thisAlien.kill("Death stillborn spawning - no initial power for child.");
+                        break;
+                    }
                     // construct a random move for the new alien depending on power and send that move through drift correction
                     // spend thisAction.power randomly on x move, y move and initital power
                     double power = Math.max(Math.min(rand.nextInt((int) thisAlien.currentActionPower), thisAlien.currentActionPower / 3), 1);

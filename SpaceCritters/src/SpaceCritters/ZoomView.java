@@ -5,8 +5,6 @@
  */
 package SpaceCritters;
 
-import alieninterfaces.AlienSpecies;
-import gameengineinterfaces.AlienSpec;
 import java.util.ArrayList;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
@@ -49,14 +47,16 @@ public class ZoomView {
     int height;
     int cellWidth;
     int cellHeight;
+    int heightPX;
     int pxX;
     int pxY;
     PerspectiveCamera camera;
     double xRot;
     double yRot;
     double zTrans;
+    double spacing;
 
-    public ZoomView(VisualizationGrid field, int mincol, int minrow, int width, int height, int cellWidth, int cellHeight) {
+    public ZoomView(VisualizationGrid field, int mincol, int minrow, int width, int height, int cellWidth, int cellHeight, int heightPX) {
         this.grid = field.grid;
         this.stars = field.stars;
         this.planets = field.planets;
@@ -69,6 +69,8 @@ public class ZoomView {
         this.xRot = -20;
         this.yRot = -10;
         this.zTrans = -width;
+        this.spacing = 1.0;
+        this.heightPX = heightPX;
         pxX = width * 6;
         pxY = height * 6;
 
@@ -92,13 +94,12 @@ public class ZoomView {
             s.setOpacity(0.5);
             group.getChildren().add(s);
 
-            
             PointLight light = new PointLight(Color.ANTIQUEWHITE);
             light.setTranslateX(xFromIndex(star.x));
             light.setTranslateY(1);
             light.setTranslateZ(zFromIndex(star.y));
             group.getChildren().add(light);
-             
+
         }
 
         // planets
@@ -121,19 +122,20 @@ public class ZoomView {
                 Cell cell = grid[i][j];
                 if (cell.alienCount > 0) {
                     int y = 0;
-                    for (CellInfo ci : cell.speciesMap.values()) {
-                        for (int k = 0; k < ci.count; k++) {
-                            Box alien = new Box(0.5, 0.5, 0.5);
-                            alien.setMaterial(new PhongMaterial(ci.color));
-                            alien.setDrawMode(DrawMode.FILL);
-                            alien.setTranslateX(xFromIndex(i));
-                            alien.setTranslateY(yFromIndex(y));
-                            alien.setTranslateZ(zFromIndex(j));
+                    if (cell.speciesMap != null) {
+                        for (CellInfo ci : cell.speciesMap.values()) {
+                            for (int k = 0; k < ci.count; k++) {
+                                Box alien = new Box(0.5, 0.5, 0.5);
+                                alien.setMaterial(new PhongMaterial(ci.color));
+                                alien.setDrawMode(DrawMode.FILL);
+                                alien.setTranslateX(xFromIndex(i));
+                                alien.setTranslateY(yFromIndex(y));
+                                alien.setTranslateZ(zFromIndex(j));
 
-                            objects.add(alien);
-                            y++;
+                                objects.add(alien);
+                                y++;
+                            }
                         }
-
                     }
                 }
             }
@@ -160,7 +162,7 @@ public class ZoomView {
     }
 
     private double xFromIndex(int i) {
-        return (i - mincol - ((double) width) / 2);
+        return (i - mincol - width / 2) * spacing;
     }
 
     private double yFromIndex(int i) {
@@ -168,7 +170,7 @@ public class ZoomView {
     }
 
     private double zFromIndex(int i) {
-        return (i - minrow - ((double) height) / 2);
+        return (i - minrow - height / 2) * spacing;
     }
 
     public Parent createView() {
@@ -254,8 +256,8 @@ public class ZoomView {
             open();
         }
 
-        this.mincol = (int) (e.getX() / cellWidth) - width / 2;
-        this.minrow = (int) (e.getY() / cellHeight) - height / 2;
+        this.mincol = (int) ((e.getX() - 1) / cellWidth) - (width / 2);
+        this.minrow = (int) (((heightPX - e.getY() - 1) / cellHeight) - (height / 2));
     }
 
     public void controlCamera(KeyEvent e) {
@@ -264,6 +266,7 @@ public class ZoomView {
             this.xRot = -20;
             this.yRot = -10;
             this.zTrans = -width;
+            this.spacing = 1.0;
 
         } else {
             switch (e.getText()) {
@@ -284,6 +287,12 @@ public class ZoomView {
                     break;
                 case "d":
                     xRot -= 5;
+                    break;
+                 case "w":
+                    spacing *= 1.1;
+                    break;
+                case "n":
+                    spacing /= 1.1;
                     break;
                 default:
                     break;
