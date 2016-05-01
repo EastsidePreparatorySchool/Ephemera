@@ -77,7 +77,7 @@ class VisualizationGrid implements GameVisualizer {
         grid = new Cell[height][width];
         for (int i = 0; i < grid.length; i++) {
             for (int k = 0; k < grid[i].length; k++) {
-                grid[i][k] = new Cell(speciesSet);
+                grid[i][k] = new Cell(speciesSet, i, k);
             }
         }
 

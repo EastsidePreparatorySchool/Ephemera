@@ -16,6 +16,8 @@ import java.lang.management.ManagementFactory;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -458,7 +460,7 @@ public class SpaceCritters extends Application {
         return tile;
     }
 
-    static void startOrPauseGame(ActionEvent e) {
+   static  void startOrPauseGame(ActionEvent e) {
         if (buttonPause.getText().equals("Pause")) {
             // pause
             engine.queueCommand(new GameCommand(GameCommandCode.Pause));
@@ -470,6 +472,14 @@ public class SpaceCritters extends Application {
             idleTimer = new Timer();
             // scheduling the task at interval
             idleTimer.schedule(task, 0, 200);
+            
+            ZoomView z = new ZoomView();
+            try {
+                z.open(SpaceCritters.field.grid);
+            } catch (Exception ex) {
+            }
+            
+            
 
         } else if (buttonPause.getText().equals("Start")) {
             // first start

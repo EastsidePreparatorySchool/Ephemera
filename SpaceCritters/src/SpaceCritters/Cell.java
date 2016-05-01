@@ -22,12 +22,16 @@ class Cell {
     boolean cellChanged;
     CellInfo color1;
     CellInfo color2;
+    int row;
+    int col;
 
-    public Cell(SpeciesSet s) { // Constructor
+    public Cell(SpeciesSet s, int row, int col) { // Constructor
         alienCount = 0;
         fightCountDown = 0;
         cellChanged = true;
         this.speciesSet = s;
+        this.row = row;
+        this.col = col;
     }
 
     public int addSpecies(String speciesName, double energy) {
@@ -40,7 +44,7 @@ class Cell {
         ci = speciesMap.get(speciesName);
 
         if (ci == null) {
-            ci = new CellInfo(0, Color.BLACK, speciesName);
+            ci = new CellInfo(0, speciesSet.getColor(speciesName), speciesName);
             speciesMap.put(speciesName, ci);
         }
 
