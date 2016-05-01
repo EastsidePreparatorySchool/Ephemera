@@ -46,7 +46,7 @@ public class ZoomView {
                             alien.setDrawMode(DrawMode.FILL);
                             alien.setTranslateX((i - mincol) * 1.0 - 10);
                             alien.setTranslateZ((j - minrow) * 1.0 + 10);
-                            alien.setTranslateY((y) * 1.0);
+                            alien.setTranslateY((10-y) * 1.0 + 10);
 
                             objects.add(alien);
                             y++;
@@ -72,9 +72,9 @@ public class ZoomView {
         // Create and position camera
         PerspectiveCamera camera = new PerspectiveCamera(true);
         camera.getTransforms().addAll(
-                new Rotate(-20, Rotate.Y_AXIS),
+                new Rotate(-10, Rotate.Y_AXIS),
                 new Rotate(-20, Rotate.X_AXIS),
-                new Translate(0, 0, -45));
+                new Translate(0, 0, -40));
 
         // Build the Scene Graph
         Group root = new Group();
