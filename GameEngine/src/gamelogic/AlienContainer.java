@@ -260,20 +260,20 @@ public class AlienContainer {
             case Research:
                 if (tech >= energy) {
                     // If the tech can't be researched due to lack of energy
-                    debugOut("AC: Research violation with T:" + (tech) + " and E:" + (energy));
+                    debugOut("AC: Research violation with "+ctx.getStateString());
                     throw new NotEnoughEnergyException();
                 }
                 break;
 
             case Spawn:
                 if (a.power + ctx.getSpawningCost() > energy) {
-                    debugOut("AC: Spawn violation with P:" + a.power + " T:" + (tech) + " and E:" + (energy));
+                    debugOut("AC: Spawn violation with P:" + a.power + " "+ctx.getStateString());
                     throw new NotEnoughEnergyException();
                 }
                 break;
             case Fight:
                 if (energy < (a.power + ctx.getFightingCost())) {
-                    debugOut("AC: Fight violation with P:" + a.power + " T:" + (tech) + " and E:" + (energy));
+                    debugOut("AC: Fight violation with P:" + a.power + " "+ctx.getStateString());
                     throw new NotEnoughEnergyException();
                 }
 

@@ -184,8 +184,8 @@ class VisualizationGrid implements GameVisualizer {
         gc.setFill(scolor);
         gc.fillRect(0.5 + (width * cellWidth) / 2 - safeZoneSize * cellWidth,
                 0.5 + (height * cellHeight) / 2 - safeZoneSize * cellHeight,
-                (2 * safeZoneSize) * cellWidth,
-                (2 * safeZoneSize) * cellHeight);
+                ((2 * safeZoneSize) + 1) * cellWidth,
+                ((2 * safeZoneSize) + 1) * cellHeight);
     }
 
     public void renderEnergyMap(GraphicsContext gc) {
@@ -239,8 +239,8 @@ class VisualizationGrid implements GameVisualizer {
         gc.setFill(color);
         gc.fillRect(1.5 + (width * cellWidth) / 2 - safeZoneSize * cellWidth,
                 1.5 + (height * cellHeight) / 2 - safeZoneSize * cellHeight,
-                (2 * safeZoneSize) * cellWidth,
-                (2 * safeZoneSize) * cellHeight);
+                ((2 * safeZoneSize) + 1) * cellWidth,
+                ((2 * safeZoneSize) + 1) * cellHeight);
     }
 
     @Override
@@ -255,11 +255,11 @@ class VisualizationGrid implements GameVisualizer {
 
             String text = "Turns completed: " + paddedString(totalTurnCounter, 6)
                     + ", Total aliens: " + paddedString(numAliens, 7);
-            //if (time > 100000000L) {
-            text += ", time for turn: " + paddedTimeString(time)
-                    + (numAliens > 0 ? ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens))) : "");
-            //        + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)));
-            //}
+            if (time > 100000000L) {
+                text += ", time for turn: " + paddedTimeString(time)
+                        + (numAliens > 0 ? ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens))) : "")
+                        + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)));
+            }
             SpaceCritters.turnCounterText.setText(text);
             speciesSet.notifyListeners();
         });
@@ -530,7 +530,7 @@ class VisualizationGrid implements GameVisualizer {
 
                 this.grid[xindex][yindex].energy += energy;
                 this.grid[oldxindex][oldyindex].energy -= energy;
-                
+
                 this.grid[xindex][yindex].cellChanged = true;
                 this.grid[oldxindex][oldyindex].cellChanged = true;
 

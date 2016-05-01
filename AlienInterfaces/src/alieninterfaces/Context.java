@@ -19,7 +19,6 @@ public interface Context {
     Position getMinPosition();
     Position getMaxPosition();
     int getDistance(Position p1, Position p2);
-    Direction getVector(Position p1, Position p2);
     double getPresentEnergy();
 
     int getSpawningCost();

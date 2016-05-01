@@ -10,15 +10,25 @@ package alieninterfaces;
  * @author gmein
  */
 public class Position {
+
     public int x;
     public int y;
-    
+
     public Position(int x, int y) {
         this.x = x;
         this.y = y;
-    }    
+    }
+
+    public Direction getDirection(Position p2) {
+        return new Direction(p2.x - x, p2.y - y);
+
+    }
     
+    public Position add(Direction dir) {
+        return new Position (x+dir.x, y+dir.y);
+    }
+
     public String toString() {
-        return "("+x+","+y+")";
+        return "(" + x + "," + y + ")";
     }
 }

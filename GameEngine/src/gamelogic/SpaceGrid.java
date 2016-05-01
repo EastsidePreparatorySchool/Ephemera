@@ -100,6 +100,7 @@ public class SpaceGrid {
 
         currentTurn++;
 
+        /*
         AlienContainer aUniqueAlien = null;
         for (AlienContainer a : aliens) {
             if (a != null) {
@@ -116,6 +117,8 @@ public class SpaceGrid {
         }
         // if we get to here, there was at most one species. Game Over.
         return true;
+        */
+        return false;
     }
 
     public void listStatus() {
@@ -258,7 +261,7 @@ public class SpaceGrid {
                 }
 
                 if (acs.star != null) {
-                    ac.kill("Death for moving into a star");
+                    ac.kill("Death for moving into star " + acs.star.className);
 
                 }
             }

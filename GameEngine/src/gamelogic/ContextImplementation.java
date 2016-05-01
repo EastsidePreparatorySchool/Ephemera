@@ -174,9 +174,4 @@ public class ContextImplementation implements Context {
         return GridCircle.distance(p1, p2);
     }
 
-    @Override
-    public Direction getVector(Position p1, Position p2) {
-        return new Direction(p2.x - p1.x, p2.y - p1.y);
-    }
-
 }

@@ -35,8 +35,7 @@ public class AggressiveAlien implements Alien {
     public Direction getMove() {
 
         ctx.debugOut("Move requested,"
-                + " E:" + Double.toString(ctx.getEnergy())
-                + " T:" + Double.toString(ctx.getTech()));
+                + ctx.getStateString());
         int move_energy;
 
         // don't move more than you have tech
@@ -44,18 +43,33 @@ public class AggressiveAlien implements Alien {
         // don't move more than 5, leave energy for other stuff
         move_energy = Math.min(move_energy, 5);
 
+        int powerX;
+        int powerY;
+
         if (move_energy <= 2) {
-            return new Direction(0, 0);
+            powerX = ctx.getRandomInt(3) - 1;
+            powerY = ctx.getRandomInt(3) - 1;
+        } else {
+            // spend a random amount of that moving into x direction
+            powerX = ctx.getRandomInt(move_energy / 2);
+            powerY = ctx.getRandomInt(move_energy / 2);
         }
 
-        // spend a random amount of that moving into x direction
-        int powerX = ctx.getRandomInt(move_energy / 2);
-        int powerY = ctx.getRandomInt(move_energy / 2);
         int x = powerX * (ctx.getRandomInt(2) == 0 ? -1 : 1);
         int y = powerY * (ctx.getRandomInt(2) == 0 ? -1 : 1);
+        
+        Direction dir = new Direction(x, y);
+        try {
+            if (ctx.getView(move_energy).getSpaceObjectAtPos(ctx.getPosition().add(dir)) != null) {
+                // don't be a dumbass, don't move into a star
+                dir = new Direction (0,0);
+            }
+        } catch (Exception e) {
+        }
 
-        ctx.debugOut("Moving " + ctx.getStateString());
-        return new Direction(x, y);
+        ctx.debugOut(
+                "Moving " + ctx.getStateString() +" dir " +dir.toString());
+        return dir;
     }
 
     @Override

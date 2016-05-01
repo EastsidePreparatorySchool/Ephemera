@@ -34,7 +34,7 @@ public class PlanetForDisplay {
         
         gc.setLineCap(StrokeLineCap.ROUND);
 
-        gc.setStroke(Color.GREEN);
+        gc.setStroke(Color.LIGHTBLUE);
              gc.strokeLine(x * cellWidth + 1.5 + offset,
                     y * cellHeight  + 1.5,
                     x * cellWidth + 1.5 + offset,

@@ -32,12 +32,17 @@ public class Planet extends InternalSpaceObject {
     }
 
     public void startOrbit() {
+        // slight random eccentricity
+        position.x += grid.rand.nextInt(3) - 1;
+        position.y += grid.rand.nextInt(3) - 1;
+        
+        // make the orbit
         gc = new GridCircle(position.x, position.y, radius);
         gcIterator = gc.iterator();
         this.orbitalVelocityCounter = radius;
         
-        // randomize orbital position
-        for (int randomShift = SpaceGrid.rand.nextInt(4 * radius); randomShift > 0; randomShift--) {
+        // randomize position in orbit
+        for (int randomShift = grid.rand.nextInt(4 * radius); randomShift > 0; randomShift--) {
             this.position = gcIterator.next();
         }
         
@@ -67,9 +72,6 @@ public class Planet extends InternalSpaceObject {
 
             // now worry about the aliens at the old and new positions
             AlienCell acsFrom = this.grid.aliens.getAliensAt(pOld);
-            if (acsFrom == null) {
-                boolean bullshit = true;
-            }
             AlienCell acsTo = this.grid.aliens.getAliensAt(pNew);
 
             // if aliens are where the planet is moving to, they die.

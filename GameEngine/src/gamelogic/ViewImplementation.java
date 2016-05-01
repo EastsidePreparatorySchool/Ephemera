@@ -79,7 +79,9 @@ public class ViewImplementation implements View {
             if (acs.star != null) {
                 return new SpaceObject("Star", acs.star.className);
             } else if (acs.planet != null) {
-                return new SpaceObject("Planet", acs.planet.className);
+                return new SpaceObject("Planet", 
+                        distance(p.x, p.y, this.centerX, this.centerY) < 1?acs.planet.className:"");
+                // you only get to know the name of a planet by landing on it
             }
         }
         return null;
@@ -98,7 +100,7 @@ public class ViewImplementation implements View {
                     if (acs.star != null) {
                         so = new SpaceObject("Star", acs.star.className);
                     } else if (acs.planet != null) {
-                        so = new SpaceObject("Planet", acs.planet.className);
+                        so = new SpaceObject("Planet", d==0?acs.planet.className:"");
                     }
                 }
 

@@ -5,13 +5,14 @@ CONSTANT,,,perSpeciesCap,,,,,,100000
 CONSTANT,,,safeZoneRadius,,,,,,10
 CONSTANT,,,filters,,,,,,death; violation; 
 CONSTANT,,,pauseOnError,,,,,,off
-SPECIES,ephemera.eastsideprep.org,stockaliens,Dalek,,,,,,
+SPECIES,ephemera.eastsideprep.org,stockaliens,AggressiveAlien,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Martian,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Venusian,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,WeepingAngel,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Alf,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,EmptyAlien,,,,,,
 STAR,ephemera.eastsideprep.org,stockelements,Sol,,0,0,38,,
+PLANET,ephemera.eastsideprep.org,stockelements,Earth,ephemera.eastsideprep.org:stockelements:Sol,-2,-2,8,8,"notes:"" The home world. Returning here scores your achievements and collected secrets."""
 STAR,ephemera.eastsideprep.org,stockelements,ProximaCentauri,,-34,-20,15.45,,
 PLANET,ephemera.eastsideprep.org,stockelements,Slathri,ephemera.eastsideprep.org:stockelements:ProximaCentauri,-2,-2,5,10,"notes:""Gravity on planet is strong. Takes a bunch of energy when you first go to planet"""
 PLANET,ephemera.eastsideprep.org,stockelements,Kukaro,ephemera.eastsideprep.org:stockelements:ProximaCentauri,4,2,20,5,"notes:""Very peaceful. Energy refreshes twice as fast"""
