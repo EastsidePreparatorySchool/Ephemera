@@ -36,7 +36,7 @@ public class Alf implements Alien {
 */
     }
 
-    public MoveDir getMove() {
+    public Direction getMove() {
 
         //ctx.debugOut("Move requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
@@ -48,9 +48,8 @@ public class Alf implements Alien {
         int y = 0;
 
         try {
-            List<AlienSpecies> nearestAliens = ctx.getView((int)ctx.getTech()).getClosestXenosToPos(
-                    new AlienSpecies("ephemera.eastsideprep.org", "stockaliens","Alf", 0),
-                    ctx.getPosition());
+            List<AlienSpecies> nearestAliens = ctx.getView((int)ctx.getTech()).getClosestXenos(
+                    new AlienSpecies("ephemera.eastsideprep.org", "stockaliens","Alf", 0));
             if (!nearestAliens.isEmpty()) {
                 Position nearest = nearestAliens.get(0).position;
 
@@ -71,7 +70,7 @@ public class Alf implements Alien {
         }
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
 
-        return new MoveDir(x, y);
+        return new Direction(x, y);
     }
 
     public Action getAction() {

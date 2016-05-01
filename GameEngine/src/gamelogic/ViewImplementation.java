@@ -112,13 +112,12 @@ public class ViewImplementation implements View {
     }
 
     @Override
-    public List<AlienSpecies> getClosestAliensToPos(Position p) throws CantSeeSquareException {
-        checkPos(p);
+    public List<AlienSpecies> getClosestAliens() {
 
         ArrayList<AlienSpecies> as = new ArrayList<>();
 
         for (int d = 0; d <= size; d++) {
-            GridCircle c = new GridCircle(p.x, p.y, d, centerX, centerY);
+            GridCircle c = new GridCircle(centerX, centerY, d);
             for (Position point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
@@ -137,13 +136,12 @@ public class ViewImplementation implements View {
     }
 
     @Override
-    public List<AlienSpecies> getClosestSpecificAliensToPos(AlienSpecies thisOne, Position p) throws CantSeeSquareException {
-        checkPos(p);
+    public List<AlienSpecies> getClosestSpecificAliens(AlienSpecies thisOne) {
 
         ArrayList<AlienSpecies> as = new ArrayList();
 
         for (int d = 0; d <= size; d++) {
-            GridCircle c = new GridCircle(p.x, p.y, d, centerX, centerY);
+            GridCircle c = new GridCircle(centerX, centerY, d);
             for (Position point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
@@ -164,13 +162,12 @@ public class ViewImplementation implements View {
     }
 
     @Override
-    public List<AlienSpecies> getClosestXenosToPos(AlienSpecies notThisOne, Position p) throws CantSeeSquareException {
-        checkPos(p);
+    public List<AlienSpecies> getClosestXenos(AlienSpecies notThisOne) {
 
         ArrayList<AlienSpecies> as = new ArrayList<>();
 
         for (int d = 0; d <= size; d++) {
-            GridCircle c = new GridCircle(p.x, p.y, d, centerX, centerY);
+            GridCircle c = new GridCircle(centerX, centerY, d);
             for (Position point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
@@ -191,21 +188,20 @@ public class ViewImplementation implements View {
     }
 
     // helpers
-    
     public void checkPos(Position p) throws CantSeeSquareException {
         checkPos(p.x, p.y);
     }
-    
+
     public void checkPos(int x, int y) throws CantSeeSquareException {
-        if (!isValidX(x)) {
+        if (!GridCircle.isValidX(x)) {
             throw new CantSeeSquareException();
         }
 
-        if (!isValidY(y)) {
+        if (!GridCircle.isValidY(y)) {
             throw new CantSeeSquareException();
         }
 
-        if (distance(x, y, this.centerX, this.centerY) > this.size) {
+        if (GridCircle.distance(x, y, this.centerX, this.centerY) > this.size) {
             throw new CantSeeSquareException();
         }
     }

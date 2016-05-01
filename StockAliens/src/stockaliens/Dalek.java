@@ -31,7 +31,7 @@ public class Dalek implements Alien {
 
     // Martians move left, right, left, right
     @Override
-    public MoveDir getMove() {
+    public Direction getMove() {
 
         ctx.debugOut("Move requested,"
                 + " E:" + Double.toString(ctx.getEnergy())
@@ -44,7 +44,7 @@ public class Dalek implements Alien {
         move_energy = Math.min(move_energy, 5);
 
         if (move_energy <= 2) {
-            return new MoveDir(0, 0);
+            return new Direction(0, 0);
         }
 
         // spend a random amount of that moving into x direction
@@ -54,7 +54,7 @@ public class Dalek implements Alien {
         int y = powerY * (ctx.getRandomInt(2) == 0 ? -1 : 1);
 
         ctx.debugOut("Moving " + ctx.getStateString());
-        return new MoveDir(x, y);
+        return new Direction(x, y);
     }
 
     @Override

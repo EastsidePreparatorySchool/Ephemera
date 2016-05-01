@@ -13,6 +13,12 @@ import java.lang.reflect.Constructor;
 import java.util.LinkedList;
 import java.util.List;
 import static gamelogic.GridCircle.distance;
+import static gamelogic.GridCircle.distance;
+import static gamelogic.GridCircle.distance;
+import static gamelogic.GridCircle.distance;
+import static gamelogic.GridCircle.distance;
+import static gamelogic.GridCircle.distance;
+import static gamelogic.GridCircle.distance;
 
 /**
  *
@@ -161,12 +167,12 @@ public class AlienContainer {
  
         // Whether the move goes off the board will be determined by the grid
 
-        MoveDir direction = null;
+        Direction direction = null;
         try {
             direction = alien.getMove();
         } catch (UnsupportedOperationException e) {
             // we'll let that go
-            direction = new MoveDir(0, 0);
+            direction = new Direction(0, 0);
         }
 
         this.checkMove(direction); // Throws an exception if illegal
@@ -187,7 +193,7 @@ public class AlienContainer {
     }
 
     // this does the actual checking
-    private void checkMove(MoveDir direction) throws NotEnoughTechException {
+    private void checkMove(Direction direction) throws NotEnoughTechException {
         int moveLength = distance(0, 0, direction.x, direction.y);
 
         // let one x one moves go
@@ -208,7 +214,7 @@ public class AlienContainer {
         }
     }
 
-    public MoveDir containMove(int x, int y, MoveDir dir) {
+    public Direction containMove(int x, int y, Direction dir) {
         int dxi, dyi;
 
         dxi = dir.x;
@@ -226,7 +232,7 @@ public class AlienContainer {
         if (y + dyi < -Constants.width / 2) {
             dyi = -Constants.width / 2 - y;
         }
-        return new MoveDir(dxi, dyi);
+        return new Direction(dxi, dyi);
     }
 
     // easy way to kill an alien

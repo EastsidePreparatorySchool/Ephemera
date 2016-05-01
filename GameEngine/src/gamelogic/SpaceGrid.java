@@ -566,7 +566,7 @@ public class SpaceGrid {
                         thisAlien.kill("Death by spawning exhaustion - died in childbirth.");
                     }
 
-                    MoveDir dir = new MoveDir(x, y);
+                    Direction dir = new Direction(x, y);
                     dir = thisAlien.containMove(thisAlien.x, thisAlien.y, dir);
 
                     x = thisAlien.x + dir.x;

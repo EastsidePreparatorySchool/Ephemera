@@ -21,11 +21,11 @@ public interface View {
 
     List<SpaceObject> getSpaceObjectsInView();
 
-    List<AlienSpecies> getClosestAliensToPos(Position p) throws CantSeeSquareException;
+    List<AlienSpecies> getClosestAliens() throws CantSeeSquareException;
 
-    List<AlienSpecies> getClosestSpecificAliensToPos(AlienSpecies thisOne, Position p) throws CantSeeSquareException;
+    List<AlienSpecies> getClosestSpecificAliens(AlienSpecies thisOne);
 
-    List<AlienSpecies> getClosestXenosToPos(AlienSpecies notThisOne, Position p) throws CantSeeSquareException;
+    List<AlienSpecies> getClosestXenos(AlienSpecies notThisOne);
 
     public class CantSeeSquareException extends Exception {
     }

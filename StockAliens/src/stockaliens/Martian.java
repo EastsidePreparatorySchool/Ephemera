@@ -37,7 +37,7 @@ public class Martian implements Alien {
 
     }
 
-    public MoveDir getMove() {
+    public Direction getMove() {
     //    ctx.debugOut("Move requested,"
         //            + " E:" + Integer.toString(ctx.getEnergy())
         //            + " T:" + Integer.toString(ctx.getTech()));
@@ -57,9 +57,8 @@ public class Martian implements Alien {
         Position ClosestAlien = new Position (0,0);
 
         try {
-            List<AlienSpecies> l = ctx.getView((int)ctx.getTech()).getClosestXenosToPos(
-                    new AlienSpecies("eastsideprep.org", "stockaliens", "Martian", 0),
-                    ctx.getPosition());
+            List<AlienSpecies> l = ctx.getView((int)ctx.getTech()).getClosestXenos(
+                    new AlienSpecies("eastsideprep.org", "stockaliens", "Martian", 0));
             if (l.size() > 1) {
                 ClosestAlien = l.get(0).position;
             }
@@ -84,7 +83,7 @@ public class Martian implements Alien {
         }
 
         //ctx.debugOut("Moving ("+ Integer.toString(HorizontalMove) + "," + Integer.toString(VerticalMove) + ")");
-        return new MoveDir((int) HorizontalMove, (int) VerticalMove);
+        return new Direction((int) HorizontalMove, (int) VerticalMove);
     }
 
     public Action getAction() {

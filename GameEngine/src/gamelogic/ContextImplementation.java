@@ -30,8 +30,8 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public double getTech() {
-        return ac.tech;
+    public int getTech() {
+        return (int) ac.tech;
     }
 
     @Override
@@ -188,8 +188,8 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public MoveDir getVector(Position p1, Position p2) {
-        return new MoveDir (p2.x - p1.x, p2.y - p1.y);
+    public Direction getVector(Position p1, Position p2) {
+        return new Direction (p2.x - p1.x, p2.y - p1.y);
     }
 
 }

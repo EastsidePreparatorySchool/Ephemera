@@ -41,7 +41,7 @@ public class Planet extends InternalSpaceObject {
             this.position = gcIterator.next();
         }
         
-        // if we somehow exhausted the circel (shouldn't happen, but you know)
+        // if we somehow exhausted the circle (shouldn't happen, but you know)
         // create another iterator
         
         if (!gcIterator.hasNext()) {
