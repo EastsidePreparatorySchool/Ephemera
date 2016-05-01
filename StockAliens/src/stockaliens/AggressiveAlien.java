@@ -11,15 +11,16 @@ import alieninterfaces.*;
  *
  * @author gmein
  */
-public class Dalek implements Alien {
+public class AggressiveAlien implements Alien {
 
     Context ctx;
 
     final boolean debug = true;
 
-    public Dalek() {
+    public AggressiveAlien() {
     }
 
+    @Override
     public void init(Context game_ctx, int id, int parent, String message) {
         ctx = game_ctx;
         ctx.debugOut("Initialized at "
@@ -98,7 +99,7 @@ public class Dalek implements Alien {
 
                 if (ctx.getEnergy() > (ctx.getSpawningCost() + 10)) {
                     // no other aliens here, have enough stuff, spawn!
-                    ctx.debugOut("DALEKS RULE SUPREME! SPAWNING!"
+                    ctx.debugOut("AAs RULE SUPREME! SPAWNING!"
                             + ctx.getStateString());
 
                     return new Action(Action.ActionCode.Spawn, 5);
@@ -118,7 +119,7 @@ public class Dalek implements Alien {
         if (ctx.getEnergy() > 100) {
             try {
                 if (ctx.getGameTurn() % 20 == 0) {
-                    ctx.broadcastAndListen("I say: Daleks rule supreme!!!!!", 1, true);
+                    ctx.broadcastAndListen("I say: AAs rule supreme!!!!!", 1, true);
                 }
             } catch (Exception e) {
             }
@@ -134,7 +135,6 @@ public class Dalek implements Alien {
 
     @Override
     public void processResults() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }
