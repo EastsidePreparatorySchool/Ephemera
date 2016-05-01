@@ -47,20 +47,7 @@ public class ContextImplementation implements Context {
         }
 
         // if we don't have one or they want a bigger one
-        if (this.view == null || this.view.size < size) {
-            // enough energy?
-            if (size != 0 && size >= ((int) ac.energy) - Constants.viewCost) {
-                throw new NotEnoughEnergyException();
-            }
-
-            if (size == 0) {
-                // seeing what is at your own spot is free
-            } else {
-                // make them pay
-                this.ac.energy -= size + Constants.viewCost;
-            }
-            this.view = new ViewImplementation(ac.grid.aliens, ac.x, ac.y, size);
-        }
+        this.view = new ViewImplementation(ac.grid.aliens, ac.x, ac.y, size);
         return this.view;
     }
 
@@ -177,8 +164,8 @@ public class ContextImplementation implements Context {
     @Override
     public String getStateString() {
         return getPosition().toString()
-                + " E:" + Double.toString(Math.round(ac.energy*100)/100)
-                + " T:" + Double.toString(Math.round(ac.tech*100)/100);
+                + " E:" + Double.toString(Math.round(ac.energy * 100) / 100)
+                + " T:" + Integer.toString((int) ac.tech);
 
     }
 
@@ -189,7 +176,7 @@ public class ContextImplementation implements Context {
 
     @Override
     public Direction getVector(Position p1, Position p2) {
-        return new Direction (p2.x - p1.x, p2.y - p1.y);
+        return new Direction(p2.x - p1.x, p2.y - p1.y);
     }
 
 }

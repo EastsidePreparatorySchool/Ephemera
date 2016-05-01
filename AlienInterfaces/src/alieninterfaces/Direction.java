@@ -35,4 +35,9 @@ public class Direction {
 
         return new Direction(newX, newY);
     }
+
+    public String toString() {
+        return "(" + x + "," + y + ")";
+    }
+
 }
