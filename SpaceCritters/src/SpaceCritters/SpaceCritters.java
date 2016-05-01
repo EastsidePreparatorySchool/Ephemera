@@ -77,6 +77,7 @@ public class SpaceCritters extends Application {
     public static SpectrumColor spectrum = new SpectrumColor();
     public static Stage dstage;
     Stage stage;
+    static ZoomView zoom;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -128,6 +129,8 @@ public class SpaceCritters extends Application {
             border.setCenter(hb);
             GraphicsContext gc = canvas.getGraphicsContext2D();
 
+            canvas.setOnMouseClicked((e) -> zoom.focus(e));
+
             //
             // initialize Ephemera game engine and visualizer
             //
@@ -164,6 +167,8 @@ public class SpaceCritters extends Application {
             this.field = new VisualizationGrid();
             this.field.init(engine, console, species, logPath, width, height, cellWidth, cellHeight, canvas);
 
+            zoom = new ZoomView(field, 200, 200, 101,101, cellWidth, cellHeight);
+
             // get engine up and running
             engine.initFromFile(field, gamePath, alienPath, "sc_config.csv");
 
@@ -185,6 +190,7 @@ public class SpaceCritters extends Application {
             // scheduling the task at interval
             idleTimer.schedule(task, 0, 200);
             // return to platform and wait for events
+
         } catch (Exception e) {
             System.out.println(e.toString());
             System.in.read();
@@ -215,7 +221,6 @@ public class SpaceCritters extends Application {
         vs.setCache(true);
         vs.setOpacity(0.4);
         vs.setClip(clip);
-        
 
         Image image = new Image(getClass().getResourceAsStream("splash.png"));
         ImageView v = new ImageView();
@@ -266,7 +271,7 @@ public class SpaceCritters extends Application {
         vb2.setStyle("-fx-background-color: rgba(0,0,0,0.0)");
         vb2.getChildren().addAll(rect1);
         vb2.setPrefSize(screenBounds.getWidth(), screenBounds.getHeight());
-        
+
         StackPane sp2 = new StackPane();
         sp2.getChildren().addAll(vb2, vs, sp1);
 
@@ -276,7 +281,6 @@ public class SpaceCritters extends Application {
         //dscene.setOnKeyPressed((e) -> dialog.close()); //doesn't work
 
         //dscene.setFill(null);
-
         dialog.initStyle(StageStyle.TRANSPARENT);
         dialog.setScene(dscene);
         dialog.show();
@@ -460,7 +464,7 @@ public class SpaceCritters extends Application {
         return tile;
     }
 
-   static  void startOrPauseGame(ActionEvent e) {
+    static void startOrPauseGame(ActionEvent e) {
         if (buttonPause.getText().equals("Pause")) {
             // pause
             engine.queueCommand(new GameCommand(GameCommandCode.Pause));
@@ -472,15 +476,6 @@ public class SpaceCritters extends Application {
             idleTimer = new Timer();
             // scheduling the task at interval
             idleTimer.schedule(task, 0, 200);
-            
-            ZoomView z = new ZoomView();
-            try {
-                z.open(SpaceCritters.field.grid);
-            } catch (Exception ex) {
-            }
-            
-            
-
         } else if (buttonPause.getText().equals("Start")) {
             // first start
             idleTimer.cancel();
@@ -496,6 +491,8 @@ public class SpaceCritters extends Application {
                     iter.remove();
                 }
             }
+            zoom.open();
+
             engine.queueCommand(new GameCommand(GameCommandCode.Resume));
             buttonPause.setText("Pause");
             buttonQuit.setVisible(false);

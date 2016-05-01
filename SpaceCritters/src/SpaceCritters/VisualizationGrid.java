@@ -491,6 +491,8 @@ class VisualizationGrid implements GameVisualizer {
 
             renderEnergyMap(this.canvas.getGraphicsContext2D());
         }
+        
+        SpaceCritters.zoom.render();    
 
     }
 
