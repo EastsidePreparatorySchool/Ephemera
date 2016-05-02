@@ -20,6 +20,8 @@ public interface GameVisualizer {
     
     void registerPlanet(int x, int y, String name, double energy, double tech);
     
+    void showPlanetMove(int oldx, int oldy, int x, int y, String name, double energy, double tech);
+    
     void mapEnergy(int x, int y, double energy);
     
     void showReady();

@@ -29,7 +29,7 @@
 /ConsoleShell/nbproject/build-impl.xml
 
 /logs/
-/ALIENS/
+/ALIENS/*
 
 /drop/
 
@@ -71,3 +71,13 @@ ConsoleShell/nbproject/private/private.xml
 ConsoleShell/nbproject/private/private.xml
 GUIShell/nbproject/jfx-impl_backup_5.xml
 ConsoleShell/nbproject/private/private.properties
+ConsoleShell/nbproject/private/private.properties
+GUIShell/nbproject/jfx-impl.xml
+GUIShell/nbproject/jfx-impl_backup_7.xml
+GUIShell/nbproject/UPDATED.TXT
+/CustomAlien/nbproject/private/
+/CustomAlien/dist/
+/CustomAlien/build/
+/SpaceCritters/nbproject/private/
+/SpaceCritters/build/
+/SpaceCritters/dist/

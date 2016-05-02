@@ -13,11 +13,14 @@ import alieninterfaces.*;
 import gameengineV1.GameEngineV1;
 import gameengineinterfaces.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  *
@@ -69,9 +72,10 @@ public class SpaceGrid {
         // send the whole energyMap to the display
         for (int x = -aliens.centerX; x < aliens.centerX; x++) {
             for (int y = -(aliens.centerY); y < (aliens.centerY); y++) {
-                vis.mapEnergy(x, y, aliens.getEnergyAt(x, y));
+                vis.mapEnergy(x, y, aliens.getEnergyAt(new Position(x, y)));
             }
         }
+
         vis.showReady();
     }
 
@@ -83,6 +87,8 @@ public class SpaceGrid {
         Thread.yield();
 
         requestAlienMoves();
+        movePlanets();
+        removeDeadAliens();
         recordAlienMoves();
         removeDeadAliens();
         Thread.yield();
@@ -92,10 +98,11 @@ public class SpaceGrid {
         resetAliens();
         Thread.yield();
 
-        beThoughtful();
+        processResults();
 
         currentTurn++;
 
+        /*
         AlienContainer aUniqueAlien = null;
         for (AlienContainer a : aliens) {
             if (a != null) {
@@ -112,6 +119,8 @@ public class SpaceGrid {
         }
         // if we get to here, there was at most one species. Game Over.
         return true;
+         */
+        return false;
     }
 
     public void listStatus() {
@@ -192,7 +201,21 @@ public class SpaceGrid {
                 displayException("Unhandled exception in getMove(): ", ex);
                 ac.kill("Death for unhandled exception in getMove(): " + ex.toString());
             }
-            ac.energy -= Math.abs(ac.x - oldX) + Math.abs(ac.y - oldY);
+
+            // charge only for moves > 1 in either direction
+            int moveLength = GridCircle.distance(ac.x, ac.y, oldX, oldY - oldX);
+            if (Math.abs(ac.x - oldX) > 1 || Math.abs(ac.y - oldY) > 1) {
+                ac.energy -= moveLength;
+            }
+        }
+    }
+
+    public void movePlanets() {
+        for (InternalSpaceObject so : this.objects) {
+            if (so.isPlanet) {
+                Planet p = (Planet) so;
+                p.move();
+            }
         }
     }
 
@@ -200,46 +223,63 @@ public class SpaceGrid {
     // record the moves in AlienContainers and the grid
     public void recordAlienMoves() {
         //vis.debugOut("Recording moves for " + (aliens.size()) + " aliens");
+
+        // now for all the aliens
         for (AlienContainer ac : aliens) {
-            int oldX = ac.x;
-            int oldY = ac.y;
+            if (ac.energy > 0) {// not accidentally killed by moving planet in this phase
+                int oldX = ac.x;
+                int oldY = ac.y;
 
-            if (oldX != ac.nextX || oldY != ac.nextY) {
-                ac.x = ac.nextX;
-                ac.y = ac.nextY;
-                aliens.move(ac, oldX, oldY, ac.x, ac.y);
-            }
-            
-            // need to go through all the rest to mark cell fresh for display, 
-            // TODO: Fix this in visualizer instead, go away from fillRect and to painting individual cells.
-            double oldEnergy = 0;
-            AlienCell acs = aliens.getAliensAt(oldX, oldY);
-            if (acs != null) {
-                oldEnergy = acs.stream().map((alien) -> alien.energy).reduce(oldEnergy, (accumulator, _item) -> accumulator + _item);
-            }
-            oldEnergy += aliens.getEnergyAt(oldX, oldY);
+                if (oldX != ac.nextX || oldY != ac.nextY) {
+                    ac.x = ac.nextX;
+                    ac.y = ac.nextY;
+                    aliens.move(ac, oldX, oldY, ac.x, ac.y);
+                }
 
-            double newEnergy = 0;
-            acs = aliens.getAliensAt(ac.x, ac.y);
-            if (acs != null) {
+                // need to go through all the rest to mark cell fresh for display, 
+                // TODO: Fix this in visualizer instead, go away from fillRect and to painting individual cells.
+                double oldEnergy = 0;
+                AlienCell acs = aliens.getAliensAt(oldX, oldY);
+                if (acs != null) {
+                    oldEnergy = acs.stream().map((alien) -> alien.energy).reduce(oldEnergy, (accumulator, _item) -> accumulator + _item);
+                }
+                oldEnergy += aliens.getEnergyAt(oldX, oldY);
+
+                double newEnergy = 0;
+                acs = aliens.getAliensAt(ac.x, ac.y);
                 newEnergy = acs.stream().map((alien) -> alien.energy).reduce(newEnergy, (accumulator, _item) -> accumulator + _item);
-            }
-            newEnergy += aliens.getEnergyAt(ac.x, ac.y);
+                newEnergy += aliens.getEnergyAt(ac.x, ac.y);
 
                 // call shell visualizer
-            // just make sure we don't blow up the alien beacuse of an exception in the shell
-            try {
-                vis.showMove(ac.getFullAlienSpec(),
-                        oldX,
-                        oldY,
-                        newEnergy,
-                        oldEnergy);
-            } catch (Exception e) {
-                displayException("Unhandled exception in showMove(): ", e);
+                // just make sure we don't blow up the alien beacuse of an exception in the shell
+                try {
+                    vis.showMove(ac.getFullAlienSpec(),
+                            oldX,
+                            oldY,
+                            newEnergy,
+                            oldEnergy);
+                } catch (Exception e) {
+                    displayException("Unhandled exception in showMove(): ", e);
 
+                }
+
+                if (acs.star != null) {
+                    ac.kill("Death for moving into star " + acs.star.className);
+
+                }
+
+                if (isInSafeZone(ac)) {
+                    ac.turnsInSafeZone++;
+                } else {
+                    ac.turnsInSafeZone = 0;
+
+                }
             }
         }
-
+    }
+    
+    public boolean isInSafeZone(AlienContainer ac) {
+        return GridCircle.distance(0, 0, ac.x, ac.y) <= Constants.safeZoneRadius;
     }
 
     public void removeDeadAliens() {
@@ -275,19 +315,19 @@ public class SpaceGrid {
         });
     }
 
-    public void beThoughtful() {
+    public void processResults() {
         for (AlienContainer ac : aliens) {
             // get rid of stale views from prior moves
             ac.ctx.view = null;
 
             // call the alien to think on the state of the universe
             try {
-                ac.beThoughtful();
+                ac.processResults();
             } catch (Exception ex) {
                 // any exceptions except NotSupported get the alien killed here
-                displayException("Unhandled exception in beThoughtful(): ", ex);
+                displayException("Unhandled exception in processResults(): ", ex);
 
-                ac.kill("Death for unhandled exception in beThoughtful(): " + ex.toString());
+                ac.kill("Death for unhandled exception in processResults(): " + ex.toString());
             }
         }
     }
@@ -332,10 +372,10 @@ public class SpaceGrid {
                     //vis.debugOut("SpaceGrid: Processing Fight");
 
                     // If the alien is in the safe zone
-                    if (Math.abs(thisAlien.x) <= Constants.safeZoneSize
-                            && Math.abs(thisAlien.y) <= Constants.safeZoneSize) {
+                    if (isInSafeZone(thisAlien)) {
                         // Make them pay the energy they spent
-                        thisAlien.energy -= thisAlien.currentActionPower;
+                        thisAlien.energy -= thisAlien.currentActionPower + Constants.fightingCost;
+                        // but don't let them fight
                         break;
                     }
                     List<AlienSpec> fightSpecs = new ArrayList<>();
@@ -345,8 +385,8 @@ public class SpaceGrid {
 
                     for (AlienContainer fightingAlien : fightingAliens) {
 
-                        if (fightingAlien.currentActionCode != Action.ActionCode.Fight &&
-                                fightingAlien.currentActionCode != Action.ActionCode.TradeOrDefend) {
+                        if (fightingAlien.currentActionCode != Action.ActionCode.Fight
+                                && fightingAlien.currentActionCode != Action.ActionCode.TradeOrDefend) {
                             fightingAlien.currentActionPower = 0;
                         }
 
@@ -480,27 +520,28 @@ public class SpaceGrid {
                                 aliensAtPos.remove(0);
                                 break;
                             }
-                            
+
                             // If the trade and buy prices are compatible
-                            if (buyingAlien.currentAction.buyPrice >= 
-                                    sellingAlien.currentAction.sellPrice &&
-                                    buyingAlien.energy >= 
-                                    sellingAlien.currentAction.sellPrice) {
-                                
+                            if (buyingAlien.currentAction.buyPrice
+                                    >= sellingAlien.currentAction.sellPrice
+                                    && buyingAlien.energy
+                                    >= sellingAlien.currentAction.sellPrice) {
+
                                 // Perform the trade
                                 buyingAlien.energy -= sellingAlien.currentAction.sellPrice;
                                 sellingAlien.energy += sellingAlien.currentAction.sellPrice;
                                 buyingAlien.tech++;
-                                
+
                                 // Remove both aliens from aliensAtPos
                                 aliensAtPos.remove(0);
                                 aliensAtPos.remove(i);
                             }
-                        } 
+                        }
                     }
-                    
+
                     break;
                 case Gain:
+                    // todo: dshare power only among those gaining
                     if (thisAlien.energy < Constants.energyCap) {
                         AlienCell acs = aliens.getAliensAt(thisAlien.x, thisAlien.y);
                         if (acs.energyPerAlien == 0) {
@@ -524,24 +565,27 @@ public class SpaceGrid {
                     thisAlien.energy -= Constants.spawningCost;
                     if (thisAlien.energy - thisAlien.currentActionPower < 0) {
                         thisAlien.kill("Death by spawning exhaustion - not enough energy to complete.");
+                        break;
                     }
 
+                    if (thisAlien.currentActionPower <= 0) {
+                        thisAlien.kill("Death stillborn spawning - no initial power for child.");
+                        break;
+                    }
                     // construct a random move for the new alien depending on power and send that move through drift correction
                     // spend thisAction.power randomly on x move, y move and initital power
-                    double power = Math.max(Math.min(rand.nextInt((int) thisAlien.currentActionPower), thisAlien.currentActionPower / 3), 1);
-                    double powerForX = rand.nextInt((int) (thisAlien.currentActionPower - power));
-                    double powerForY = rand.nextInt((int) (thisAlien.currentActionPower - power - powerForX));
+                    double power = thisAlien.currentActionPower;
 
-                    int x = (int) powerForX * (rand.nextInt(2) == 0 ? 1 : -1);
-                    int y = (int) powerForY * (rand.nextInt(2) == 0 ? 1 : -1);
+                    int x = rand.nextInt(3) - 1;
+                    int y = rand.nextInt(3) - 1;
 
-                    thisAlien.energy -= power + powerForX + powerForY;
+                    thisAlien.energy -= power;
                     if (thisAlien.energy <= 0) {
                         thisAlien.kill("Death by spawning exhaustion - died in childbirth.");
                     }
 
-                    MoveDir dir = new MoveDir(x, y);
-                    dir = thisAlien.applyDrift(thisAlien.x, thisAlien.y, dir);
+                    Direction dir = new Direction(x, y);
+                    dir = thisAlien.containMove(thisAlien.x, thisAlien.y, dir);
 
                     x = thisAlien.x + dir.x;
                     y = thisAlien.y + dir.y;
@@ -609,7 +653,7 @@ public class SpaceGrid {
 
         if (as.cns == null) {
             try {
-                as.cns = Load(engine, alienPackageName, alienClassName);
+                as.cns = LoadConstructor(engine, domainName, alienPackageName, alienClassName);
             } catch (Exception e) {
                 gridDebugErr("sg.addAlien: Error loading contructor for " + speciesName);
                 //throw (e);
@@ -647,14 +691,28 @@ public class SpaceGrid {
     // as there is already a large if statement in addElement and the code in
     // addPlanet and addStar is nearly identical
     void addPlanet(GameElementSpec element) {
-        Planet p = new Planet(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech, element.parent);
-        objects.add(p);
-        this.aliens.plugPlanet(p);
-        vis.registerPlanet(element.x, element.y, element.className, element.energy, element.tech);
+        InternalSpaceObject soParent = null;
+
+        for (InternalSpaceObject o : this.objects) {
+            if (element.parent.equalsIgnoreCase(o.getFullName())) {
+                soParent = o;
+                break;
+            }
+        }
+        if (soParent != null) {
+            Planet p = new Planet(this, soParent.position.x, soParent.position.y,
+                    GridCircle.distance(element.x, element.y, 0, 0),
+                    element.domainName, element.packageName, element.className,
+                    element.energy, element.tech, element.parent);
+            p.startOrbit();
+            objects.add(p);
+            this.aliens.plugPlanet(p);
+            vis.registerPlanet(p.position.x, p.position.y, element.className, element.energy, element.tech);
+        }
     }
 
     void addStar(GameElementSpec element) {
-        Star st = new Star(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech);
+        Star st = new Star(this, element.x, element.y, element.domainName, element.packageName, element.className, element.energy, element.tech);
         objects.add(st);
         this.aliens.plugStar(st);
         vis.registerStar(element.x, element.y, element.className, element.energy);
@@ -662,7 +720,7 @@ public class SpaceGrid {
     }
 
     void addResident(GameElementSpec element) {
-        Resident r = new Resident(this.vis, element.x, element.y, element.packageName, element.className, element.energy, element.tech, element.parent);
+        Resident r = new Resident(this, element.x, element.y, element.domainName, element.packageName, element.className, element.energy, element.tech, element.parent);
     }
 
     public void addElement(GameElementSpec element) throws IOException {
@@ -689,54 +747,41 @@ public class SpaceGrid {
     // Dynamic class loader (.jar files)
     // stolen from StackOverflow, considered dark voodoo magic
     //
-    /**
-     * Parameters of the method to add an URL to the System classes.
-     */
-    private static final Class<?>[] parameters = new Class[]{URL.class
-    };
-
-    /**
-     * Adds the content pointed by the file to the class path.
-     *
-     */
-    public static void addClassPathFile(String gamePath, String alienPath, String packageName) throws IOException {
+    public Constructor<?> LoadConstructor(GameEngineV1 engine, String domainName, String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Constructor<?> cs = null;
         String fullName;
+        File file;
+        URL url;
+        Object[] parameters;
 
         if (packageName.equalsIgnoreCase("stockaliens")
                 || packageName.equalsIgnoreCase("alieninterfaces")) {
-            fullName = gamePath
-                    + System.getProperty("file.separator")
+            fullName = engine.gameJarPath
                     + packageName
                     + System.getProperty("file.separator")
                     + "dist"
                     + System.getProperty("file.separator")
                     + packageName + ".jar";
         } else {
-            fullName = alienPath + packageName + ".jar";
+            fullName = engine.alienPath + domainName;
         }
 
-        URL url = new File(fullName).toURI().toURL();
-        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        Class<?> sysclass = URLClassLoader.class;
-
         try {
-            Method method = sysclass.getDeclaredMethod("addURL", parameters);
+            file = new File(fullName);
+            url = file.toURI().toURL();
+            parameters = new Object[1];
+            parameters[0] = url;
+
+            URLClassLoader classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+            Method method = URLClassLoader.class
+                    .getDeclaredMethod("addURL", URL.class
+                    );
             method.setAccessible(true);
-            method.invoke(sysloader, new Object[]{url});
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("GameElementThread: Error, could not add URL to system classloader");
-        }
-        //engine.vis.debugOut("GameElementThread: package " + packageName + " added as " + fullName);
+            Object result = method.invoke(classLoader, parameters);
 
-    }
+            String fullClassName = packageName.equals("") ? className : (packageName + "." + className);
 
-    public static Constructor<?> Load(GameEngineV1 engine, String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        Constructor<?> cs = null;
-
-        try {
-            addClassPathFile(engine.gameJarPath, engine.alienPath, packageName);
-            cs = ClassLoader.getSystemClassLoader().loadClass(packageName + "." + className).getConstructor();
+            cs = ClassLoader.getSystemClassLoader().loadClass(fullClassName).getConstructor();
         } catch (Exception e) {
             e.printStackTrace();
             //vis.debugErr("GameElementThread: Error: Could not get constructor");
@@ -764,4 +809,48 @@ public class SpaceGrid {
         //    }
     }
 
+    public void addAllCustomAliens() {
+        addCustomAliens(engine.alienPath, "");
+    }
+
+    public void addCustomAliens(String folder, String domain) {
+        String packageName;
+        String className;
+        File[] files = new File(folder).listFiles();
+
+        for (File f : files) {
+            if (f.isDirectory()) {
+                // recurse
+                addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), domain + f.getName() + System.getProperty("file.separator"));
+            } else if (f.getName().toLowerCase().endsWith(".jar")) {
+                try {
+                    // look for jar files and process
+                    List<String> classNames = new ArrayList<String>();
+                    ZipInputStream zip = new ZipInputStream(new FileInputStream(f));
+                    for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                        if (!entry.isDirectory() && entry.getName().toLowerCase().endsWith("alien.class")) {
+                            // handle classes in the default package differently
+                            if (entry.getName().lastIndexOf('/') != -1) {
+                                // named package
+                                packageName = entry.getName().substring(0, entry.getName().lastIndexOf('/'));
+                                className = entry.getName().substring(entry.getName().lastIndexOf('/') + 1).replace(".class", "");
+                            } else {
+                                //default package
+                                packageName = "";
+                                className = entry.getName().replace(".class", "");
+                            }
+
+                            addSpecies(new GameElementSpec("SPECIES",
+                                    domain + f.getName(),
+                                    packageName,
+                                    className,
+                                    "")
+                            );
+                        }
+                    }
+                } catch (Exception e) {
+                }
+            }
+        }
+    }
 }

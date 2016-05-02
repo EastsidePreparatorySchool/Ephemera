@@ -5,6 +5,7 @@
  */
 package gamelogic;
 
+import alieninterfaces.Position;
 import java.util.LinkedList;
 
 /**
@@ -51,10 +52,6 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     }
 
     public void move(AlienContainer ac, int oldX, int oldY, int newX, int newY) {
-        //if (oldX == newX && oldY == newY) {
-        //    ac.debugOut("Grid: standing still, shouldn't be here");
-        //}
-
         AlienCell acs = acGrid[oldX + centerX][oldY + centerY];
         //ac.debugOut("Grid: removing from list " + getXYString(oldX, oldY));
         acs.remove(ac);
@@ -75,13 +72,17 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     }
 
     public void unplug(AlienContainer ac) {
-        // remove alien from grid as well as from master list
+        // remove alien from grid 
         AlienCell acs = acGrid[ac.x + centerX][ac.y + centerY];
         //ac.debugOut("Grid: removing from list " + getXYString(ac.x, ac.y));
         acs.remove(ac);
         if (canBeRemoved(acs)) {
             acGrid[ac.x + centerX][ac.y + centerY] = null;
         }
+    }
+    
+    public AlienCell getAliensAt(Position p) {
+        return getAliensAt (p.x, p.y);
     }
 
     public AlienCell getAliensAt(int x, int y) {
@@ -98,31 +99,37 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     }
 
     public void plugStar(Star st) {
-        // add alien to grid as well as to master list
-        AlienCell acs = acGrid[st.x + centerX][st.y + centerY];
+        // add alien to grid 
+        AlienCell acs = acGrid[st.position.x + centerX][st.position.y + centerY];
         if (acs == null) {
             acs = new AlienCell();
-            acGrid[st.x + centerX][st.y + centerY] = acs;
+            acGrid[st.position.x + centerX][st.position.y + centerY] = acs;
         }
         acs.star = st;
         acs.energy = st.energy;
     }
 
     public void plugPlanet(Planet p) {
-        // add alien to grid as well as to master list
-        AlienCell acs = acGrid[p.x + centerX][p.y + centerY];
+        // add alien to grid 
+        AlienCell acs = acGrid[p.position.x + centerX][p.position.y + centerY];
         if (acs == null) {
             acs = new AlienCell();
-            acGrid[p.x + centerX][p.y + centerY] = acs;
+            acGrid[p.position.x + centerX][p.position.y + centerY] = acs;
         }
         acs.planet = p;
-        acs.energy = p.energy;
+        acs.energy += p.energy;
         acs.tech = p.tech;
     }
 
-    public void distributeStarEnergy(int x, int y, double energy) {
-        int[] pos = {Integer.MAX_VALUE, Integer.MAX_VALUE};
+    public void unplugPlanet(Planet p) {
+        // add alien to grid 
+        AlienCell acs = acGrid[p.position.x + centerX][p.position.y + centerY];
+        acs.planet = null;
+        acs.energy -= p.energy;
+        acs.tech = 0;
+    }
 
+    public void distributeStarEnergy(int x, int y, double energy) {
         // probe around our current position,
         // tracing an imaginary square of increasing size,
         // starting from the midpoints of the sides
@@ -136,15 +143,18 @@ public class AlienGrid extends LinkedList<AlienContainer> {
             }
 
             GridCircle g = new GridCircle(x, y, d);
-            for (int[] point : g) {
+            for (Position point : g) {
                 if (point != null) {
-                    putEnergyAt(point[0], point[1], pointEnergy);
+                    putEnergyAt(point, pointEnergy);
                 }
             }
         }
     }
 
-    void putEnergyAt(int x, int y, double energy) {
+    void putEnergyAt(Position p, double energy) {
+        int x = p.x;
+        int y = p.y;
+
         if (((x + centerX) >= width)
                 || ((x + centerX) < 0)
                 || ((y + centerY) >= height)
@@ -159,16 +169,21 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         }
 
         if (energy > acs.energy) {
-            acs.energy = energy;
+            acs.energy += energy;
         }
+    }
+
+    public double getEnergyAt(Position p) {
+        return getEnergyAt(p.x, p.y);
     }
 
     public double getEnergyAt(int x, int y) {
         // off grid?
         if (x + centerX >= width || x + centerX < 0
-            || y + centerY >= height || y + centerY < 0)
+                || y + centerY >= height || y + centerY < 0) {
             return 0;
-        
+        }
+
         //
         AlienCell acs = acGrid[x + centerX][y + centerY];
         if (acs == null) {

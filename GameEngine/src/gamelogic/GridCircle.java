@@ -5,7 +5,7 @@
  */
 package gamelogic;
 
-import java.util.ArrayList;
+import alieninterfaces.Position;
 import java.util.Iterator;
 
 /**
@@ -16,42 +16,35 @@ import java.util.Iterator;
  * this class - create and then use in enhanced for loop - can be used for any
  * metric we might choose
  */
-public class GridCircle implements Iterable<int[]> {
+public class GridCircle implements Iterable<Position> {
 
-    int centerX;
-    int centerY;
+    Position center;
     int radius;
-    int viewX;
-    int viewY;
-    ArrayList<int[]> points;
+    Position view;
 
     public GridCircle(int centerX, int centerY, int radius) {
-        this.centerX = centerX;
-        this.centerY = centerY;
+        this.center = new Position (centerX, centerY);
         this.radius = radius;
-        this.viewX = centerX;
-        this.viewY = centerY;
+        this.view = new Position (centerX, centerY);
     }
 
     public GridCircle(int centerX, int centerY, int radius, int viewX, int viewY) {
-        this.centerX = centerX;
-        this.centerY = centerY;
+        this.center = new Position (centerX, centerY);
         this.radius = radius;
-        this.viewX = viewX;
-        this.viewY = viewY;
+        this.view = new Position (viewX, viewY);
     }
 
     @Override
-    public Iterator<int[]> iterator() {
-        return new PointIterator();
+    public Iterator<Position> iterator() {
+        return new PositionIterator();
     }
 
     // this is used in for(int[] point:circle)
-    private class PointIterator implements Iterator<int[]> {
+    private class PositionIterator implements Iterator<Position> {
 
         int counter = 0;
         int phase = 0;
-        int[] nextPoint;
+        Position nextPoint;
         boolean computed = false;
 
         @Override
@@ -72,7 +65,7 @@ public class GridCircle implements Iterable<int[]> {
         }
 
         @Override
-        public int[] next() {
+        public Position next() {
             if (!computed) {
                 nextPoint = internalNext();
             }
@@ -81,28 +74,24 @@ public class GridCircle implements Iterable<int[]> {
             return nextPoint;
         }
 
-        public int[] internalNext() {
-            int[] point = new int[2];
+        public Position internalNext() {
+            Position point = null;
 
             do {
                 if (phase == 0) {
-                    point[0] = centerX + (counter);
-                    point[1] = centerY + (radius - (counter));
+                    point = new Position (center.x + (counter), center.y + (radius - (counter)));
                 }
 
                 if (phase == 1) {
-                    point[0] = centerX + (radius - counter);
-                    point[1] = centerY - counter;
+                    point = new Position (center.x + (radius - counter), center.y - counter);
                 }
 
                 if (phase == 2) {
-                    point[0] = centerX - counter;
-                    point[1] = centerY - (radius - counter);
+                    point = new Position(center.x - counter, center.y - (radius - counter));
                 }
 
                 if (phase == 3) {
-                    point[0] = centerX - (radius - counter);
-                    point[1] = centerY + counter;
+                    point = new Position (center.x - (radius - counter), center.y + counter);
                 }
 
                 if (++counter >= radius) {
@@ -116,16 +105,20 @@ public class GridCircle implements Iterable<int[]> {
     }
 
 // helper function: our metric
+    public static int distance(Position p1, Position p2) {
+        return distance(p1.x, p1.y, p2.x, p2.y);
+    }
+
     public static int distance(int x1, int y1, int x2, int y2) {
         return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
 
-    public boolean outOfView(int[] point) {
-        return (distance(point[0], point[1], viewX, viewY) > radius);
+    public boolean outOfView(Position point) {
+        return (distance(point, new Position (view.x, view.y)) > radius);
     }
 
-    public static boolean isValidPoint(int[] point) {
-        return isValidX(point[0]) && isValidY(point[1]);
+    public static boolean isValidPoint(Position point) {
+        return isValidX(point.x) && isValidY(point.y);
     }
 
     public static boolean isValidX(int x) {

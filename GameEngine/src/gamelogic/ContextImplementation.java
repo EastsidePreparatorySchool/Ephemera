@@ -8,6 +8,8 @@ package gamelogic;
 import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -24,54 +26,53 @@ public class ContextImplementation implements Context {
         this.vis = vis;
     }
 
+    @Override
     public double getEnergy() {
         return ac.energy;
     }
 
-    public double getTech() {
-        return ac.tech;
+    @Override
+    public int getTech() {
+        return (int) ac.tech;
     }
 
-    public int getX() {
-        return ac.x;
+    @Override
+    public Position getPosition() {
+        return new Position(ac.x, ac.y);
     }
 
-    public int getY() {
-        return ac.y;
-    }
-
+    @Override
     public View getView(int size) throws NotEnoughEnergyException, NotEnoughTechException {
         // not more than tech
-        if (size > (int) ac.tech) {
+        if (size > 2 && size > (int) ac.tech) {
             throw new NotEnoughTechException();
         }
+        
+        // Make size at least 2 so people can see where they can move for free
+        size = Math.max(size, 2);
 
         // if we don't have one or they want a bigger one
-        if (this.view == null || this.view.size < size) {
-            // enough energy?
-            if (size >= ((int)ac.energy) - Constants.viewCost) {
-                throw new NotEnoughEnergyException();
-            }
-            // make them pay
-            this.ac.energy -= size + Constants.viewCost;
-            this.view = new ViewImplementation(ac.grid.aliens, ac.x, ac.y, size);
-        }
+        this.view = new ViewImplementation(ac.grid.aliens, ac.x, ac.y, size);
         return this.view;
     }
 
-    public double getPresentEnergy(){
+    @Override
+    public double getPresentEnergy() {
         return ac.grid.aliens.getEnergyAt(ac.x, ac.y);
     }
 
+    @Override
     public int getSpawningCost() {
         return Constants.spawningCost;
     }
 
+    @Override
     public int getFightingCost() {
         return Constants.fightingCost;
     }
 
     // alien chatter is prefixed with full info, and only talks when chatter is on
+    @Override
     public void debugOut(String s) {
         if (Constants.chatter) {
             vis.debugOut(ac.getFullName() + ": " + s);
@@ -115,16 +116,19 @@ public class ContextImplementation implements Context {
         // in 8 line segments, hopefully without overlap
         for (int d = 1; d <= ac.outgoingPower; d++) {
             GridCircle c = new GridCircle(ac.x, ac.y, d);
-            for (int[] point : c) {
+            for (Position point : c) {
                 if (point != null) {
-                    depositMessageAt(point[0], point[1], ac.outgoingMessage);
+                    depositMessageAt(point, ac.outgoingMessage);
                 }
             }
         }
     }
 
     // put a message at one grid point ONLY if someone is listening
-    public void depositMessageAt(int x, int y, String message) {
+    public void depositMessageAt(Position p, String message) {
+        int x = p.x;
+        int y = p.y;
+
         if (((x + ac.grid.aliens.centerX) >= ac.grid.width)
                 || ((x + ac.grid.aliens.centerX) < 0)
                 || ((y + ac.grid.aliens.centerY) >= ac.grid.height)
@@ -153,22 +157,38 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public int getMinX() {
-        return -ac.grid.width / 2;
+    public Position getMinPosition() {
+        return new Position(-ac.grid.width / 2, -ac.grid.height / 2);
     }
 
     @Override
-    public int getMinY() {
-        return -ac.grid.height / 2;
+    public Position getMaxPosition() {
+        return new Position(ac.grid.width / 2 - 1, ac.grid.height / 2 - 1);
     }
 
     @Override
-    public int getMaxX() {
-        return ac.grid.width / 2 - 1;
+    public String getStateString() {
+        return getPosition().toString()
+                + " E:" + Double.toString(Math.round(ac.energy * 100) / 100)
+                + " T:" + Integer.toString((int) ac.tech);
+
     }
 
     @Override
-    public int getMaxY() {
-        return ac.grid.height / 2 - 1;
+    public int getDistance(Position p1, Position p2) {
+        return GridCircle.distance(p1, p2);
     }
+
+    @Override
+    public List<Position> computeOrbit(Position center, int radius) {
+        GridCircle gc = new GridCircle(center.x, center.y, radius);
+        ArrayList<Position> orbit = new ArrayList<>();
+        
+        for (Position p:gc) {
+            orbit.add(p);
+        }
+        
+        return orbit;
+    }
+
 }

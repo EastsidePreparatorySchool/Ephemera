@@ -13,19 +13,19 @@ import java.util.List;
  */
 public interface View {
 
-    List<AlienSpecies> getAliensAtPos(int x, int y) throws CantSeeSquareException;
+    List<AlienSpecies> getAliensAtPos(Position p) throws CantSeeSquareException;
 
     List<AlienSpecies> getAliensInView();
 
-    SpaceObject getSpaceObjectAtPos(int x, int y) throws CantSeeSquareException;
+    SpaceObject getSpaceObjectAtPos(Position p) throws CantSeeSquareException;
 
     List<SpaceObject> getSpaceObjectsInView();
 
-    List<AlienSpecies> getClosestAliensToPos(int x, int y) throws CantSeeSquareException;
+    List<AlienSpecies> getClosestAliens() throws CantSeeSquareException;
 
-    List<AlienSpecies> getClosestSpecificAliensToPos(AlienSpecies thisOne, int x, int y) throws CantSeeSquareException;
+    List<AlienSpecies> getClosestSpecificAliens(AlienSpecies thisOne);
 
-    List<AlienSpecies> getClosestXenosToPos(AlienSpecies notThisOne, int x, int y) throws CantSeeSquareException;
+    List<AlienSpecies> getClosestXenos(AlienSpecies notThisOne);
 
     public class CantSeeSquareException extends Exception {
     }

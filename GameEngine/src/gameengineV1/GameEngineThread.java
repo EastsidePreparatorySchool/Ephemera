@@ -32,14 +32,7 @@ public class GameEngineThread extends Thread {
         int totalTurns = 0;
 
         //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-        engine.grid = new SpaceGrid(engine, engine.vis, 500, 500);
-
-        try {
-            SpaceGrid.addClassPathFile(engine.gameJarPath, engine.alienPath, "alieninterfaces");
-        } catch (Exception e) {
-            engine.vis.debugErr("GameEngineThread: run() could not load alieninterfaces.jar");
-            return;
-        }
+        engine.grid = new SpaceGrid(engine, engine.vis, Constants.width, Constants.height);
 
         engine.vis.debugOut("GameEngineThread: Started");
         do {
@@ -191,6 +184,7 @@ public class GameEngineThread extends Thread {
                 break;
 
             case Ready:
+                engine.grid.addAllCustomAliens();
                 engine.grid.ready();
                 break;
 

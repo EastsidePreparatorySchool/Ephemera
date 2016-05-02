@@ -12,6 +12,13 @@ import static gamelogic.GridCircle.distance;
 import java.lang.reflect.Constructor;
 import java.util.LinkedList;
 import java.util.List;
+import static gamelogic.GridCircle.distance;
+import static gamelogic.GridCircle.distance;
+import static gamelogic.GridCircle.distance;
+import static gamelogic.GridCircle.distance;
+import static gamelogic.GridCircle.distance;
+import static gamelogic.GridCircle.distance;
+import static gamelogic.GridCircle.distance;
 
 /**
  *
@@ -50,6 +57,7 @@ public class AlienContainer {
     public int nextY;
     public String outgoingMessage;
     public double outgoingPower;
+    int turnsInSafeZone;
 
     // Declare stats here
     //
@@ -74,9 +82,9 @@ public class AlienContainer {
 
         // if position = (0,0) assign random position in safe zone
         if (x == 0 && y == 0) {
-            this.x = ctx.getRandomInt(Constants.safeZoneSize + 1);
+            this.x = ctx.getRandomInt(Constants.safeZoneRadius + 1);
             this.x *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
-            this.y = ctx.getRandomInt(Constants.safeZoneSize + 1);
+            this.y = ctx.getRandomInt(Constants.safeZoneRadius + 1);
             this.y *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
         } else {
             this.x = x;
@@ -147,31 +155,32 @@ public class AlienContainer {
                 + " T:" + (tech)
                 + " r:" + ((int) Math.floor(Math.hypot((double) x, (double) y)));
     }
+    
 
-    public void beThoughtful() {
+    public void processResults() {
         try {
-            this.alien.beThoughtful();
+            this.alien.processResults();
         } catch (UnsupportedOperationException e) {
         }
 
     }
 
-    // checked moves
     public void move() throws NotEnoughTechException {
+ 
         // Whether the move goes off the board will be determined by the grid
 
-        MoveDir direction = null;
+        Direction direction = null;
         try {
             direction = alien.getMove();
         } catch (UnsupportedOperationException e) {
             // we'll let that go
-            direction = new MoveDir(0, 0);
+            direction = new Direction(0, 0);
         }
 
         this.checkMove(direction); // Throws an exception if illegal
 
         // we want to contain aliens in the 250 sphere, so apply the "cosmic drift"
-        direction = this.applyDrift(x, y, direction);
+        direction = this.containMove(x, y, direction);
 
         int oldx = x;
         int oldy = y;
@@ -180,24 +189,23 @@ public class AlienContainer {
 
         int width = Constants.width;
         int height = Constants.height;
-        if (nextX >= (width / 2) || nextX < (0 - width / 2) || nextY >= (height / 2) || nextY < (0 - height / 2)) {
+        if (nextX > (width / 2) || nextX < (0 - width / 2) || nextY > (height / 2) || nextY < (0 - height / 2)) {
             debugErr("ac.move: Out of bounds: (" + x + ":" + y + ")");
         }
     }
 
     // this does the actual checking
-    private void checkMove(MoveDir direction) throws NotEnoughTechException {
+    private void checkMove(Direction direction) throws NotEnoughTechException {
         int moveLength = distance(0, 0, direction.x, direction.y);
 
-        // leet onexone moves go
-        
-        if (moveLength <= 2) {
+        // let one x one moves go
+        if (Math.abs(direction.x) <= 1 && Math.abs(direction.y) <= 1) {
             return;
         }
-        
+
         // If the move is farther than the alien has the power to move
         if (moveLength > tech) {
-           debugErr("Illegal move(" + moveLength + "): " + (direction.x) + "," + (direction.y) + " tech " + tech);
+            debugErr("Illegal move(" + moveLength + "): " + (direction.x) + "," + (direction.y) + " tech " + tech);
             throw new NotEnoughTechException();
         }
 
@@ -208,30 +216,33 @@ public class AlienContainer {
         }
     }
 
-    public MoveDir applyDrift(int x, int y, MoveDir dir) {
+    public Direction containMove(int x, int y, Direction dir) {
         int dxi, dyi;
 
         dxi = dir.x;
         dyi = dir.y;
 
-        if (x + dxi > 249) {
-            dxi = 249 - x;
+        if (x + dxi > Constants.width / 2) {
+            dxi = Constants.width / 2 - x;
         }
-        if (x + dxi < -250) {
-            dxi = -250 - x;
+        if (x + dxi < -Constants.width / 2) {
+            dxi = -Constants.width / 2 - x;
         }
-        if (y + dyi > 249) {
-            dyi = 249 - y;
+        if (y + dyi > Constants.width / 2) {
+            dyi = Constants.width / 2 - y;
         }
-        if (y + dyi < -250) {
-            dyi = -250 - y;
+        if (y + dyi < -Constants.width / 2) {
+            dyi = -Constants.width / 2 - y;
         }
-        return new MoveDir(dxi, dyi);
+        return new Direction(dxi, dyi);
     }
 
     // easy way to kill an alien
     public void kill(String s) {
-        debugOut(s + " with T:" + (Math.round(tech * 10) / 10) + " and E:" + (Math.round(energy * 10) / 10));
+        debugOut(s + " with T:" + (Math.round(tech * 10) / 10)
+                + " and E:" + (Math.round(energy * 10) / 10)
+                + " during turn:" + grid.currentTurn
+        );
         energy = 0;
     }
 
@@ -251,20 +262,20 @@ public class AlienContainer {
             case Research:
                 if (tech >= energy) {
                     // If the tech can't be researched due to lack of energy
-                    debugOut("AC: Research violation with T:" + (tech) + " and E:" + (energy));
+                    debugOut("AC: Research violation with "+ctx.getStateString());
                     throw new NotEnoughEnergyException();
                 }
                 break;
 
             case Spawn:
                 if (a.power + ctx.getSpawningCost() > energy) {
-                    debugOut("AC: Spawn violation with P:" + a.power + " T:" + (tech) + " and E:" + (energy));
+                    debugOut("AC: Spawn violation with P:" + a.power + " "+ctx.getStateString());
                     throw new NotEnoughEnergyException();
                 }
                 break;
             case Fight:
                 if (energy < (a.power + ctx.getFightingCost())) {
-                    debugOut("AC: Fight violation with P:" + a.power + " T:" + (tech) + " and E:" + (energy));
+                    debugOut("AC: Fight violation with P:" + a.power + " "+ctx.getStateString());
                     throw new NotEnoughEnergyException();
                 }
 

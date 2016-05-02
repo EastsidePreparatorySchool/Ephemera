@@ -14,7 +14,9 @@ public interface Alien
     void init(Context ctx, int id, int parent, String message);
     void communicate();
     void receive(String[] messages);
-    MoveDir getMove();
+    Direction getMove();
     Action getAction();
-    void beThoughtful();
+    void processResults();
+
+
 }

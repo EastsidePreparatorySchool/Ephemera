@@ -5,6 +5,8 @@
  */
 package alieninterfaces;
 
+import java.util.List;
+
 /**
  *
  * @author gmein
@@ -12,36 +14,25 @@ package alieninterfaces;
 public interface Context {
 
     double getEnergy();
+    int getTech();
 
-    double getTech();
-
-    int getX();
-
-    int getY();
-
+    Position getPosition();
     View getView(int size) throws NotEnoughEnergyException, NotEnoughTechException;
+    Position getMinPosition();
+    Position getMaxPosition();
+    int getDistance(Position p1, Position p2);
+    double getPresentEnergy();
 
     int getSpawningCost();
-
     int getFightingCost();
 
     int getRandomInt(int ceiling);
-    
     int getGameTurn();
-    
-    int getMinX();
-    
-    int getMinY();
-    
-    int getMaxX();
-    
-    int getMaxY();
-    
-    double getPresentEnergy();
+    List<Position> computeOrbit (Position center, int radius);
 
     void broadcastAndListen(String message, int power, boolean listen)
             throws NotEnoughTechException, NotEnoughEnergyException;
 
-    void debugOut(String s
-    );
+    void debugOut(String s);
+    String getStateString ();
 }

@@ -5,18 +5,14 @@
  */
 package gamelogic;
 
-import gameengineinterfaces.GameVisualizer;
-import java.lang.reflect.Constructor;
-import java.util.List;
-
 /**
  *
  * @author guberti
  */
 public class Star extends InternalSpaceObject{
     
-    public Star (GameVisualizer vis, int x, int y, String packageName, String className, double energy, double tech) {
-        super(vis, x, y, packageName, className, energy, tech);
+    public Star (SpaceGrid grid, int x, int y, String domainName, String packageName, String className, double energy, double tech) {
+        super(grid, x, y, domainName, packageName, className, energy, tech);
     }
     
     // Add code here to detail the working of stars
