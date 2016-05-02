@@ -28,22 +28,23 @@ RESIDENT,ephemera.eastsideprep.org,stockelements,Elbubbians,ephemera.eastsidepre
 PLANET,ephemera.eastsideprep.org,stockelements,Cerile,ephemera.eastsideprep.org:stockelements:Lalande21185,5,1,12,5,"notes:""Nothing special happens here"""
 PLANET,ephemera.eastsideprep.org,stockelements,Vorium,ephemera.eastsideprep.org:stockelements:Lalande21185,1,6,10,3,"notes:""It is beautiful at night on this planet, gain 3 energy every 2 turns spent on the planet."""
 STAR,ephemera.eastsideprep.org,stockelements,Sirius,,-2,165,151.1,,
-PLANET,ephemera.eastsideprep.org,stockelements,Leyec,ephemera.eastsideprep.org:stockelements:Sirius,8,8,16,16,"notes:""Planet has a force field around it, must have technology 10 to land on planet."""
+PLANET,ephemera.eastsideprep.org,stockelements,Leyec,ephemera.eastsideprep.org:stockelements:Sirius,8,8,16,16,"notes:""Planet has a force field around it, must have technology 50 to land on planet."""
 RESIDENT,ephemera.eastsideprep.org,stockelements,Ezkar,ephemera.eastsideprep.org:stockelements:Leyec,0,0,8,255,"notes:""High tech. Planet bound. Wishes to be left alone and if an alien stays on planet for longer than 10 turns they will fight them."""
-STAR,ephemera.eastsideprep.org,stockelements,L 726-8,,161,45,1,,
-STAR,ephemera.eastsideprep.org,stockelements,Ross 154,,2,-179,1.4,,
-STAR,ephemera.eastsideprep.org,stockelements,Ross 248,,143,-36,0.7,,
+STAR,ephemera.eastsideprep.org,stockelements,L726-8,,161,45,1,,
+STAR,ephemera.eastsideprep.org,stockelements,Ross154,,2,-179,1.4,,
+STAR,ephemera.eastsideprep.org,stockelements,Ross248,,143,-36,0.7,,
+PLANET,ephemera.eastsideprep.org,stockelements,Petigi,ephemera.eastsideprep.org:stockelements:Ross248,1,1,16,8,"notes:""Impossible to spawn on this planet"""
 STAR,ephemera.eastsideprep.org,stockelements,Epsilon Eridani,,145,148,22.2,,
-STAR,ephemera.eastsideprep.org,stockelements,Lacaille 9352,,171,-45,5.3,,
-STAR,ephemera.eastsideprep.org,stockelements,Ross 128,,-211,53,1.2,,
-STAR,ephemera.eastsideprep.org,stockelements,L 789-6,,186,-105,1.4,,
+STAR,ephemera.eastsideprep.org,stockelements,Lacaille9352,,171,-45,5.3,,
+STAR,ephemera.eastsideprep.org,stockelements,Ross128,,-211,53,1.2,,
+STAR,ephemera.eastsideprep.org,stockelements,L789-6,,186,-105,1.4,,
 STAR,ephemera.eastsideprep.org,stockelements,Procyon,,-61,218,92.8,,
-STAR,ephemera.eastsideprep.org,stockelements,61 Cygni,,126,-125,22.5,,
-STAR,ephemera.eastsideprep.org,stockelements,Struve 2398,,1,-117,5.2,,
-STAR,ephemera.eastsideprep.org,stockelements,Groombridge 34,,167,0,5.5,,
+STAR,ephemera.eastsideprep.org,stockelements,61Cygni,,126,-125,22.5,,
+STAR,ephemera.eastsideprep.org,stockelements,Struve2398,,1,-117,5.2,,
+STAR,ephemera.eastsideprep.org,stockelements,Groombridge34,,167,0,5.5,,
 STAR,ephemera.eastsideprep.org,stockelements,G51-15,,-107,181,1,,
 STAR,ephemera.eastsideprep.org,stockelements,Epsilon Indi,,116,-67,16.7,,
 STAR,ephemera.eastsideprep.org,stockelements,Tau Ceti,,222,62,27.1,,
-STAR,ephemera.eastsideprep.org,stockelements,L 372-58,,122,125,0.6,,
-STAR,ephemera.eastsideprep.org,stockelements,L 725-32,,223,60,0.9,,
+STAR,ephemera.eastsideprep.org,stockelements,L372-58,,122,125,0.6,,
+STAR,ephemera.eastsideprep.org,stockelements,L725-32,,223,60,0.9,,
 STAR,ephemera.eastsideprep.org,stockelements,Luyten's Star,,-65,237,2.2,,
