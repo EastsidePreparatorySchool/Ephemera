@@ -245,31 +245,37 @@ public class ZoomView {
     }
 
     private void buildAxes(Group root) {
-        final PhongMaterial redMaterial = new PhongMaterial(Color.rgb(24, 12, 12, 1.0));
-
+        Box axis;
+        final PhongMaterial grayMaterial = new PhongMaterial(Color.rgb(24, 24, 24, 1.0));
         final PhongMaterial greenMaterial = new PhongMaterial(Color.GREEN);
-
-        final PhongMaterial blueMaterial = new PhongMaterial(Color.DARKBLUE);
+        final PhongMaterial blueMaterial = new PhongMaterial(Color.BLUE);
+        final PhongMaterial redMaterial = new PhongMaterial(Color.RED);
 
         for (int x = -width / 2; x <= width / 2; x++) {
-            Box axis = new Box(width, 0.05, 0.05);
-            axis.setTranslateZ(x -0.5);
-            axis.setMaterial(redMaterial);
+            axis = new Box(width*spacing, 0.05, 0.05);
+            axis.setTranslateZ(x);
+            axis.setMaterial(grayMaterial);
             root.getChildren().add(axis);
 
         }
         for (int y = -height / 2; y <= height / 2; y++) {
-            Box axis = new Box(0.05, 0.05, height);
-            axis.setTranslateX(y -0.5);
-            axis.setMaterial(redMaterial);
+            axis = new Box(0.05, 0.05, height*spacing);
+            axis.setTranslateX(y);
+            axis.setMaterial(grayMaterial);
             root.getChildren().add(axis);
         }
         
-        Box yAxis = new Box(0.05, 100, 0.05);
+        axis = new Box(0.06, 100*spacing, 0.06);
+        axis.setMaterial(greenMaterial);
+        root.getChildren().addAll(axis);
 
-        yAxis.setMaterial(greenMaterial);
+        axis = new Box(height * spacing,0.06, 0.06);
+        axis.setMaterial(redMaterial);
+        root.getChildren().addAll(axis);
 
-        root.getChildren().addAll(yAxis);
+        axis = new Box(0.06, 0.06, height*spacing);
+        axis.setMaterial(blueMaterial);
+        root.getChildren().addAll(axis);
     }
 
     //public void focusZoomOn (int col, int row);
