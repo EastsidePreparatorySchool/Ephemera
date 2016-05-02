@@ -6,7 +6,7 @@ CONSTANT,,,safeZoneSize,,,,,,10
 CONSTANT,,,filters,,,,,,death; violation; 
 CONSTANT,,,pauseOnError,,,,,,off
 SPECIES,ephemera.eastsideprep.org,stockaliens,Dalek,,,,,,
-SPECIES,ephemera.eastsideprep.org,stockaliens,Martian,,,,,,
+SPECIES,ephemera.eastsideprep.org,stockaliens,Altarian,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Venusian,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,WeepingAngel,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Alf,,,,,,
