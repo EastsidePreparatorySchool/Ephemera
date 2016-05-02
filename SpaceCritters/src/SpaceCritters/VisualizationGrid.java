@@ -5,10 +5,12 @@
  */
 package SpaceCritters;
 
+import static SpaceCritters.SpaceCritters.dstage;
 import gameengineinterfaces.AlienSpec;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import gameengineinterfaces.*;
+import gamelogic.Constants;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
@@ -115,15 +117,15 @@ class VisualizationGrid implements GameVisualizer {
             for (int k = 0; k < width; k++) {
 
                 Cell cell = grid[k][i];
-                boolean isFighting = cell.isFighting();
+                int fightCount = cell.isFighting();
 
                 if (cell.cellChanged) {
                     int x = cellWidth * k;
                     int y = cellHeight * i;
 
-                    color[1] = (isFighting ? Color.RED : Color.BLACK);
+                    color[1] = (fightCount > 0 ? Color.RED : Color.BLACK);
                     if (cell.alienCount == 0) {
-                        if (!isFighting) {
+                        if (fightCount == 0) {
                             //gc.setStroke(Color.BLACK);
                             //gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth + 0.5, y + 0.5);
                             cell.cellChanged = false;
@@ -168,7 +170,7 @@ class VisualizationGrid implements GameVisualizer {
                         gc.strokeLine(x + 1.5, this.heightPX - y + 1.5, x + 2.5, this.heightPX - y + 1.5);
                         x++;
                         gc.setStroke(color[2]);
-                        gc.strokeLine(x + 1.5, this.heightPX - y + 1.5, x + 2.5, this.heightPX - y + 2.5);
+                        gc.strokeLine(x + 1.5, this.heightPX - y + 1.5, x + 2.5, this.heightPX - y + 1.5);
                         x++;
                     }
 
@@ -180,12 +182,6 @@ class VisualizationGrid implements GameVisualizer {
         gc.setLineWidth(1.0);
         gc.strokeRect(0.5, 0.5, widthPX + 1, heightPX + 1);
 
-        Color scolor = new Color(0.0, 1.0, 0.0, 0.3); // translucent green
-        gc.setFill(scolor);
-        gc.fillRect(0.5 + (width * cellWidth) / 2 - safeZoneSize * cellWidth,
-                0.5 + (height * cellHeight) / 2 - safeZoneSize * cellHeight,
-                ((2 * safeZoneSize) + 1) * cellWidth,
-                ((2 * safeZoneSize) + 1) * cellHeight);
     }
 
     public void renderEnergyMap(GraphicsContext gc) {
@@ -196,7 +192,7 @@ class VisualizationGrid implements GameVisualizer {
             for (int k = 0; k < width; k++) {
 
                 Cell cell = grid[k][i];
-                boolean isFighting = cell.isFighting(); // doing this so fight counter goes down
+                int fightCount = cell.isFighting(); // doing this so fight counter goes down
 
                 //if (cell.cellChanged) {
                 int x = cellWidth * k;
@@ -235,12 +231,6 @@ class VisualizationGrid implements GameVisualizer {
         gc.setLineWidth(1.0);
         gc.strokeRect(0.5, 0.5, widthPX + 1, heightPX + 1);
 
-        color = new Color(0.0, 1.0, 0.0, 0.3); // translucent green
-        gc.setFill(color);
-        gc.fillRect(1.5 + (width * cellWidth) / 2 - safeZoneSize * cellWidth,
-                1.5 + (height * cellHeight) / 2 - safeZoneSize * cellHeight,
-                ((2 * safeZoneSize) + 1) * cellWidth,
-                ((2 * safeZoneSize) + 1) * cellHeight);
     }
 
     @Override
@@ -480,7 +470,14 @@ class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void showReady() {
-        Utilities.runAndWait(() -> renderField());
+        Utilities.runAndWait(() -> {
+            renderField();
+            if ((boolean) Constants.getValue("autoStart")) {
+                SpaceCritters.autoStartGame();
+            }
+
+        }
+        );
 
     }
 
@@ -491,8 +488,10 @@ class VisualizationGrid implements GameVisualizer {
 
             renderEnergyMap(this.canvas.getGraphicsContext2D());
         }
-        
-        SpaceCritters.zoom.render();    
+
+        if (SpaceCritters.zoom.zStage.isShowing()) {
+            SpaceCritters.zoom.render();
+        }
 
     }
 

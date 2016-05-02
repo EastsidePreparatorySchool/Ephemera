@@ -42,9 +42,12 @@ public class ContextImplementation implements Context {
     @Override
     public View getView(int size) throws NotEnoughEnergyException, NotEnoughTechException {
         // not more than tech
-        if (size > (int) ac.tech) {
+        if (size > 2 && size > (int) ac.tech) {
             throw new NotEnoughTechException();
         }
+        
+        // Make size at least 2 so people can see where they can move for free
+        size = Math.max(size, 2);
 
         // if we don't have one or they want a bigger one
         this.view = new ViewImplementation(ac.grid.aliens, ac.x, ac.y, size);

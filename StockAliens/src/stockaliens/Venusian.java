@@ -35,7 +35,7 @@ public class Venusian implements Alien {
         int y = 0;
 
         try {
-            List<AlienSpecies> nearestAliens = ctx.getView((int)ctx.getTech()).getClosestXenos(
+            List<AlienSpecies> nearestAliens = ctx.getView((int) ctx.getTech()).getClosestXenos(
                     new AlienSpecies("eastsideprep.org", "stockaliens", "Alf", 0));
             if (!nearestAliens.isEmpty()) {
                 Position nearest = nearestAliens.get(0).position;
@@ -51,13 +51,16 @@ public class Venusian implements Alien {
                 } else if (nearest.y < ctx.getPosition().y) {
                     y = 1;
                 }
-                
+
                 // guard against tech fail
                 //if (ctx.getTech() < 2.0) {
                 //    y = 0;
                 //}
             }
         } catch (Exception e) {
+            x = ctx.getRandomInt(3) - 1;
+            y = ctx.getRandomInt(3) - 1;
+
         }
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
 
@@ -71,9 +74,9 @@ public class Venusian implements Alien {
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
         View view = null;
-        
+
         try {
-            view = ctx.getView((int)ctx.getTech());
+            view = ctx.getView((int) ctx.getTech());
         } catch (Exception e) {
         }
 

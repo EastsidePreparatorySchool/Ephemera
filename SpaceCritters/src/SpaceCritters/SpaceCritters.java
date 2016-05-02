@@ -16,9 +16,6 @@ import java.lang.management.ManagementFactory;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
@@ -52,7 +49,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
-import javafx.util.Duration;
 
 /**
  *
@@ -167,7 +163,7 @@ public class SpaceCritters extends Application {
             this.field = new VisualizationGrid();
             this.field.init(engine, console, species, logPath, width, height, cellWidth, cellHeight, canvas);
 
-            zoom = new ZoomView(field, 200, 200, 101,101, cellWidth, cellHeight, field.heightPX);
+            zoom = new ZoomView(field, 0, 0, width, height, cellWidth, cellHeight, field.heightPX);
 
             // get engine up and running
             engine.initFromFile(field, gamePath, alienPath, "sc_config.csv");
@@ -180,7 +176,10 @@ public class SpaceCritters extends Application {
 
             stage.setScene(scene);
             stage.show();
-            dstage.show();
+
+            if (!(boolean) Constants.getValue("autoStart")) {
+                dstage.show();
+            }
 
             engine.queueCommand(new GameCommand(GameCommandCode.Ready));
 
@@ -283,7 +282,7 @@ public class SpaceCritters extends Application {
         //dscene.setFill(null);
         dialog.initStyle(StageStyle.TRANSPARENT);
         dialog.setScene(dscene);
-        dialog.show();
+        //dialog.show();
         //dialog.setFullScreen(true);
         return dialog;
     }
@@ -464,6 +463,29 @@ public class SpaceCritters extends Application {
         return tile;
     }
 
+    static void autoStartGame() {
+        // first start
+        idleTimer.cancel();
+        idleTimer = null;
+        Iterator<AlienSpeciesForDisplay> iter = species.speciesList.iterator();
+        while (iter.hasNext()) {
+            AlienSpeciesForDisplay as = iter.next();
+            if (as.isOn()) {
+                GameElementSpec element = new GameElementSpec("ALIEN", as.domainName, as.packageName, as.className,
+                        null); // state
+                engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
+            } else {
+                iter.remove();
+            }
+        }
+
+        engine.queueCommand(new GameCommand(GameCommandCode.Resume));
+        buttonPause.setText("Pause");
+        buttonQuit.setVisible(false);
+        buttonRestart.setVisible(false);
+
+    }
+
     static void startOrPauseGame(ActionEvent e) {
         if (buttonPause.getText().equals("Pause")) {
             // pause
@@ -477,27 +499,7 @@ public class SpaceCritters extends Application {
             // scheduling the task at interval
             idleTimer.schedule(task, 0, 200);
         } else if (buttonPause.getText().equals("Start")) {
-            // first start
-            idleTimer.cancel();
-            idleTimer = null;
-            Iterator<AlienSpeciesForDisplay> iter = species.speciesList.iterator();
-            while (iter.hasNext()) {
-                AlienSpeciesForDisplay as = iter.next();
-                if (as.isOn()) {
-                    GameElementSpec element = new GameElementSpec("ALIEN", as.domainName, as.packageName, as.className,
-                            null); // state
-                    engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
-                } else {
-                    iter.remove();
-                }
-            }
-            zoom.open();
-
-            engine.queueCommand(new GameCommand(GameCommandCode.Resume));
-            buttonPause.setText("Pause");
-            buttonQuit.setVisible(false);
-            buttonRestart.setVisible(false);
-
+            autoStartGame();
         } else {
             // regular resume
             idleTimer.cancel();

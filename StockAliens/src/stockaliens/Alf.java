@@ -33,7 +33,7 @@ public class Alf implements Alien {
                 + "," + Integer.toString(ctx.getY()) + ")"
                 + " E: " + Double.toString(ctx.getEnergy())
                 + " T: " + Double.toString(ctx.getTech()));
-*/
+         */
     }
 
     public Direction getMove() {
@@ -48,8 +48,8 @@ public class Alf implements Alien {
         int y = 0;
 
         try {
-            List<AlienSpecies> nearestAliens = ctx.getView((int)ctx.getTech()).getClosestXenos(
-                    new AlienSpecies("ephemera.eastsideprep.org", "stockaliens","Alf", 0));
+            List<AlienSpecies> nearestAliens = ctx.getView((int) ctx.getTech()).getClosestXenos(
+                    new AlienSpecies("ephemera.eastsideprep.org", "stockaliens", "Alf", 0));
             if (!nearestAliens.isEmpty()) {
                 Position nearest = nearestAliens.get(0).position;
 
@@ -67,6 +67,9 @@ public class Alf implements Alien {
                 }
             }
         } catch (Exception e) {
+            x = ctx.getRandomInt(3) - 1;
+            y = ctx.getRandomInt(3) - 1;
+
         }
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
 
@@ -78,10 +81,9 @@ public class Alf implements Alien {
         //ctx.debugOut("Action requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
-        
         View view = null;
         try {
-            view = ctx.getView((int)ctx.getTech());
+            view = ctx.getView((int) ctx.getTech());
         } catch (Exception e) {
         }
 
@@ -124,7 +126,6 @@ public class Alf implements Alien {
 
         return new Action(Action.ActionCode.Gain);
     }
-
 
     @Override
     public void communicate() {

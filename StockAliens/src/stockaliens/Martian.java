@@ -54,7 +54,7 @@ public class Martian implements Alien {
         }
 
         //gets the coordinates of the closest alien.
-        Position ClosestAlien = new Position (0,0);
+        Position ClosestAlien = new Position (5,5);
 
         try {
             List<AlienSpecies> l = ctx.getView((int)ctx.getTech()).getClosestXenos(

@@ -5,6 +5,8 @@
  */
 package gamelogic;
 
+import java.lang.reflect.Field;
+
 /**
  *
  * @author gmein
@@ -30,6 +32,7 @@ public class Constants {
     public static int viewCost = 2; // views cost 2 + size
     public static double energyGainReducer = 30; // harvested energy will be divided by this factor
     public static double starEnergyPerLuminosity = 5; // factor for placing energy into space around star
+    public static boolean autoStart = false; // start without splashscreen or start button
 
     public static double deathThreshold = 5; // if you lose a fight by more than this much, you die
     public static String filters = "death; violation";
@@ -37,8 +40,23 @@ public class Constants {
 
     /*
     ** Not truly adjustable yet - do not change these, do not put in config file
-    */
+     */
     final public static int width = 501; // grid width 
     final public static int height = 501; // grid height
+
+    
+    
+    
+    public static Object getValue(String variable) {
+        try {
+            for (Field field : Constants.class.getDeclaredFields()) {
+                if (variable.equalsIgnoreCase(field.getName())) {
+                    return field.get(Constants.class);
+                }
+            }
+        } catch (Exception e) {
+        }
+        return null;
+    }
 
 }

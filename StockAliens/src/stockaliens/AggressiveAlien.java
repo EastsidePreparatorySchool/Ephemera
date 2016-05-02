@@ -65,6 +65,8 @@ public class AggressiveAlien implements Alien {
                 dir = new Direction(0, 0);
             }
         } catch (Exception e) {
+                // do something here to deal with errors
+                ctx.debugOut("EXPLAIN?????? " + e.toString());
         }
 
         ctx.debugOut("Moving to " + ctx.getPosition().add(dir).toString() + ctx.getStateString());

@@ -24,6 +24,7 @@ class Cell {
     CellInfo color2;
     int row;
     int col;
+    int totalFighters;
 
     public Cell(SpeciesSet s, int row, int col) { // Constructor
         alienCount = 0;
@@ -117,18 +118,23 @@ class Cell {
     public void fight() {
         fightCountDown = 5; // show this for 5 iterations
         cellChanged = true;
+        totalFighters = alienCount;
     }
 
-    public boolean isFighting() {
+    public int isFighting() {
         if (fightCountDown > 0) {
             fightCountDown--;
             if (fightCountDown == 0) {
                 cellChanged = true;
-                return false;
+                return 0;
             }
-            return true;
+            return fightCountDown;
         }
 
-        return false;
+        return 0;
+    }
+    
+    public int fightCountNoDecrement() {
+        return fightCountDown;
     }
 }

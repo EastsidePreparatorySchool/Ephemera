@@ -51,10 +51,13 @@ public class ZoomView {
     int pxX;
     int pxY;
     PerspectiveCamera camera;
+    double focusX;
+    double focusY;
     double xRot;
     double yRot;
     double zTrans;
     double spacing;
+    double objectElevation;
 
     public ZoomView(VisualizationGrid field, int mincol, int minrow, int width, int height, int cellWidth, int cellHeight, int heightPX) {
         this.grid = field.grid;
@@ -68,11 +71,15 @@ public class ZoomView {
         this.cellHeight = cellHeight;
         this.xRot = -20;
         this.yRot = -10;
-        this.zTrans = -width;
+        this.zTrans = -(Math.min(width, 100));
         this.spacing = 1.0;
         this.heightPX = heightPX;
-        pxX = width * 6;
-        pxY = height * 6;
+        pxX = Math.min(width * 6, 600);
+        pxY = Math.min(height * 6, 600);
+        focusX = 0.0;
+        focusY = 0.0;
+        zStage = new Stage(StageStyle.DECORATED);
+       
 
     }
 
@@ -89,14 +96,14 @@ public class ZoomView {
             s.setMaterial(new PhongMaterial(Color.ANTIQUEWHITE));
             s.setDrawMode(DrawMode.FILL);
             s.setTranslateX(xFromIndex(star.x));
-            s.setTranslateY(1);
+            s.setTranslateY(objectElevation);
             s.setTranslateZ(zFromIndex(star.y));
             s.setOpacity(0.5);
             group.getChildren().add(s);
 
             PointLight light = new PointLight(Color.ANTIQUEWHITE);
             light.setTranslateX(xFromIndex(star.x));
-            light.setTranslateY(1);
+            light.setTranslateY(objectElevation);
             light.setTranslateZ(zFromIndex(star.y));
             group.getChildren().add(light);
 
@@ -108,7 +115,7 @@ public class ZoomView {
             s.setMaterial(new PhongMaterial(Color.GREEN));
             s.setDrawMode(DrawMode.FILL);
             s.setTranslateX(xFromIndex(planet.x));
-            s.setTranslateY(1);
+            s.setTranslateY(objectElevation);
             s.setTranslateZ(zFromIndex(planet.y));
 
             group.getChildren().add(s);
@@ -137,6 +144,29 @@ public class ZoomView {
                             }
                         }
                     }
+                    int fighting = cell.fightCountNoDecrement();
+                    if (fighting > 0) {
+                        y = cell.totalFighters;
+
+                        Sphere s = new Sphere(fighting / (double) 2);
+                        s.setMaterial(new PhongMaterial(Color.RED));
+                        s.setDrawMode(DrawMode.FILL);
+                        s.setTranslateX(xFromIndex(i));
+                        s.setTranslateY(yFromIndex(y) - fighting);
+                        s.setTranslateZ(zFromIndex(j));
+                        s.setOpacity(fighting / (double) 10);
+                        objects.add(s);
+
+                        Box box = new Box(0.7, y, 0.7);
+                        box.setMaterial(new PhongMaterial(Color.RED));
+                        box.setDrawMode(DrawMode.FILL);
+                        box.setTranslateX(xFromIndex(i));
+                        box.setTranslateY(yFromIndex(y) - (yFromIndex(y) / 2) + 0.5);
+                        box.setTranslateZ(zFromIndex(j));
+                        box.setOpacity(0.05);
+                        objects.add(box);
+
+                    }
                 }
             }
         }
@@ -149,16 +179,7 @@ public class ZoomView {
         buildAxes(root);
         root.getChildren().addAll(group);
 
-        /*
-        Box alien = new Box(1.0, 1.0, 1.0);
-        alien.setMaterial(new PhongMaterial(Color.WHITE));
-        alien.setDrawMode(DrawMode.FILL);
-        alien.setTranslateX(0);
-        alien.setTranslateY(0);
-        alien.setTranslateZ(0);
-
-        root.getChildren().add(alien);
-         */
+       
     }
 
     private double xFromIndex(int i) {
@@ -175,20 +196,17 @@ public class ZoomView {
 
     public Parent createView() {
 
-        // Box
-        Sphere test2 = new Sphere(0.3);
-        test2.setMaterial(new PhongMaterial(Color.RED));
-        test2.setDrawMode(DrawMode.FILL);
-        test2.setTranslateX(2);
-
+     
         // Create and position camera
         camera = new PerspectiveCamera(true);
         camera.getTransforms().setAll(
+                new Translate(focusX, 0, focusY),
                 new Rotate(yRot, Rotate.Y_AXIS),
                 new Rotate(xRot, Rotate.X_AXIS),
-                new Translate(0, 0, zTrans));
+                new Translate(0, 0, Math.min(zTrans, 100))
+        );
         camera.setNearClip(5);
-        camera.setFarClip(200);
+        camera.setFarClip(1500);
 
         // Build the Scene Graph
         root = new Group();
@@ -206,9 +224,7 @@ public class ZoomView {
     }
 
     public void open() {
-        zStage = new Stage(StageStyle.DECORATED);
         zStage.setResizable(false);
-        zStage.setAlwaysOnTop(true);
 
         javafx.geometry.Rectangle2D sb;
         sb = Screen.getPrimary().getVisualBounds();
@@ -221,6 +237,7 @@ public class ZoomView {
         zStage.show();
         //scene.setOnMouseClicked((e) -> close());
         scene.setOnKeyPressed((e) -> controlCamera(e));
+        
     }
 
     public void close() {
@@ -228,36 +245,54 @@ public class ZoomView {
     }
 
     private void buildAxes(Group root) {
-        final PhongMaterial redMaterial = new PhongMaterial();
-        redMaterial.setDiffuseColor(Color.DARKRED);
-        redMaterial.setSpecularColor(Color.RED);
+        final PhongMaterial redMaterial = new PhongMaterial(Color.rgb(24, 12, 12, 1.0));
 
-        final PhongMaterial greenMaterial = new PhongMaterial();
-        greenMaterial.setDiffuseColor(Color.DARKGREEN);
-        greenMaterial.setSpecularColor(Color.GREEN);
+        final PhongMaterial greenMaterial = new PhongMaterial(Color.GREEN);
 
-        final PhongMaterial blueMaterial = new PhongMaterial();
-        blueMaterial.setDiffuseColor(Color.DARKBLUE);
-        blueMaterial.setSpecularColor(Color.BLUE);
+        final PhongMaterial blueMaterial = new PhongMaterial(Color.DARKBLUE);
 
-        final Box xAxis = new Box(240.0, 0.05, 0.05);
-        final Box yAxis = new Box(0.05, 240.0, 0.05);
-        final Box zAxis = new Box(0.05, 0.05, 240.0);
+        for (int x = -width / 2; x <= width / 2; x++) {
+            Box axis = new Box(width, 0.05, 0.05);
+            axis.setTranslateZ(x -0.5);
+            axis.setMaterial(redMaterial);
+            root.getChildren().add(axis);
 
-        xAxis.setMaterial(redMaterial);
+        }
+        for (int y = -height / 2; y <= height / 2; y++) {
+            Box axis = new Box(0.05, 0.05, height);
+            axis.setTranslateX(y -0.5);
+            axis.setMaterial(redMaterial);
+            root.getChildren().add(axis);
+        }
+        
+        Box yAxis = new Box(0.05, 100, 0.05);
+
         yAxis.setMaterial(greenMaterial);
-        zAxis.setMaterial(blueMaterial);
 
-        root.getChildren().addAll(xAxis, yAxis, zAxis);
+        root.getChildren().addAll(yAxis);
     }
 
+    //public void focusZoomOn (int col, int row);
     public void focus(MouseEvent e) {
         if (!this.zStage.isShowing()) {
             open();
         }
+        
+        zStage.toFront();
 
-        this.mincol = (int) ((e.getX() - 1) / cellWidth) - (width / 2);
-        this.minrow = (int) (((heightPX - e.getY() - 1) / cellHeight) - (height / 2));
+        focusX = ((e.getX() - 1) / cellWidth) - (width / 2);
+        focusY = (((heightPX - e.getY() - 1) / cellHeight) - (height / 2));
+        //this.mincol = (int) ((e.getX() - 1) / cellWidth) - (width / 2);
+        //this.minrow = (int) (((heightPX - e.getY() - 1) / cellHeight) - (height / 2));
+
+        camera.getTransforms().setAll(
+                new Translate(focusX, 0, focusY),
+                new Rotate(yRot, Rotate.Y_AXIS),
+                new Rotate(xRot, Rotate.X_AXIS),
+                new Translate(0, 0, zTrans)
+        );
+
+        e.consume();
     }
 
     public void controlCamera(KeyEvent e) {
@@ -265,34 +300,51 @@ public class ZoomView {
         if (e.getCode() == KeyCode.ESCAPE) {
             this.xRot = -20;
             this.yRot = -10;
-            this.zTrans = -width;
+            this.zTrans = -(Math.min(width, 100));
             this.spacing = 1.0;
+            this.objectElevation = 0;
 
         } else {
             switch (e.getText()) {
                 case "f":
-                    zTrans += 10;
+                    if (zTrans < 1000) {
+                        zTrans += 10;
+                    }
                     break;
                 case "b":
-                    zTrans -= 10;
-                    break;
-                case "l":
-                    yRot -= 5;
+                    if (zTrans > -1000) {
+                        zTrans -= 10;
+                    }
                     break;
                 case "r":
+                    yRot -= 5;
+                    break;
+                case "l":
                     yRot += 5;
                     break;
-                case "u":
+                case "d":
                     xRot += 5;
                     break;
-                case "d":
+                case "u":
                     xRot -= 5;
                     break;
-                 case "w":
-                    spacing *= 1.1;
+                case "w":
+                    if (spacing < 20) {
+                        spacing *= 1.1;
+                    }
                     break;
                 case "n":
-                    spacing /= 1.1;
+                    if (spacing > 0.5) {
+                        spacing /= 1.1;
+                    }
+                    break;
+                case "e":
+                    if (objectElevation >= -20) {
+                        objectElevation -= 1;
+                    }
+                    break;
+                case "0":
+                    objectElevation = 0;
                     break;
                 default:
                     break;
@@ -300,9 +352,11 @@ public class ZoomView {
         }
 
         camera.getTransforms().setAll(
+                new Translate(focusX, 0, focusY),
                 new Rotate(yRot, Rotate.Y_AXIS),
                 new Rotate(xRot, Rotate.X_AXIS),
-                new Translate(0, 0, zTrans));
+                new Translate(0, 0, zTrans)
+        );
 
         e.consume();
     }

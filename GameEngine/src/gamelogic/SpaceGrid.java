@@ -87,6 +87,8 @@ public class SpaceGrid {
         Thread.yield();
 
         requestAlienMoves();
+        movePlanets();
+        removeDeadAliens();
         recordAlienMoves();
         removeDeadAliens();
         Thread.yield();
@@ -117,7 +119,7 @@ public class SpaceGrid {
         }
         // if we get to here, there was at most one species. Game Over.
         return true;
-        */
+         */
         return false;
     }
 
@@ -208,18 +210,19 @@ public class SpaceGrid {
         }
     }
 
-    // now that moving is done and views don't matter anymore,
-    // record the moves in AlienContainers and the grid
-    public void recordAlienMoves() {
-        //vis.debugOut("Recording moves for " + (aliens.size()) + " aliens");
-
-        // move planets first
+    public void movePlanets() {
         for (InternalSpaceObject so : this.objects) {
             if (so.isPlanet) {
                 Planet p = (Planet) so;
                 p.move();
             }
         }
+    }
+
+    // now that moving is done and views don't matter anymore,
+    // record the moves in AlienContainers and the grid
+    public void recordAlienMoves() {
+        //vis.debugOut("Recording moves for " + (aliens.size()) + " aliens");
 
         // now for all the aliens
         for (AlienContainer ac : aliens) {
@@ -264,8 +267,19 @@ public class SpaceGrid {
                     ac.kill("Death for moving into star " + acs.star.className);
 
                 }
+
+                if (isInSafeZone(ac)) {
+                    ac.turnsInSafeZone++;
+                } else {
+                    ac.turnsInSafeZone = 0;
+
+                }
             }
         }
+    }
+    
+    public boolean isInSafeZone(AlienContainer ac) {
+        return GridCircle.distance(0, 0, ac.x, ac.y) <= Constants.safeZoneRadius;
     }
 
     public void removeDeadAliens() {
@@ -358,8 +372,7 @@ public class SpaceGrid {
                     //vis.debugOut("SpaceGrid: Processing Fight");
 
                     // If the alien is in the safe zone
-                    if (Math.abs(thisAlien.x) <= Constants.safeZoneRadius
-                            && Math.abs(thisAlien.y) <= Constants.safeZoneRadius) {
+                    if (isInSafeZone(thisAlien)) {
                         // Make them pay the energy they spent
                         thisAlien.energy -= thisAlien.currentActionPower + Constants.fightingCost;
                         // but don't let them fight
@@ -561,14 +574,12 @@ public class SpaceGrid {
                     }
                     // construct a random move for the new alien depending on power and send that move through drift correction
                     // spend thisAction.power randomly on x move, y move and initital power
-                    double power = Math.max(Math.min(rand.nextInt((int) thisAlien.currentActionPower), thisAlien.currentActionPower / 3), 1);
-                    double powerForX = rand.nextInt((int) (thisAlien.currentActionPower - power));
-                    double powerForY = rand.nextInt((int) (thisAlien.currentActionPower - power - powerForX));
+                    double power = thisAlien.currentActionPower;
 
-                    int x = (int) powerForX * (rand.nextInt(2) == 0 ? 1 : -1);
-                    int y = (int) powerForY * (rand.nextInt(2) == 0 ? 1 : -1);
+                    int x = rand.nextInt(3) - 1;
+                    int y = rand.nextInt(3) - 1;
 
-                    thisAlien.energy -= power + powerForX + powerForY;
+                    thisAlien.energy -= power;
                     if (thisAlien.energy <= 0) {
                         thisAlien.kill("Death by spawning exhaustion - died in childbirth.");
                     }
@@ -762,7 +773,9 @@ public class SpaceGrid {
             parameters[0] = url;
 
             URLClassLoader classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-            Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+            Method method = URLClassLoader.class
+                    .getDeclaredMethod("addURL", URL.class
+                    );
             method.setAccessible(true);
             Object result = method.invoke(classLoader, parameters);
 

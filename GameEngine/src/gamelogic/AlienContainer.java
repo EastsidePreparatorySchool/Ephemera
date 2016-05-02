@@ -57,6 +57,7 @@ public class AlienContainer {
     public int nextY;
     public String outgoingMessage;
     public double outgoingPower;
+    int turnsInSafeZone;
 
     // Declare stats here
     //
@@ -154,6 +155,7 @@ public class AlienContainer {
                 + " T:" + (tech)
                 + " r:" + ((int) Math.floor(Math.hypot((double) x, (double) y)));
     }
+    
 
     public void processResults() {
         try {
