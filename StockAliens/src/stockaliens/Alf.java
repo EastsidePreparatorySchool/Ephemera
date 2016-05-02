@@ -28,15 +28,15 @@ public class Alf implements Alien {
         myAlienNumber = totalCount;
 
         ctx = game_ctx;
-        ctx.debugOut("Initialized at "
+        /*ctx.debugOut("Initialized at "
                 + "(" + Integer.toString(ctx.getX())
                 + "," + Integer.toString(ctx.getY()) + ")"
                 + " E: " + Double.toString(ctx.getEnergy())
                 + " T: " + Double.toString(ctx.getTech()));
-
+         */
     }
 
-    public MoveDir getMove() {
+    public Direction getMove() {
 
         //ctx.debugOut("Move requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
@@ -48,31 +48,45 @@ public class Alf implements Alien {
         int y = 0;
 
         try {
-            List<AlienSpecies> nearestAliens = ctx.getView((int)ctx.getTech()).getClosestXenosToPos(
-                    new AlienSpecies("eastsideprep.org", "stockaliens","Alf", 0),
-                    ctx.getX(), ctx.getY());
+            List<AlienSpecies> nearestAliens = ctx.getView((int) ctx.getTech()).getClosestXenos(
+                    new AlienSpecies("ephemera.eastsideprep.org", "stockaliens", "Alf", 0));
             if (!nearestAliens.isEmpty()) {
-                int nearestX = nearestAliens.get(0).x;
-                int nearestY = nearestAliens.get(0).y;
+                Position nearest = nearestAliens.get(0).position;
 
                 //always moves away from other aliens
-                if (nearestX > ctx.getX()) {
+                if (nearest.x > ctx.getPosition().x) {
                     x = (int) (-techLevel / 2);
-                } else if (nearestX < ctx.getX()) {
+                } else if (nearest.x < ctx.getPosition().x) {
                     x = (int) (techLevel / 2);
                 }
 
-                if (nearestX > ctx.getY()) {
+                if (nearest.y > ctx.getPosition().y) {
                     y = (int) (-techLevel / 2);
-                } else if (nearestY < ctx.getY()) {
+                } else if (nearest.y < ctx.getPosition().y) {
                     y = (int) (techLevel / 2);
                 }
             }
         } catch (Exception e) {
+            x = ctx.getRandomInt(3) - 1;
+            y = ctx.getRandomInt(3) - 1;
+
         }
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
 
-        return new MoveDir(x, y);
+        // move at least 1, but don't move into star
+        if (x == 0 && y == 0) {
+            y = 1;
+            try {
+                if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new Direction((int) x, (int) y))) != null) {
+                    y = -1;
+                }
+            } catch (NotEnoughEnergyException ex) {
+            } catch (NotEnoughTechException ex) {
+            } catch (View.CantSeeSquareException ex) {
+            }
+        }
+
+        return new Direction(x, y);
     }
 
     public Action getAction() {
@@ -80,10 +94,9 @@ public class Alf implements Alien {
         //ctx.debugOut("Action requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
-        
         View view = null;
         try {
-            view = ctx.getView((int)ctx.getTech());
+            view = ctx.getView((int) ctx.getTech());
         } catch (Exception e) {
         }
 
@@ -91,7 +104,7 @@ public class Alf implements Alien {
         // catch and shenanigans
         try {
             // is there another alien on our position?
-            if (view.getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1) {
+            if (view.getAliensAtPos(ctx.getPosition()).size() > 1) {
                 ctx.debugOut("Others are here");
                 // if so, do we have any energy?
                 if (ctx.getEnergy() < 10) {
@@ -127,11 +140,6 @@ public class Alf implements Alien {
         return new Action(Action.ActionCode.Gain);
     }
 
-    public void processResults() {
-        ctx.debugOut("Processing results");
-        return;
-    }
-
     @Override
     public void communicate() {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -143,7 +151,7 @@ public class Alf implements Alien {
     }
 
     @Override
-    public void beThoughtful() {
+    public void processResults() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

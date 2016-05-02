@@ -5,6 +5,8 @@ package stockaliens;
 
 import alieninterfaces.*;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -32,16 +34,13 @@ public class Martian implements Alien {
     public void init(Context ctx, int id, int parent, String message) {
         this.ctx = ctx;
         ctx.debugOut("Initialized at "
-                + "(" + Double.toString(ctx.getX())
-                + "," + Double.toString(ctx.getY()) + ")"
-                + " E: " + Double.toString(ctx.getEnergy())
-                + " T: " + Double.toString(ctx.getTech()));
+                + ctx.getStateString());
         ctx.debugOut("Pancakes taste like styrofoam");
 
     }
 
-    public MoveDir getMove() {
-    //    ctx.debugOut("Move requested,"
+    public Direction getMove() {
+        //    ctx.debugOut("Move requested,"
         //            + " E:" + Integer.toString(ctx.getEnergy())
         //            + " T:" + Integer.toString(ctx.getTech()));
 
@@ -57,39 +56,54 @@ public class Martian implements Alien {
         }
 
         //gets the coordinates of the closest alien.
-        int ClosestAlienXCoordinate = 0;
-        int ClosestAlienYCoordinate = 0;
+        Position ClosestAlien = new Position(5, 5);
 
         try {
-            List<AlienSpecies> l = ctx.getView((int)ctx.getTech()).getClosestXenosToPos(
-                    new AlienSpecies("eastsideprep.org", "stockaliens", "Martian", 0),
-                    ctx.getX(), ctx.getY());
+            List<AlienSpecies> l = ctx.getView((int) ctx.getTech()).getClosestXenos(
+                    new AlienSpecies("eastsideprep.org", "stockaliens", "Martian", 0));
             if (l.size() > 1) {
-                ClosestAlienXCoordinate = l.get(0).x;
-                ClosestAlienYCoordinate = l.get(0).y;
+                ClosestAlien = l.get(0).position;
             }
         } catch (Exception e) {
+            ClosestAlien = new Position(5, 5);
+        }
+
+        if (ClosestAlien == null) {
+            ClosestAlien = new Position(5, 5);
+
         }
 
         //Checks to see if the closest alien is withen moving capability.
-        if ((long) Math.abs((long) ClosestAlienXCoordinate - ctx.getX()) + (long) Math.abs((long) ClosestAlienYCoordinate - ctx.getY()) <= (long) ctx.getTech()) {
+        if (ctx.getDistance(ClosestAlien, ctx.getPosition()) <= (long) ctx.getTech()) {
 
-            HorizontalMove = ClosestAlienXCoordinate - ctx.getX();
-            VerticalMove = ClosestAlienYCoordinate - ctx.getY();
+            HorizontalMove = ClosestAlien.x - ctx.getPosition().x;
+            VerticalMove = ClosestAlien.y - ctx.getPosition().y;
         }
 
         //sets the amount of energy to fight with by how much energy, and how muc technology
         fightStrength = 1;
-        if (ctx.getEnergy() > 3) {
-            fightStrength = (int) ctx.getEnergy() - 2;
-            if (ctx.getEnergy() > ctx.getTech()) {
+        if (ctx.getEnergy() > 3 + ctx.getFightingCost()) {
+            fightStrength = (int) ctx.getEnergy() - ctx.getFightingCost()- 2;
+            if (fightStrength > ctx.getTech()) {
                 fightStrength = (int) ctx.getTech();
             }
 
         }
+        
+        if (HorizontalMove ==0 && VerticalMove == 0) {
+            VerticalMove = 1;
+            try {
+                if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new Direction((int)HorizontalMove, (int)VerticalMove))) != null) {
+                    VerticalMove = -1;
+                }
+            } catch (NotEnoughEnergyException ex) {
+            } catch (NotEnoughTechException ex) {
+            } catch (View.CantSeeSquareException ex) {
+            }
+        }
 
         //ctx.debugOut("Moving ("+ Integer.toString(HorizontalMove) + "," + Integer.toString(VerticalMove) + ")");
-        return new MoveDir((int) HorizontalMove, (int) VerticalMove);
+        return new Direction((int) HorizontalMove, (int) VerticalMove);
     }
 
     public Action getAction() {
@@ -99,13 +113,13 @@ public class Martian implements Alien {
 
         //checks if alien is on the same position, if so, then fights with the priorly designated amount of energy
         try {
-            if (ctx.getView((int)ctx.getTech()).getAliensAtPos(ctx.getX(), ctx.getY()).size() > 1) {
+            if (ctx.getView((int) ctx.getTech()).getAliensAtPos(ctx.getPosition()).size() > 1) {
                 ctx.debugOut("Fighting");
                 return new Action(Action.ActionCode.Fight, (fightStrength));
             }
         } catch (Exception e) {
             ctx.debugOut("Fighting");
-            return new Action(Action.ActionCode.Fight, (int) ctx.getEnergy() - 1);
+            return new Action(Action.ActionCode.Fight, fightStrength);
         }
         //if it doesnt fight, it chooses a item to do depending on how much energy it has.
         if (ctx.getEnergy() < 2) {
@@ -133,7 +147,7 @@ public class Martian implements Alien {
     }
 
     @Override
-    public void beThoughtful() {
+    public void processResults() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
