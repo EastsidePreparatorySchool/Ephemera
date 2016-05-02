@@ -69,25 +69,22 @@ public class WeepingAngel implements Alien {
             // always get energy
             if (ctx.getEnergy() < 25) {
                 // no, charge
-                ctx.debugOut("Choosing to gain Energy,"
-                                                + ctx.getStateString());
+                ctx.debugOut("Choosing to gain Energy," + ctx.getStateString());
                 return new Action(Action.ActionCode.Gain);
             } 
            
              // do we have enough tech?
             if (ctx.getTech() < 20) {
                 // no, research
-                ctx.debugOut("Choosing to research"
-                                                + ctx.getStateString());
+                ctx.debugOut("Choosing to research" + ctx.getStateString());
                 return new Action(Action.ActionCode.Research);
             }
             // every 
             turn = turn + 1;
             if (ctx.getEnergy()>= ctx.getSpawningCost() + 40 ) {
-                ctx.debugOut("Spwaning"
-                                                + ctx.getStateString());
+                ctx.debugOut("Spwaning" + ctx.getStateString());
 
-            return new Action(Action.ActionCode.Spawn,(int)ctx.getEnergy()/2) ;
+            return new Action(Action.ActionCode.Spawn,(int)(ctx.getEnergy()-ctx.getSpawningCost())/2) ;
             }
             
         } catch (Exception e) {

@@ -64,6 +64,20 @@ public class Venusian implements Alien {
         }
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
 
+        // move at least 1, but don't move into star
+        if (x == 0 && y == 0) {
+            y = 1;
+            try {
+                if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new Direction((int) x, (int) y))) != null) {
+                    y = -1;
+                }
+            } catch (NotEnoughEnergyException ex) {
+            } catch (NotEnoughTechException ex) {
+            } catch (View.CantSeeSquareException ex) {
+            }
+        }
+
+        
         return new Direction(x, y);
     }
 

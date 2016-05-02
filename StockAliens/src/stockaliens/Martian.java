@@ -5,6 +5,8 @@ package stockaliens;
 
 import alieninterfaces.*;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -80,12 +82,24 @@ public class Martian implements Alien {
 
         //sets the amount of energy to fight with by how much energy, and how muc technology
         fightStrength = 1;
-        if (ctx.getEnergy() > 3) {
-            fightStrength = (int) ctx.getEnergy() - 2;
-            if (ctx.getEnergy() > ctx.getTech()) {
+        if (ctx.getEnergy() > 3 + ctx.getFightingCost()) {
+            fightStrength = (int) ctx.getEnergy() - ctx.getFightingCost()- 2;
+            if (fightStrength > ctx.getTech()) {
                 fightStrength = (int) ctx.getTech();
             }
 
+        }
+        
+        if (HorizontalMove ==0 && VerticalMove == 0) {
+            VerticalMove = 1;
+            try {
+                if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new Direction((int)HorizontalMove, (int)VerticalMove))) != null) {
+                    VerticalMove = -1;
+                }
+            } catch (NotEnoughEnergyException ex) {
+            } catch (NotEnoughTechException ex) {
+            } catch (View.CantSeeSquareException ex) {
+            }
         }
 
         //ctx.debugOut("Moving ("+ Integer.toString(HorizontalMove) + "," + Integer.toString(VerticalMove) + ")");
@@ -105,7 +119,7 @@ public class Martian implements Alien {
             }
         } catch (Exception e) {
             ctx.debugOut("Fighting");
-            return new Action(Action.ActionCode.Fight, (int) ctx.getEnergy() - 1);
+            return new Action(Action.ActionCode.Fight, fightStrength);
         }
         //if it doesnt fight, it chooses a item to do depending on how much energy it has.
         if (ctx.getEnergy() < 2) {

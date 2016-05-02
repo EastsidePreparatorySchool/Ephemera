@@ -8,6 +8,8 @@ package gamelogic;
 import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -175,6 +177,18 @@ public class ContextImplementation implements Context {
     @Override
     public int getDistance(Position p1, Position p2) {
         return GridCircle.distance(p1, p2);
+    }
+
+    @Override
+    public List<Position> computeOrbit(Position center, int radius) {
+        GridCircle gc = new GridCircle(center.x, center.y, radius);
+        ArrayList<Position> orbit = new ArrayList<>();
+        
+        for (Position p:gc) {
+            orbit.add(p);
+        }
+        
+        return orbit;
     }
 
 }

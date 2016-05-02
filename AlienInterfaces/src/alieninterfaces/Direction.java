@@ -23,6 +23,10 @@ public class Direction {
         this.x = p2.x - p1.x;
         this.y = p2.y - p1.y;
     }
+    
+    public Direction add(Direction d1) {
+        return new Direction(x+d1.x, y+d1.y);
+    }
 
     public int getLength() {
         return Math.abs(x) + Math.abs(y);

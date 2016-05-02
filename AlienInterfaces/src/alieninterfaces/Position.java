@@ -19,9 +19,12 @@ public class Position {
         this.y = y;
     }
 
-    public Direction getDirection(Position p2) {
+    public Direction getDirectionTo(Position p2) {
         return new Direction(p2.x - x, p2.y - y);
-
+    }
+    
+    public Direction getDirectionFrom(Position p2) {
+        return new Direction(x- p2.x, y - p2.y);
     }
     
     public Position add(Direction dir) {
