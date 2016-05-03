@@ -83,23 +83,23 @@ public class Martian implements Alien {
         //sets the amount of energy to fight with by how much energy, and how muc technology
         fightStrength = 1;
         if (ctx.getEnergy() > 3 + ctx.getFightingCost()) {
-            fightStrength = (int) ctx.getEnergy() - ctx.getFightingCost()- 2;
+            fightStrength = (int) ctx.getEnergy() - ctx.getFightingCost() - 2;
             if (fightStrength > ctx.getTech()) {
                 fightStrength = (int) ctx.getTech();
             }
 
         }
-        
-        if (HorizontalMove ==0 && VerticalMove == 0) {
+
+        // move at least 1 
+        if (HorizontalMove == 0 && VerticalMove == 0) {
             VerticalMove = 1;
-            try {
-                if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new Direction((int)HorizontalMove, (int)VerticalMove))) != null) {
-                    VerticalMove = -1;
-                }
-            } catch (NotEnoughEnergyException ex) {
-            } catch (NotEnoughTechException ex) {
-            } catch (View.CantSeeSquareException ex) {
+        }
+        //but don't move into star
+        try {
+            if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new Direction((int) HorizontalMove, (int) VerticalMove))) != null) {
+                VerticalMove -= VerticalMove > 0 ? 1 : -1;
             }
+        } catch (NotEnoughEnergyException | NotEnoughTechException | View.CantSeeSquareException ex) {
         }
 
         //ctx.debugOut("Moving ("+ Integer.toString(HorizontalMove) + "," + Integer.toString(VerticalMove) + ")");

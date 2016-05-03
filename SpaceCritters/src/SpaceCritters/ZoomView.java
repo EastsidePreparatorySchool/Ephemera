@@ -6,6 +6,7 @@
 package SpaceCritters;
 
 import java.util.ArrayList;
+import javafx.geometry.Point3D;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -20,6 +21,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
+import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
@@ -79,7 +81,6 @@ public class ZoomView {
         focusX = 0.0;
         focusY = 0.0;
         zStage = new Stage(StageStyle.DECORATED);
-       
 
     }
 
@@ -179,7 +180,6 @@ public class ZoomView {
         buildAxes(root);
         root.getChildren().addAll(group);
 
-       
     }
 
     private double xFromIndex(int i) {
@@ -196,7 +196,6 @@ public class ZoomView {
 
     public Parent createView() {
 
-     
         // Create and position camera
         camera = new PerspectiveCamera(true);
         camera.getTransforms().setAll(
@@ -237,7 +236,7 @@ public class ZoomView {
         zStage.show();
         //scene.setOnMouseClicked((e) -> close());
         scene.setOnKeyPressed((e) -> controlCamera(e));
-        
+
     }
 
     public void close() {
@@ -245,37 +244,50 @@ public class ZoomView {
     }
 
     private void buildAxes(Group root) {
-        Box axis;
+        Cylinder axis;
+        double thickness = 0.1;
+        
         final PhongMaterial grayMaterial = new PhongMaterial(Color.rgb(24, 24, 24, 1.0));
         final PhongMaterial greenMaterial = new PhongMaterial(Color.GREEN);
         final PhongMaterial blueMaterial = new PhongMaterial(Color.BLUE);
         final PhongMaterial redMaterial = new PhongMaterial(Color.RED);
 
         for (int x = -width / 2; x <= width / 2; x++) {
-            axis = new Box(width*spacing, 0.05, 0.05);
+            axis = new Cylinder(thickness,width * spacing);
+            axis.setRotationAxis(new Point3D(0.0, 0.0, 1.0));
+            axis.setRotate(90);
             axis.setTranslateZ(x);
-            axis.setMaterial(grayMaterial);
+            axis.setMaterial(x == 0? redMaterial: grayMaterial);
             root.getChildren().add(axis);
 
         }
         for (int y = -height / 2; y <= height / 2; y++) {
-            axis = new Box(0.05, 0.05, height*spacing);
+            axis = new Cylinder(thickness, height * spacing);
+            axis.setRotationAxis(new Point3D(1.0, 0.0, 0.0));
+            axis.setRotate(90);
             axis.setTranslateX(y);
-            axis.setMaterial(grayMaterial);
+            axis.setMaterial(y == 0? blueMaterial: grayMaterial);
             root.getChildren().add(axis);
         }
-        
-        axis = new Box(0.06, 100*spacing, 0.06);
+
+        axis = new Cylinder(thickness, 100 * spacing);
         axis.setMaterial(greenMaterial);
         root.getChildren().addAll(axis);
+        
+                  axis = new Cylinder(thickness, height * spacing);
+            axis.setRotationAxis(new Point3D(1.0, 0.0, 0.0));
+            axis.setRotate(90);
+            axis.setTranslateX(0);
+            axis.setMaterial(blueMaterial);
+            root.getChildren().add(axis);
+   
+                      axis = new Cylinder(thickness,width * spacing);
+            axis.setRotationAxis(new Point3D(0.0, 0.0, 1.0));
+            axis.setRotate(90);
+            axis.setTranslateZ(0);
+            axis.setMaterial(redMaterial);
+            root.getChildren().add(axis);
 
-        axis = new Box(height * spacing,0.06, 0.06);
-        axis.setMaterial(redMaterial);
-        root.getChildren().addAll(axis);
-
-        axis = new Box(0.06, 0.06, height*spacing);
-        axis.setMaterial(blueMaterial);
-        root.getChildren().addAll(axis);
     }
 
     //public void focusZoomOn (int col, int row);
@@ -283,7 +295,7 @@ public class ZoomView {
         if (!this.zStage.isShowing()) {
             open();
         }
-        
+
         zStage.toFront();
 
         focusX = ((e.getX() - 1) / cellWidth) - (width / 2);

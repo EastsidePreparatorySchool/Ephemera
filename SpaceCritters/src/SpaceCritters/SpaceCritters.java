@@ -154,6 +154,7 @@ public class SpaceCritters extends Application {
                     + "logs";
 
             Utilities.createFolder(logPath);
+            Utilities.createFolder(alienPath);
 
             //gamePath += System.getProperty("file.separator");
             alienPath += System.getProperty("file.separator");

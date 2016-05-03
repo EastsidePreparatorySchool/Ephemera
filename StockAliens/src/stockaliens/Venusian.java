@@ -37,7 +37,7 @@ public class Venusian implements Alien {
         try {
             List<AlienSpecies> nearestAliens = ctx.getView((int) ctx.getTech()).getClosestXenos(
                     new AlienSpecies("eastsideprep.org", "stockaliens", "Alf", 0));
-            if (!nearestAliens.isEmpty()) {
+            if (nearestAliens != null) {
                 Position nearest = nearestAliens.get(0).position;
 
                 if (nearest.x > ctx.getPosition().x) {
@@ -64,20 +64,19 @@ public class Venusian implements Alien {
         }
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
 
-        // move at least 1, but don't move into star
+        
+        // move at least 1 
         if (x == 0 && y == 0) {
             y = 1;
-            try {
-                if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new Direction((int) x, (int) y))) != null) {
-                    y = -1;
-                }
-            } catch (NotEnoughEnergyException ex) {
-            } catch (NotEnoughTechException ex) {
-            } catch (View.CantSeeSquareException ex) {
+        }
+        //but don't move into star
+        try {
+            if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new Direction((int) x, (int) y))) != null) {
+                y -= y > 0? 1:-1;
             }
+        } catch (NotEnoughEnergyException | NotEnoughTechException | View.CantSeeSquareException ex) {
         }
 
-        
         return new Direction(x, y);
     }
 

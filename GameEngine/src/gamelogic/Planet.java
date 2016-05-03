@@ -87,7 +87,11 @@ public class Planet extends InternalSpaceObject {
             // do this on a cloned list to avoid comodification
             LinkedList<AlienContainer> acsClone = (LinkedList<AlienContainer>) acsFrom.clone();
             for (AlienContainer ac : acsClone) {
-                grid.aliens.move(ac, this.position.x, this.position.y, pNew.x, pNew.y);
+              if (ac.nextX == ac.x && ac.nextY == ac.y) {
+                  // they didn't intend to move away, move with planet
+                  ac.nextX = this.position.x;
+                  ac.nextY = this.position.y;
+              }
             }
 
             // update our position

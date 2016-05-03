@@ -84,21 +84,20 @@ public class SpaceGrid {
         removeDeadAliens();
         performReceives();
         removeDeadAliens();
-        Thread.yield();
 
         requestAlienMoves();
         movePlanets();
         removeDeadAliens();
+        
         recordAlienMoves();
         removeDeadAliens();
-        Thread.yield();
 
         performAlienActions();
         removeDeadAliens();
         resetAliens();
-        Thread.yield();
 
         processResults();
+        removeDeadAliens();
 
         currentTurn++;
 
@@ -277,7 +276,7 @@ public class SpaceGrid {
             }
         }
     }
-    
+
     public boolean isInSafeZone(AlienContainer ac) {
         return GridCircle.distance(0, 0, ac.x, ac.y) <= Constants.safeZoneRadius;
     }
@@ -353,7 +352,6 @@ public class SpaceGrid {
                 // for all other exceptions, we'll kill it. 
                 thisAlien.currentActionCode = Action.ActionCode.None;
                 thisAlien.currentActionPower = 0;
-                displayException("Unhandled exception in getAction(): ", ex);
                 thisAlien.kill("Death for unhandled exception in getAction(): " + ex.toString());
             }
         }
@@ -816,39 +814,43 @@ public class SpaceGrid {
     public void addCustomAliens(String folder, String domain) {
         String packageName;
         String className;
-        File[] files = new File(folder).listFiles();
+        File folderFile = new File(folder);
 
-        for (File f : files) {
-            if (f.isDirectory()) {
-                // recurse
-                addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), domain + f.getName() + System.getProperty("file.separator"));
-            } else if (f.getName().toLowerCase().endsWith(".jar")) {
-                try {
-                    // look for jar files and process
-                    List<String> classNames = new ArrayList<String>();
-                    ZipInputStream zip = new ZipInputStream(new FileInputStream(f));
-                    for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
-                        if (!entry.isDirectory() && entry.getName().toLowerCase().endsWith("alien.class")) {
-                            // handle classes in the default package differently
-                            if (entry.getName().lastIndexOf('/') != -1) {
-                                // named package
-                                packageName = entry.getName().substring(0, entry.getName().lastIndexOf('/'));
-                                className = entry.getName().substring(entry.getName().lastIndexOf('/') + 1).replace(".class", "");
-                            } else {
-                                //default package
-                                packageName = "";
-                                className = entry.getName().replace(".class", "");
+        if (folderFile != null) {
+            File[] files = folderFile.listFiles();
+
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    // recurse
+                    addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), domain + f.getName() + System.getProperty("file.separator"));
+                } else if (f.getName().toLowerCase().endsWith(".jar")) {
+                    try {
+                        // look for jar files and process
+                        List<String> classNames = new ArrayList<String>();
+                        ZipInputStream zip = new ZipInputStream(new FileInputStream(f));
+                        for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                            if (!entry.isDirectory() && entry.getName().toLowerCase().endsWith("alien.class")) {
+                                // handle classes in the default package differently
+                                if (entry.getName().lastIndexOf('/') != -1) {
+                                    // named package
+                                    packageName = entry.getName().substring(0, entry.getName().lastIndexOf('/'));
+                                    className = entry.getName().substring(entry.getName().lastIndexOf('/') + 1).replace(".class", "");
+                                } else {
+                                    //default package
+                                    packageName = "";
+                                    className = entry.getName().replace(".class", "");
+                                }
+
+                                addSpecies(new GameElementSpec("SPECIES",
+                                        domain + f.getName(),
+                                        packageName,
+                                        className,
+                                        "")
+                                );
                             }
-
-                            addSpecies(new GameElementSpec("SPECIES",
-                                    domain + f.getName(),
-                                    packageName,
-                                    className,
-                                    "")
-                            );
                         }
+                    } catch (Exception e) {
                     }
-                } catch (Exception e) {
                 }
             }
         }
