@@ -88,7 +88,7 @@ public class SpaceGrid {
         requestAlienMoves();
         movePlanets();
         removeDeadAliens();
-        
+
         recordAlienMoves();
         removeDeadAliens();
 
@@ -267,12 +267,6 @@ public class SpaceGrid {
 
                 }
 
-                if (isInSafeZone(ac)) {
-                    ac.turnsInSafeZone++;
-                } else {
-                    ac.turnsInSafeZone = 0;
-
-                }
             }
         }
     }
@@ -565,11 +559,17 @@ public class SpaceGrid {
                         thisAlien.kill("Death by spawning exhaustion - not enough energy to complete.");
                         break;
                     }
-
+                    
                     if (thisAlien.currentActionPower <= 0) {
                         thisAlien.kill("Death stillborn spawning - no initial power for child.");
                         break;
                     }
+                    
+                    // no spawning in safezone. makes sure squatters can't win the games.
+                    if (isInSafeZone(thisAlien)) {
+                        break;
+                    }
+                    
                     // construct a random move for the new alien depending on power and send that move through drift correction
                     // spend thisAction.power randomly on x move, y move and initital power
                     double power = thisAlien.currentActionPower;
