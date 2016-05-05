@@ -8,17 +8,9 @@ package gamelogic;
 import gameengineinterfaces.AlienSpec;
 import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
-import static gamelogic.GridCircle.distance;
 import java.lang.reflect.Constructor;
-import java.util.LinkedList;
-import java.util.List;
 import static gamelogic.GridCircle.distance;
-import static gamelogic.GridCircle.distance;
-import static gamelogic.GridCircle.distance;
-import static gamelogic.GridCircle.distance;
-import static gamelogic.GridCircle.distance;
-import static gamelogic.GridCircle.distance;
-import static gamelogic.GridCircle.distance;
+import java.util.HashMap;
 
 /**
  *
@@ -50,6 +42,8 @@ public class AlienContainer {
     double energy;
     public static boolean chatter = false;
 
+    public HashMap secrets;
+    
     boolean participatedInAction;
     public int x;
     public int y;
