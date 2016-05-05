@@ -1,5 +1,7 @@
 package gamelogic;
 
+import java.util.HashMap;
+
 /**
  *
  * @author guberti
@@ -9,9 +11,11 @@ public class Resident extends InternalSpaceObject {
     // Nothing else about residents is known, so no constructors/variables
     // are defined here yet.
     String parent;
+    HashMap secrets;
     
-    public Resident (SpaceGrid grid, int x, int y, String domainName, String packageName, String className, double energy, double tech, String parent) {
+    public Resident (SpaceGrid grid, int x, int y, String domainName, String packageName, String className, double energy, double tech, HashMap secrets, String parent) {
         super(grid, x, y, domainName, packageName, className, energy, tech);
         this.parent = parent;
+        this.secrets = secrets;
     }
 }

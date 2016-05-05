@@ -722,7 +722,10 @@ public class SpaceGrid {
     }
 
     void addResident(GameElementSpec element) {
-        Resident r = new Resident(this, element.x, element.y, element.domainName, element.packageName, element.className, element.energy, element.tech, element.parent);
+        HashMap secrets = new HashMap();
+        // TODO add code to seed Residents with secrets loaded from config file
+        // Unsure of how secrets will be added to config, see Github issue
+        Resident r = new Resident(this, element.x, element.y, element.domainName, element.packageName, element.className, element.energy, element.tech, secrets, element.parent);
     }
 
     public void addElement(GameElementSpec element) throws IOException {
