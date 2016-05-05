@@ -8,6 +8,7 @@ package gamelogic;
 import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -71,6 +72,15 @@ public class ContextImplementation implements Context {
         return Constants.fightingCost;
     }
 
+    @Override
+    public HashMap getSecrets() {
+        return new HashMap<>(ac.secrets);
+    }
+    
+    @Override
+    public int getSecret(String key) {
+        return ac.secrets.get(key);
+    }
     // alien chatter is prefixed with full info, and only talks when chatter is on
     @Override
     public void debugOut(String s) {

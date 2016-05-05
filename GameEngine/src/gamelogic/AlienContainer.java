@@ -42,7 +42,7 @@ public class AlienContainer {
     double energy;
     public static boolean chatter = false;
 
-    public HashMap secrets;
+    public HashMap<String, Integer> secrets;
     
     boolean participatedInAction;
     public int x;
@@ -71,6 +71,7 @@ public class AlienContainer {
         this.ctx = new ContextImplementation(this, vis);
         this.grid = sg;
         this.listening = false;
+        this.secrets = new HashMap<>();
 
         Alien a = null;
 

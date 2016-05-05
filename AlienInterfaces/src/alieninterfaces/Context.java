@@ -5,6 +5,7 @@
  */
 package alieninterfaces;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,6 +31,9 @@ public interface Context {
     int getGameTurn();
     List<Position> computeOrbit (Position center, int radius);
 
+    HashMap getSecrets();
+    int getSecret(String key);
+    
     void broadcastAndListen(String message, int power, boolean listen)
             throws NotEnoughTechException, NotEnoughEnergyException;
 
