@@ -518,7 +518,11 @@ public class SpaceGrid {
                                     >= sellingAlien.currentAction.sellPrice
                                     && buyingAlien.energy
                                     >= sellingAlien.currentAction.sellPrice) {
-
+                                
+                                // The two individual trading aliens exchange secrets
+                                buyingAlien.secrets.putAll(sellingAlien.secrets);
+                                sellingAlien.secrets.putAll(buyingAlien.secrets);
+                                
                                 // Perform the trade
                                 buyingAlien.energy -= sellingAlien.currentAction.sellPrice;
                                 sellingAlien.energy += sellingAlien.currentAction.sellPrice;
