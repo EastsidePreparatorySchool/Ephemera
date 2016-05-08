@@ -243,18 +243,25 @@ class VisualizationGrid implements GameVisualizer {
             GraphicsContext gc = canvas.getGraphicsContext2D();
             renderField();
 
-            String text = "Turns completed: " + paddedString(totalTurnCounter, 6)
-                    + ", Total aliens: " + paddedString(numAliens, 7);
+            String text = "Turns: " + paddedString(totalTurnCounter, 6);
+            /*
             if (time > 100000000L) {
                 text += ", time for turn: " + paddedTimeString(time)
                         + (numAliens > 0 ? ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens))) : "")
                         + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)));
             }
-            SpaceCritters.turnCounterText.setText(text);
-            speciesSet.notifyListeners();
-        });
+             */
+            SpaceCritters.currentInstance.controlPane.turnCounter.setText(text);
 
-        if (totalTurnCounter % 20 == 0) {
+            text = "Aliens: " + paddedString(numAliens, 7);
+            SpaceCritters.currentInstance.controlPane.alienNumber.setText(text);
+
+            speciesSet.notifyListeners();
+        }
+        );
+
+        if (totalTurnCounter
+                % 20 == 0) {
             try {
                 //Thread.sleep(200);
             } catch (Exception e) {
@@ -473,7 +480,7 @@ class VisualizationGrid implements GameVisualizer {
         Utilities.runAndWait(() -> {
             renderField();
             if ((boolean) Constants.getValue("autoStart")) {
-                SpaceCritters.autoStartGame();
+                SpaceCritters.currentInstance.startGame();
             }
 
         }
@@ -482,7 +489,7 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     public void renderField() {
-        if (SpaceCritters.renderSelectorAliens.isSelected()) {
+        if (SpaceCritters.currentInstance.controlPane.alienView.isSelected()) {
             renderAlienView(this.canvas.getGraphicsContext2D());
         } else {
 
@@ -498,7 +505,7 @@ class VisualizationGrid implements GameVisualizer {
     @Override
     public void setFilter(String s) {
         filter = s;
-        SpaceCritters.filterText.setText(s);
+        SpaceCritters.currentInstance.consolePane.filter.setText(s);
         filters = s.split(";");
         for (int i = 0; i < filters.length; i++) {
             filters[i] = filters[i].trim();
@@ -507,7 +514,7 @@ class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void setChatter(boolean f) {
-        SpaceCritters.chatter.setSelected(f);
+        SpaceCritters.currentInstance.consolePane.chatter.setSelected(f);
     }
 
     @Override
@@ -538,8 +545,8 @@ class VisualizationGrid implements GameVisualizer {
             }
         }
     }
-    
-      void setRenderMode(String renderMode) {
+
+    void setRenderMode(String renderMode) {
         switch (renderMode) {
             case "Aliens":
                 break;

@@ -61,35 +61,27 @@ public class SpaceCritters extends Application {
     public static GameEngineV1 engine;
     public static VisualizationGrid field;
     public static SpeciesSet species;
-    public static Text turnCounterText;
-    public static TextField filterText;
-    public static Button buttonPause;
-    public static Button buttonQuit;
-    public static Button buttonRestart;
-    public static RadioButton renderSelectorAliens;
-    public static ConsolePane console;
-    public static CheckBox chatter;
     public static Timer idleTimer;
     public static SpectrumColor spectrum = new SpectrumColor();
     public static Stage dstage;
     Stage stage;
     static ZoomView zoom;
     static SpaceCritters currentInstance; // kludge until rework is done
-    
-    // rework: new variables
-    ControlPane controlPane;
-    Stage consoleStage;
 
-    
+    // rework: new variables
+    ControlPane controlPane; // view and game controls
+    Stage consoleStage; // the window for the console
+    ConsolePane consolePane; // the console object with the print API
+
     @Override
     public void start(Stage stage) throws IOException {
 
         try {
             dstage = createSplashScreen();
-            
+
             // kludge to enable otherwise static methods
             currentInstance = this;
-            
+
             // Constants from current Ephemera game
             int width = Constants.width;
             int height = Constants.height;
@@ -115,18 +107,14 @@ public class SpaceCritters extends Application {
             BorderPane border = new BorderPane();
             border.setStyle("-fx-background-color: black;");
 
-            // add top, left and right boxes
-            border.setTop(addTopBox());
-            border.setLeft(addLeftBox());
-            //border.setRight(addFlowPane());
-            border.setBottom(addBottomBox());
-            
             controlPane = new ControlPane(this);
             border.setRight(controlPane);
-            
+
             // debug output console
             consoleStage = new Stage();
-
+            consolePane = new ConsolePane(this);
+            Scene cScene = new Scene(consolePane);
+            consoleStage.setScene(cScene);
 
             // add a center pane
             this.canvas = new Canvas(width * cellWidth + 2/*Border*/, height * cellHeight + 2);
@@ -174,7 +162,7 @@ public class SpaceCritters extends Application {
 
             // init visualizer
             this.field = new VisualizationGrid();
-            this.field.init(engine, console, species, logPath, width, height, cellWidth, cellHeight, canvas);
+            this.field.init(engine, consolePane, species, logPath, width, height, cellWidth, cellHeight, canvas);
 
             zoom = new ZoomView(field, 0, 0, width, height, cellWidth, cellHeight, field.heightPX);
 
@@ -323,103 +311,12 @@ public class SpaceCritters extends Application {
 
     }
 
-    public static void armPauseButton() {
-        buttonPause.setDisable(false);
-    }
 
     /*
      * Creates an HBox with two buttons for the top region
      */
-    private VBox addTopBox() {
 
-        VBox vbox = new VBox();
-        vbox.setPadding(new Insets(15, 12, 15, 12));
-        vbox.setSpacing(10);   // Gap between nodes
-        vbox.setStyle("-fx-background-color: black;");
-
-        HBox box = new HBox();
-        box.setPadding(new Insets(15, 12, 15, 12));
-        box.setSpacing(10);   // Gap between nodes
-        box.setStyle("-fx-background-color: black;");
-
-        buttonPause = new Button("Start");
-        buttonPause.setPrefSize(100, 20);
-        buttonPause.setOnAction((ActionEvent e) -> startOrPauseGame(e));
-
-        buttonQuit = new Button("Quit");
-        buttonQuit.setVisible(false);
-        buttonQuit.setPrefSize(100, 20);
-        buttonQuit.setOnAction((ActionEvent e) -> quit());
-
-        buttonRestart = new Button("Restart");
-        buttonRestart.setVisible(false);
-        buttonRestart.setPrefSize(100, 20);
-        buttonRestart.setOnAction((ActionEvent e) -> restart());
-        
-
-        box.getChildren().addAll(buttonPause, buttonQuit, buttonRestart, addRenderSelector());
-
-        SpaceCritters.turnCounterText = new Text("Turns completed: 0");
-        SpaceCritters.turnCounterText.setFont(Font.font("Consolas", FontWeight.BOLD, 18));
-        SpaceCritters.turnCounterText.setStyle("-fx-background-color: black;");
-        SpaceCritters.turnCounterText.setFill(Color.WHITE);
-
-        vbox.getChildren().addAll(box, SpaceCritters.turnCounterText);
-
-        return vbox;
-    }
-
-    /*     * Creates an HBox for the bottom region
-
-     */
-    private VBox addBottomBox() {
-
-        VBox vbox = new VBox();
-        vbox.setSpacing(10);   // Gap between nodes
-        vbox.setPadding(new Insets(15, 12, 15, 12));
-
-        HBox hbox = new HBox();
-
-        hbox.setPadding(new Insets(15, 12, 15, 12));
-        hbox.setSpacing(10);   // Gap between nodes
-        hbox.setStyle("-fx-background-color: black;");
-
-        HBox hb2 = new HBox();
-        hb2.setPadding(new Insets(15, 12, 15, 12));
-        hb2.setSpacing(10);   // Gap between nodes
-
-        chatter = new CheckBox("Chatter");
-        chatter.setStyle("-fx-text-fill: white;");
-        chatter.setOnAction((e) -> {
-            engine.queueCommand(
-                    new GameCommand(GameCommandCode.SetConstant, "CHATTER", chatter.isSelected() ? "true" : "false"));
-        });
-
-        filterText = new TextField("");
-        //t.setStyle("-fx-text-fill: white;");
-        filterText.setEditable(true);
-        filterText.setOnAction((e) -> field.setFilter(filterText.getText()));
-
-        Label l = new Label("   Filter:");
-        l.setStyle("-fx-text-fill: white;");
-
-        Button b1 = new Button("Set");
-        b1.setOnAction((e) -> field.setFilter(filterText.getText()));
-
-        hb2.getChildren().addAll(chatter, l, filterText, b1);
-
-        console = new ConsolePane();
-        HBox hb3 = new HBox();
-        console.setPrefWidth(1400);
-        hb3.setPrefWidth(1500);
-        hb3.getChildren().add(console);
-
-        vbox.getChildren().addAll(hb2, hb3);
-
-        return vbox;
-
-    }
-
+  
     ListView<AlienSpeciesForDisplay> addAlienSpeciesList() {
         ListView<AlienSpeciesForDisplay> speciesView = new ListView<>(species.getObservableList());
 
@@ -429,55 +326,7 @@ public class SpaceCritters extends Application {
         return speciesView;
     }
 
-    /*
-     * Creates a VBox for the left region
-     */
-    private VBox addLeftBox() {
-
-        VBox vbox = new VBox();
-        vbox.setPadding(new Insets(10)); // Set all sides to 10
-        vbox.setSpacing(8);              // Gap between nodes
-
-        vbox.setStyle("-fx-background-color: black; -fx-text-fill: white;");
-        vbox.setPrefWidth(200);
-
-        // add list of alien species
-        vbox.getChildren().add(this.addAlienSpeciesList());
-
-        return vbox;
-    }
-
-    /*
-     * Creates a horizontal flow pane for the right side
-     */
-    private FlowPane addFlowPane() {
-
-        FlowPane flow = new FlowPane();
-        flow.setPadding(new Insets(5, 0, 5, 0));
-        flow.setVgap(4);
-        flow.setHgap(4);
-        flow.setPrefWrapLength(170); // preferred width allows for two columns
-        flow.setStyle("-fx-background-color: black;");
-
-        return flow;
-    }
-
-    /*
-     * Creates a horizontal (default) top tile pane 
-     */
-    private TilePane addTilePane() {
-
-        TilePane tile = new TilePane();
-        tile.setPadding(new Insets(5, 0, 5, 0));
-        tile.setVgap(4);
-        tile.setHgap(4);
-        tile.setPrefColumns(2);
-        tile.setStyle("-fx-background-color: black;");
-
-        return tile;
-    }
-
-    static void autoStartGame() {
+     void startGame() {
         // first start
         idleTimer.cancel();
         idleTimer = null;
@@ -494,34 +343,28 @@ public class SpaceCritters extends Application {
         }
 
         engine.queueCommand(new GameCommand(GameCommandCode.Resume));
-        buttonPause.setText("Pause");
-        buttonQuit.setVisible(false);
-        buttonRestart.setVisible(false);
+        controlPane.buttonPause.setText("Pause");
 
     }
 
-    void startOrPauseGame(ActionEvent e) {
-        if (buttonPause.getText().equals("Pause")) {
+    void startOrPauseGame(ActionEvent e) {  
+        if (controlPane.buttonPause.getText().equals("Pause")) {
             // pause
             engine.queueCommand(new GameCommand(GameCommandCode.Pause));
-            buttonPause.setText("Resume");
-            buttonQuit.setVisible(true);
-            buttonRestart.setVisible(true);
+            controlPane.buttonPause.setText("Resume");
 
             TimerTask task = new ReadyTimer();
             idleTimer = new Timer();
             // scheduling the task at interval
             idleTimer.schedule(task, 0, 200);
-        } else if (buttonPause.getText().equals("Start")) {
-            autoStartGame();
+        } else if (controlPane.buttonPause.getText().equals("Start")) {
+            startGame();
         } else {
             // regular resume
             idleTimer.cancel();
             idleTimer = null;
             engine.queueCommand(new GameCommand(GameCommandCode.Resume));
-            buttonPause.setText("Pause");
-            buttonQuit.setVisible(false);
-            buttonRestart.setVisible(false);
+            controlPane.buttonPause.setText("Pause");
         }
     }
 
@@ -531,6 +374,7 @@ public class SpaceCritters extends Application {
         stage.close();
     }
 
+    // doesn't really work
     private void restart() {
         engine.queueCommand(new GameCommand(GameCommandCode.End));
         stage.close();
@@ -547,30 +391,4 @@ public class SpaceCritters extends Application {
         } catch (Exception e) {
         }
     }
-
-    private VBox addRenderSelector() {
-        ToggleGroup renderSelectorGroup = new ToggleGroup();
-
-        renderSelectorAliens = new RadioButton("Aliens");
-        renderSelectorAliens.setStyle("-fx-text-fill:white;");
-        renderSelectorAliens.setToggleGroup(renderSelectorGroup);
-        renderSelectorAliens.setSelected(true);
-
-        renderSelectorAliens.setOnAction((e) -> {
-            if (renderSelectorAliens.isSelected()) {
-                field.renderField();
-            }
-        });
-
-        RadioButton rb2 = new RadioButton("Energy");
-        rb2.setStyle("-fx-text-fill:white;");
-        rb2.setToggleGroup(renderSelectorGroup);
-
-        VBox vbox = new VBox();
-        vbox.setSpacing(5);
-        vbox.getChildren().addAll(renderSelectorAliens, rb2);
-        return vbox;
-    }
-
-  
 }

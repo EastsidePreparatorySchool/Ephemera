@@ -31,6 +31,7 @@ public final class ControlPane extends VBox {
     final HBox top;
     final VBox viewControls;
     final VBox gameControls;
+    final VBox gameStats;
     final VBox bottom;
     final ListView<AlienSpeciesForDisplay> speciesView;
 
@@ -44,6 +45,7 @@ public final class ControlPane extends VBox {
     final Button buttonPause;
     final Button buttonConsole;
     final Text turnCounter;
+    final Text alienNumber;
 
     //inside
     public ControlPane(SpaceCritters gameShellInstance) {
@@ -52,11 +54,13 @@ public final class ControlPane extends VBox {
         top = new HBox();
         viewControls = new VBox();
         gameControls = new VBox();
+        gameStats = new VBox();
         bottom = new VBox();
 
         buttonPause = new Button("Start");
         buttonConsole = new Button("Console");
         turnCounter = new Text("Turns: 0");
+        alienNumber = new Text("Aliens: 0");
         alienView = new RadioButton("Aliens");
         energyView = new RadioButton("Energy");
         techView = new RadioButton("Tech");
@@ -66,13 +70,15 @@ public final class ControlPane extends VBox {
 
         addGameControls();
         addViewControls();
+        addStats();
         createSpeciesView();
 
+   
         top.getChildren().addAll(viewControls, gameControls);
         bottom.getChildren().addAll(speciesView);
 
         this.setPrefWidth(300);
-        this.getChildren().addAll(top, speciesView);
+        this.getChildren().addAll(top, gameStats, speciesView);
     }
 
     public void addViewControls() {
@@ -111,6 +117,22 @@ public final class ControlPane extends VBox {
         viewControls.getChildren().addAll(alienView, energyView, techView);
 
     }
+    
+    public void addStats() {
+     gameStats.setPadding(new Insets(15, 12, 15, 12));
+        gameStats.setSpacing(10);
+        gameStats.setStyle("-fx-background-color: black;");
+        
+             //turnCounter.setFont(Font.font("Consolas", FontWeight.BOLD, 18));
+        turnCounter.setStyle("-fx-background-color: black;");
+        turnCounter.setFill(Color.WHITE);
+
+        //alienNumber.setFont(Font.font("Consolas", FontWeight.BOLD, 18));
+        alienNumber.setStyle("-fx-background-color: black;");
+        alienNumber.setFill(Color.WHITE);
+
+        gameStats.getChildren().addAll(turnCounter, alienNumber);
+    }
 
     public void addGameControls() {
         gameControls.setPadding(new Insets(15, 12, 15, 12));
@@ -119,18 +141,13 @@ public final class ControlPane extends VBox {
 
         buttonPause.setPrefSize(100, 20);
         buttonPause.setOnAction((ActionEvent e) -> {
-            buttonPause.setText(buttonPause.getText().equals("Start") ? "Pause":"Start");
             gameShell.startOrPauseGame(e);
         });
 
         buttonConsole.setPrefSize(100, 20);
         buttonConsole.setOnAction((ActionEvent e) -> gameShell.consoleStage.show());
 
-        turnCounter.setFont(Font.font("Consolas", FontWeight.BOLD, 18));
-        turnCounter.setStyle("-fx-background-color: black;");
-        turnCounter.setFill(Color.WHITE);
-
-        gameControls.getChildren().addAll(buttonPause, buttonConsole, turnCounter);
+        gameControls.getChildren().addAll(buttonPause, buttonConsole);
     }
 
     public void createSpeciesView() {

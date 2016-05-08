@@ -45,7 +45,7 @@ public class SpeciesListCell extends CheckBoxListCell<AlienSpeciesForDisplay> {
             this.setStyle(item.getStyle());
             String s = item.toString();
             if(s.startsWith("ephemera.eastsideprep.org:stockaliens:")) {
-                s = s.replace("ephemera.eastsideprep.org:stockaliens:", "System::");
+                s = s.replace("ephemera.eastsideprep.org:stockaliens:", "System:");
             }
             setText(s);
         } else {

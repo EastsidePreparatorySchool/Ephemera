@@ -19,6 +19,7 @@ import java.util.List;
 public class ViewImplementation implements View {
 
     private AlienGrid ag;
+    public AlienContainer ac;
     private int centerX;
     private int centerY;
     public int size;
@@ -30,8 +31,9 @@ public class ViewImplementation implements View {
         this.size = 0;
     }
 
-    public ViewImplementation(AlienGrid ag, int centerX, int centerY, int size) {
+    public ViewImplementation(AlienGrid ag, AlienContainer ac, int centerX, int centerY, int size) {
         this.ag = ag;
+        this.ac = ac;
         this.centerX = centerX;
         this.centerY = centerY;
         this.size = size;
@@ -167,6 +169,7 @@ public class ViewImplementation implements View {
     public List<AlienSpecies> getClosestXenos(AlienSpecies notThisOne) {
 
         ArrayList<AlienSpecies> as = new ArrayList<>();
+        int notThisID = this.ac.speciesID;
 
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
@@ -174,7 +177,7 @@ public class ViewImplementation implements View {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     for (AlienContainer ac : acs) {
-                        if (!ac.getFullSpeciesName().equalsIgnoreCase(notThisOne.getFullSpeciesName())) {
+                        if (ac.speciesID != notThisID) {
                             as.add(ac.getAlienSpecies());
                         }
                     }
