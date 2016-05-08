@@ -79,6 +79,10 @@ public final class ControlPane extends VBox {
 
         this.setPrefWidth(300);
         this.getChildren().addAll(top, gameStats, speciesView);
+        
+        this.setPrefSize(300, 800);
+        this.setMaxSize(500,1920);
+        this.setMinSize(200,500);
     }
 
     public void addViewControls() {

@@ -19,6 +19,7 @@ public class PlanetForDisplay {
     String name;
     double energy;
     double tech;
+    int index;
     
     public PlanetForDisplay(int x, int y, String name, double energy, double tech) {
         this.x = x;

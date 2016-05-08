@@ -25,21 +25,21 @@ import javafx.scene.shape.StrokeLineCap;
  *
  * @author gmein
  */
-class VisualizationGrid implements GameVisualizer {
+public class VisualizationGrid implements GameVisualizer {
 
+    public SpaceCritters gameShell;
     public Cell[][] grid;
     public Canvas canvas;
     public SpeciesSet speciesSet;
     public ArrayList<StarForDisplay> stars;
     public ArrayList<PlanetForDisplay> planets;
 
-    private int width;
-    private int height;
-    private int cellWidth;
-    private int cellHeight;
+    public int width;
+    public int height;
+    public int cellWidth;
+    public int cellHeight;
     public int widthPX;
     public int heightPX;
-    public int safeZoneSize = 10;
 
     public ConsolePane console;
 
@@ -57,8 +57,9 @@ class VisualizationGrid implements GameVisualizer {
     BufferedWriter logFile;
     GameEngine engine;
 
-    public void init(GameEngine eng, ConsolePane console, SpeciesSet species, String logPath, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
+    public void init(SpaceCritters gameShellInstance, GameEngine eng, ConsolePane console, SpeciesSet species, String logPath, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
         Date date = new Date();
+        this.gameShell = gameShellInstance;
         this.engine = eng;
 
         // Set up properties
@@ -461,8 +462,10 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void registerStar(int x, int y, String name, double luminosity) {
+    public void registerStar(int x, int y, String name, int index, double luminosity) {
         Utilities.runSafe(() -> stars.add(new StarForDisplay(x + this.width / 2, y + this.height / 2, name, luminosity)));
+        Utilities.runSafe(() -> gameShell.mainScene.createStar(x, y, name, index, luminosity));
+
     }
 
     @Override

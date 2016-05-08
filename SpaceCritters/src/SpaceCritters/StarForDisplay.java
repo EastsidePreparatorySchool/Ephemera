@@ -22,6 +22,7 @@ public class StarForDisplay {
     int flicker;
     long lastTime;
     int lastFlicker;
+    int index; // index in ArrayList of stars in both engine and visualizer
 
     public StarForDisplay(int x, int y, String name, double energy) {
         this.x = x;

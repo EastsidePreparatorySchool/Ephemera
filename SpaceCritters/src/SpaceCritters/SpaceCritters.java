@@ -24,12 +24,9 @@ import javafx.stage.Screen;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -37,11 +34,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import static javafx.application.Application.launch;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -72,6 +64,7 @@ public class SpaceCritters extends Application {
     ControlPane controlPane; // view and game controls
     Stage consoleStage; // the window for the console
     ConsolePane consolePane; // the console object with the print API
+    Scene3D mainScene; // the object controlling the main 3D display, not actually a scene (yet)
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -87,34 +80,23 @@ public class SpaceCritters extends Application {
             int height = Constants.height;
             this.stage = stage;
 
+            // keep track of species, need this before constructing UI
+            species = new SpeciesSet();
+
             // get screen geometry
             javafx.geometry.Rectangle2D screenBounds;
             double w = Screen.getPrimary().getDpi();
             screenBounds = Screen.getPrimary().getVisualBounds();
-
-            // TODO: Make this adapt better to available space (from bounds)
             int cellWidth = screenBounds.getWidth() < 1900 ? 2 : 3;
             int cellHeight = 1;
-
-            // keep track of species, need this before constructing UI
-            species = new SpeciesSet();
-
-            // set up main window
             stage.setTitle("SpaceCritters V0.90");
             setSize(stage, screenBounds);
+            
 
-            // Use a border pane as the root for scene
             BorderPane border = new BorderPane();
             border.setStyle("-fx-background-color: black;");
-
             controlPane = new ControlPane(this);
             border.setRight(controlPane);
-
-            // debug output console
-            consoleStage = new Stage();
-            consolePane = new ConsolePane(this);
-            Scene cScene = new Scene(consolePane);
-            consoleStage.setScene(cScene);
 
             // add a center pane
             this.canvas = new Canvas(width * cellWidth + 2/*Border*/, height * cellHeight + 2);
@@ -122,18 +104,17 @@ public class SpaceCritters extends Application {
             hb.setPadding(new Insets(15, 12, 15, 12));
             hb.getChildren().add(canvas);
             hb.setAlignment(Pos.TOP_LEFT);
-            border.setCenter(hb);
+            //border.setCenter(hb);
             GraphicsContext gc = canvas.getGraphicsContext2D();
-
             canvas.setOnMouseClicked((e) -> zoom.focus(e));
 
-            //
-            // initialize Ephemera game engine and visualizer
-            //
-            //get some objects created (not initialized, nothing important happens here)
-            engine = new GameEngineV1();
+            // debug output console
+            consoleStage = new Stage();
+            consolePane = new ConsolePane(this);
+            Scene cScene = new Scene(consolePane);
+            consoleStage.setScene(cScene);
 
-            // can override the path for class jar files in arguments
+            // construct path to important game folders
             String gamePath = System.getProperty("user.dir");
             gamePath = gamePath.toLowerCase();
 
@@ -147,48 +128,56 @@ public class SpaceCritters extends Application {
                 gamePath += System.getProperty("file.separator");
             }
 
-            String alienPath = gamePath
-                    + "aliens";
+            String alienPath = gamePath + "aliens";
+            String logPath = gamePath + "logs";
 
-            String logPath = gamePath
-                    + "logs";
-
+            // make sure these exist
             Utilities.createFolder(logPath);
             Utilities.createFolder(alienPath);
 
-            //gamePath += System.getProperty("file.separator");
             alienPath += System.getProperty("file.separator");
             logPath += System.getProperty("file.separator");
 
-            // init visualizer
+            //
+            // initialize Ephemera game engine and visualizer
+            //
+            //get some objects created (not initialized, nothing important happens here)
+            engine = new GameEngineV1();
             this.field = new VisualizationGrid();
-            this.field.init(engine, consolePane, species, logPath, width, height, cellWidth, cellHeight, canvas);
+            zoom = new ZoomView(field, 0, 0, width, height, cellWidth, cellHeight, height * cellHeight);
 
-            zoom = new ZoomView(field, 0, 0, width, height, cellWidth, cellHeight, field.heightPX);
-
-            // get engine up and running
+            // now initialize
+            this.field.init(this, engine, consolePane, species, logPath, width, height, cellWidth, cellHeight, canvas);
             engine.initFromFile(field, gamePath, alienPath, "sc_config.csv");
+
+            // need field to be alive before constructing this
+            mainScene = new Scene3D(this, (int)screenBounds.getWidth() - 220, (int)screenBounds.getHeight() - 20);
 
             // set a hook to shut down engine on game exit
             stage.setOnCloseRequest(e -> handleExit());
 
             // set scene and stage
+
+            border.setCenter(mainScene.outer);
             Scene scene = new Scene(border);
+            scene.setOnKeyPressed((e) -> mainScene.controlCamera(e));
+            mainScene.outer.requestFocus();
 
             stage.setScene(scene);
+
             stage.show();
 
+            // show the splash sceen unless we have autostart
             if (!(boolean) Constants.getValue("autoStart")) {
                 dstage.show();
             }
-
+            // and tell the engine (and through it, the shell) that we are done adding elements
             engine.queueCommand(new GameCommand(GameCommandCode.Ready));
 
+            // create a timer to create the idle doodling (star flicker)
             TimerTask task = new ReadyTimer();
             idleTimer = new Timer();
-
-            // scheduling the task at interval
-            idleTimer.schedule(task, 0, 200);
+        //idleTimer.schedule(task, 0, 200);
             // return to platform and wait for events
 
         } catch (Exception e) {
@@ -315,8 +304,6 @@ public class SpaceCritters extends Application {
     /*
      * Creates an HBox with two buttons for the top region
      */
-
-  
     ListView<AlienSpeciesForDisplay> addAlienSpeciesList() {
         ListView<AlienSpeciesForDisplay> speciesView = new ListView<>(species.getObservableList());
 
@@ -326,7 +313,7 @@ public class SpaceCritters extends Application {
         return speciesView;
     }
 
-     void startGame() {
+    void startGame() {
         // first start
         idleTimer.cancel();
         idleTimer = null;
@@ -347,7 +334,7 @@ public class SpaceCritters extends Application {
 
     }
 
-    void startOrPauseGame(ActionEvent e) {  
+    void startOrPauseGame(ActionEvent e) {
         if (controlPane.buttonPause.getText().equals("Pause")) {
             // pause
             engine.queueCommand(new GameCommand(GameCommandCode.Pause));

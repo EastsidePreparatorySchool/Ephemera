@@ -717,7 +717,7 @@ public class SpaceGrid {
         Star st = new Star(this, element.x, element.y, element.domainName, element.packageName, element.className, element.energy, element.tech);
         objects.add(st);
         this.aliens.plugStar(st);
-        vis.registerStar(element.x, element.y, element.className, element.energy);
+        vis.registerStar(element.x, element.y, element.className, objects.indexOf(st), element.energy);
         aliens.distributeStarEnergy(element.x, element.y, element.energy);
     }
 

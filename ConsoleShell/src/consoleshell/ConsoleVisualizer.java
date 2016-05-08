@@ -253,7 +253,7 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void registerStar(int x, int y, String name, double magnitude) {
+    public void registerStar(int x, int y, String name, int index, double magnitude) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
