@@ -29,8 +29,8 @@ public class AlienSpeciesForDisplay {
     private final StringProperty name = new SimpleStringProperty();
     private final BooleanProperty on = new SimpleBooleanProperty();
 
-    static Color[] alienColors = {Color.BLUE, Color.YELLOW, Color.LIGHTPINK, Color.LIGHTGREEN, Color.ORANGE};
-    static String[] alienStyles = {"blue", "yellow", "lightpink", "lightgreen", "orange"};
+    static Color[] alienColors = {Color.LIGHTBLUE, Color.YELLOW, Color.LIGHTPINK, Color.LIGHTGREEN, Color.ORANGE};
+    static String[] alienStyles = {"lightblue", "yellow", "lightpink", "lightgreen", "orange"};
     static int colorCount = 0;
 
     AlienSpeciesForDisplay(String speciesName) {

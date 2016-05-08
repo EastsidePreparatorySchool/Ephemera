@@ -357,7 +357,7 @@ class VisualizationGrid implements GameVisualizer {
         } catch (Exception e) {
         }
         debugOut("Game Over");
-        Utilities.runSafe(() -> SpaceCritters.startOrPauseGame(new ActionEvent()));
+        Utilities.runSafe(() -> SpaceCritters.currentInstance.startOrPauseGame(new ActionEvent()));
     }
 
     @Override
@@ -536,6 +536,19 @@ class VisualizationGrid implements GameVisualizer {
                 this.grid[oldxindex][oldyindex].cellChanged = true;
 
             }
+        }
+    }
+    
+      void setRenderMode(String renderMode) {
+        switch (renderMode) {
+            case "Aliens":
+                break;
+            case "Energy":
+                break;
+            case "Tech":
+                break;
+            default:
+                break;
         }
     }
 

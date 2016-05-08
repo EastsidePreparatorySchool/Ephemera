@@ -74,17 +74,22 @@ public class SpaceCritters extends Application {
     public static Stage dstage;
     Stage stage;
     static ZoomView zoom;
+    static SpaceCritters currentInstance; // kludge until rework is done
+    
+    // rework: new variables
+    ControlPane controlPane;
+    Stage consoleStage;
 
+    
     @Override
     public void start(Stage stage) throws IOException {
 
         try {
             dstage = createSplashScreen();
-            /*
-            if (true) {
-                return;
-            }
-             */
+            
+            // kludge to enable otherwise static methods
+            currentInstance = this;
+            
             // Constants from current Ephemera game
             int width = Constants.width;
             int height = Constants.height;
@@ -115,6 +120,13 @@ public class SpaceCritters extends Application {
             border.setLeft(addLeftBox());
             //border.setRight(addFlowPane());
             border.setBottom(addBottomBox());
+            
+            controlPane = new ControlPane(this);
+            border.setRight(controlPane);
+            
+            // debug output console
+            consoleStage = new Stage();
+
 
             // add a center pane
             this.canvas = new Canvas(width * cellWidth + 2/*Border*/, height * cellHeight + 2);
@@ -343,6 +355,7 @@ public class SpaceCritters extends Application {
         buttonRestart.setVisible(false);
         buttonRestart.setPrefSize(100, 20);
         buttonRestart.setOnAction((ActionEvent e) -> restart());
+        
 
         box.getChildren().addAll(buttonPause, buttonQuit, buttonRestart, addRenderSelector());
 
@@ -487,7 +500,7 @@ public class SpaceCritters extends Application {
 
     }
 
-    static void startOrPauseGame(ActionEvent e) {
+    void startOrPauseGame(ActionEvent e) {
         if (buttonPause.getText().equals("Pause")) {
             // pause
             engine.queueCommand(new GameCommand(GameCommandCode.Pause));
@@ -558,4 +571,6 @@ public class SpaceCritters extends Application {
         vbox.getChildren().addAll(renderSelectorAliens, rb2);
         return vbox;
     }
+
+  
 }
