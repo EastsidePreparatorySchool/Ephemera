@@ -13,8 +13,8 @@ public class Resident extends InternalSpaceObject {
     String parent;
     HashMap secrets;
     
-    public Resident (SpaceGrid grid, int x, int y, String domainName, String packageName, String className, double energy, double tech, HashMap secrets, String parent) {
-        super(grid, x, y, domainName, packageName, className, energy, tech);
+    public Resident (SpaceGrid grid, int x, int y, int index, String domainName, String packageName, String className, double energy, double tech, HashMap secrets, String parent) {
+        super(grid, x, y, index, domainName, packageName, className, energy, tech);
         this.parent = parent;
         this.secrets = secrets;
     }

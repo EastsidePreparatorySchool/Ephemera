@@ -22,6 +22,7 @@ public class AlienSpeciesForDisplay {
     String domainName;
     String packageName;
     String className;
+    int id;
 
     int count;
     Color color;
@@ -33,9 +34,10 @@ public class AlienSpeciesForDisplay {
     static String[] alienStyles = {"lightblue", "yellow", "lightpink", "lightgreen", "orange"};
     static int colorCount = 0;
 
-    AlienSpeciesForDisplay(String speciesName) {
+    AlienSpeciesForDisplay(String speciesName, int id) {
         this.speciesName = speciesName;
         this.count = 0; 
+        this.id = id;
         this.color = alienColors[colorCount % alienColors.length];
         this.style = alienStyles[colorCount % alienColors.length];
         colorCount++;
@@ -49,6 +51,7 @@ public class AlienSpeciesForDisplay {
         this.packageName = as.packageName;
         this.className = as.className;
         this.speciesName = as.getFullSpeciesName();
+        this.id = as.speciesID;
         this.count = 0; 
         this.color = alienColors[colorCount % alienColors.length];
         this.style = alienStyles[colorCount % alienColors.length];

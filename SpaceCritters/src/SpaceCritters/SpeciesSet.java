@@ -7,7 +7,6 @@ package SpaceCritters;
 
 import gameengineinterfaces.AlienSpec;
 import java.util.Iterator;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
@@ -37,16 +36,16 @@ public class SpeciesSet {
         }
     }
 
-    public void addAlien(String speciesName) {
+    public void addAlien(String speciesName, int id) {
         for (AlienSpeciesForDisplay as : speciesList) {
-            if (as.speciesName.equalsIgnoreCase(speciesName)) {
+            if (as.id == id) {
                 as.count++;
                 return;
             }
         }
 
         // if we got here, no matching species found
-        AlienSpeciesForDisplay as = new AlienSpeciesForDisplay(speciesName);
+        AlienSpeciesForDisplay as = new AlienSpeciesForDisplay(speciesName, id);
         Utilities.runSafe(() -> speciesList.add(as));
         as.setOn(true);
 
@@ -58,11 +57,11 @@ public class SpeciesSet {
         asfd.setOn(true);
     }
 
-    public void removeAlien(String speciesName) {
+    public void removeAlien(String speciesName, int speciesId) {
         Iterator<AlienSpeciesForDisplay> iter = speciesList.iterator();
         while (iter.hasNext()) {
             AlienSpeciesForDisplay as = iter.next();
-            if (as.speciesName.equals(speciesName)) {
+            if (as.id == speciesId) {
                 as.count--;
 
                 // if this is the last one, take it out
@@ -87,9 +86,9 @@ public class SpeciesSet {
         }
     }
 
-    public Color getColor(String speciesName) {
+    public Color getColor(String speciesName, int id) {
         for (AlienSpeciesForDisplay as : speciesList) {
-            if (as.speciesName.equals(speciesName)) {
+            if (as.id == id) {
                 return as.color;
             }
         }

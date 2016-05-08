@@ -5,7 +5,9 @@
  */
 package SpaceCritters;
 
-import java.util.ArrayList;
+import gameengineinterfaces.AlienSpec;
+import java.util.HashMap;
+import java.util.HashSet;
 import javafx.geometry.Point3D;
 import javafx.geometry.Pos;
 import javafx.scene.AmbientLight;
@@ -16,13 +18,13 @@ import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.PickResult;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
-import javafx.scene.shape.DrawMode;
-import javafx.scene.shape.Sphere;
+import javafx.scene.shape.Shape3D;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 
@@ -36,12 +38,16 @@ public class Scene3D {
     final private int pxX;
     final private int pxY;
     final SpaceCritters gameShell;
-    final public HBox outer;
+    final HBox outer;
     final Group root;
+    final Group grid;
+    boolean gridVisible;
 
     // master lists
-    final private ArrayList<Star3D> stars;
-    final private ArrayList<PlanetForDisplay> planets;
+    final HashMap<Integer, Star3D> stars;
+    final HashMap<Integer, Planet3D> planets;
+    final HashMap<Integer, Alien3D> aliens;
+    final HashSet<Alien3D> updateSet;
 
     // camera
     final private PerspectiveCamera camera;
@@ -58,8 +64,10 @@ public class Scene3D {
 
     public Scene3D(SpaceCritters gameShellInstance, int widthPX, int heightPX) {
         this.gameShell = gameShellInstance;
-        this.stars = new ArrayList(50);
-        this.planets = new ArrayList(50);
+        this.stars = new HashMap(50);
+        this.planets = new HashMap(50);
+        this.aliens = new HashMap(100000);
+        this.updateSet = new HashSet(100000);
 
         // initial camera values
         this.xRot = -20;
@@ -74,11 +82,9 @@ public class Scene3D {
         this.root = new Group();
 
         // axes
-        buildAxes(root);
-        Box box = new Box(10, 10, 10);
-        box.setMaterial(new PhongMaterial(Color.RED));
-        box.setDrawMode(DrawMode.FILL);
-        root.getChildren().add(box);
+        this.grid = buildAxes();
+        this.gridVisible = true;
+        this.root.getChildren().addAll(this.grid);
 
         AmbientLight aLight = new AmbientLight(Color.rgb(50, 50, 50));
         pLight = new PointLight(Color.ANTIQUEWHITE);
@@ -109,6 +115,7 @@ public class Scene3D {
         outer = new HBox(subScene);
         subScene.widthProperty().bind(outer.widthProperty());
         subScene.heightProperty().bind(outer.heightProperty());
+        subScene.setOnMouseClicked((e) -> focus(e));
 
         outer.setPrefSize(pxX, pxY);
         outer.setMaxSize(pxX, pxY);
@@ -123,20 +130,33 @@ public class Scene3D {
         Star3D star = new Star3D(gameShell, x, y, name, index, energy);
 
         this.root.getChildren().add(star.s);
-        this.stars.add(star);
-        assert this.stars.indexOf(star) == star.index;
+        this.stars.put(index, star);
     }
 
-    public void addPlanet(PlanetForDisplay planet) {
-        Sphere s = new Sphere(0.5);
-        s.setMaterial(new PhongMaterial(Color.GREEN));
-        s.setDrawMode(DrawMode.FILL);
-        s.setTranslateX(xFromX(planet.x));
-        s.setTranslateY(objectElevation);
-        s.setTranslateZ(zFromY(planet.y));
-        this.root.getChildren().add(s);
+    public void createPlanet(int x, int y, String name, int index, double energy, int tech) {
 
-        this.planets.add(planet.index, planet); // add at same index as on engine side
+        Planet3D planet = new Planet3D(gameShell, x, y, name, index, energy);
+
+        this.root.getChildren().add(planet.s);
+        this.planets.put(index, planet);
+    }
+
+    public void createAlien(AlienSpec as, int id, int x, int y) {
+        Alien3D alien = new Alien3D(gameShell, as, id, x, y);
+        this.aliens.put(as.hashCode, alien);
+
+        // alien is added with isNew == true, this leads to update() adding it to the visuals
+        this.updateSet.add(alien);
+    }
+
+    public void destroyAlien(AlienSpec as, int id, int x, int y) {
+        Alien3D alien = this.aliens.get(as.hashCode);
+        assert (alien != null);
+
+        alien.killMe = true;
+
+        // remove it later on the UI thread
+        this.updateSet.add(alien);
     }
 
     double xFromX(int x) {
@@ -151,8 +171,10 @@ public class Scene3D {
         return (y) * spacing;
     }
 
-    private void buildAxes(Group root) {
+    private Group buildAxes() {
         Cylinder axis;
+        Group root = new Group();
+
         double thickness = 0.07;
 
         final PhongMaterial grayMaterial = new PhongMaterial(Color.rgb(24, 24, 24, 1.0));
@@ -165,6 +187,7 @@ public class Scene3D {
             axis.setRotationAxis(new Point3D(0.0, 0.0, 1.0));
             axis.setRotate(90);
             axis.setTranslateZ(x);
+            axis.setTranslateY(1);
             axis.setMaterial(x == 0 ? redMaterial : grayMaterial);
             root.getChildren().add(axis);
 
@@ -174,6 +197,7 @@ public class Scene3D {
             axis.setRotationAxis(new Point3D(1.0, 0.0, 0.0));
             axis.setRotate(90);
             axis.setTranslateX(y);
+            axis.setTranslateY(1);
             axis.setMaterial(y == 0 ? blueMaterial : grayMaterial);
             root.getChildren().add(axis);
         }
@@ -186,6 +210,7 @@ public class Scene3D {
         axis.setRotationAxis(new Point3D(1.0, 0.0, 0.0));
         axis.setRotate(90);
         axis.setTranslateX(0);
+        axis.setTranslateY(1);
         axis.setMaterial(blueMaterial);
         root.getChildren().add(axis);
 
@@ -193,22 +218,41 @@ public class Scene3D {
         axis.setRotationAxis(new Point3D(0.0, 0.0, 1.0));
         axis.setRotate(90);
         axis.setTranslateZ(0);
+        axis.setTranslateY(1);
         axis.setMaterial(redMaterial);
         root.getChildren().add(axis);
 
+        // plate to alwasy have someting to click on
+        Box plate = new Box(gameShell.field.width * spacing, 0, gameShell.field.height * spacing);
+        plate.setMaterial(new PhongMaterial(Color.DARKRED));
+        plate.setTranslateY(1 + 2 * thickness);
+        root.getChildren().add(plate);
+
+        return root;
     }
 
     public void focus(MouseEvent e) {
-        focusX = 0;
-        focusY = 0;
+        if (e.getClickCount() > 1) {
+            PickResult res = e.getPickResult();
+            if (res.getIntersectedNode() instanceof Shape3D) {
+                Shape3D shape = (Shape3D) res.getIntersectedNode();
+                focusX = shape.getTranslateX() + res.getIntersectedPoint().getX();
+                focusY = shape.getTranslateZ() + res.getIntersectedPoint().getZ();
+                gameShell.field.debugOut("Focus: " + focusX + ", " + focusY);
+            } else {
+                focusX = 0;
+                focusY = 0;
+            }
 
-        camera.getTransforms().setAll(
-                new Translate(focusX, 0, focusY),
-                new Rotate(yRot, Rotate.Y_AXIS),
-                new Rotate(xRot, Rotate.X_AXIS),
-                new Translate(0, 0, zTrans)
-        );
+            zTrans *= 0.7;
 
+            camera.getTransforms().setAll(
+                    new Translate(focusX, 0, focusY),
+                    new Rotate(yRot, Rotate.Y_AXIS),
+                    new Rotate(xRot, Rotate.X_AXIS),
+                    new Translate(0, 0, zTrans)
+            );
+        }
         e.consume();
     }
 
@@ -265,16 +309,25 @@ public class Scene3D {
             case PAGE_DOWN:
                 objectElevation = 0;
                 break;
+
+            case G:
+                if (gridVisible) {
+                    root.getChildren().removeAll(grid);
+                } else {
+                    root.getChildren().addAll(grid);
+                }
+                gridVisible = !gridVisible;
+                break;
             default:
                 return; // do not consumer this event if you can't handle it
         }
 
         camera.getTransforms().setAll(
-                        new Translate(focusX, 0, focusY),
-                        new Rotate(yRot, Rotate.Y_AXIS),
-                        new Rotate(xRot, Rotate.X_AXIS),
-                        new Translate(0, 0, zTrans)
-                );
+                new Translate(focusX, 0, focusY),
+                new Rotate(yRot, Rotate.Y_AXIS),
+                new Rotate(xRot, Rotate.X_AXIS),
+                new Translate(0, 0, zTrans)
+        );
         pLight.getTransforms().setAll(
                 new Translate(focusX, 0, focusY),
                 new Rotate(yRot, Rotate.Y_AXIS),
@@ -285,36 +338,26 @@ public class Scene3D {
         e.consume();
     }
 
+    void update() {
+        for (Planet3D p : planets.values()) {
+            p.updatePosition();
+        }
+
+        for (Alien3D a : updateSet) {
+            if (a.killMe) {
+                this.aliens.remove(a);
+                this.root.getChildren().remove(a.alien);
+            } else {
+                a.updatePosition();
+            }
+        }
+
+        updateSet.clear();
+    }
+
 }
 
 /*
-    //aliens
-    ArrayList<Node> objects = new ArrayList<>();
-    for (int i = mincol;
-    i< mincol + width ;
-    i
-
-    
-        ++) {
-            for (int j = minrow; j < minrow + height; j++) {
-            Cell cell = grid[i][j];
-            if (cell.alienCount > 0) {
-                int y = 0;
-                if (cell.speciesMap != null) {
-                    for (CellInfo ci : cell.speciesMap.values()) {
-                        for (int k = 0; k < ci.count; k++) {
-                            Box alien = new Box(0.5, 0.5, 0.5);
-                            alien.setMaterial(new PhongMaterial(ci.color));
-                            alien.setDrawMode(DrawMode.FILL);
-                            alien.setTranslateX(xFromIndex(i));
-                            alien.setTranslateY(yFromIndex(y));
-                            alien.setTranslateZ(zFromIndex(j));
-
-                            objects.add(alien);
-                            y++;
-                        }
-                    }
-                }
                 int fighting = cell.fightCountNoDecrement();
                 if (fighting > 0) {
                     y = cell.totalFighters;
@@ -337,29 +380,5 @@ public class Scene3D {
                     box.setOpacity(0.05);
                     objects.add(box);
 
-                }
-            }
-        }
-    }
-
-    }
-
-    public void open() {
-        zStage.setResizable(false);
-
-        javafx.geometry.Rectangle2D sb;
-        sb = Screen.getPrimary().getVisualBounds();
-
-        zStage.setX(sb.getMaxX() - pxX);
-        zStage.setY(sb.getMaxY() - pxY);
-
-        Scene scene = new Scene(createView());
-        zStage.setScene(scene);
-        zStage.show();
-        //scene.setOnMouseClicked((e) -> close());
-        
-
-    }
-
-
+  
  */

@@ -22,9 +22,9 @@ public class Planet extends InternalSpaceObject {
     int orbitalVelocityCounter;
     Position parentPosition;
 
-    public Planet(SpaceGrid grid, int parentx, int parenty, int radius, String domainName, String packageName, String className,
+    public Planet(SpaceGrid grid, int parentx, int parenty, int radius, int index, String domainName, String packageName, String className,
             double energy, double tech, String parent) {
-        super(grid, parentx, parenty, domainName, packageName, className, energy, tech);
+        super(grid, parentx, parenty, index, domainName, packageName, className, energy, tech);
         this.parent = parent;
         this.parentPosition = new Position(parentx, parenty);
         this.radius = radius;
@@ -101,7 +101,7 @@ public class Planet extends InternalSpaceObject {
             this.grid.aliens.plugPlanet(this);
 
             // visualize
-            this.grid.vis.showPlanetMove(pOld.x, pOld.y, pNew.x, pNew.y, className, energy, tech);
+            this.grid.vis.showPlanetMove(pOld.x, pOld.y, pNew.x, pNew.y, className, this.index, energy, (int)tech);
         }
         return this.position;
     }

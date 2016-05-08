@@ -23,11 +23,12 @@ public abstract class InternalSpaceObject {
     private String fullName;
     protected SpaceGrid grid;
     protected boolean isPlanet = false;
+    protected int index; 
 
     public double energy; // Energy that aliens gain every turn from the planet
     public double tech; // Tech boost for the planet
 
-    public InternalSpaceObject(SpaceGrid grid, int x, int y, String domainName, String packageName, String className, double energy, double tech) {
+    public InternalSpaceObject(SpaceGrid grid, int x, int y, int index, String domainName, String packageName, String className, double energy, double tech) {
         this.position = new Position (x,y);
         this.energy = energy;
         this.tech = tech;
@@ -35,6 +36,7 @@ public abstract class InternalSpaceObject {
         this.packageName = packageName;
         this.className = className;
         this.grid = grid;
+        this.index = index;
     }
 
     public String getFullName() {

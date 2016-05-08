@@ -15,33 +15,49 @@ import javafx.scene.shape.Sphere;
  *
  * @author gunnar
  */
-public class Star3D {
+public class Planet3D {
 
     final private SpaceCritters gameShell;
-    final public int x;
-    final public int y;
+    public int x;
+    public int y;
     final public String name;
     final public double energy;
-    final public int index; // index in ArrayList of stars in both engine and visualizer
+    final public int index;
     final public Sphere s;
+    int nextX;
+    int nextY;
 
-    public Star3D(SpaceCritters gameShellInstance, int x, int y, String name, int index, double energy) {
+    public Planet3D(SpaceCritters gameShellInstance, int x, int y, String name, int index, double energy) {
         this.gameShell = gameShellInstance;
         this.x = x;
         this.y = y;
         this.name = name;
         this.energy = energy;
         this.index = index;
+        this.nextX = 0;
+        this.nextY = 0;
 
-        this.s = new Sphere(1.0);
-        s.setMaterial(new PhongMaterial(Color.WHITE));
+        this.s = new Sphere(0.7);
+        s.setMaterial(new PhongMaterial(Color.GREEN));
         s.setDrawMode(DrawMode.FILL);
         s.setTranslateX(gameShell.mainScene.xFromX(x));
         s.setTranslateY(gameShell.mainScene.objectElevation);
         s.setTranslateZ(gameShell.mainScene.zFromY(y));
-        Glow glow = new Glow(1.0);
-        glow.setLevel(1.0);
-        s.setEffect(glow);
     }
 
+    public void recordMoveTo(int x, int y) {
+        this.nextX = x;
+        this.nextY = y;
+    }
+
+    public void updatePosition() {
+        if (nextX != x || nextY != y) {
+            x = nextX;
+            y = nextY;
+            s.setTranslateX(gameShell.mainScene.xFromX(x));
+            s.setTranslateY(gameShell.mainScene.objectElevation);
+            s.setTranslateZ(gameShell.mainScene.zFromY(y));
+
+        }
+    }
 }

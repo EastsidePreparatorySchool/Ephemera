@@ -5,8 +5,8 @@
  */
 package SpaceCritters;
 
-import java.util.HashMap;
-import javafx.scene.paint.Color;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  *
@@ -14,118 +14,52 @@ import javafx.scene.paint.Color;
  */
 class Cell {
 
-    int alienCount;
+    SpaceCritters gameShell;
     int fightCountDown;
     double energy;
-    HashMap<String, CellInfo> speciesMap;
-    SpeciesSet speciesSet;  // master set of species
-    boolean cellChanged;
-    CellInfo color1;
-    CellInfo color2;
-    int row;
-    int col;
     int totalFighters;
+    final LinkedList<Alien3D> aliens;
 
-    public Cell(SpeciesSet s, int row, int col) { // Constructor
-        alienCount = 0;
+    public Cell(SpaceCritters gameShellInstance, SpeciesSet s, int row, int col) { // Constructor
+        gameShell = gameShellInstance;
         fightCountDown = 0;
-        cellChanged = true;
-        this.speciesSet = s;
-        this.row = row;
-        this.col = col;
+        this.aliens = new LinkedList();
     }
 
-    public int addSpecies(String speciesName, double energy) {
-        CellInfo ci;
-
-        if (speciesMap == null) {
-            speciesMap = new HashMap<>();
-        }
-
-        ci = speciesMap.get(speciesName);
-
-        if (ci == null) {
-            ci = new CellInfo(0, speciesSet.getColor(speciesName), speciesName);
-            speciesMap.put(speciesName, ci);
-        }
-
-        ci.count++;
-        alienCount++;
-        this.energy = energy;
-        cellChanged = true;
-
-        if (color1 == null) {
-            color1 = ci;
-        } else if (color2 == null) {
-            color2 = ci;
-        }
-
-        return ci.count;
+    public void addAlien(Alien3D alien) {
+        this.aliens.add(alien);
+        alien.zPos = this.aliens.indexOf(alien);
     }
 
-    public boolean removeSpecies(String speciesName, double energy) {
-        CellInfo ci = speciesMap.get(speciesName);
-        if (ci != null) {
-            if (ci.count > 1) {
-                ci.count--;
-                speciesMap.put(speciesName, ci);
+    public void removeAlien(Alien3D alien) {
+        Alien3D a;
+        int count = 0;
+        int newZPos;
+
+        Iterator<Alien3D> iter = aliens.iterator();
+        while (iter.hasNext()) {
+            a = iter.next();
+            if (a == alien) {
+                iter.remove();
             } else {
-                speciesMap.remove(speciesName);
+                newZPos = count++;
+                if (a.zPos != newZPos) {
+                    a.zPos = newZPos;
+                    gameShell.mainScene.updateSet.add(a);
+                }
             }
         }
-        alienCount--;
-        this.energy = energy;
-        boolean empty = speciesMap.isEmpty();
-        if (empty) {
-            speciesMap = null;
-        }
-        if (alienCount == 0) {
-            color1 = null;
-            color2 = null;
-        } else if (alienCount == 1) {
-            color2 = null;
-        }
-
-        cellChanged = true;
-        return empty;
     }
 
-    public Color getColor(int i) {
-        // color for cells is MOSTLY right.
-        // when more than one aliens get in or out of the cell, this cache will become stale
-        // - but it gets reset when the count goes to 0
-
-        Color color = Color.BLACK;
-
-        if (i == 1) {
-            if (color1.color == color.BLACK) {
-                // not initialized yet
-                color1.color = this.speciesSet.getColor(color1.speciesName);
-            }
-            color = color1.color;
-
-        } else if (i == 2) {
-            if (color2.color == color.BLACK) {
-                // not initialized yet
-                color2.color = this.speciesSet.getColor(color2.speciesName);
-            }
-            color = color2.color;
-        }
-
-        return color;
-    }
-
+  
     public void fight() {
         fightCountDown = 5; // show this for 5 iterations
-        cellChanged = true;
-        totalFighters = alienCount;
     }
 
     public int isFighting() {
         if (fightCountDown > 0) {
             fightCountDown--;
             if (fightCountDown == 0) {
-                cellChanged = true;
                 return 0;
             }
             return fightCountDown;
@@ -133,7 +67,7 @@ class Cell {
 
         return 0;
     }
-    
+
     public int fightCountNoDecrement() {
         return fightCountDown;
     }

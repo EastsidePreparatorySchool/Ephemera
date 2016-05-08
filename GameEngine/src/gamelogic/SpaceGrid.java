@@ -35,6 +35,9 @@ public class SpaceGrid {
     public HashMap<String, InternalAlienSpecies> speciesMap; // Maps alienSpeciesNames to indexes
     int width;
     int height;
+    int planetCount = 0;
+    int starCount = 0;
+    int residentCount = 0;
 
     int currentTurn = 1;
     int speciesCounter = 1; // starting with ID 1
@@ -704,17 +707,18 @@ public class SpaceGrid {
         if (soParent != null) {
             Planet p = new Planet(this, soParent.position.x, soParent.position.y,
                     GridCircle.distance(element.x, element.y, 0, 0),
+                    planetCount++,
                     element.domainName, element.packageName, element.className,
                     element.energy, element.tech, element.parent);
             p.startOrbit();
             objects.add(p);
             this.aliens.plugPlanet(p);
-            vis.registerPlanet(p.position.x, p.position.y, element.className, element.energy, element.tech);
+            vis.registerPlanet(p.position.x, p.position.y, element.className, p.index, element.energy, (int)element.tech);
         }
     }
 
     void addStar(GameElementSpec element) {
-        Star st = new Star(this, element.x, element.y, element.domainName, element.packageName, element.className, element.energy, element.tech);
+        Star st = new Star(this, element.x, element.y, starCount++, element.domainName, element.packageName, element.className, element.energy, element.tech);
         objects.add(st);
         this.aliens.plugStar(st);
         vis.registerStar(element.x, element.y, element.className, objects.indexOf(st), element.energy);
@@ -725,7 +729,7 @@ public class SpaceGrid {
         HashMap secrets = new HashMap();
         // TODO add code to seed Residents with secrets loaded from config file
         // Unsure of how secrets will be added to config, see Github issue
-        Resident r = new Resident(this, element.x, element.y, element.domainName, element.packageName, element.className, element.energy, element.tech, secrets, element.parent);
+        Resident r = new Resident(this, element.x, element.y, residentCount++, element.domainName, element.packageName, element.className, element.energy, element.tech, secrets, element.parent);
     }
 
     public void addElement(GameElementSpec element) throws IOException {

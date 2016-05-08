@@ -258,7 +258,7 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void registerPlanet(int x, int y, String name, double energy, double tech) {
+    public void registerPlanet(int x, int y, String name, int index, double energy, int tech) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -283,7 +283,7 @@ public class ConsoleVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, double energy, double tech) {
+    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

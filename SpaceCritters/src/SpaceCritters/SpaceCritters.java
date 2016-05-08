@@ -14,19 +14,14 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Iterator;
-import java.util.Timer;
-import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Screen;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -49,18 +44,13 @@ import javafx.stage.StageStyle;
 public class SpaceCritters extends Application {
 
     public static boolean gameOver = false;
-    public static Canvas canvas;
     public static GameEngineV1 engine;
     public static VisualizationGrid field;
     public static SpeciesSet species;
-    public static Timer idleTimer;
     public static SpectrumColor spectrum = new SpectrumColor();
     public static Stage dstage;
     Stage stage;
-    static ZoomView zoom;
     static SpaceCritters currentInstance; // kludge until rework is done
-
-    // rework: new variables
     ControlPane controlPane; // view and game controls
     Stage consoleStage; // the window for the console
     ConsolePane consolePane; // the console object with the print API
@@ -98,21 +88,12 @@ public class SpaceCritters extends Application {
             controlPane = new ControlPane(this);
             border.setRight(controlPane);
 
-            // add a center pane
-            this.canvas = new Canvas(width * cellWidth + 2/*Border*/, height * cellHeight + 2);
-            HBox hb = new HBox();
-            hb.setPadding(new Insets(15, 12, 15, 12));
-            hb.getChildren().add(canvas);
-            hb.setAlignment(Pos.TOP_LEFT);
-            //border.setCenter(hb);
-            GraphicsContext gc = canvas.getGraphicsContext2D();
-            canvas.setOnMouseClicked((e) -> zoom.focus(e));
-
             // debug output console
             consoleStage = new Stage();
             consolePane = new ConsolePane(this);
             Scene cScene = new Scene(consolePane);
             consoleStage.setScene(cScene);
+            consoleStage.setAlwaysOnTop(true);
 
             // construct path to important game folders
             String gamePath = System.getProperty("user.dir");
@@ -144,10 +125,9 @@ public class SpaceCritters extends Application {
             //get some objects created (not initialized, nothing important happens here)
             engine = new GameEngineV1();
             this.field = new VisualizationGrid();
-            zoom = new ZoomView(field, 0, 0, width, height, cellWidth, cellHeight, height * cellHeight);
 
             // now initialize
-            this.field.init(this, engine, consolePane, species, logPath, width, height, cellWidth, cellHeight, canvas);
+            this.field.init(this, engine, consolePane, species, logPath, width, height);
             engine.initFromFile(field, gamePath, alienPath, "sc_config.csv");
 
             // need field to be alive before constructing this
@@ -173,13 +153,6 @@ public class SpaceCritters extends Application {
             }
             // and tell the engine (and through it, the shell) that we are done adding elements
             engine.queueCommand(new GameCommand(GameCommandCode.Ready));
-
-            // create a timer to create the idle doodling (star flicker)
-            TimerTask task = new ReadyTimer();
-            idleTimer = new Timer();
-        //idleTimer.schedule(task, 0, 200);
-            // return to platform and wait for events
-
         } catch (Exception e) {
             System.out.println(e.toString());
             System.in.read();
@@ -315,8 +288,6 @@ public class SpaceCritters extends Application {
 
     void startGame() {
         // first start
-        idleTimer.cancel();
-        idleTimer = null;
         Iterator<AlienSpeciesForDisplay> iter = species.speciesList.iterator();
         while (iter.hasNext()) {
             AlienSpeciesForDisplay as = iter.next();
@@ -339,27 +310,15 @@ public class SpaceCritters extends Application {
             // pause
             engine.queueCommand(new GameCommand(GameCommandCode.Pause));
             controlPane.buttonPause.setText("Resume");
-
-            TimerTask task = new ReadyTimer();
-            idleTimer = new Timer();
-            // scheduling the task at interval
-            idleTimer.schedule(task, 0, 200);
         } else if (controlPane.buttonPause.getText().equals("Start")) {
             startGame();
         } else {
             // regular resume
-            idleTimer.cancel();
-            idleTimer = null;
             engine.queueCommand(new GameCommand(GameCommandCode.Resume));
             controlPane.buttonPause.setText("Pause");
         }
     }
 
-    private void quit() {
-        idleTimer.cancel();
-        engine.queueCommand(new GameCommand(GameCommandCode.End));
-        stage.close();
-    }
 
     // doesn't really work
     private void restart() {
