@@ -44,4 +44,10 @@ public class Star3D {
         s.setEffect(glow);
     }
 
+    public void forceUpdatePosition() {
+        s.setTranslateX(gameShell.mainScene.xFromX(x));
+        s.setTranslateY(gameShell.mainScene.objectElevation);
+        s.setTranslateZ(gameShell.mainScene.zFromY(y));
+    }
+
 }

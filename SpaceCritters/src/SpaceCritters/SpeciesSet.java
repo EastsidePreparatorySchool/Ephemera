@@ -17,9 +17,11 @@ import javafx.scene.paint.Color;
  */
 public class SpeciesSet {
 
+    SpaceCritters gameShell;
     ObservableList<AlienSpeciesForDisplay> speciesList;
 
-    SpeciesSet() {
+    SpeciesSet(SpaceCritters gameShellInstance) {
+        this.gameShell = gameShellInstance;
         speciesList = FXCollections.observableArrayList();
     }
 
@@ -31,8 +33,10 @@ public class SpeciesSet {
         boolean isOn;
         for (AlienSpeciesForDisplay as : speciesList) {
             int i = speciesList.indexOf(as);
+            isOn = as.isOn();
             speciesList.set(i, null);
             speciesList.set(i, as);
+            as.setOn(isOn);
         }
     }
 
@@ -45,14 +49,14 @@ public class SpeciesSet {
         }
 
         // if we got here, no matching species found
-        AlienSpeciesForDisplay as = new AlienSpeciesForDisplay(speciesName, id);
+        AlienSpeciesForDisplay as = new AlienSpeciesForDisplay(gameShell, speciesName, id);
         Utilities.runSafe(() -> speciesList.add(as));
         as.setOn(true);
 
     }
 
     public void addAlienSpecies(AlienSpec as) {
-        AlienSpeciesForDisplay asfd = new AlienSpeciesForDisplay(as);
+        AlienSpeciesForDisplay asfd = new AlienSpeciesForDisplay(gameShell, as);
         Utilities.runSafe(() -> speciesList.add(asfd));
         asfd.setOn(true);
     }
@@ -66,7 +70,7 @@ public class SpeciesSet {
 
                 // if this is the last one, take it out
                 if (as.count == 0) {
-                    Utilities.runSafe(() -> iter.remove());
+                    //Utilities.runSafe(() -> iter.remove()); // for now, leave it in.
                 }
                 return;
             }
@@ -92,8 +96,7 @@ public class SpeciesSet {
                 return as.color;
             }
         }
-
+        assert false;
         return Color.SILVER;
     }
-
 }

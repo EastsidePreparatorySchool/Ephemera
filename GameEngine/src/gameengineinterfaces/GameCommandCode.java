@@ -10,5 +10,5 @@ package gameengineinterfaces;
  * @author gmein
  */
 public enum GameCommandCode {
-    AddElement, Pause, Resume, List, End, RandSeed, Ready, SetConstant
+    AddElement, KillElement, Pause, Resume, List, End, RandSeed, Ready, SetConstant
 }

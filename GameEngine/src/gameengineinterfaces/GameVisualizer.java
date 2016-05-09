@@ -28,6 +28,8 @@ public interface GameVisualizer {
     
     void showCompletedTurn(int totalTurns, int numAliens, long timeTaken);
     
+    void showIdleUpdate(int numAliens);
+
     void showAliens(List<AlienSpec> aliens);
     
     void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition);

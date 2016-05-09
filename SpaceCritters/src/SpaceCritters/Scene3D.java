@@ -286,28 +286,21 @@ public class Scene3D {
                 yRot += 5;
                 break;
             case DOWN:
-                xRot += 5;
+                xRot += 2;
                 break;
             case UP:
-                xRot -= 5;
+                xRot -= 2;
                 break;
-            case W:
-                if (spacing < 20) {
-                    spacing *= 1.1;
-                }
-                break;
-            case N:
-                if (spacing > 0.5) {
-                    spacing /= 1.1;
-                }
-                break;
+            
             case PAGE_UP:
                 if (objectElevation >= -20) {
                     objectElevation -= 1;
+                    this.updatePlanetsAndStars();
                 }
                 break;
             case PAGE_DOWN:
                 objectElevation = 0;
+                this.updatePlanetsAndStars();
                 break;
 
             case G:
@@ -354,6 +347,15 @@ public class Scene3D {
         }
 
         updateSet.clear();
+    }
+    
+    void updatePlanetsAndStars() {
+        for(Star3D s : stars.values()) {
+            s.forceUpdatePosition();
+        }
+        for (Planet3D p : planets.values()) {
+            p.forceUpdatePosition();
+        }
     }
 
 }

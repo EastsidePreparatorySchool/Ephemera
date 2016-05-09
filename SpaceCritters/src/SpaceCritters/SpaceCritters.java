@@ -71,14 +71,13 @@ public class SpaceCritters extends Application {
             this.stage = stage;
 
             // keep track of species, need this before constructing UI
-            species = new SpeciesSet();
+            species = new SpeciesSet(this);
 
             // get screen geometry
             javafx.geometry.Rectangle2D screenBounds;
             screenBounds = Screen.getPrimary().getVisualBounds();
             stage.setTitle("SpaceCritters V0.90");
             setSize(stage, screenBounds);
-            
 
             BorderPane border = new BorderPane();
             border.setStyle("-fx-background-color: black;");
@@ -128,13 +127,12 @@ public class SpaceCritters extends Application {
             engine.initFromFile(field, gamePath, alienPath, "sc_config.csv");
 
             // need field to be alive before constructing this
-            mainScene = new Scene3D(this, (int)screenBounds.getWidth() - 220, (int)screenBounds.getHeight() - 20);
+            mainScene = new Scene3D(this, (int) screenBounds.getWidth() - 220, (int) screenBounds.getHeight() - 20);
 
             // set a hook to shut down engine on game exit
             stage.setOnCloseRequest(e -> handleExit());
 
             // set scene and stage
-
             border.setCenter(mainScene.outer);
             Scene scene = new Scene(border);
             scene.setOnKeyPressed((e) -> mainScene.controlCamera(e));
@@ -293,7 +291,7 @@ public class SpaceCritters extends Application {
                         null); // state
                 engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
             } else {
-                iter.remove();
+                //iter.remove();
             }
         }
 
@@ -307,15 +305,19 @@ public class SpaceCritters extends Application {
             // pause
             engine.queueCommand(new GameCommand(GameCommandCode.Pause));
             controlPane.buttonPause.setText("Resume");
+            controlPane.speciesView.setDisable(false);
         } else if (controlPane.buttonPause.getText().equals("Start")) {
+            // first start
             startGame();
+            controlPane.speciesView.setDisable(true);
+
         } else {
             // regular resume
             engine.queueCommand(new GameCommand(GameCommandCode.Resume));
             controlPane.buttonPause.setText("Pause");
+            controlPane.speciesView.setDisable(true);
         }
     }
-
 
     // doesn't really work
     private void restart() {

@@ -87,8 +87,21 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showCompletedTurn(int totalTurns, int numAliens, long time
-    ) {
+    public void showIdleUpdate(int numAliens) {
+        this.numAliens = numAliens;
+
+        Utilities.runAndWait(() -> {
+            String text = "Aliens: " + paddedString(numAliens, 7);
+            SpaceCritters.currentInstance.controlPane.alienNumber.setText(text);
+
+            speciesSet.notifyListeners();
+
+            gameShell.mainScene.update();
+        });
+    }
+
+    @Override
+    public void showCompletedTurn(int totalTurns, int numAliens, long time) {
         ++totalTurnCounter;
         this.numAliens = numAliens;
         debugOut("Turn #" + totalTurnCounter + " complete.");
@@ -197,14 +210,14 @@ public class VisualizationGrid implements GameVisualizer {
     @Override
     public void debugOut(String s) {
         if (gameShell.consoleStage.isShowing()) {
-            if (filter != null && filters != null) {
+            if (filter != null && !filter.trim().equals("") && filters != null) {
                 for (String f : filters) {
                     if (s.toLowerCase().contains(f.toLowerCase())) {
                         println(s);
                         break;
                     }
                 }
-            }else {
+            } else {
                 // no filter
                 println(s);
             }
@@ -318,7 +331,7 @@ public class VisualizationGrid implements GameVisualizer {
     public void setFilter(String s) {
         filter = s;
         filters = null;
-        
+
         SpaceCritters.currentInstance.consolePane.filter.setText(s);
         if (s != null) {
             filters = s.split(";");

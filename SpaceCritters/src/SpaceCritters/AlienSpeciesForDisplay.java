@@ -18,6 +18,7 @@ import javafx.scene.paint.Color;
  */
 public class AlienSpeciesForDisplay {
 
+    SpaceCritters gameShell;
     String speciesName;
     String domainName;
     String packageName;
@@ -34,9 +35,10 @@ public class AlienSpeciesForDisplay {
     static String[] alienStyles = {"lightblue", "yellow", "lightpink", "lightgreen", "orange"};
     static int colorCount = 0;
 
-    AlienSpeciesForDisplay(String speciesName, int id) {
+    AlienSpeciesForDisplay(SpaceCritters gameShellInstance, String speciesName, int id) {
+        this.gameShell = gameShellInstance;
         this.speciesName = speciesName;
-        this.count = 0; 
+        this.count = 0;
         this.id = id;
         this.color = alienColors[colorCount % alienColors.length];
         this.style = alienStyles[colorCount % alienColors.length];
@@ -46,13 +48,14 @@ public class AlienSpeciesForDisplay {
 
     }
 
-    AlienSpeciesForDisplay(AlienSpec as) {
+    AlienSpeciesForDisplay(SpaceCritters gameShellInstance, AlienSpec as) {
+        this.gameShell = gameShellInstance;
         this.domainName = as.domainName;
         this.packageName = as.packageName;
         this.className = as.className;
         this.speciesName = as.getFullSpeciesName();
         this.id = as.speciesID;
-        this.count = 0; 
+        this.count = 0;
         this.color = alienColors[colorCount % alienColors.length];
         this.style = alienStyles[colorCount % alienColors.length];
         colorCount++;

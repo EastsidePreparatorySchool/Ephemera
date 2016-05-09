@@ -127,11 +127,11 @@ public final class ControlPane extends VBox {
         gameStats.setSpacing(10);
         gameStats.setStyle("-fx-background-color: black;");
         
-        turnCounter.setFont(Font.font("Consolas", FontWeight.NORMAL, 12));
+        turnCounter.setFont(Font.font("Consolas", FontWeight.NORMAL, 14));
         turnCounter.setStyle("-fx-background-color: black;");
         turnCounter.setFill(Color.WHITE);
 
-        alienNumber.setFont(Font.font("Consolas", FontWeight.NORMAL, 12));
+        alienNumber.setFont(Font.font("Consolas", FontWeight.NORMAL, 14));
         alienNumber.setStyle("-fx-background-color: black;");
         alienNumber.setFill(Color.WHITE);
 

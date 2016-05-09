@@ -52,12 +52,15 @@ public class Planet3D {
 
     public void updatePosition() {
         if (nextX != x || nextY != y) {
-            x = nextX;
-            y = nextY;
-            s.setTranslateX(gameShell.mainScene.xFromX(x));
-            s.setTranslateY(gameShell.mainScene.objectElevation);
-            s.setTranslateZ(gameShell.mainScene.zFromY(y));
-
+            forceUpdatePosition();
         }
+    }
+
+    public void forceUpdatePosition() {
+        x = nextX;
+        y = nextY;
+        s.setTranslateX(gameShell.mainScene.xFromX(x));
+        s.setTranslateY(gameShell.mainScene.objectElevation);
+        s.setTranslateZ(gameShell.mainScene.zFromY(y));
     }
 }
