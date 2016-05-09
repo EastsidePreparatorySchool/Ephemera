@@ -96,6 +96,7 @@ public class GameEngineThread extends Thread {
                     if (pastReady) {
                         if ((System.currentTimeMillis() - lastUpdate) > 100) {
                             engine.vis.showIdleUpdate(engine.grid.aliens.size());
+                            lastUpdate = System.currentTimeMillis();
                         }
                     }
                 }
