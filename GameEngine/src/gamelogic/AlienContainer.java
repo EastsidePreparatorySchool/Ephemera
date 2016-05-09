@@ -31,6 +31,7 @@ public class AlienContainer {
     public final ContextImplementation ctx;
     public final SpaceGrid grid;
     public int alienHashCode;
+    public int speciesID;
 
     public Action.ActionCode currentActionCode;
     public double currentActionPower;
@@ -72,6 +73,7 @@ public class AlienContainer {
         this.grid = sg;
         this.listening = false;
         this.secrets = new HashMap<>();
+        this.speciesID = as.speciesID;
 
         Alien a = null;
 

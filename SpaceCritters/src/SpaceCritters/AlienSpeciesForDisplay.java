@@ -18,10 +18,12 @@ import javafx.scene.paint.Color;
  */
 public class AlienSpeciesForDisplay {
 
+    SpaceCritters gameShell;
     String speciesName;
     String domainName;
     String packageName;
     String className;
+    int id;
 
     int count;
     Color color;
@@ -29,13 +31,15 @@ public class AlienSpeciesForDisplay {
     private final StringProperty name = new SimpleStringProperty();
     private final BooleanProperty on = new SimpleBooleanProperty();
 
-    static Color[] alienColors = {Color.BLUE, Color.YELLOW, Color.LIGHTPINK, Color.LIGHTGREEN, Color.ORANGE};
-    static String[] alienStyles = {"blue", "yellow", "lightpink", "lightgreen", "orange"};
+    static Color[] alienColors = {Color.LIGHTBLUE, Color.YELLOW, Color.LIGHTPINK, Color.LIGHTGREEN, Color.ORANGE};
+    static String[] alienStyles = {"lightblue", "yellow", "lightpink", "lightgreen", "orange"};
     static int colorCount = 0;
 
-    AlienSpeciesForDisplay(String speciesName) {
+    AlienSpeciesForDisplay(SpaceCritters gameShellInstance, String speciesName, int id) {
+        this.gameShell = gameShellInstance;
         this.speciesName = speciesName;
-        this.count = 0; 
+        this.count = 0;
+        this.id = id;
         this.color = alienColors[colorCount % alienColors.length];
         this.style = alienStyles[colorCount % alienColors.length];
         colorCount++;
@@ -44,12 +48,14 @@ public class AlienSpeciesForDisplay {
 
     }
 
-    AlienSpeciesForDisplay(AlienSpec as) {
+    AlienSpeciesForDisplay(SpaceCritters gameShellInstance, AlienSpec as) {
+        this.gameShell = gameShellInstance;
         this.domainName = as.domainName;
         this.packageName = as.packageName;
         this.className = as.className;
         this.speciesName = as.getFullSpeciesName();
-        this.count = 0; 
+        this.id = as.speciesID;
+        this.count = 0;
         this.color = alienColors[colorCount % alienColors.length];
         this.style = alienStyles[colorCount % alienColors.length];
         colorCount++;

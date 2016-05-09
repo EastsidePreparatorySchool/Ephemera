@@ -5,41 +5,30 @@
  */
 package SpaceCritters;
 
-import static SpaceCritters.SpaceCritters.dstage;
 import gameengineinterfaces.AlienSpec;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 import gameengineinterfaces.*;
 import gamelogic.Constants;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.shape.StrokeLineCap;
 
 /**
  *
  * @author gmein
  */
-class VisualizationGrid implements GameVisualizer {
+public class VisualizationGrid implements GameVisualizer {
 
+    public SpaceCritters gameShell;
     public Cell[][] grid;
     public Canvas canvas;
     public SpeciesSet speciesSet;
-    public ArrayList<StarForDisplay> stars;
-    public ArrayList<PlanetForDisplay> planets;
 
-    private int width;
-    private int height;
-    private int cellWidth;
-    private int cellHeight;
-    public int widthPX;
-    public int heightPX;
-    public int safeZoneSize = 10;
+    public int width;
+    public int height;
 
     public ConsolePane console;
 
@@ -57,35 +46,31 @@ class VisualizationGrid implements GameVisualizer {
     BufferedWriter logFile;
     GameEngine engine;
 
-    public void init(GameEngine eng, ConsolePane console, SpeciesSet species, String logPath, int width, int height, int cellWidth, int cellHeight, Canvas canvas) {
-        Date date = new Date();
+    public void init(SpaceCritters gameShellInstance, GameEngine eng, ConsolePane console,
+            SpeciesSet species, String logPath, int width, int height) {
+        this.gameShell = gameShellInstance;
         this.engine = eng;
 
         // Set up properties
         this.width = width;
         this.height = height;
-        this.cellWidth = cellWidth;
-        this.cellHeight = cellHeight;
         this.speciesSet = species;
         this.console = console;
 
-        widthPX = width * cellWidth;
-        heightPX = height * cellHeight;
-
-        // Store ref to canvas for updating
-        this.canvas = canvas;
+        // logfile
+        createLogFile(logPath);
 
         // cet up a grid with cells holding alien counts to display in a color code
         grid = new Cell[height][width];
         for (int i = 0; i < grid.length; i++) {
             for (int k = 0; k < grid[i].length; k++) {
-                grid[i][k] = new Cell(speciesSet, i, k);
+                grid[i][k] = new Cell(gameShell, speciesSet, i, k);
             }
         }
+    }
 
-        stars = new ArrayList<>();
-        planets = new ArrayList<>();
-
+    private void createLogFile(String logPath) {
+        Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
         String fileName = "";
@@ -97,216 +82,72 @@ class VisualizationGrid implements GameVisualizer {
         }
     }
 
-    public void renderAlienView(GraphicsContext gc) {
-        Color[] color = {Color.BLACK, Color.BLACK, Color.BLACK};
-
-        gc.setFill(Color.BLACK);
-        gc.fillRect(1.5, 1.5, widthPX, heightPX);
-
-        for (StarForDisplay st : stars) {
-            st.draw(gc, cellWidth, cellHeight, heightPX);
-        }
-
-        for (PlanetForDisplay p : planets) {
-            p.draw(gc, cellWidth, cellHeight, heightPX);
-        }
-
-        gc.setLineCap(StrokeLineCap.SQUARE);
-        gc.setLineWidth(1);
-        for (int i = 0; i < height; i++) {
-            for (int k = 0; k < width; k++) {
-
-                Cell cell = grid[k][i];
-                int fightCount = cell.isFighting();
-
-                if (cell.cellChanged) {
-                    int x = cellWidth * k;
-                    int y = cellHeight * i;
-
-                    color[1] = (fightCount > 0 ? Color.RED : Color.BLACK);
-                    if (cell.alienCount == 0) {
-                        if (fightCount == 0) {
-                            //gc.setStroke(Color.BLACK);
-                            //gc.strokeLine(x + 0.5, y + 0.5, x + cellWidth + 0.5, y + 0.5);
-                            cell.cellChanged = false;
-                            continue;
-                        }
-                        color[0] = Color.BLACK;
-                        color[2] = Color.BLACK;
-                    } else if (cell.alienCount == 1) {
-                        color[0] = cell.getColor(1);
-                        color[2] = Color.BLACK;
-                    } else if (cell.alienCount == 2) {
-                        color[0] = cell.getColor(1);
-                        color[2] = cell.getColor(2);
-                    } else {
-                        color[0] = Color.WHITE;
-                        color[2] = Color.WHITE;
-                    }
-
-                    if (cellWidth == 3) {
-                        // hires displays, HD1080 or better
-                        if (color[1] == Color.RED) {
-                            gc.setStroke(Color.RED);
-                            gc.strokeLine(x + 1.5, this.heightPX - y + 1.5, x + cellWidth + 1.5, this.heightPX - y + 1.5);
-                        } else {
-                            for (int l = 0; l < 3; l++) {
-                                if (color[l] != Color.BLACK) {
-                                    gc.setStroke(color[l]);
-                                    gc.strokeLine(x + 1.5, this.heightPX - y + 1.5, x + cellWidth / 3 + 1.5, this.heightPX - y + 1.5);
-                                }
-                                x++;
-                            }
-                        }
-                    } else {
-                        // lowres displays
-                        if (color[1] == Color.RED) {
-                            // for fighting cells, color the whole thing red
-                            color[0] = color[1];
-                            color[2] = color[1];
-                        }
-
-                        gc.setStroke(color[0]);
-                        gc.strokeLine(x + 1.5, this.heightPX - y + 1.5, x + 2.5, this.heightPX - y + 1.5);
-                        x++;
-                        gc.setStroke(color[2]);
-                        gc.strokeLine(x + 1.5, this.heightPX - y + 1.5, x + 2.5, this.heightPX - y + 1.5);
-                        x++;
-                    }
-
-                    cell.cellChanged = false;
-                }
-            }
-        }
-        gc.setStroke(Color.BLUE);
-        gc.setLineWidth(1.0);
-        gc.strokeRect(0.5, 0.5, widthPX + 1, heightPX + 1);
-
-    }
-
-    public void renderEnergyMap(GraphicsContext gc) {
-        Color color = Color.BLACK;
-        gc.setLineCap(StrokeLineCap.SQUARE);
-        gc.setLineWidth(1);
-        for (int i = 0; i < height; i++) {
-            for (int k = 0; k < width; k++) {
-
-                Cell cell = grid[k][i];
-                int fightCount = cell.isFighting(); // doing this so fight counter goes down
-
-                //if (cell.cellChanged) {
-                int x = cellWidth * k;
-                int y = cellHeight * i;
-                int j = 1; // draw 1 cell
-
-                color = SpaceCritters.spectrum.getColor((int) cell.energy - 1);
-                if (cell.energy > 750) {
-                    x = x;
-                }
-
-                while (j + k < width) {
-                    if (grid[k + j][i].alienCount != 0 || grid[k + j][i].energy != cell.energy) {
-                        break;
-                    }
-                    j++;
-                }
-
-                gc.setStroke(color);
-                gc.strokeLine(x + 1.5, this.heightPX - y + 1.5, x + cellWidth * j + 1.5, this.heightPX - y + 1.5);
-                k += j - 1;
-                //    cell.cellChanged = false;
-                //}
-            }
-        }
-        for (StarForDisplay st : stars) {
-            st.draw(gc, cellWidth, cellHeight, heightPX);
-        }
-
-        for (PlanetForDisplay p : planets) {
-            p.draw(gc, cellWidth, cellHeight, heightPX);
-        }
-
-        // draw boundary
-        gc.setStroke(Color.RED);
-        gc.setLineWidth(1.0);
-        gc.strokeRect(0.5, 0.5, widthPX + 1, heightPX + 1);
-
+    Cell getCell(int x, int y) {
+        return grid[x + (width / 2)][y + (height / 2)];
     }
 
     @Override
-    public void showCompletedTurn(int totalTurns, int numAliens, long time
-    ) {
+    public void showIdleUpdate(int numAliens) {
+        this.numAliens = numAliens;
+
+        Utilities.runAndWait(() -> {
+            String text = "Aliens: " + paddedString(numAliens, 7);
+            SpaceCritters.currentInstance.controlPane.alienNumber.setText(text);
+
+            speciesSet.notifyListeners();
+
+            gameShell.mainScene.update();
+        });
+    }
+
+    @Override
+    public void showCompletedTurn(int totalTurns, int numAliens, long time) {
         ++totalTurnCounter;
         this.numAliens = numAliens;
         debugOut("Turn #" + totalTurnCounter + " complete.");
         Utilities.runAndWait(() -> {
-            GraphicsContext gc = canvas.getGraphicsContext2D();
-            renderField();
 
-            String text = "Turns completed: " + paddedString(totalTurnCounter, 6)
-                    + ", Total aliens: " + paddedString(numAliens, 7);
+            String text = "Turns:   " + paddedString(totalTurnCounter, 6);
+            SpaceCritters.currentInstance.controlPane.turnCounter.setText(text);
+
+            /*
             if (time > 100000000L) {
                 text += ", time for turn: " + paddedTimeString(time)
                         + (numAliens > 0 ? ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens))) : "")
                         + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)));
             }
-            SpaceCritters.turnCounterText.setText(text);
-            speciesSet.notifyListeners();
-        });
+             */
+            text = "Aliens: " + paddedString(numAliens, 7);
+            SpaceCritters.currentInstance.controlPane.alienNumber.setText(text);
 
-        if (totalTurnCounter % 20 == 0) {
+            speciesSet.notifyListeners();
+
+            gameShell.mainScene.update();
+        }
+        );
+
+        /*
+        if (totalTurnCounter
+                % 20 == 0) {
             try {
                 //Thread.sleep(200);
             } catch (Exception e) {
             }
         }
-    }
-
-    public void incrementCell(int x, int y, String speciesName, double energy) {
-        if (x > (width / 2) || x < (0 - width / 2) || y > (height / 2) || y < (0 - height / 2)) {
-            debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
-            return;
-        }
-        Cell cell = grid[x + (width / 2)][y + (height / 2)];
-        cell.addSpecies(speciesName, energy);
-    }
-
-    public void decrementCell(int x, int y, String speciesName, double energy) {
-        if (x > (width / 2) || x < (0 - width / 2) || y > (height / 2) || y < (0 - height / 2)) {
-            debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
-            return;
-        }
-
-        Cell cell = grid[x + (width / 2)][y + (height / 2)];
-        if (cell.alienCount > 0) {
-            cell.removeSpecies(speciesName, energy);
-        } else {
-            debugOut("winvis: cell underflow at (" + x + "," + y + ")");
-        }
+         */
     }
 
     @Override
     public void showMove(AlienSpec as, int oldx, int oldy, double energyAtNew, double energyAtOld) {
-        if (showMove) {
-            print("Vis.showMove: " + as.toString() + ",  moved from (");
-            print(oldx + "," + oldy + ")");
-        }
-
-        String speciesName = as.getFullSpeciesName();
         int x = as.x;
         int y = as.y;
 
-        decrementCell(oldx, oldy, speciesName, energyAtOld);
-        incrementCell(x, y, speciesName, energyAtNew);
+        Alien3D alien = gameShell.mainScene.aliens.get(as.hashCode);
+        alien.recordMoveTo(x, y);
     }
 
     public void markFight(int x, int y) {
-        if (x > (width / 2) || x < (0 - width / 2) || y > (height / 2) || y < (0 - height / 2)) {
-            debugErr("winvis: Out of bounds: (" + x + ":" + y + ")");
-            return;
-        }
-        Cell cell = grid[x + (width / 2)][y + (height / 2)];
-        cell.fight();
+        getCell(x, y).fight();
     }
 
     @Override
@@ -338,15 +179,16 @@ class VisualizationGrid implements GameVisualizer {
     @Override
     public void showSpawn(AlienSpec as, double energyAtPos) {
         debugOut("Engine reporting Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
-        speciesSet.addAlien(as.getFullSpeciesName());
-        incrementCell(as.x, as.y, as.getFullSpeciesName(), energyAtPos);
+        speciesSet.addAlien(as.getFullSpeciesName(), as.speciesID);
+        gameShell.mainScene.createAlien(as, as.hashCode, as.x, as.y);
     }
 
     @Override
     public void showDeath(AlienSpec as, double energyAtPos) {
         debugOut("Engine reporting death: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
-        decrementCell(as.x, as.y, as.getFullSpeciesName(), energyAtPos);
-        speciesSet.removeAlien(as.getFullSpeciesName());
+        speciesSet.removeAlien(as.getFullSpeciesName(), as.speciesID);
+        gameShell.mainScene.destroyAlien(as, as.hashCode, as.x, as.y);
+
     }
 
     @Override
@@ -357,7 +199,7 @@ class VisualizationGrid implements GameVisualizer {
         } catch (Exception e) {
         }
         debugOut("Game Over");
-        Utilities.runSafe(() -> SpaceCritters.startOrPauseGame(new ActionEvent()));
+        Utilities.runSafe(() -> SpaceCritters.currentInstance.startOrPauseGame(new ActionEvent()));
     }
 
     @Override
@@ -367,14 +209,20 @@ class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void debugOut(String s) {
-        if (filter != null) {
-            for (String f : filters) {
-                if (s.toLowerCase().contains(f.toLowerCase())) {
-                    println(s);
-                    break;
+        if (gameShell.consoleStage.isShowing()) {
+            if (filter != null && !filter.trim().equals("") && filters != null) {
+                for (String f : filters) {
+                    if (s.toLowerCase().contains(f.toLowerCase())) {
+                        println(s);
+                        break;
+                    }
                 }
+            } else {
+                // no filter
+                println(s);
             }
         } else {
+            // console not showing
             printlnLogOnly(s);
         }
     }
@@ -454,13 +302,15 @@ class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void registerStar(int x, int y, String name, double luminosity) {
-        Utilities.runSafe(() -> stars.add(new StarForDisplay(x + this.width / 2, y + this.height / 2, name, luminosity)));
+    public void registerStar(int x, int y, String name, int index, double luminosity) {
+        Utilities.runSafe(() -> gameShell.mainScene.createStar(x, y, name, index, luminosity));
+
     }
 
     @Override
-    public void registerPlanet(int x, int y, String name, double energy, double tech) {
-        Utilities.runSafe(() -> planets.add(new PlanetForDisplay(x + this.width / 2, y + this.height / 2, name, energy, tech)));
+    public void registerPlanet(int x, int y, String name, int index, double energy, int tech) {
+        Utilities.runSafe(() -> gameShell.mainScene.createPlanet(x, y, name, index, energy, tech));
+
     }
 
     @Override
@@ -471,71 +321,46 @@ class VisualizationGrid implements GameVisualizer {
     @Override
     public void showReady() {
         Utilities.runAndWait(() -> {
-            renderField();
             if ((boolean) Constants.getValue("autoStart")) {
-                SpaceCritters.autoStartGame();
+                SpaceCritters.currentInstance.startGame();
             }
-
-        }
-        );
-
-    }
-
-    public void renderField() {
-        if (SpaceCritters.renderSelectorAliens.isSelected()) {
-            renderAlienView(this.canvas.getGraphicsContext2D());
-        } else {
-
-            renderEnergyMap(this.canvas.getGraphicsContext2D());
-        }
-
-        if (SpaceCritters.zoom.zStage.isShowing()) {
-            SpaceCritters.zoom.render();
-        }
-
+        });
     }
 
     @Override
     public void setFilter(String s) {
         filter = s;
-        SpaceCritters.filterText.setText(s);
-        filters = s.split(";");
-        for (int i = 0; i < filters.length; i++) {
-            filters[i] = filters[i].trim();
+        filters = null;
+
+        SpaceCritters.currentInstance.consolePane.filter.setText(s);
+        if (s != null) {
+            filters = s.split(";");
+            for (int i = 0; i < filters.length; i++) {
+                filters[i] = filters[i].trim();
+            }
         }
     }
 
     @Override
     public void setChatter(boolean f) {
-        SpaceCritters.chatter.setSelected(f);
+        SpaceCritters.currentInstance.consolePane.chatter.setSelected(f);
     }
 
     @Override
-    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, double energy, double tech) {
-        Utilities.runSafe(() -> updatePlanet(
-                oldx + this.width / 2,
-                oldy + this.height / 2,
-                x + this.width / 2,
-                y + this.height / 2,
-                name, energy, tech));
-
+    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) {
+        gameShell.mainScene.planets.get(index).recordMoveTo(x, y);
     }
 
-    void updatePlanet(int oldxindex, int oldyindex, int xindex, int yindex, String name, double energy, double tech) {
-        for (PlanetForDisplay p : planets) {
-            if (p.name.equalsIgnoreCase(name)) {
-                p.x = xindex;
-                p.y = yindex;
-                p.energy = energy;
-                p.tech = tech;
-
-                this.grid[xindex][yindex].energy += energy;
-                this.grid[oldxindex][oldyindex].energy -= energy;
-
-                this.grid[xindex][yindex].cellChanged = true;
-                this.grid[oldxindex][oldyindex].cellChanged = true;
-
-            }
+    void setRenderMode(String renderMode) {
+        switch (renderMode) {
+            case "Aliens":
+                break;
+            case "Energy":
+                break;
+            case "Tech":
+                break;
+            default:
+                break;
         }
     }
 

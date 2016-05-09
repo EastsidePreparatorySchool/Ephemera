@@ -18,6 +18,7 @@ import java.lang.reflect.Field;
 public class GameEngineThread extends Thread {
 
     final private GameEngineV1 engine;
+    boolean pastReady = false;
 
     public GameEngineThread(GameEngineV1 ge) {
         engine = ge;
@@ -30,6 +31,7 @@ public class GameEngineThread extends Thread {
         GameCommand gc;
         boolean endGame = false;
         int totalTurns = 0;
+        long lastUpdate = 0;
 
         //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         engine.grid = new SpaceGrid(engine, engine.vis, Constants.width, Constants.height);
@@ -90,7 +92,15 @@ public class GameEngineThread extends Thread {
                     //engine.vis.debugOut("GameEngineThread: Processing command");
                     endGame = processCommand(gc);
                     // endGame signifies that an "End" request has come through
+
+                    if (pastReady) {
+                        if ((System.currentTimeMillis() - lastUpdate) > 100) {
+                            engine.vis.showIdleUpdate(engine.grid.aliens.size());
+                            lastUpdate = System.currentTimeMillis();
+                        }
+                    }
                 }
+                Thread.yield();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -102,6 +112,7 @@ public class GameEngineThread extends Thread {
     }
 
     private boolean processCommand(GameCommand gc) throws Exception {
+        GameElementSpec element;
         boolean gameOver = false;
         switch (gc.code) {
             case SetConstant:
@@ -125,8 +136,7 @@ public class GameEngineThread extends Thread {
                 break;
 
             case AddElement:
-                GameElementSpec element = (GameElementSpec) gc.parameters[0];
-
+                element = (GameElementSpec) gc.parameters[0];
                 engine.vis.debugOut("GameEngineThread: Processing GameElement " + element.kind.name() + " "
                         + element.packageName + ":" + element.className + ", " + element.state);
 
@@ -168,6 +178,19 @@ public class GameEngineThread extends Thread {
                 }
                 break;
 
+            case KillElement:
+                element = (GameElementSpec) gc.parameters[0];
+                engine.vis.debugOut("GameEngineThread: Processing Kill of GameElement " + element.kind.name() + " "
+                        + element.packageName + ":" + element.className + ", " + element.state);
+
+                if (element.kind != GameElementKind.INVALID) {
+                    // kill all aliens of a certain species
+                    if (element.kind == GameElementKind.ALIEN) {
+                        engine.grid.killAll(element);
+                    }
+                }
+                break;
+
             case Pause:
                 engine.vis.debugOut("GameEngineThread: Pausing");
                 engine.gameState = GameState.Paused;
@@ -186,6 +209,7 @@ public class GameEngineThread extends Thread {
             case Ready:
                 engine.grid.addAllCustomAliens();
                 engine.grid.ready();
+                pastReady = true;
                 break;
 
             case End:
@@ -196,7 +220,6 @@ public class GameEngineThread extends Thread {
             default:
                 break;
         }
-
 
         return gameOver;
     }

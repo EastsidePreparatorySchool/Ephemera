@@ -5,6 +5,9 @@
  */
 package SpaceCritters;
 
+import gameengineinterfaces.GameCommand;
+import gameengineinterfaces.GameCommandCode;
+import gameengineinterfaces.GameElementSpec;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -24,13 +27,20 @@ public class SpeciesListCell extends CheckBoxListCell<AlienSpeciesForDisplay> {
         this.setSelectedStateCallback(new Callback<AlienSpeciesForDisplay, ObservableValue<Boolean>>() {
             @Override
             public ObservableValue<Boolean> call(AlienSpeciesForDisplay item) {
-                BooleanProperty observable = new SimpleBooleanProperty(true);
-                observable.addListener((obs, wasSelected, isNowSelected)
-                        -> {
+                BooleanProperty observable = new SimpleBooleanProperty(item != null?item.isOn():false);
+                observable.addListener((obs, wasSelected, isNowSelected) -> {
                     item.setOn(isNowSelected);
+                    GameElementSpec element = new GameElementSpec("ALIEN", item.domainName, item.packageName, item.className, null);
+                    if (item.gameShell.field.totalTurnCounter > 0) {
+                        if (isNowSelected) {
+                            item.gameShell.engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
+                        } else {
+                            //iter.remove(); // this would remove it from the display list
+                            item.gameShell.engine.queueCommand(new GameCommand(GameCommandCode.KillElement, element));
+                        }
+                    }
                     //System.out.println("Check box for " + item + " changed from " + wasSelected + " to " + isNowSelected);
-                }
-                );
+                });
                 return observable;
             }
         });
@@ -44,8 +54,8 @@ public class SpeciesListCell extends CheckBoxListCell<AlienSpeciesForDisplay> {
         if (item != null && !empty) {
             this.setStyle(item.getStyle());
             String s = item.toString();
-            if(s.startsWith("ephemera.eastsideprep.org:stockaliens:")) {
-                s = s.replace("ephemera.eastsideprep.org:stockaliens:", "System::");
+            if (s.startsWith("ephemera.eastsideprep.org:stockaliens:")) {
+                s = s.replace("ephemera.eastsideprep.org:stockaliens:", "System:");
             }
             setText(s);
         } else {

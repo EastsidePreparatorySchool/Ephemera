@@ -53,7 +53,7 @@ public class ContextImplementation implements Context {
         size = Math.max(size, 2);
 
         // if we don't have one or they want a bigger one
-        this.view = new ViewImplementation(ac.grid.aliens, ac.x, ac.y, size);
+        this.view = new ViewImplementation(ac.grid.aliens, ac, ac.x, ac.y, size);
         return this.view;
     }
 

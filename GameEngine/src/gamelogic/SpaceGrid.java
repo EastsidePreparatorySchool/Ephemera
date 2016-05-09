@@ -35,6 +35,9 @@ public class SpaceGrid {
     public HashMap<String, InternalAlienSpecies> speciesMap; // Maps alienSpeciesNames to indexes
     int width;
     int height;
+    int planetCount = 0;
+    int starCount = 0;
+    int residentCount = 0;
 
     int currentTurn = 1;
     int speciesCounter = 1; // starting with ID 1
@@ -518,11 +521,11 @@ public class SpaceGrid {
                                     >= sellingAlien.currentAction.sellPrice
                                     && buyingAlien.energy
                                     >= sellingAlien.currentAction.sellPrice) {
-                                
+
                                 // The two individual trading aliens exchange secrets
                                 buyingAlien.secrets.putAll(sellingAlien.secrets);
                                 sellingAlien.secrets.putAll(buyingAlien.secrets);
-                                
+
                                 // Perform the trade
                                 buyingAlien.energy -= sellingAlien.currentAction.sellPrice;
                                 sellingAlien.energy += sellingAlien.currentAction.sellPrice;
@@ -563,17 +566,17 @@ public class SpaceGrid {
                         thisAlien.kill("Death by spawning exhaustion - not enough energy to complete.");
                         break;
                     }
-                    
+
                     if (thisAlien.currentActionPower <= 0) {
                         thisAlien.kill("Death stillborn spawning - no initial power for child.");
                         break;
                     }
-                    
+
                     // no spawning in safezone. makes sure squatters can't win the games.
                     if (isInSafeZone(thisAlien)) {
                         break;
                     }
-                    
+
                     // construct a random move for the new alien depending on power and send that move through drift correction
                     // spend thisAction.power randomly on x move, y move and initital power
                     double power = thisAlien.currentActionPower;
@@ -704,20 +707,21 @@ public class SpaceGrid {
         if (soParent != null) {
             Planet p = new Planet(this, soParent.position.x, soParent.position.y,
                     GridCircle.distance(element.x, element.y, 0, 0),
+                    planetCount++,
                     element.domainName, element.packageName, element.className,
                     element.energy, element.tech, element.parent);
             p.startOrbit();
             objects.add(p);
             this.aliens.plugPlanet(p);
-            vis.registerPlanet(p.position.x, p.position.y, element.className, element.energy, element.tech);
+            vis.registerPlanet(p.position.x, p.position.y, element.className, p.index, element.energy, (int) element.tech);
         }
     }
 
     void addStar(GameElementSpec element) {
-        Star st = new Star(this, element.x, element.y, element.domainName, element.packageName, element.className, element.energy, element.tech);
+        Star st = new Star(this, element.x, element.y, starCount++, element.domainName, element.packageName, element.className, element.energy, element.tech);
         objects.add(st);
         this.aliens.plugStar(st);
-        vis.registerStar(element.x, element.y, element.className, element.energy);
+        vis.registerStar(element.x, element.y, element.className, objects.indexOf(st), element.energy);
         aliens.distributeStarEnergy(element.x, element.y, element.energy);
     }
 
@@ -725,7 +729,7 @@ public class SpaceGrid {
         HashMap secrets = new HashMap();
         // TODO add code to seed Residents with secrets loaded from config file
         // Unsure of how secrets will be added to config, see Github issue
-        Resident r = new Resident(this, element.x, element.y, element.domainName, element.packageName, element.className, element.energy, element.tech, secrets, element.parent);
+        Resident r = new Resident(this, element.x, element.y, residentCount++, element.domainName, element.packageName, element.className, element.energy, element.tech, secrets, element.parent);
     }
 
     public void addElement(GameElementSpec element) throws IOException {
@@ -812,6 +816,22 @@ public class SpaceGrid {
         //    for (StackTraceElement s : ex.getStackTrace()) {
         //        vis.debugErr(s.toString());
         //    }
+    }
+
+    public void killAll(GameElementSpec element) {
+        String speciesName = element.domainName + ":" + element.packageName + ":" + element.className;
+
+        InternalAlienSpecies as = speciesMap.get(speciesName);
+        if (as != null) {
+            for (AlienContainer ac: aliens) {
+                if (as.speciesID == ac.speciesID) {
+                    ac.kill("Death by shell selection");
+                }
+            }
+        }
+        
+        removeDeadAliens();
+
     }
 
     public void addAllCustomAliens() {
