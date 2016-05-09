@@ -9,6 +9,8 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 /*
@@ -55,8 +57,8 @@ public final class ControlPane extends VBox {
 
         buttonPause = new Button("Start");
         buttonConsole = new Button("Console");
-        turnCounter = new Text("Turns: 0");
-        alienNumber = new Text("Aliens: 0");
+        turnCounter = new Text("Turns:   0");
+        alienNumber = new Text("Aliens:  0");
         alienView = new RadioButton("Aliens");
         energyView = new RadioButton("Energy");
         techView = new RadioButton("Tech");
@@ -99,6 +101,7 @@ public final class ControlPane extends VBox {
         energyView.setStyle("-fx-text-fill:white;");
         energyView.setToggleGroup(renderSelector);
         energyView.setSelected(false);
+        energyView.setDisable(true);
         energyView.setOnAction((e) -> {
             if (energyView.isSelected()) {
                 gameShell.field.setRenderMode("Energy");
@@ -108,6 +111,7 @@ public final class ControlPane extends VBox {
         techView.setStyle("-fx-text-fill:white;");
         techView.setToggleGroup(renderSelector);
         techView.setSelected(false);
+        techView.setDisable(true);
         techView.setOnAction((e) -> {
             if (alienView.isSelected()) {
                 gameShell.field.setRenderMode("Tech");
@@ -123,11 +127,11 @@ public final class ControlPane extends VBox {
         gameStats.setSpacing(10);
         gameStats.setStyle("-fx-background-color: black;");
         
-             //turnCounter.setFont(Font.font("Consolas", FontWeight.BOLD, 18));
+        turnCounter.setFont(Font.font("Consolas", FontWeight.NORMAL, 12));
         turnCounter.setStyle("-fx-background-color: black;");
         turnCounter.setFill(Color.WHITE);
 
-        //alienNumber.setFont(Font.font("Consolas", FontWeight.BOLD, 18));
+        alienNumber.setFont(Font.font("Consolas", FontWeight.NORMAL, 12));
         alienNumber.setStyle("-fx-background-color: black;");
         alienNumber.setFill(Color.WHITE);
 

@@ -346,6 +346,7 @@ public class Scene3D {
         for (Alien3D a : updateSet) {
             if (a.killMe) {
                 this.aliens.remove(a);
+                this.gameShell.field.getCell(a.x, a.y).removeAlien(a);
                 this.root.getChildren().remove(a.alien);
             } else {
                 a.updatePosition();

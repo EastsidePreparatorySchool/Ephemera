@@ -75,10 +75,7 @@ public class SpaceCritters extends Application {
 
             // get screen geometry
             javafx.geometry.Rectangle2D screenBounds;
-            double w = Screen.getPrimary().getDpi();
             screenBounds = Screen.getPrimary().getVisualBounds();
-            int cellWidth = screenBounds.getWidth() < 1900 ? 2 : 3;
-            int cellHeight = 1;
             stage.setTitle("SpaceCritters V0.90");
             setSize(stage, screenBounds);
             

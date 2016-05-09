@@ -48,7 +48,6 @@ public class VisualizationGrid implements GameVisualizer {
 
     public void init(SpaceCritters gameShellInstance, GameEngine eng, ConsolePane console,
             SpeciesSet species, String logPath, int width, int height) {
-        Date date = new Date();
         this.gameShell = gameShellInstance;
         this.engine = eng;
 
@@ -58,6 +57,9 @@ public class VisualizationGrid implements GameVisualizer {
         this.speciesSet = species;
         this.console = console;
 
+        // logfile
+        createLogFile(logPath);
+
         // cet up a grid with cells holding alien counts to display in a color code
         grid = new Cell[height][width];
         for (int i = 0; i < grid.length; i++) {
@@ -65,7 +67,10 @@ public class VisualizationGrid implements GameVisualizer {
                 grid[i][k] = new Cell(gameShell, speciesSet, i, k);
             }
         }
+    }
 
+    private void createLogFile(String logPath) {
+        Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
         String fileName = "";
@@ -89,7 +94,7 @@ public class VisualizationGrid implements GameVisualizer {
         debugOut("Turn #" + totalTurnCounter + " complete.");
         Utilities.runAndWait(() -> {
 
-            String text = "Turns: " + paddedString(totalTurnCounter, 6);
+            String text = "Turns:   " + paddedString(totalTurnCounter, 6);
             SpaceCritters.currentInstance.controlPane.turnCounter.setText(text);
 
             /*
@@ -191,14 +196,20 @@ public class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void debugOut(String s) {
-        if (filter != null) {
-            for (String f : filters) {
-                if (s.toLowerCase().contains(f.toLowerCase())) {
-                    println(s);
-                    break;
+        if (gameShell.consoleStage.isShowing()) {
+            if (filter != null && filters != null) {
+                for (String f : filters) {
+                    if (s.toLowerCase().contains(f.toLowerCase())) {
+                        println(s);
+                        break;
+                    }
                 }
+            }else {
+                // no filter
+                println(s);
             }
         } else {
+            // console not showing
             printlnLogOnly(s);
         }
     }
@@ -306,6 +317,8 @@ public class VisualizationGrid implements GameVisualizer {
     @Override
     public void setFilter(String s) {
         filter = s;
+        filters = null;
+        
         SpaceCritters.currentInstance.consolePane.filter.setText(s);
         if (s != null) {
             filters = s.split(";");

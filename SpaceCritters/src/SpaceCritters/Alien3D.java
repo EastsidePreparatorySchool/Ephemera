@@ -50,7 +50,7 @@ public class Alien3D {
         if (nextX != x || nextY != y) {
             if (!isNew) {
                 cell = gameShell.field.getCell(x, y);
-                cell.aliens.remove(this);
+                cell.removeAlien(this);
             }
 
             x = nextX;
@@ -61,7 +61,7 @@ public class Alien3D {
             alien.setTranslateZ(gameShell.mainScene.zFromY(y));
 
             cell = gameShell.field.getCell(x, y);
-            cell.aliens.add(this);
+            cell.addAlien(this);
 
             if (isNew) {
                 this.zPos = cell.aliens.size() - 1;
