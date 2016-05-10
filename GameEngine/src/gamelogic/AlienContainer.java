@@ -44,7 +44,7 @@ public class AlienContainer {
     public static boolean chatter = false;
 
     public HashMap<String, Integer> secrets;
-    
+
     boolean participatedInAction;
     public int x;
     public int y;
@@ -152,7 +152,6 @@ public class AlienContainer {
                 + " T:" + (tech)
                 + " r:" + ((int) Math.floor(Math.hypot((double) x, (double) y)));
     }
-    
 
     public void processResults() {
         try {
@@ -163,9 +162,8 @@ public class AlienContainer {
     }
 
     public void move() throws NotEnoughTechException {
- 
-        // Whether the move goes off the board will be determined by the grid
 
+        // Whether the move goes off the board will be determined by the grid
         Direction direction = null;
         try {
             direction = alien.getMove();
@@ -259,20 +257,20 @@ public class AlienContainer {
             case Research:
                 if (tech >= energy) {
                     // If the tech can't be researched due to lack of energy
-                    debugOut("AC: Research violation with "+ctx.getStateString());
+                    debugOut("AC: Research violation with " + ctx.getStateString());
                     throw new NotEnoughEnergyException();
                 }
                 break;
 
             case Spawn:
                 if (a.power + ctx.getSpawningCost() > energy) {
-                    debugOut("AC: Spawn violation with P:" + a.power + " "+ctx.getStateString());
+                    debugOut("AC: Spawn violation with P:" + a.power + " " + ctx.getStateString());
                     throw new NotEnoughEnergyException();
                 }
                 break;
             case Fight:
                 if (energy < (a.power + ctx.getFightingCost())) {
-                    debugOut("AC: Fight violation with P:" + a.power + " "+ctx.getStateString());
+                    debugOut("AC: Fight violation with P:" + a.power + " " + ctx.getStateString());
                     throw new NotEnoughEnergyException();
                 }
 

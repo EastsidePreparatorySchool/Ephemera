@@ -36,6 +36,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
+import static javafx.application.Application.launch;
 
 /**
  *

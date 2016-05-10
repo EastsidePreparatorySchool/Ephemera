@@ -76,7 +76,7 @@ public class Alien3D {
         this.nextX = x;
         this.nextY = y;
         
-        gameShell.mainScene.updateSet.add(this);
+        gameShell.mainScene.updateQueue.add(this);
     }
 
 }
