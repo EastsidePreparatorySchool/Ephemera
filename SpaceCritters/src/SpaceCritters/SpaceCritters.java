@@ -298,6 +298,7 @@ public class SpaceCritters extends Application {
 
         engine.queueCommand(new GameCommand(GameCommandCode.Resume));
         controlPane.buttonPause.setText("Pause");
+        controlPane.speciesView.setDisable(true);
 
     }
 

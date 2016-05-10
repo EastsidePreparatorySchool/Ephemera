@@ -389,8 +389,7 @@ public class Scene3D {
         glow.setLevel(1.0);
         s.setEffect(glow);
 
-        // make it fade over 2 seconds
-        // this doesn't work, but it gives me a cheap timer to destroy the object
+        // make it shrink over 2 seconds
         ScaleTransition t = new ScaleTransition(Duration.millis(500), s);
         t.setFromX(1);
         t.setFromY(1);

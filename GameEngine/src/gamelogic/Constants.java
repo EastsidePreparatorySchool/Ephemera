@@ -38,6 +38,7 @@ public class Constants {
     public static double deathThreshold = 5; // if you lose a fight by more than this much, you die
     public static String filters = "death; violation";
     public static boolean pauseOnError = true; // debugErr stops the show
+    public static boolean searchParentForAliens = true; // searches whole user folder in addition to aliens folder
 
     /*
     ** Not truly adjustable yet - do not change these, do not put in config file

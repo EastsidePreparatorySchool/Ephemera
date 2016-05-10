@@ -240,9 +240,8 @@ public class SpaceGrid {
 
                 // need to go through all the rest to mark cell fresh for display, 
                 // TODO: Fix this in visualizer instead, go away from fillRect and to painting individual cells.
-            
                 AlienCell acs = aliens.getAliensAt(ac.x, ac.y);
-              
+
                 // call shell visualizer
                 // just make sure we don't blow up the alien beacuse of an exception in the shell
                 try {
@@ -652,7 +651,7 @@ public class SpaceGrid {
 
         }
 
-        if (as.counter < Constants.perSpeciesCap 
+        if (as.counter < Constants.perSpeciesCap
                 && as.spawns < Constants.perSpeciesSpawnCap) {
             try {
                 AlienContainer ac = new AlienContainer(this, this.vis, x, y,
@@ -744,7 +743,7 @@ public class SpaceGrid {
 
         if (packageName.equalsIgnoreCase("stockaliens")
                 || packageName.equalsIgnoreCase("alieninterfaces")) {
-            fullName = engine.gameJarPath
+            fullName = engine.gamePath
                     + packageName
                     + System.getProperty("file.separator")
                     + "dist"
@@ -815,6 +814,13 @@ public class SpaceGrid {
 
     public void addAllCustomAliens() {
         addCustomAliens(engine.alienPath, "");
+        if (Constants.searchParentForAliens) {
+            String parent = engine.gamePath;
+            parent = parent.substring(0, parent.lastIndexOf(System.getProperty("file.separator"))); // take of trailing separator
+            parent = parent.substring(0, parent.lastIndexOf(System.getProperty("file.separator")) + 1); // take off "SpaceCritters" or such
+            
+            addCustomAliens(parent, "");
+        }
     }
 
     public void addCustomAliens(String folder, String domain) {
@@ -825,37 +831,43 @@ public class SpaceGrid {
         if (folderFile != null) {
             File[] files = folderFile.listFiles();
 
-            for (File f : files) {
-                if (f.isDirectory()) {
-                    // recurse
-                    addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), domain + f.getName() + System.getProperty("file.separator"));
-                } else if (f.getName().toLowerCase().endsWith(".jar")) {
-                    try {
-                        // look for jar files and process
-                        List<String> classNames = new ArrayList<String>();
-                        ZipInputStream zip = new ZipInputStream(new FileInputStream(f));
-                        for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
-                            if (!entry.isDirectory() && entry.getName().toLowerCase().endsWith("alien.class")) {
-                                // handle classes in the default package differently
-                                if (entry.getName().lastIndexOf('/') != -1) {
-                                    // named package
-                                    packageName = entry.getName().substring(0, entry.getName().lastIndexOf('/'));
-                                    className = entry.getName().substring(entry.getName().lastIndexOf('/') + 1).replace(".class", "");
-                                } else {
-                                    //default package
-                                    packageName = "";
-                                    className = entry.getName().replace(".class", "");
-                                }
+            if (files != null) {
+                for (File f : files) {
+                    if (f.isDirectory()) {
+                        // recurse
+                        addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), domain + f.getName() + System.getProperty("file.separator"));
+                    } else if ((f.getName().toLowerCase().endsWith(".jar"))
+                            && (!f.getName().toLowerCase().equals("stockaliens.jar"))
+                            && (!f.getName().toLowerCase().equals("alieninterfaces.jar"))) {
+                        try {
+                            // look for jar files and process
+                            List<String> classNames = new ArrayList<String>();
+                            ZipInputStream zip = new ZipInputStream(new FileInputStream(f));
+                            for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                                if (!entry.isDirectory() && (entry.getName().toLowerCase().endsWith("alien.class")
+                                        || entry.getName().toLowerCase().endsWith("spacecritter.class"))) {
 
-                                addSpecies(new GameElementSpec("SPECIES",
-                                        domain + f.getName(),
-                                        packageName,
-                                        className,
-                                        "")
-                                );
+                                    // handle classes in the default package differently
+                                    if (entry.getName().lastIndexOf('/') != -1) {
+                                        // named package
+                                        packageName = entry.getName().substring(0, entry.getName().lastIndexOf('/'));
+                                        className = entry.getName().substring(entry.getName().lastIndexOf('/') + 1).replace(".class", "");
+                                    } else {
+                                        //default package
+                                        packageName = "";
+                                        className = entry.getName().replace(".class", "");
+                                    }
+
+                                    addSpecies(new GameElementSpec("SPECIES",
+                                            domain + f.getName(),
+                                            packageName,
+                                            className,
+                                            "")
+                                    );
+                                }
                             }
+                        } catch (Exception e) {
                         }
-                    } catch (Exception e) {
                     }
                 }
             }

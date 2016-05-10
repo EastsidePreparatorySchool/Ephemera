@@ -26,7 +26,7 @@ public class GameEngineV1 implements GameEngine {
     Queue<GameCommand> queue;
     GameEngineThread gameThread;
     GameState gameState;
-    public String gameJarPath;
+    public String gamePath;
     public String alienPath;
 
     @Override
@@ -39,7 +39,7 @@ public class GameEngineV1 implements GameEngine {
         GameElementSpec[] savedGame;
 
         this.vis = v;
-        this.gameJarPath = gameJarPath;
+        this.gamePath = gameJarPath;
         this.alienPath = alienPath;
 
         //
@@ -54,7 +54,7 @@ public class GameEngineV1 implements GameEngine {
         BufferedReader in;
 
         try {
-            in = new BufferedReader(new FileReader(this.gameJarPath + savedGameFile));
+            in = new BufferedReader(new FileReader(this.gamePath + savedGameFile));
 
             String strLine;
             while ((strLine = in.readLine()) != null) {
@@ -182,7 +182,7 @@ public class GameEngineV1 implements GameEngine {
         this.vis = v;
         this.queue = new ConcurrentLinkedQueue<GameCommand>();
         gameState = GameState.Paused;
-        this.gameJarPath = gameJarPath;
+        this.gamePath = gameJarPath;
 
         vis.debugOut("GameEngine: Creating thread");
         this.gameThread = new GameEngineThread(this);
