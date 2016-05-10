@@ -5,7 +5,8 @@
  */
 package SpaceCritters;
 
-import javafx.scene.effect.Glow;
+import javafx.geometry.Point3D;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.DrawMode;
@@ -26,6 +27,7 @@ public class Planet3D {
     final public Sphere s;
     int nextX;
     int nextY;
+    double rotation = 0;
 
     public Planet3D(SpaceCritters gameShellInstance, int x, int y, String name, int index, double energy) {
         this.gameShell = gameShellInstance;
@@ -43,6 +45,10 @@ public class Planet3D {
         s.setTranslateX(gameShell.mainScene.xFromX(x));
         s.setTranslateY(gameShell.mainScene.objectElevation);
         s.setTranslateZ(gameShell.mainScene.zFromY(y));
+
+        if (name.equalsIgnoreCase("Earth")) {
+            decorateEarth(s);
+        }
     }
 
     public void recordMoveTo(int x, int y) {
@@ -53,6 +59,12 @@ public class Planet3D {
     public void updatePosition() {
         if (nextX != x || nextY != y) {
             forceUpdatePosition();
+            this.s.setRotationAxis(new Point3D(0, -1, 0));
+            this.s.setRotate(rotation);
+            rotation += 10;
+            if (rotation > 360) {
+                rotation -= 360;
+            }
         }
     }
 
@@ -62,5 +74,23 @@ public class Planet3D {
         s.setTranslateX(gameShell.mainScene.xFromX(x));
         s.setTranslateY(gameShell.mainScene.objectElevation);
         s.setTranslateZ(gameShell.mainScene.zFromY(y));
+    }
+
+    private static Image dMap;
+    private static Image bMap;
+    private static Image sMap;
+
+    public static void loadEarth() {
+        dMap = new Image(SpaceCritters.class.getResourceAsStream("dMap_earth.jpg"));
+        bMap = new Image(SpaceCritters.class.getResourceAsStream("bMap_earth.jpg"));
+        sMap = new Image(SpaceCritters.class.getResourceAsStream("sMap_earth.jpg"));
+    }
+
+    private void decorateEarth(Sphere earth) {
+        PhongMaterial earthMaterial = new PhongMaterial();
+        earthMaterial.setDiffuseMap(dMap);
+        earthMaterial.setBumpMap(bMap);
+        earthMaterial.setSpecularMap(sMap);
+        earth.setMaterial(earthMaterial);
     }
 }

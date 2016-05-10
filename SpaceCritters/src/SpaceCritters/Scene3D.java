@@ -20,6 +20,9 @@ import javafx.scene.PointLight;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.effect.Glow;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
@@ -94,11 +97,11 @@ public class Scene3D {
         this.gridVisible = true;
         this.root.getChildren().addAll(this.grid);
 
-        AmbientLight aLight = new AmbientLight(Color.rgb(50, 50, 50));
+        AmbientLight aLight = new AmbientLight(Color.rgb(10, 10, 10));
         pLight = new PointLight(Color.ANTIQUEWHITE);
         pLight.getTransforms().setAll(
                 new Translate(focusX, 0, focusY),
-                new Rotate(yRot, Rotate.Y_AXIS),
+                new Rotate(yRot+45, Rotate.Y_AXIS),
                 new Rotate(xRot, Rotate.X_AXIS),
                 new Translate(0, 0, zTrans)
         );
@@ -112,7 +115,7 @@ public class Scene3D {
                 new Rotate(xRot, Rotate.X_AXIS),
                 new Translate(0, 0, zTrans)
         );
-        camera.setNearClip(5);
+        camera.setNearClip(1);
         camera.setFarClip(1500);
         root.getChildren().add(camera);
 
@@ -138,6 +141,7 @@ public class Scene3D {
         Star3D star = new Star3D(gameShell, x, y, name, index, energy);
 
         this.root.getChildren().add(star.s);
+
         this.stars.put(index, star);
     }
 
@@ -180,63 +184,10 @@ public class Scene3D {
     }
 
     private Group buildAxes() {
-        Cylinder axis;
-        Group root = new Group();
-
-        double thickness = 0.07;
-
-        final PhongMaterial grayMaterial = new PhongMaterial(Color.rgb(24, 24, 24, 1.0));
-        final PhongMaterial greenMaterial = new PhongMaterial(Color.GREEN);
-        final PhongMaterial blueMaterial = new PhongMaterial(Color.BLUE);
-        final PhongMaterial redMaterial = new PhongMaterial(Color.RED);
-
-        for (int x = -gameShell.field.width / 2; x <= gameShell.field.width / 2; x++) {
-            axis = new Cylinder(thickness, gameShell.field.width * spacing);
-            axis.setRotationAxis(new Point3D(0.0, 0.0, 1.0));
-            axis.setRotate(90);
-            axis.setTranslateZ(x);
-            axis.setTranslateY(1);
-            axis.setMaterial(x == 0 ? redMaterial : grayMaterial);
-            root.getChildren().add(axis);
-
-        }
-        for (int y = -gameShell.field.height / 2; y <= gameShell.field.height / 2; y++) {
-            axis = new Cylinder(thickness, gameShell.field.height * spacing);
-            axis.setRotationAxis(new Point3D(1.0, 0.0, 0.0));
-            axis.setRotate(90);
-            axis.setTranslateX(y);
-            axis.setTranslateY(1);
-            axis.setMaterial(y == 0 ? blueMaterial : grayMaterial);
-            root.getChildren().add(axis);
-        }
-
-        axis = new Cylinder(thickness, 100 * spacing);
-        axis.setMaterial(greenMaterial);
-        root.getChildren().addAll(axis);
-
-        axis = new Cylinder(thickness, gameShell.field.height * spacing);
-        axis.setRotationAxis(new Point3D(1.0, 0.0, 0.0));
-        axis.setRotate(90);
-        axis.setTranslateX(0);
-        axis.setTranslateY(1);
-        axis.setMaterial(blueMaterial);
-        root.getChildren().add(axis);
-
-        axis = new Cylinder(thickness, gameShell.field.width * spacing);
-        axis.setRotationAxis(new Point3D(0.0, 0.0, 1.0));
-        axis.setRotate(90);
-        axis.setTranslateZ(0);
-        axis.setTranslateY(1);
-        axis.setMaterial(redMaterial);
-        root.getChildren().add(axis);
-
-        // plate to alwasy have someting to click on
-        Box plate = new Box(gameShell.field.width * spacing, 0, gameShell.field.height * spacing);
-        plate.setMaterial(new PhongMaterial(Color.DARKRED));
-        plate.setTranslateY(1 + 2 * thickness);
-        root.getChildren().add(plate);
-
-        return root;
+        Group g = new Group();
+        Box b = buildPlate();
+        g.getChildren().add(b);
+        return g;
     }
 
     public void focus(MouseEvent e) {
@@ -405,5 +356,41 @@ public class Scene3D {
         // add to scene and play
         t.play();
         this.root.getChildren().add(s);
+    }
+
+    private Box buildPlate() {
+
+        int scale = 5;
+        int w = gameShell.field.width * scale + 1;
+        int h = gameShell.field.height * scale + 1;
+        WritableImage gridImg = new WritableImage(w, h);
+        PixelWriter writer = gridImg.getPixelWriter();
+
+        // mostly DARKRED
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                writer.setColor(x, y, Color.DARKRED);
+            }
+        }
+
+        for (int x = 0; x <= w; x += scale) {
+            for (int y = 0; y < h; y++) {
+                writer.setColor(x, y, x == w / 2 ? Color.RED : Color.BLACK);
+            }
+        }
+
+        for (int y = 0; y <= h; y += scale) {
+            for (int x = 0; x < w; x++) {
+                writer.setColor(x, y, y == h / 2 ? Color.BLUE : Color.BLACK);
+            }
+        }
+
+        Box b = new Box(gameShell.field.width, 0.01, gameShell.field.height);
+        PhongMaterial plateMaterial = new PhongMaterial();
+        plateMaterial.setDiffuseMap(gridImg);
+        b.setMaterial(plateMaterial);
+        b.setTranslateY(1.1);
+
+        return b;
     }
 }

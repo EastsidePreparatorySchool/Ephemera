@@ -99,6 +99,7 @@ public class SpaceCritters extends Application {
             if (gamePath.contains("ephemera" + System.getProperty("file.separator") + "spacecritters")) {
                 // probably started from netbeans
                 gamePath = gamePath.substring(0, gamePath.toLowerCase().indexOf("spacecritters"));
+                Constants.searchParentForAliens = false;
             } else {
                 // probably started from other folder
                 gamePath = System.getProperty("user.dir");
@@ -132,6 +133,9 @@ public class SpaceCritters extends Application {
 
             // set a hook to shut down engine on game exit
             stage.setOnCloseRequest(e -> handleExit());
+
+            // load fancy earth
+            Planet3D.loadEarth();
 
             // set scene and stage
             border.setCenter(mainScene.outer);
@@ -208,13 +212,17 @@ public class SpaceCritters extends Application {
         t4.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
         t4.setFill(Color.GOLD);
 
+        Text t6 = new Text("Earth by planetmaker.wthr.us");
+        t6.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
+        t6.setFill(Color.GOLD);
+
         Text t5 = new Text("Backdrop courtesy of NASA");
-        t5.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
+        t5.setFont(Font.font("Arial", FontWeight.NORMAL, 10));
         t5.setFill(Color.GOLD);
 
         VBox vb1 = new VBox();
         vb1.setStyle("-fx-background-color: rgba(0,0,0,0.0)");
-        vb1.getChildren().addAll(t1, tw, t2, t3, t4, t5);
+        vb1.getChildren().addAll(t1, tw, t2, t3, t6, t5, t4);
         vb1.setPadding(new Insets(15, 12, 15, 12));
         vb1.setSpacing(8);
         vb1.setAlignment(Pos.BOTTOM_RIGHT);

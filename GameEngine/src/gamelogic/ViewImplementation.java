@@ -7,7 +7,7 @@ package gamelogic;
 
 import alieninterfaces.*;
 import static gamelogic.GridCircle.*;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -43,7 +43,7 @@ public class ViewImplementation implements View {
     public List<AlienSpecies> getAliensAtPos(Position p) throws CantSeeSquareException {
         checkPos(p);
 
-        ArrayList<AlienSpecies> as = new ArrayList();
+        LinkedList<AlienSpecies> as = new LinkedList();
         AlienCell acs = ag.getAliensAt(p);
         if (acs != null) {
             for (AlienContainer ac : acs) {
@@ -55,7 +55,7 @@ public class ViewImplementation implements View {
 
     @Override
     public List<AlienSpecies> getAliensInView() {
-        ArrayList<AlienSpecies> as = new ArrayList();
+        LinkedList<AlienSpecies> as = new LinkedList();
 
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
@@ -91,7 +91,7 @@ public class ViewImplementation implements View {
 
     @Override
     public List<SpaceObject> getSpaceObjectsInView() {
-        ArrayList<SpaceObject> sos = new ArrayList();
+        LinkedList<SpaceObject> sos = new LinkedList();
         SpaceObject so = null;
 
         for (int d = 0; d <= size; d++) {
@@ -118,7 +118,7 @@ public class ViewImplementation implements View {
     @Override
     public List<AlienSpecies> getClosestAliens() {
 
-        ArrayList<AlienSpecies> as = new ArrayList<>();
+        LinkedList<AlienSpecies> as = new LinkedList<>();
 
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
@@ -142,7 +142,7 @@ public class ViewImplementation implements View {
     @Override
     public List<AlienSpecies> getClosestSpecificAliens(AlienSpecies thisOne) {
 
-        ArrayList<AlienSpecies> as = new ArrayList();
+        LinkedList<AlienSpecies> as = new LinkedList();
 
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
@@ -168,7 +168,7 @@ public class ViewImplementation implements View {
     @Override
     public List<AlienSpecies> getClosestXenos(AlienSpecies notThisOne) {
 
-        ArrayList<AlienSpecies> as = new ArrayList<>();
+        LinkedList<AlienSpecies> as = new LinkedList<>();
         int notThisID = this.ac.speciesID;
 
         for (int d = 0; d <= size; d++) {

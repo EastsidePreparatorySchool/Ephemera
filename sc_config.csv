@@ -6,7 +6,7 @@ CONSTANT,,,perSpeciesSpawnCap,,,,,,4000
 CONSTANT,,,safeZoneRadius,,,,,,10
 CONSTANT,,,filters,,,,,,
 CONSTANT,,,pauseOnError,,,,,,off
-CONSTANT,,,autoStart,,,,,,on
+CONSTANT,,,autoStart,,,,,,off
 SPECIES,ephemera.eastsideprep.org,stockaliens,AggressiveAlien,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Martian,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Venusian,,,,,,
