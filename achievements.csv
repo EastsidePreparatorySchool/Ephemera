@@ -1,0 +1,14 @@
+Name,Requirement,energy,tech,trades,fightenergy,aliens,broadcast,flag
+Into the World,Exit the same zone.,,,,,,,ExitSafeZone
+Science!,Perform research for the first time.,,1,,,,,
+Merchant,Perform a trade.,,,1,,,,
+1.21 Jigawatts,Obtain 121 energy.,121,,,,,,
+Overpowered,Hit the energy limit.,1000,,,,,,
+Dealbreaker,Respond to an alien's trade offer by fighting.,,,,,,,TradeDenied
+Break out the big guns,Kill an alien of another species.,,,,,,,AlienKilledByFighting
+No place like home,Land on a planet.,,,,,,,LandOnPlanet
+Einstein,Surpass the research cap.,,31,,,,,
+Duplication,Spawn another alien.,,,,,2,,
+Anyone out there?,Broadcast a message to the world,,,,,,1,
+Megaphone,Broadcast a message across the universe,,,,,,250,
+High-tech death ray,Spend more than 35 energy on a single fight with a single alien,,,,36,,,
