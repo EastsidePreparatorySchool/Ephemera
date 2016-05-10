@@ -293,6 +293,12 @@ public class SpaceGrid {
                 vis.showDeath(ac.getFullAlienSpec(), newEnergy);
                 aliens.unplug(ac);
                 iterator.remove();
+
+                InternalAlienSpecies as = speciesMap.get(ac.getFullSpeciesName());
+                if (as != null) {
+                    as.counter--;
+                }
+
             }
         }
     }
@@ -823,13 +829,13 @@ public class SpaceGrid {
 
         InternalAlienSpecies as = speciesMap.get(speciesName);
         if (as != null) {
-            for (AlienContainer ac: aliens) {
+            for (AlienContainer ac : aliens) {
                 if (as.speciesID == ac.speciesID) {
                     ac.kill("Death by shell selection");
                 }
             }
         }
-        
+
         removeDeadAliens();
 
     }

@@ -45,7 +45,7 @@ class Cell {
                 newZPos = count++;
                 if (a.zPos != newZPos) {
                     a.zPos = newZPos;
-                    gameShell.mainScene.updateSet.add(a);
+                    gameShell.mainScene.updateQueue.add(a);
                 }
             }
         }

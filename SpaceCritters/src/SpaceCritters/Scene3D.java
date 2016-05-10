@@ -8,6 +8,7 @@ package SpaceCritters;
 import gameengineinterfaces.AlienSpec;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import javafx.geometry.Point3D;
 import javafx.geometry.Pos;
 import javafx.scene.AmbientLight;
@@ -47,7 +48,7 @@ public class Scene3D {
     final HashMap<Integer, Star3D> stars;
     final HashMap<Integer, Planet3D> planets;
     final HashMap<Integer, Alien3D> aliens;
-    final HashSet<Alien3D> updateSet;
+    final ConcurrentLinkedQueue<Alien3D> updateQueue;
 
     // camera
     final private PerspectiveCamera camera;
@@ -67,7 +68,7 @@ public class Scene3D {
         this.stars = new HashMap(50);
         this.planets = new HashMap(50);
         this.aliens = new HashMap(100000);
-        this.updateSet = new HashSet(100000);
+        this.updateQueue = new ConcurrentLinkedQueue();
 
         // initial camera values
         this.xRot = -20;
@@ -146,7 +147,7 @@ public class Scene3D {
         this.aliens.put(as.hashCode, alien);
 
         // alien is added with isNew == true, this leads to update() adding it to the visuals
-        this.updateSet.add(alien);
+        this.updateQueue.add(alien);
     }
 
     public void destroyAlien(AlienSpec as, int id, int x, int y) {
@@ -156,7 +157,7 @@ public class Scene3D {
         alien.killMe = true;
 
         // remove it later on the UI thread
-        this.updateSet.add(alien);
+        this.updateQueue.add(alien);
     }
 
     double xFromX(int x) {
@@ -336,7 +337,7 @@ public class Scene3D {
             p.updatePosition();
         }
 
-        for (Alien3D a : updateSet) {
+        for (Alien3D a : updateQueue) {
             if (a.killMe) {
                 this.aliens.remove(a);
                 this.gameShell.field.getCell(a.x, a.y).removeAlien(a);
@@ -346,7 +347,7 @@ public class Scene3D {
             }
         }
 
-        updateSet.clear();
+        updateQueue.clear();
     }
     
     void updatePlanetsAndStars() {
