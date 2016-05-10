@@ -9,6 +9,8 @@ import gameengineinterfaces.AlienSpec;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import javafx.animation.FadeTransition;
+import javafx.animation.ScaleTransition;
 import javafx.geometry.Point3D;
 import javafx.geometry.Pos;
 import javafx.scene.AmbientLight;
@@ -17,6 +19,7 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.PointLight;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
+import javafx.scene.effect.Glow;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.PickResult;
@@ -24,10 +27,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Cylinder;
+import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Shape3D;
+import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
+import javafx.util.Duration;
 
 /**
  *
@@ -292,7 +299,7 @@ public class Scene3D {
             case UP:
                 xRot -= 2;
                 break;
-            
+
             case PAGE_UP:
                 if (objectElevation >= -20) {
                     objectElevation -= 1;
@@ -344,14 +351,20 @@ public class Scene3D {
                 this.root.getChildren().remove(a.alien);
             } else {
                 a.updatePosition();
+
+                Cell cell = gameShell.field.getCell(a.x, a.y);
+                if (cell.totalFighters > 0) {
+                    displayFight(a.x, a.y);
+                    cell.totalFighters = 0;
+                }
             }
         }
 
         updateQueue.clear();
     }
-    
+
     void updatePlanetsAndStars() {
-        for(Star3D s : stars.values()) {
+        for (Star3D s : stars.values()) {
             s.forceUpdatePosition();
         }
         for (Planet3D p : planets.values()) {
@@ -359,30 +372,39 @@ public class Scene3D {
         }
     }
 
+    public void displayFight(int x, int y) {
+        Cell cell = gameShell.field.getCell(x, y);
+        int fighting = cell.totalFighters;
+
+        Sphere s = new Sphere(fighting / (double) 2);
+        s.setMaterial(new PhongMaterial(Color.rgb(255, 0, 0, 0.2)));
+        s.setDrawMode(DrawMode.FILL);
+        s.setTranslateX(xFromX(x));
+        s.setTranslateY(-fighting);
+        s.setTranslateZ(zFromY(y));
+        s.setOpacity(0.1);
+
+        // make it glow
+        Glow glow = new Glow(1.0);
+        glow.setLevel(1.0);
+        s.setEffect(glow);
+
+        // make it fade over 2 seconds
+        // this doesn't work, but it gives me a cheap timer to destroy the object
+        ScaleTransition t = new ScaleTransition(Duration.millis(500), s);
+        t.setFromX(1);
+        t.setFromY(1);
+        t.setFromZ(1);
+
+        t.setToX(0);
+        t.setToY(0);
+        t.setToZ(0);
+
+        // kill it when done
+        t.setOnFinished((e) -> this.root.getChildren().remove(s));
+
+        // add to scene and play
+        t.play();
+        this.root.getChildren().add(s);
+    }
 }
-
-/*
-                int fighting = cell.fightCountNoDecrement();
-                if (fighting > 0) {
-                    y = cell.totalFighters;
-
-                    Sphere s = new Sphere(fighting / (double) 2);
-                    s.setMaterial(new PhongMaterial(Color.RED));
-                    s.setDrawMode(DrawMode.FILL);
-                    s.setTranslateX(xFromIndex(i));
-                    s.setTranslateY(yFromIndex(y) - fighting);
-                    s.setTranslateZ(zFromIndex(j));
-                    s.setOpacity(fighting / (double) 10);
-                    objects.add(s);
-
-                    Box box = new Box(0.7, y, 0.7);
-                    box.setMaterial(new PhongMaterial(Color.RED));
-                    box.setDrawMode(DrawMode.FILL);
-                    box.setTranslateX(xFromIndex(i));
-                    box.setTranslateY(yFromIndex(y) - (yFromIndex(y) / 2) + 0.5);
-                    box.setTranslateZ(zFromIndex(j));
-                    box.setOpacity(0.05);
-                    objects.add(box);
-
-  
- */

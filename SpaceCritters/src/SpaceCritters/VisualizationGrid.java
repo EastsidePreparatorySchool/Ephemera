@@ -146,10 +146,6 @@ public class VisualizationGrid implements GameVisualizer {
         alien.recordMoveTo(x, y);
     }
 
-    public void markFight(int x, int y) {
-        getCell(x, y).fight();
-    }
-
     @Override
     public void showFightBefore(int x, int y, List<AlienSpec> participants) {
         if (showFights) {
@@ -160,7 +156,7 @@ public class VisualizationGrid implements GameVisualizer {
                 println("");
             }
         }
-        markFight(x, y);
+        getCell(x, y).fight(participants.size());
     }
 
     @Override
@@ -321,6 +317,13 @@ public class VisualizationGrid implements GameVisualizer {
     @Override
     public void showReady() {
         Utilities.runAndWait(() -> {
+            String text = "Aliens: " + paddedString(numAliens, 7);
+            SpaceCritters.currentInstance.controlPane.alienNumber.setText(text);
+
+            speciesSet.notifyListeners();
+
+            gameShell.mainScene.update();
+
             if ((boolean) Constants.getValue("autoStart")) {
                 SpaceCritters.currentInstance.startGame();
             }

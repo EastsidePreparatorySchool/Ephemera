@@ -15,8 +15,11 @@ import java.lang.reflect.Constructor;
 public class InternalAlienSpecies extends AlienSpecies {
     public Constructor<?> cns;
     public long counter;
+    public long spawns;
 
     public InternalAlienSpecies(String domainName, String packageName, String className, int id) {
         super(domainName, packageName, className, id);
+        counter = 0;
+        spawns = 0;
     }
 }

@@ -34,8 +34,8 @@ public class Planet3D {
         this.name = name;
         this.energy = energy;
         this.index = index;
-        this.nextX = 0;
-        this.nextY = 0;
+        this.nextX = x;
+        this.nextY = y;
 
         this.s = new Sphere(0.7);
         s.setMaterial(new PhongMaterial(Color.GREEN));

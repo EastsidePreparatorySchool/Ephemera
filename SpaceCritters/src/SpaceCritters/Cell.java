@@ -52,23 +52,7 @@ class Cell {
     }
 
   
-    public void fight() {
-        fightCountDown = 5; // show this for 5 iterations
-    }
-
-    public int isFighting() {
-        if (fightCountDown > 0) {
-            fightCountDown--;
-            if (fightCountDown == 0) {
-                return 0;
-            }
-            return fightCountDown;
-        }
-
-        return 0;
-    }
-
-    public int fightCountNoDecrement() {
-        return fightCountDown;
+    public void fight(int num) {
+        totalFighters = num;
     }
 }

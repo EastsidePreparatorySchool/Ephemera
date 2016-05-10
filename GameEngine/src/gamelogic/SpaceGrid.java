@@ -240,36 +240,24 @@ public class SpaceGrid {
 
                 // need to go through all the rest to mark cell fresh for display, 
                 // TODO: Fix this in visualizer instead, go away from fillRect and to painting individual cells.
-                double oldEnergy = 0;
-                AlienCell acs = aliens.getAliensAt(oldX, oldY);
-                if (acs != null) {
-                    oldEnergy = acs.stream().map((alien) -> alien.energy).reduce(oldEnergy, (accumulator, _item) -> accumulator + _item);
-                }
-                oldEnergy += aliens.getEnergyAt(oldX, oldY);
-
-                double newEnergy = 0;
-                acs = aliens.getAliensAt(ac.x, ac.y);
-                newEnergy = acs.stream().map((alien) -> alien.energy).reduce(newEnergy, (accumulator, _item) -> accumulator + _item);
-                newEnergy += aliens.getEnergyAt(ac.x, ac.y);
-
+            
+                AlienCell acs = aliens.getAliensAt(ac.x, ac.y);
+              
                 // call shell visualizer
                 // just make sure we don't blow up the alien beacuse of an exception in the shell
                 try {
                     vis.showMove(ac.getFullAlienSpec(),
                             oldX,
                             oldY,
-                            newEnergy,
-                            oldEnergy);
+                            0,
+                            0);
                 } catch (Exception e) {
                     displayException("Unhandled exception in showMove(): ", e);
-
                 }
 
                 if (acs.star != null) {
                     ac.kill("Death for moving into star " + acs.star.className);
-
                 }
-
             }
         }
     }
@@ -282,15 +270,7 @@ public class SpaceGrid {
         for (Iterator<AlienContainer> iterator = aliens.iterator(); iterator.hasNext();) {
             AlienContainer ac = iterator.next();
             if (ac.energy <= 0) {
-
-                double newEnergy = 0;
-                AlienCell acs = aliens.getAliensAt(ac.x, ac.y);
-                if (acs != null) {
-                    newEnergy = acs.stream().map((alien) -> alien.energy).reduce(newEnergy, (accumulator, _item) -> accumulator + _item);
-                }
-                newEnergy += aliens.getEnergyAt(ac.x, ac.y);
-
-                vis.showDeath(ac.getFullAlienSpec(), newEnergy);
+                vis.showDeath(ac.getFullAlienSpec(), 0);
                 aliens.unplug(ac);
                 iterator.remove();
 
@@ -672,7 +652,8 @@ public class SpaceGrid {
 
         }
 
-        if (as.counter < Constants.perSpeciesCap) {
+        if (as.counter < Constants.perSpeciesCap 
+                && as.spawns < Constants.perSpeciesSpawnCap) {
             try {
                 AlienContainer ac = new AlienContainer(this, this.vis, x, y,
                         domainName, alienPackageName, alienClassName, as.cns, as,
@@ -681,17 +662,9 @@ public class SpaceGrid {
                         spawnMsg); // no spawn state
 
                 aliens.addAlienAndPlug(ac);
-
-                double newEnergy = 0;
-                AlienCell acs = aliens.getAliensAt(ac.x, ac.y);
-                if (acs != null) {
-                    newEnergy = acs.stream().map((alien) -> alien.energy).reduce(newEnergy, (accumulator, _item) -> accumulator + _item);
-                }
-
-                newEnergy += aliens.getEnergyAt(ac.x, ac.y);
-
-                vis.showSpawn(ac.getFullAlienSpec(), newEnergy);
+                vis.showSpawn(ac.getFullAlienSpec(), 0);
                 as.counter++;
+                as.spawns++;
             } catch (InstantiationException e) {
                 gridDebugErr("sg: could not instantiate new " + domainName + ":" + alienPackageName + ":" + alienClassName);
             }

@@ -2,10 +2,11 @@
 CONSTANT,,,randseed,,,,,,1
 CONSTANT,,,chatter,,,,,,on
 CONSTANT,,,perSpeciesCap,,,,,,2000
+CONSTANT,,,perSpeciesSpawnCap,,,,,,4000
 CONSTANT,,,safeZoneRadius,,,,,,10
-CONSTANT,,,filters,,,,,,death; violation
+CONSTANT,,,filters,,,,,,
 CONSTANT,,,pauseOnError,,,,,,off
-CONSTANT,,,autoStart,,,,,,off
+CONSTANT,,,autoStart,,,,,,on
 SPECIES,ephemera.eastsideprep.org,stockaliens,AggressiveAlien,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Martian,,,,,,
 SPECIES,ephemera.eastsideprep.org,stockaliens,Venusian,,,,,,
