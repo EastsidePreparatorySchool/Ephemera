@@ -115,7 +115,7 @@ public class Scene3D {
                 new Rotate(xRot, Rotate.X_AXIS),
                 new Translate(0, 0, zTrans)
         );
-        camera.setNearClip(1);
+        camera.setNearClip(0.1);
         camera.setFarClip(1500);
         root.getChildren().add(camera);
 
@@ -230,7 +230,7 @@ public class Scene3D {
             case PLUS:
             case EQUALS:
                 if (zTrans < 1000) {
-                    zTrans += 10;
+                    zTrans += 1;
                 }
                 break;
             case MINUS:

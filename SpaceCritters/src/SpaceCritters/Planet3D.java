@@ -45,10 +45,14 @@ public class Planet3D {
         s.setTranslateX(gameShell.mainScene.xFromX(x));
         s.setTranslateY(gameShell.mainScene.objectElevation);
         s.setTranslateZ(gameShell.mainScene.zFromY(y));
+        this.s.setRotationAxis(new Point3D(0, -1, 0));
 
         if (name.equalsIgnoreCase("Earth")) {
             decorateEarth(s);
+        } else if (name.equalsIgnoreCase("RM'Ack")) {
+            decorateRMack(s);
         }
+
     }
 
     public void recordMoveTo(int x, int y) {
@@ -59,7 +63,6 @@ public class Planet3D {
     public void updatePosition() {
         if (nextX != x || nextY != y) {
             forceUpdatePosition();
-            this.s.setRotationAxis(new Point3D(0, -1, 0));
             this.s.setRotate(rotation);
             rotation += 10;
             if (rotation > 360) {
@@ -79,18 +82,26 @@ public class Planet3D {
     private static Image dMap;
     private static Image bMap;
     private static Image sMap;
+    private static Image dMapMack;
 
-    public static void loadEarth() {
+    public static void preLoadPlanetImages() {
         dMap = new Image(SpaceCritters.class.getResourceAsStream("dMap_earth.jpg"));
         bMap = new Image(SpaceCritters.class.getResourceAsStream("bMap_earth.jpg"));
         sMap = new Image(SpaceCritters.class.getResourceAsStream("sMap_earth.jpg"));
+        dMapMack = new Image(SpaceCritters.class.getResourceAsStream("dmap_rmack.jpg"));
     }
 
-    private void decorateEarth(Sphere earth) {
-        PhongMaterial earthMaterial = new PhongMaterial();
-        earthMaterial.setDiffuseMap(dMap);
-        earthMaterial.setBumpMap(bMap);
-        earthMaterial.setSpecularMap(sMap);
-        earth.setMaterial(earthMaterial);
+    private void decorateEarth(Sphere s) {
+        PhongMaterial material = new PhongMaterial();
+        material.setDiffuseMap(dMap);
+        material.setBumpMap(bMap);
+        material.setSpecularMap(sMap);
+        s.setMaterial(material);
+    }
+
+    private void decorateRMack(Sphere s) {
+        PhongMaterial material = new PhongMaterial();
+        material.setDiffuseMap(dMapMack);
+        s.setMaterial(material);
     }
 }
