@@ -34,8 +34,10 @@ RESIDENT,ephemera.eastsideprep.org,stockelements,Ezkar,ephemera.eastsideprep.org
 STAR,ephemera.eastsideprep.org,stockelements,L726-8,,161,45,1,,
 STAR,ephemera.eastsideprep.org,stockelements,Ross154,,2,-179,1.4,,
 STAR,ephemera.eastsideprep.org,stockelements,Ross248,,143,-36,0.7,,
-PLANET,ephemera.eastsideprep.org,stockelements,Petigi,ephemera.eastsideprep.org:stockelements:Ross248,1,1,16,8,"notes:""Impossible to spawn on this planet"""
-STAR,ephemera.eastsideprep.org,stockelements,Epsilon Eridani,,145,148,22.2,,
+PLANET,ephemera.eastsideprep.org,stockelements,Petigi,ephemera.eastsideprep.org:stockelements:Ross248,3,5,16,8,"notes:""Impossible to spawn on this planet"""
+STAR,ephemera.eastsideprep.org,stockelements,EpsilonEridani,,145,148,22.2,,
+PLANET,ephemera.eastsideprep.org,stockelements,RM'Ack,ephemera.eastsideprep.org:stockelements:EpsilonEridani,6,2,16,8,"notes:""Lots of places to hide on this planet, aliens on this planet do not show up on radar."""
+RESIDENT,ephemera.eastsideprep.org,stockelements,Space Pirate Blackhole Gang,ephemera.eastsideprep.org:stockelements:RM'Ack,0,0,8,8,"notes:""Will always fight"""
 STAR,ephemera.eastsideprep.org,stockelements,Lacaille9352,,171,-45,5.3,,
 STAR,ephemera.eastsideprep.org,stockelements,Ross128,,-211,53,1.2,,
 STAR,ephemera.eastsideprep.org,stockelements,L789-6,,186,-105,1.4,,

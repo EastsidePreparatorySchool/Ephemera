@@ -149,7 +149,7 @@ public class SpaceCritters extends Application {
 
             // show the splash sceen unless we have autostart
             if (!(boolean) Constants.getValue("autoStart")) {
-                dstage.show();
+                //dstage.show();
             }
             // and tell the engine (and through it, the shell) that we are done adding elements
             engine.queueCommand(new GameCommand(GameCommandCode.Ready));
