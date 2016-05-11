@@ -135,7 +135,7 @@ public class SpaceCritters extends Application {
             stage.setOnCloseRequest(e -> handleExit());
 
             // load fancy earth
-            Planet3D.loadEarth();
+            Planet3D.preLoadPlanetImages();
 
             // set scene and stage
             border.setCenter(mainScene.outer);
