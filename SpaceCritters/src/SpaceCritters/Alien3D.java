@@ -16,6 +16,7 @@ public class Alien3D {
     int nextX;
     int nextY;
     int zPos;
+    int nextZ;
     boolean isNew;
     boolean killMe;
 
@@ -31,6 +32,7 @@ public class Alien3D {
         this.x = Integer.MAX_VALUE;
         this.y = Integer.MAX_VALUE;
         this.zPos = 0;
+        this.nextZ = 0;
         this.id = id;
         this.as = as;
         this.isNew = true;
@@ -47,35 +49,38 @@ public class Alien3D {
     void updatePosition() {
         Cell cell;
 
-        if (nextX != x || nextY != y) {
-            if (!isNew) {
+        if (nextX != x || nextY != y || nextZ != zPos) {
+            if (nextX != x || nextY != y) { // if we are changing cells
+                if (!isNew) {
+                    cell = gameShell.field.getCell(x, y);
+                    cell.removeAlien(this);
+                }
+
+                x = nextX;
+                y = nextY;
+
                 cell = gameShell.field.getCell(x, y);
-                cell.removeAlien(this);
+                cell.addAlien(this);
+
+                if (isNew) {
+                    gameShell.mainScene.root.getChildren().add(this.alien);
+                    isNew = false;
+                }
+            } else {// we are only changing height
+                zPos = nextZ;
             }
-
-            x = nextX;
-            y = nextY;
-
+            
             alien.setTranslateX(gameShell.mainScene.xFromX(x));
             alien.setTranslateY(gameShell.mainScene.yFromIndex(zPos));
             alien.setTranslateZ(gameShell.mainScene.zFromY(y));
 
-            cell = gameShell.field.getCell(x, y);
-            cell.addAlien(this);
-
-            if (isNew) {
-                this.zPos = cell.aliens.size() - 1;
-
-                gameShell.mainScene.root.getChildren().add(this.alien);
-                isNew = false;
-            }
         }
     }
 
     public void recordMoveTo(int x, int y) {
         this.nextX = x;
         this.nextY = y;
-        
+
         gameShell.mainScene.updateQueue.add(this);
     }
 
