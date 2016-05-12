@@ -280,12 +280,12 @@ public class Scene3D {
                 new Rotate(xRot, Rotate.X_AXIS),
                 new Translate(0, 0, zTrans)
         );
-        pLight.getTransforms().setAll(
+        /*pLight.getTransforms().setAll(
                 new Translate(focusX, 0, focusY),
                 new Rotate(yRot, Rotate.Y_AXIS),
                 new Rotate(xRot, Rotate.X_AXIS),
                 new Translate(0, 0, zTrans)
-        );
+        );*/
 
         e.consume();
     }
