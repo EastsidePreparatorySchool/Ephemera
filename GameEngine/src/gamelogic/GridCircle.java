@@ -6,6 +6,7 @@
 package gamelogic;
 
 import alieninterfaces.Position;
+import java.util.AbstractCollection;
 import java.util.Iterator;
 import java.util.Spliterators;
 
@@ -17,27 +18,46 @@ import java.util.Spliterators;
  * this class - create and then use in enhanced for loop - can be used for any
  * metric we might choose
  */
-public class GridCircle implements Iterable<Position> {
+public class GridCircle extends AbstractCollection<Position> {
 
     Position center;
     int radius;
     Position view;
 
     public GridCircle(int centerX, int centerY, int radius) {
-        this.center = new Position (centerX, centerY);
+        this.center = new Position(centerX, centerY);
         this.radius = radius;
-        this.view = new Position (centerX, centerY);
+        this.view = new Position(centerX, centerY);
     }
 
     public GridCircle(int centerX, int centerY, int radius, int viewX, int viewY) {
-        this.center = new Position (centerX, centerY);
+        this.center = new Position(centerX, centerY);
         this.radius = radius;
-        this.view = new Position (viewX, viewY);
+        this.view = new Position(viewX, viewY);
     }
 
     @Override
     public Iterator<Position> iterator() {
         return new PositionIterator();
+    }
+
+    @Override
+    public int size() {
+        // if it is far enough away from the edges, this is simple
+        if (center.x > -Constants.width / 2
+                && center.x < Constants.width / 2
+                && center.y > -Constants.width / 2
+                && center.y < Constants.width / 2 - radius) {
+            return 4 * radius;
+        }
+        
+        // otherwise, we will have to count because it skips invalid cells
+        int count = 0;
+        for (Position p : this) {
+            count++;
+        }
+        
+        return count;
     }
 
     // this is used in for(int[] point:circle)
@@ -80,11 +100,11 @@ public class GridCircle implements Iterable<Position> {
 
             do {
                 if (phase == 0) {
-                    point = new Position (center.x + (counter), center.y + (radius - (counter)));
+                    point = new Position(center.x + (counter), center.y + (radius - (counter)));
                 }
 
                 if (phase == 1) {
-                    point = new Position (center.x + (radius - counter), center.y - counter);
+                    point = new Position(center.x + (radius - counter), center.y - counter);
                 }
 
                 if (phase == 2) {
@@ -92,7 +112,7 @@ public class GridCircle implements Iterable<Position> {
                 }
 
                 if (phase == 3) {
-                    point = new Position (center.x - (radius - counter), center.y + counter);
+                    point = new Position(center.x - (radius - counter), center.y + counter);
                 }
 
                 if (++counter >= radius) {
@@ -115,7 +135,7 @@ public class GridCircle implements Iterable<Position> {
     }
 
     public boolean outOfView(Position point) {
-        return (distance(point, new Position (view.x, view.y)) > radius);
+        return (distance(point, new Position(view.x, view.y)) > radius);
     }
 
     public static boolean isValidPoint(Position point) {

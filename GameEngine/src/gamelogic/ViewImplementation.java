@@ -81,8 +81,8 @@ public class ViewImplementation implements View {
             if (acs.star != null) {
                 return new SpaceObject("Star", acs.star.className);
             } else if (acs.planet != null) {
-                return new SpaceObject("Planet", 
-                        distance(p.x, p.y, this.centerX, this.centerY) < 1?acs.planet.className:"");
+                return new SpaceObject("Planet",
+                        distance(p.x, p.y, this.centerX, this.centerY) < 1 ? acs.planet.className : "");
                 // you only get to know the name of a planet by landing on it
             }
         }
@@ -102,7 +102,7 @@ public class ViewImplementation implements View {
                     if (acs.star != null) {
                         so = new SpaceObject("Star", acs.star.className);
                     } else if (acs.planet != null) {
-                        so = new SpaceObject("Planet", d==0?acs.planet.className:"");
+                        so = new SpaceObject("Planet", d == 0 ? acs.planet.className : "");
                     }
                 }
 
@@ -173,7 +173,9 @@ public class ViewImplementation implements View {
 
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
-            for (Position point : c) {
+
+            c.stream().forEach(point -> {
+                //for (Position point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     for (AlienContainer ac : acs) {
@@ -182,10 +184,11 @@ public class ViewImplementation implements View {
                         }
                     }
                 }
-                // if any added in this circle, return
-                if (as.size() > 0) {
-                    return as;
-                }
+
+            });
+            // if any added in this circle, return
+            if (as.size() > 0) {
+                return as;
             }
         }
 
