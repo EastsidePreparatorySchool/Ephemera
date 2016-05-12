@@ -187,7 +187,8 @@ public class SpaceGrid {
 
     public void requestAlienMoves() {
         //vis.debugOut("Requesting moves for " + (aliens.size()) + " aliens");
-        for (AlienContainer ac : aliens) {
+        aliens.parallelStream().forEach( ac ->
+        /*for (AlienContainer ac : aliens) */{
             // get rid of stale views from prior moves
             ac.ctx.view = null;
 
@@ -209,7 +210,7 @@ public class SpaceGrid {
             if (Math.abs(ac.x - oldX) > 1 || Math.abs(ac.y - oldY) > 1) {
                 ac.energy -= moveLength;
             }
-        }
+        });
     }
 
     public void movePlanets() {
@@ -283,7 +284,7 @@ public class SpaceGrid {
     }
 
     public void resetAliens() {
-        aliens.stream().forEach((alien) -> {
+        aliens.parallelStream().forEach((alien) -> {
             alien.participatedInAction = false;
             alien.ctx.view = null;
             alien.outgoingMessage = null;

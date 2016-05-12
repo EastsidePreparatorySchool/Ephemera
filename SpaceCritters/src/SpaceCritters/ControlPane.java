@@ -162,8 +162,6 @@ public final class ControlPane extends VBox {
                     + System.lineSeparator()
                     + "Double-click    Set focal point & zoom in"
                     + System.lineSeparator()
-                    + "g                      Toggle grid"
-                    + System.lineSeparator()
                     + "-                       Zoom out"
                     + System.lineSeparator()
                     + "=/+                  Zoom in"

@@ -7,11 +7,8 @@ package SpaceCritters;
 
 import gameengineinterfaces.AlienSpec;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
-import javafx.geometry.Point3D;
 import javafx.geometry.Pos;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
@@ -20,7 +17,6 @@ import javafx.scene.PointLight;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.effect.Glow;
-import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
@@ -30,8 +26,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
@@ -262,14 +256,6 @@ public class Scene3D {
                 this.updatePlanetsAndStars();
                 break;
 
-            case G:
-                if (gridVisible) {
-                    root.getChildren().removeAll(grid);
-                } else {
-                    root.getChildren().addAll(grid);
-                }
-                gridVisible = !gridVisible;
-                break;
             default:
                 return; // do not consume this event if you can't handle it
         }
