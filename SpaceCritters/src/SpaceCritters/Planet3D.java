@@ -49,7 +49,7 @@ public class Planet3D {
 
         if (name.equalsIgnoreCase("Earth")) {
             decorateEarth(s);
-        } else if (name.equalsIgnoreCase("RM'Ack")) {
+        } else if (name.equalsIgnoreCase("RMack")) {
             decorateRMack(s);
         }
 

@@ -41,6 +41,8 @@ public class Planet extends InternalSpaceObject {
         gcIterator = gc.iterator();
         this.orbitalVelocityCounter = radius;
 
+        this.position = gcIterator.next();
+
         // randomize position in orbit
         for (int randomShift = grid.rand.nextInt(4 * radius); randomShift > 0; randomShift--) {
             this.position = gcIterator.next();
@@ -87,11 +89,11 @@ public class Planet extends InternalSpaceObject {
             // do this on a cloned list to avoid comodification
             LinkedList<AlienContainer> acsClone = (LinkedList<AlienContainer>) acsFrom.clone();
             for (AlienContainer ac : acsClone) {
-              if (ac.nextX == ac.x && ac.nextY == ac.y) {
-                  // they didn't intend to move away, move with planet
-                  ac.nextX = this.position.x;
-                  ac.nextY = this.position.y;
-              }
+                if (ac.nextX == ac.x && ac.nextY == ac.y) {
+                    // they didn't intend to move away, move with planet
+                    ac.nextX = this.position.x;
+                    ac.nextY = this.position.y;
+                }
             }
 
             // update our position
@@ -101,7 +103,7 @@ public class Planet extends InternalSpaceObject {
             this.grid.aliens.plugPlanet(this);
 
             // visualize
-            this.grid.vis.showPlanetMove(pOld.x, pOld.y, pNew.x, pNew.y, className, this.index, energy, (int)tech);
+            this.grid.vis.showPlanetMove(pOld.x, pOld.y, pNew.x, pNew.y, className, this.index, energy, (int) tech);
         }
         return this.position;
     }

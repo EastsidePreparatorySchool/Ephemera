@@ -101,7 +101,7 @@ public class Scene3D {
         pLight = new PointLight(Color.ANTIQUEWHITE);
         pLight.getTransforms().setAll(
                 new Translate(focusX, 0, focusY),
-                new Rotate(yRot+45, Rotate.Y_AXIS),
+                new Rotate(yRot, Rotate.Y_AXIS),
                 new Rotate(xRot, Rotate.X_AXIS),
                 new Translate(0, 0, zTrans)
         );
@@ -230,12 +230,12 @@ public class Scene3D {
             case PLUS:
             case EQUALS:
                 if (zTrans < 1000) {
-                    zTrans += 1;
+                    zTrans += 5;
                 }
                 break;
             case MINUS:
                 if (zTrans > -1000) {
-                    zTrans -= 10;
+                    zTrans -= 5;
                 }
                 break;
             case RIGHT:
@@ -271,7 +271,7 @@ public class Scene3D {
                 gridVisible = !gridVisible;
                 break;
             default:
-                return; // do not consumer this event if you can't handle it
+                return; // do not consume this event if you can't handle it
         }
 
         camera.getTransforms().setAll(
