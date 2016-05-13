@@ -28,6 +28,7 @@ class Cell {
 
     public void addAlien(Alien3D alien) {
         this.aliens.add(alien);
+        alien.zPos = this.alienCount;
         alien.nextZ = this.alienCount;
         this.alienCount++;
 

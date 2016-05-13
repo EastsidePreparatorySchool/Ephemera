@@ -65,7 +65,7 @@ public class Planet3D {
             forceUpdatePosition();
             this.s.setRotate(rotation);
             rotation += 10;
-            if (rotation > 360) {
+            if (rotation >= 360) {
                 rotation -= 360;
             }
         }

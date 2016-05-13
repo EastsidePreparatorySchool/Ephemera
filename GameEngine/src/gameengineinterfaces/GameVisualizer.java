@@ -45,6 +45,8 @@ public interface GameVisualizer {
     boolean showContinuePrompt();
 
     void showEngineStateChange(GameState gs);
+    
+    void showUpdateAfterRequestedActions();
 
     void showGameOver();
 

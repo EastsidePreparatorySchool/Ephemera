@@ -367,4 +367,11 @@ public class VisualizationGrid implements GameVisualizer {
         }
     }
 
+    @Override
+    public void showUpdateAfterRequestedActions() {
+        Utilities.runAndWait(() -> {
+            gameShell.mainScene.update();
+        });
+    }
+
 }

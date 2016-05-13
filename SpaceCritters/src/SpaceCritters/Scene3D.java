@@ -220,6 +220,7 @@ public class Scene3D {
                 this.objectElevation = 0;
                 this.focusX = 0.0;
                 this.focusY = -80.0;
+                this.updatePlanetsAndStars();
                 break;
             case PLUS:
             case EQUALS:
@@ -239,10 +240,22 @@ public class Scene3D {
                 yRot += 5;
                 break;
             case DOWN:
-                xRot += 2;
+                if (e.isShiftDown()) {
+                    objectElevation = 0;
+                    this.updatePlanetsAndStars();
+                } else {
+                    xRot += 2;
+                }
                 break;
             case UP:
-                xRot -= 2;
+                if (e.isShiftDown()) {
+                    if (objectElevation >= -20) {
+                        objectElevation -= 1;
+                        this.updatePlanetsAndStars();
+                    } else {
+                        xRot -= 2;
+                    }
+                }
                 break;
 
             case PAGE_UP:

@@ -96,6 +96,9 @@ public class SpaceGrid {
         removeDeadAliens();
 
         requestAlienActions();
+        
+        vis.showUpdateAfterRequestedActions();
+        
         performAlienActions();
         removeDeadAliens();
         resetAliens();
