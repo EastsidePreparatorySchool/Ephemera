@@ -174,8 +174,7 @@ public class ViewImplementation implements View {
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
 
-            c.stream().forEach(point -> {
-                //for (Position point : c) {
+            c.parallelStream().forEach(point -> {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     for (AlienContainer ac : acs) {

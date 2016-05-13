@@ -95,6 +95,7 @@ public class SpaceGrid {
         recordAlienMoves();
         removeDeadAliens();
 
+        requestAlienActions();
         performAlienActions();
         removeDeadAliens();
         resetAliens();
@@ -187,30 +188,30 @@ public class SpaceGrid {
 
     public void requestAlienMoves() {
         //vis.debugOut("Requesting moves for " + (aliens.size()) + " aliens");
-        aliens.parallelStream().forEach( ac ->
-        /*for (AlienContainer ac : aliens) */{
-            // get rid of stale views from prior moves
-            ac.ctx.view = null;
+        aliens.parallelStream().forEach(ac
+                -> /*for (AlienContainer ac : aliens) */ {
+                    // get rid of stale views from prior moves
+                    ac.ctx.view = null;
 
-            int oldX = ac.x;
-            int oldY = ac.y;
+                    int oldX = ac.x;
+                    int oldY = ac.y;
 
-            // call the alien to move
-            try {
-                ac.move();
-            } catch (UnsupportedOperationException e) {
-                // we'll let that go
-            } catch (Exception ex) {
-                displayException("Unhandled exception in getMove(): ", ex);
-                ac.kill("Death for unhandled exception in getMove(): " + ex.toString());
-            }
+                    // call the alien to move
+                    try {
+                        ac.move();
+                    } catch (UnsupportedOperationException e) {
+                        // we'll let that go
+                    } catch (Exception ex) {
+                        displayException("Unhandled exception in getMove(): ", ex);
+                        ac.kill("Death for unhandled exception in getMove(): " + ex.toString());
+                    }
 
-            // charge only for moves > 1 in either direction
-            int moveLength = GridCircle.distance(ac.x, ac.y, oldX, oldY - oldX);
-            if (Math.abs(ac.x - oldX) > 1 || Math.abs(ac.y - oldY) > 1) {
-                ac.energy -= moveLength;
-            }
-        });
+                    // charge only for moves > 1 in either direction
+                    int moveLength = GridCircle.distance(ac.x, ac.y, oldX, oldY - oldX);
+                    if (Math.abs(ac.x - oldX) > 1 || Math.abs(ac.y - oldY) > 1) {
+                        ac.energy -= moveLength;
+                    }
+                });
     }
 
     public void movePlanets() {
@@ -314,12 +315,11 @@ public class SpaceGrid {
         }
     }
 
-    public void performAlienActions() {
-        LinkedList<AlienSpec> newAliens = new LinkedList();
+    public void requestAlienActions() {
 
-        //vis.debugOut("Processing actions for " + (aliens.size()) + " aliens");
         // first request all the actions from the aliens
-        for (AlienContainer thisAlien : aliens) {
+        aliens.parallelStream().forEach(thisAlien -> {
+        //for (AlienContainer thisAlien : aliens) {
             // get rid of stale views from prior phases
             thisAlien.ctx.view = null;
 
@@ -337,7 +337,11 @@ public class SpaceGrid {
                 thisAlien.currentActionPower = 0;
                 thisAlien.kill("Death for unhandled exception in getAction(): " + ex.toString());
             }
-        }
+        });
+    }
+
+    public void performAlienActions() {
+        LinkedList<AlienSpec> newAliens = new LinkedList();
 
         // now process all actions
         for (AlienContainer thisAlien : aliens) {
@@ -819,7 +823,7 @@ public class SpaceGrid {
             String parent = engine.gamePath;
             parent = parent.substring(0, parent.lastIndexOf(System.getProperty("file.separator"))); // take of trailing separator
             parent = parent.substring(0, parent.lastIndexOf(System.getProperty("file.separator")) + 1); // take off "SpaceCritters" or such
-            
+
             addCustomAliens(parent, "");
         }
     }
