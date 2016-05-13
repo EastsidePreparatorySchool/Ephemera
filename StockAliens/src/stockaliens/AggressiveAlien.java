@@ -27,7 +27,7 @@ import javafx.scene.shape.Shape3D;
 public class AggressiveAlien implements Alien, AlienShapeFactory {
 
     Context ctx;
-    Mesh dalekMesh;
+    static Mesh dalekMesh;
 
     final boolean debug = true;
 
@@ -207,7 +207,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
             dalek.setRotate(-90);
            
             // THIS IS HERE TO MAKE IT NOT WORK!!!!!!
-            //return dalek;
+            return dalek;
 
         }
 
