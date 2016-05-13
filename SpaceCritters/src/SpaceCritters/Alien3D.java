@@ -2,10 +2,14 @@ package SpaceCritters;
 
 import alieninterfaces.AlienShapeFactory;
 import gameengineinterfaces.AlienSpec;
+import java.util.LinkedList;
+import javafx.collections.ObservableList;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Shape3D;
+import javafx.scene.transform.Transform;
+import javafx.scene.transform.Translate;
 
 /**
  *
@@ -26,6 +30,7 @@ public class Alien3D {
     final AlienSpec as;
     final SpaceCritters gameShell;
     Shape3D alien;
+    private LinkedList<Transform> intrinsicTransforms;
 
     public Alien3D(SpaceCritters gameShellInstance, AlienSpec as, int id, int x, int y,
             AlienShapeFactory asf) {
@@ -49,12 +54,15 @@ public class Alien3D {
         if (alien == null) {
             alien = new Box(0.5, 0.5, 0.5);
         }
+
+        this.intrinsicTransforms = new LinkedList();
+        for(Transform t:alien.getTransforms()) {
+            this.intrinsicTransforms.add(t);
+        }
+      
+
         alien.setMaterial(new PhongMaterial(gameShell.field.speciesSet.getColor(as.speciesName, as.speciesID)));
         alien.setDrawMode(DrawMode.FILL);
-
-        alien.setTranslateX(gameShell.mainScene.xFromX(x));
-        alien.setTranslateY(gameShell.mainScene.yFromIndex(zPos));
-        alien.setTranslateZ(gameShell.mainScene.zFromY(y));
     }
 
     void updatePosition() {
@@ -80,11 +88,12 @@ public class Alien3D {
             } else {// we are only changing height
                 zPos = nextZ;
             }
-
-            alien.setTranslateX(gameShell.mainScene.xFromX(x));
-            alien.setTranslateY(gameShell.mainScene.yFromIndex(zPos));
-            alien.setTranslateZ(gameShell.mainScene.zFromY(y));
-
+            alien.getTransforms().clear();
+            alien.getTransforms().add(new Translate(
+                            gameShell.mainScene.xFromX(x),
+                            gameShell.mainScene.yFromIndex(zPos),
+                            gameShell.mainScene.zFromY(y)));
+            alien.getTransforms().addAll(intrinsicTransforms);
         }
     }
 
