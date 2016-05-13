@@ -166,7 +166,8 @@ public class SpaceGrid {
 
     public void performReceives() {
         // phase 3: receive messages
-        for (AlienContainer ac : aliens) {
+        aliens.parallelStream().forEach( ac -> {
+        //for (AlienContainer ac : aliens) {
             if (ac.listening) {
                 // get rid of stale views from prior phases
                 ac.ctx.view = null;
@@ -183,7 +184,7 @@ public class SpaceGrid {
                     }
                 }
             }
-        }
+        });
     }
 
     public void requestAlienMoves() {
@@ -299,7 +300,8 @@ public class SpaceGrid {
     }
 
     public void processResults() {
-        for (AlienContainer ac : aliens) {
+        aliens.parallelStream().forEach(ac -> {
+        //for (AlienContainer ac : aliens) {
             // get rid of stale views from prior moves
             ac.ctx.view = null;
 
@@ -312,7 +314,7 @@ public class SpaceGrid {
 
                 ac.kill("Death for unhandled exception in processResults(): " + ex.toString());
             }
-        }
+        });
     }
 
     public void requestAlienActions() {
