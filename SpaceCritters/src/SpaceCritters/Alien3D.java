@@ -25,7 +25,7 @@ public class Alien3D {
     final int id;
     final AlienSpec as;
     final SpaceCritters gameShell;
-    final Shape3D alien;
+    Shape3D alien;
 
     public Alien3D(SpaceCritters gameShellInstance, AlienSpec as, int id, int x, int y,
             AlienShapeFactory asf) {
@@ -40,16 +40,18 @@ public class Alien3D {
         this.as = as;
         this.isNew = true;
         this.killMe = false;
+        this.alien = null;
 
         if (asf != null) {
             alien = asf.getShape();
-        } else {
+        }
+
+        if (alien == null) {
             alien = new Box(0.5, 0.5, 0.5);
-            alien.setMaterial(new PhongMaterial(gameShell.field.speciesSet.getColor(as.speciesName, as.speciesID)));
-            alien.setDrawMode(DrawMode.FILL);
         }
         alien.setMaterial(new PhongMaterial(gameShell.field.speciesSet.getColor(as.speciesName, as.speciesID)));
         alien.setDrawMode(DrawMode.FILL);
+
         alien.setTranslateX(gameShell.mainScene.xFromX(x));
         alien.setTranslateY(gameShell.mainScene.yFromIndex(zPos));
         alien.setTranslateZ(gameShell.mainScene.zFromY(y));
@@ -80,7 +82,7 @@ public class Alien3D {
             }
 
             alien.setTranslateX(gameShell.mainScene.xFromX(x));
-            alien.setTranslateY(gameShell.mainScene.yFromIndex(zPos)-10);
+            alien.setTranslateY(gameShell.mainScene.yFromIndex(zPos));
             alien.setTranslateZ(gameShell.mainScene.zFromY(y));
 
         }

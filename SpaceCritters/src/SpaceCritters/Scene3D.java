@@ -253,9 +253,10 @@ public class Scene3D {
                     if (objectElevation >= -20) {
                         objectElevation -= 1;
                         this.updatePlanetsAndStars();
-                    } else {
-                        xRot -= 2;
                     }
+                } else {
+                    xRot -= 2;
+
                 }
                 break;
 

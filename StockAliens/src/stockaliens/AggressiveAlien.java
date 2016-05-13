@@ -178,17 +178,17 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
         MeshView dalek;
         if (dalekMesh == null) {
             try {
-                // Try this tomorrow:
                 StlMeshImporter imp = new StlMeshImporter();
 
                 File file = getFile(this.getClass().getResourceAsStream("/Resources/DalekFull.stl"));
                 StlMeshImporter importer = new StlMeshImporter();
                 importer.read(file);
                 dalekMesh = importer.getImport();
-
+                
+                
                 /*
                 FXMLLoader fxmlLoader = new FXMLLoader();
-                fxmlLoader.setLocation(this.getClass().getResource("Duck.fxml"));
+                fxmlLoader.setLocation(this.getClass().getResource("/Resources/Duck.fxml"));
                 dalek = fxmlLoader.<MeshView>load();
                 dalekMesh = dalek.getMesh();
                  */
@@ -198,14 +198,14 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
         }
 
         if (dalekMesh != null) {
-        
+
             dalek = new MeshView(dalekMesh);
             dalek.setScaleX(0.5);
             dalek.setScaleY(0.5);
             dalek.setScaleZ(0.5);
-            dalek.setRotationAxis(new Point3D(1,0,0));
+            dalek.setRotationAxis(new Point3D(1, 0, 0));
             dalek.setRotate(-90);
-           
+
             // THIS IS HERE TO MAKE IT NOT WORK!!!!!!
             return dalek;
 
