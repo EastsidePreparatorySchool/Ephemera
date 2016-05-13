@@ -5,6 +5,7 @@
  */
 package SpaceCritters;
 
+import alieninterfaces.AlienShapeFactory;
 import gameengineinterfaces.AlienSpec;
 import gameengineinterfaces.*;
 import gamelogic.Constants;
@@ -175,8 +176,8 @@ public class VisualizationGrid implements GameVisualizer {
     @Override
     public void showSpawn(AlienSpec as, double energyAtPos) {
         debugOut("Engine reporting Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
-        speciesSet.addAlien(as.getFullSpeciesName(), as.speciesID);
-        gameShell.mainScene.createAlien(as, as.hashCode, as.x, as.y);
+        AlienShapeFactory asf = speciesSet.addAlien(as.getFullSpeciesName(), as.speciesID);
+        gameShell.mainScene.createAlien(as, as.hashCode, as.x, as.y, asf);
     }
 
     @Override
@@ -293,8 +294,8 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void registerSpecies(AlienSpec as) {
-        speciesSet.addAlienSpecies(as);
+    public void registerSpecies(AlienSpec as, AlienShapeFactory asf) {
+        speciesSet.addAlienSpecies(as, asf);
     }
 
     @Override

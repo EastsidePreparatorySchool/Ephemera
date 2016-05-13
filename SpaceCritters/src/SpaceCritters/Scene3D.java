@@ -5,6 +5,7 @@
  */
 package SpaceCritters;
 
+import alieninterfaces.AlienShapeFactory;
 import gameengineinterfaces.AlienSpec;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -147,8 +148,8 @@ public class Scene3D {
         this.planets.put(index, planet);
     }
 
-    public void createAlien(AlienSpec as, int id, int x, int y) {
-        Alien3D alien = new Alien3D(gameShell, as, id, x, y);
+    public void createAlien(AlienSpec as, int id, int x, int y, AlienShapeFactory asf) {
+        Alien3D alien = new Alien3D(gameShell, as, id, x, y, asf);
         this.aliens.put(as.hashCode, alien);
 
         // alien is added with isNew == true, this leads to update() adding it to the visuals

@@ -96,9 +96,9 @@ public class SpaceGrid {
         removeDeadAliens();
 
         requestAlienActions();
-        
+
         vis.showUpdateAfterRequestedActions();
-        
+
         performAlienActions();
         removeDeadAliens();
         resetAliens();
@@ -169,8 +169,8 @@ public class SpaceGrid {
 
     public void performReceives() {
         // phase 3: receive messages
-        aliens.parallelStream().forEach( ac -> {
-        //for (AlienContainer ac : aliens) {
+        aliens.parallelStream().forEach(ac -> {
+            //for (AlienContainer ac : aliens) {
             if (ac.listening) {
                 // get rid of stale views from prior phases
                 ac.ctx.view = null;
@@ -304,7 +304,7 @@ public class SpaceGrid {
 
     public void processResults() {
         aliens.parallelStream().forEach(ac -> {
-        //for (AlienContainer ac : aliens) {
+            //for (AlienContainer ac : aliens) {
             // get rid of stale views from prior moves
             ac.ctx.view = null;
 
@@ -324,7 +324,7 @@ public class SpaceGrid {
 
         // first request all the actions from the aliens
         aliens.parallelStream().forEach(thisAlien -> {
-        //for (AlienContainer thisAlien : aliens) {
+            //for (AlienContainer thisAlien : aliens) {
             // get rid of stale views from prior phases
             thisAlien.ctx.view = null;
 
@@ -629,7 +629,27 @@ public class SpaceGrid {
             as = new InternalAlienSpecies(element.domainName, element.packageName, element.className, speciesCounter);
             speciesMap.put(speciesName, as);
             speciesCounter++;
-            vis.registerSpecies(new AlienSpec(as));
+
+            if (as.cns == null) {
+                try {
+                    as.cns = LoadConstructor(engine, element.domainName, element.packageName, element.className);
+                } catch (Exception e) {
+                    gridDebugErr("sg.addSpecies: Error loading contructor for " + speciesName);
+                    //throw (e);
+                }
+                as.shapeFactory = null;
+                try {
+                    Alien a = (Alien) as.cns.newInstance();
+                    if (a instanceof AlienShapeFactory) {
+                        as.shapeFactory = (AlienShapeFactory) a;
+                    }
+                } catch (Exception e) {
+                    gridDebugErr("sg.addSpecies: Error constructing class reference alien for " + speciesName);
+                    //throw (e);
+                }
+
+            }
+            vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
         }
     }
 
@@ -648,17 +668,7 @@ public class SpaceGrid {
             as = new InternalAlienSpecies(domainName, alienPackageName, alienClassName, speciesCounter);
             speciesMap.put(speciesName, as);
             speciesCounter++;
-            vis.registerSpecies(new AlienSpec(as));
-        }
-
-        if (as.cns == null) {
-            try {
-                as.cns = LoadConstructor(engine, domainName, alienPackageName, alienClassName);
-            } catch (Exception e) {
-                gridDebugErr("sg.addAlien: Error loading contructor for " + speciesName);
-                //throw (e);
-            }
-
+            vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
         }
 
         if (as.counter < Constants.perSpeciesCap

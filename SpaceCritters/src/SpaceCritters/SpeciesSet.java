@@ -5,6 +5,7 @@
  */
 package SpaceCritters;
 
+import alieninterfaces.AlienShapeFactory;
 import gameengineinterfaces.AlienSpec;
 import java.util.Iterator;
 import javafx.collections.FXCollections;
@@ -40,11 +41,11 @@ public class SpeciesSet {
         }
     }
 
-    public void addAlien(String speciesName, int id) {
+    public AlienShapeFactory addAlien(String speciesName, int id) {
         for (AlienSpeciesForDisplay as : speciesList) {
             if (as.id == id) {
                 as.count++;
-                return;
+                return as.asf;
             }
         }
 
@@ -52,11 +53,12 @@ public class SpeciesSet {
         AlienSpeciesForDisplay as = new AlienSpeciesForDisplay(gameShell, speciesName, id);
         Utilities.runSafe(() -> speciesList.add(as));
         as.setOn(true);
+        return null;
 
     }
 
-    public void addAlienSpecies(AlienSpec as) {
-        AlienSpeciesForDisplay asfd = new AlienSpeciesForDisplay(gameShell, as);
+    public void addAlienSpecies(AlienSpec as, AlienShapeFactory asf) {
+        AlienSpeciesForDisplay asfd = new AlienSpeciesForDisplay(gameShell, as, asf);
         Utilities.runSafe(() -> speciesList.add(asfd));
         asfd.setOn(true);
     }

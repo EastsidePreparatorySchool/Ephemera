@@ -1,9 +1,11 @@
 package SpaceCritters;
 
+import alieninterfaces.AlienShapeFactory;
 import gameengineinterfaces.AlienSpec;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.DrawMode;
+import javafx.scene.shape.Shape3D;
 
 /**
  *
@@ -23,9 +25,10 @@ public class Alien3D {
     final int id;
     final AlienSpec as;
     final SpaceCritters gameShell;
-    final Box alien;
+    final Shape3D alien;
 
-    public Alien3D(SpaceCritters gameShellInstance, AlienSpec as, int id, int x, int y) {
+    public Alien3D(SpaceCritters gameShellInstance, AlienSpec as, int id, int x, int y,
+            AlienShapeFactory asf) {
         this.gameShell = gameShellInstance;
         this.nextX = x;
         this.nextY = y;
@@ -38,7 +41,13 @@ public class Alien3D {
         this.isNew = true;
         this.killMe = false;
 
-        alien = new Box(0.5, 0.5, 0.5);
+        if (asf != null) {
+            alien = asf.getShape();
+        } else {
+            alien = new Box(0.5, 0.5, 0.5);
+            alien.setMaterial(new PhongMaterial(gameShell.field.speciesSet.getColor(as.speciesName, as.speciesID)));
+            alien.setDrawMode(DrawMode.FILL);
+        }
         alien.setMaterial(new PhongMaterial(gameShell.field.speciesSet.getColor(as.speciesName, as.speciesID)));
         alien.setDrawMode(DrawMode.FILL);
         alien.setTranslateX(gameShell.mainScene.xFromX(x));
@@ -69,9 +78,9 @@ public class Alien3D {
             } else {// we are only changing height
                 zPos = nextZ;
             }
-            
+
             alien.setTranslateX(gameShell.mainScene.xFromX(x));
-            alien.setTranslateY(gameShell.mainScene.yFromIndex(zPos));
+            alien.setTranslateY(gameShell.mainScene.yFromIndex(zPos)-10);
             alien.setTranslateZ(gameShell.mainScene.zFromY(y));
 
         }

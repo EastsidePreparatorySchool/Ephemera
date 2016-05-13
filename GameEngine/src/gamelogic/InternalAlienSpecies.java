@@ -5,6 +5,7 @@
  */
 package gamelogic;
 
+import alieninterfaces.AlienShapeFactory;
 import alieninterfaces.AlienSpecies;
 import java.lang.reflect.Constructor;
 
@@ -14,6 +15,7 @@ import java.lang.reflect.Constructor;
  */
 public class InternalAlienSpecies extends AlienSpecies {
     public Constructor<?> cns;
+    public AlienShapeFactory shapeFactory;
     public long counter;
     public long spawns;
 

@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface GameVisualizer {
     
-    void registerSpecies(AlienSpec as);
+    void registerSpecies(AlienSpec as, AlienShapeFactory asf);
     
     void registerStar(int x, int y, String name, int index, double luminosity);
     

@@ -5,6 +5,7 @@
  */
 package SpaceCritters;
 
+import alieninterfaces.AlienShapeFactory;
 import gameengineinterfaces.AlienSpec;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -24,6 +25,7 @@ public class AlienSpeciesForDisplay {
     String packageName;
     String className;
     int id;
+    AlienShapeFactory asf;
 
     int count;
     Color color;
@@ -43,12 +45,13 @@ public class AlienSpeciesForDisplay {
         this.color = alienColors[colorCount % alienColors.length];
         this.style = alienStyles[colorCount % alienColors.length];
         colorCount++;
+        this.asf = null;
 
         on.setValue(true);
 
     }
 
-    AlienSpeciesForDisplay(SpaceCritters gameShellInstance, AlienSpec as) {
+    AlienSpeciesForDisplay(SpaceCritters gameShellInstance, AlienSpec as, AlienShapeFactory asf) {
         this.gameShell = gameShellInstance;
         this.domainName = as.domainName;
         this.packageName = as.packageName;
@@ -59,6 +62,7 @@ public class AlienSpeciesForDisplay {
         this.color = alienColors[colorCount % alienColors.length];
         this.style = alienStyles[colorCount % alienColors.length];
         colorCount++;
+        this.asf = asf;
 
         //on.setValue(true);
     }
