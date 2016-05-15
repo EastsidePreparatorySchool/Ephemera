@@ -148,31 +148,12 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showFightBefore(int x, int y, List<AlienSpec> participants) {
-        if (showFights) {
-            println("Vis.showFightBefore at (" + x + "," + y + "):");
-            for (AlienSpec as : participants) {
-                print("Alien \"" + as.getFullName() + "\" ");
-                print(" is fighting with power " + as.actionPower);
-                println("");
-            }
-        }
-        getCell(x, y).fight(participants.size());
+    public void showFight(int x, int y) {
+       
+        getCell(x, y).fight();
     }
 
-    @Override
-    public void showFightAfter(int x, int y, List<AlienSpec> participants) {
-        if (showFights) {
-            println("");
-            println("Here is what is left from that fight:");
-            for (AlienSpec as : participants) {
-                print("Alien \"" + as.getFullName() + "\" ");
-                print(" now has tech/energy " + as.getTechEnergyString());
-                println("");
-            }
-        }
-    }
-
+ 
     @Override
     public void showSpawn(AlienSpec as, double energyAtPos) {
         debugOut("Engine reporting Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());

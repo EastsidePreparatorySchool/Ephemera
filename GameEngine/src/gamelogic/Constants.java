@@ -39,6 +39,7 @@ public class Constants {
     public static String filters = "death; violation";
     public static boolean pauseOnError = true; // debugErr stops the show
     public static boolean searchParentForAliens = true; // searches whole user folder in addition to aliens folder
+    public static int shapeComplexityLimit = 5000; // max number of faces for custom aliens shapes
 
     /*
     ** Not truly adjustable yet - do not change these, do not put in config file

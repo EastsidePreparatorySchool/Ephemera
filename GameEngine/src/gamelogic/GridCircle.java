@@ -8,7 +8,6 @@ package gamelogic;
 import alieninterfaces.Position;
 import java.util.AbstractCollection;
 import java.util.Iterator;
-import java.util.Spliterators;
 
 /**
  *

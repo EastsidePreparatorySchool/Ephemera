@@ -6,6 +6,7 @@
 package gamelogic;
 
 import alieninterfaces.Position;
+import gameengineinterfaces.PlanetBehavior;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -23,12 +24,13 @@ public class Planet extends InternalSpaceObject {
     Position parentPosition;
 
     public Planet(SpaceGrid grid, int parentx, int parenty, int radius, int index, String domainName, String packageName, String className,
-            double energy, double tech, String parent) {
+            double energy, double tech, String parent, PlanetBehavior pb) {
         super(grid, parentx, parenty, index, domainName, packageName, className, energy, tech);
         this.parent = parent;
         this.parentPosition = new Position(parentx, parenty);
         this.radius = radius;
         this.isPlanet = true;
+        this.pb = pb;
     }
 
     public void startOrbit() {
@@ -106,5 +108,56 @@ public class Planet extends InternalSpaceObject {
             this.grid.vis.showPlanetMove(pOld.x, pOld.y, pNew.x, pNew.y, className, this.index, energy, (int) tech);
         }
         return this.position;
+    }
+
+    public void communicateWithAliens() {
+
+        if (pb == null) {
+            return;
+        }
+
+        try {
+            pb.communicateWithAliens();
+        } catch (UnsupportedOperationException e) {
+            // that's ok.
+        }
+    }
+
+    public void receive() {
+        if (pb == null) {
+            return;
+        }
+
+        try {
+            pb.receive();
+        } catch (UnsupportedOperationException e) {
+            // that's ok.
+        }
+
+    }
+
+    public void reviewInhabitants() {
+        if (pb == null) {
+            return;
+        }
+
+        try {
+            pb.reviewInhabitants();
+        } catch (UnsupportedOperationException e) {
+            // that's ok.
+        }
+
+    }
+
+    public void reviewInhabitantActions() {
+        if (pb == null) {
+            return;
+        }
+
+        try {
+            pb.reviewInhabitantActions();
+        } catch (UnsupportedOperationException e) {
+            // that's ok.
+        }
     }
 }

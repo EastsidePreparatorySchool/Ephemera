@@ -25,12 +25,12 @@ public class PlanetRMack implements PlanetBehavior {
     }
 
     @Override
-    public void moveAliens() {
+    public void reviewInhabitants() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void affectAliens() {
+    public void reviewInhabitantActions() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

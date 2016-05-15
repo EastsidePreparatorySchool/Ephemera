@@ -7,18 +7,10 @@ package stockaliens;
 
 import alieninterfaces.*;
 import com.interactivemesh.jfx.importer.stl.StlMeshImporter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point3D;
-import javafx.scene.shape.Mesh;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Shape3D;
+import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
@@ -30,7 +22,8 @@ import javafx.scene.transform.Translate;
 public class AggressiveAlien implements Alien, AlienShapeFactory {
 
     Context ctx;
-    static Mesh dalekMesh;
+    static TriangleMesh dalekMesh;
+    boolean tooComplex = false;
 
     final boolean debug = true;
 
@@ -177,61 +170,26 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
     }
 
     @Override
-    public Shape3D getShape() {
+    public Shape3D getShape(int complexityLimit) {
         MeshView dalek;
         if (dalekMesh == null) {
             try {
-                StlMeshImporter imp = new StlMeshImporter();
-
-                File file = getFile(this.getClass().getResourceAsStream("/Resources/DalekFull.stl"));
                 StlMeshImporter importer = new StlMeshImporter();
-                importer.read(file);
+                importer.read(this.getClass().getResource("/Resources/DalekFull.stl"));
                 dalekMesh = importer.getImport();
-
-                /*
-                FXMLLoader fxmlLoader = new FXMLLoader();
-                fxmlLoader.setLocation(this.getClass().getResource("/Resources/Duck.fxml"));
-                dalek = fxmlLoader.<MeshView>load();
-                dalekMesh = dalek.getMesh();
-                 */
-            } catch (IOException e) {
+                tooComplex = (dalekMesh.getFaceElementSize() > complexityLimit);
+            } catch (Exception e) {
                 dalekMesh = null;
             }
         }
 
-        if (dalekMesh != null) {
-
+        if (dalekMesh != null && !tooComplex) {
             dalek = new MeshView(dalekMesh);
             dalek.getTransforms().setAll(new Scale(0.01, 0.01, 0.01));
             dalek.getTransforms().add(new Translate(0, 20, 0));
             dalek.getTransforms().add(new Rotate(-90, new Point3D(1, 0, 0)));
-
             return dalek;
-
         }
-
         return null;
-    }
-
-    public File getFile(InputStream inStream) throws FileNotFoundException, IOException {
-
-        File file = new File("file.txt");
-        OutputStream outStream = null;
-        outStream = new FileOutputStream(file);
-
-        byte[] buffer = new byte[1024];
-
-        int length;
-        //copy the file content in bytes 
-        while ((length = inStream.read(buffer)) > 0) {
-
-            outStream.write(buffer, 0, length);
-
-        }
-
-        outStream.close();
-
-        return file;
-
     }
 }

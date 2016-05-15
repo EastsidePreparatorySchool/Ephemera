@@ -34,9 +34,7 @@ public interface GameVisualizer {
     
     void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition);
 
-    void showFightBefore(int x, int y, List<AlienSpec> aiens);
-
-    void showFightAfter(int x, int y, List<AlienSpec> aliens);
+    void showFight(int x, int y);
 
     void showSpawn(AlienSpec as, double energyAtPos);
             

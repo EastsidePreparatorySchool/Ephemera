@@ -2,6 +2,7 @@ package SpaceCritters;
 
 import alieninterfaces.AlienShapeFactory;
 import gameengineinterfaces.AlienSpec;
+import gamelogic.Constants;
 import java.util.LinkedList;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.PhongMaterial;
@@ -48,7 +49,7 @@ public class Alien3D {
         this.alien = null;
 
         if (asf != null) {
-            alien = asf.getShape();
+            alien = asf.getShape(Constants.shapeComplexityLimit);
         }
 
         if (alien == null) {

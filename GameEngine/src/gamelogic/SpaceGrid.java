@@ -91,11 +91,13 @@ public class SpaceGrid {
         requestAlienMoves();
         movePlanets();
         removeDeadAliens();
+        reviewInhabitants();
 
         recordAlienMoves();
         removeDeadAliens();
 
         requestAlienActions();
+        reviewInhabitantActions();
 
         vis.showUpdateAfterRequestedActions();
 
@@ -227,6 +229,16 @@ public class SpaceGrid {
         }
     }
 
+    private void reviewInhabitants() {
+        for (InternalSpaceObject so : this.objects) {
+            if (so.isPlanet) {
+                Planet p = (Planet)so;
+                p.reviewInhabitants();
+            }
+        }
+
+    }
+
     // now that moving is done and views don't matter anymore,
     // record the moves in AlienContainers and the grid
     public void recordAlienMoves() {
@@ -345,6 +357,15 @@ public class SpaceGrid {
         });
     }
 
+    private void reviewInhabitantActions() {
+     for (InternalSpaceObject so : this.objects) {
+            if (so.isPlanet) {
+                Planet p = (Planet)so;
+                p.reviewInhabitantActions();
+            }
+        }
+    }
+
     public void performAlienActions() {
         LinkedList<AlienSpec> newAliens = new LinkedList();
 
@@ -408,7 +429,7 @@ public class SpaceGrid {
                         }
                     }
 
-                    vis.showFightBefore(thisAlien.x, thisAlien.y, fightSpecs);
+                    vis.showFight(thisAlien.x, thisAlien.y);
 
                     // Determine the winning power in the fight
                     double winningPower = 0; // The fight powers might tie
@@ -467,7 +488,6 @@ public class SpaceGrid {
                                 ac.tech = 2;
                             }
                         }
-                        vis.showFightAfter(thisAlien.x, thisAlien.y, fightSpecs);
                     }
                     break;
                 case TradeOrDefend:
@@ -632,7 +652,7 @@ public class SpaceGrid {
 
             if (as.cns == null) {
                 try {
-                    as.cns = LoadConstructor(engine, element.domainName, element.packageName, element.className);
+                    as.cns = loadConstructor(engine, element.domainName, element.packageName, element.className);
                 } catch (Exception e) {
                     gridDebugErr("sg.addSpecies: Error loading contructor for " + speciesName);
                     //throw (e);
@@ -695,6 +715,7 @@ public class SpaceGrid {
     // addPlanet and addStar is nearly identical
     void addPlanet(GameElementSpec element) {
         InternalSpaceObject soParent = null;
+        PlanetBehavior pb = null;
 
         for (InternalSpaceObject o : this.objects) {
             if (element.parent.equalsIgnoreCase(o.getFullName())) {
@@ -703,11 +724,18 @@ public class SpaceGrid {
             }
         }
         if (soParent != null) {
+            try {
+                Constructor<?> cs = this.loadConstructor(engine, element.domainName, element.packageName, element.className);
+                pb = (PlanetBehavior) cs.newInstance();
+            } catch (Exception e) {
+                vis.debugOut("sg.addPlanet: behavior not found: " + element.className);
+            }
+
             Planet p = new Planet(this, soParent.position.x, soParent.position.y,
                     GridCircle.distance(element.x, element.y, 0, 0),
                     planetCount++,
                     element.domainName, element.packageName, element.className,
-                    element.energy, element.tech, element.parent);
+                    element.energy, element.tech, element.parent, pb);
             p.startOrbit();
             objects.add(p);
             this.aliens.plugPlanet(p);
@@ -754,7 +782,7 @@ public class SpaceGrid {
     // Dynamic class loader (.jar files)
     // stolen from StackOverflow, considered dark voodoo magic
     //
-    public Constructor<?> LoadConstructor(GameEngineV1 engine, String domainName, String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    public Constructor<?> loadConstructor(GameEngineV1 engine, String domainName, String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Constructor<?> cs = null;
         String fullName;
         File file;
@@ -790,8 +818,8 @@ public class SpaceGrid {
 
             cs = ClassLoader.getSystemClassLoader().loadClass(fullClassName).getConstructor();
         } catch (Exception e) {
-            e.printStackTrace();
-            //vis.debugErr("GameElementThread: Error: Could not get constructor");
+            //e.printStackTrace();
+            vis.debugErr("sg: Could not get constructor: " + className);
             throw e;
         }
         return cs;

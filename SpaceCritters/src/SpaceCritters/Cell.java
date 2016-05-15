@@ -54,7 +54,7 @@ class Cell {
         }
     }
 
-    public void fight(int num) {
-        totalFighters = num;
+    public void fight() {
+        totalFighters = this.alienCount;
     }
 }

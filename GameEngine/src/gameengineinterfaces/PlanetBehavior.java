@@ -12,6 +12,6 @@ package gameengineinterfaces;
 public interface PlanetBehavior {
     void communicateWithAliens();
     void receive();
-    void moveAliens();
-    void affectAliens();
+    void reviewInhabitants();
+    void reviewInhabitantActions();
 }
