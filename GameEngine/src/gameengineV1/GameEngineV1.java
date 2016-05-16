@@ -14,6 +14,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import com.google.gson.Gson;
+import java.io.FileWriter;
 
 /**
  *
@@ -37,6 +39,9 @@ public class GameEngineV1 implements GameEngine {
     @Override
     public void initFromFile(GameVisualizer v, String gameJarPath, String alienPath, String savedGameFile) {
         GameElementSpec[] savedGame;
+        GameElementSpec element = null;
+
+        Gson gson = new Gson();
 
         this.vis = v;
         this.gamePath = gameJarPath;
@@ -52,97 +57,26 @@ public class GameEngineV1 implements GameEngine {
         // Every line has kind, package, class, state in csv format
         //
         BufferedReader in;
-
+        
         try {
             in = new BufferedReader(new FileReader(this.gamePath + savedGameFile));
-
+           
             String strLine;
             while ((strLine = in.readLine()) != null) {
                 try {
                     //vis.debugOut("GameEngineV1: read config line: " + strLine);
-                    String[] strElement = strLine.split(",");
-
+                 
                     // ignore empty lines
-                    if (strElement.length == 0) {
+                    if (strLine.length() == 0) {
                         continue;
                     }
-                    // need at least the code
-                    if (strElement[0] == null) {
-                        throw new ParseException(strLine, 0);
-                    }
-
+                  
                     // ignore comments
-                    if (strElement[0].startsWith("!")) {
+                    if (strLine.startsWith("!")) {
                         continue;
                     }
 
-                    //if (strElement[0].equalsIgnoreCase("COMMAND")) // make new GameElement from code and next few fields
-                    GameElementSpec element = new GameElementSpec(strElement[0]);
-
-                    // get domain name
-                    if (strElement.length > 1 && strElement[1] != null) {
-                        element.domainName = strElement[1].trim();
-                    } else {
-                        element.domainName = "";
-                    }
-
-                    // get package name
-                    if (strElement.length > 2 && strElement[2] != null) {
-                        element.packageName = strElement[2].trim();
-                    } else {
-                        element.packageName = "";
-                    }
-
-                    // get class name
-                    if (strElement.length > 3 && strElement[3] != null) {
-                        element.className = strElement[3].trim();
-                    } else {
-                        element.className = "";
-                    }
-
-                    // get parent
-                    if (strElement.length > 4 && strElement[4] != null) {
-                        element.parent = strElement[4].trim();
-                    } else {
-                        element.parent = "";
-                    }
-
-                    // get pos x
-                    if (strElement.length > 5 && strElement[5] != null
-                            && !strElement[5].trim().isEmpty()) {
-                        element.x = Integer.parseInt(strElement[5].trim());
-                        
-                    } else {
-                        element.x = 0;
-                    }
-
-                    // get pos Y
-                    if (strElement.length > 6 && strElement[6] != null && !strElement[6].trim().isEmpty()) {
-                        element.y = Integer.parseInt(strElement[6].trim());
-                    } else {
-                        element.y = 0;
-                    }
-
-                    // get energy TODO: Deal with real doubles here if we want them
-                    if (strElement.length > 7 && strElement[7] != null && !strElement[7].trim().isEmpty()) {
-                        element.energy = Double.parseDouble(strElement[7].trim());
-                    } else {
-                        element.energy = 0;
-                    }
-
-                    // get tech
-                    if (strElement.length > 8 && strElement[8] != null && !strElement[8].trim().isEmpty()) {
-                        element.tech = Integer.parseInt(strElement[8].trim());
-                    } else {
-                        element.tech = 0;
-                    }
-
-                    // get state
-                    if (strElement.length > 9 && strElement[9] != null) {
-                        element.state = strElement[9].trim();
-                    } else {
-                        element.state = "<no state>";
-                    }
+                    element = gson.fromJson(strLine, GameElementSpec.class);
 
                     // add to list
                     elements.add(element);
@@ -154,6 +88,7 @@ public class GameEngineV1 implements GameEngine {
                     v.debugOut("GameEngineV1:init:File parse error");
                     v.debugOut("GameEngineV1:init:     " + e.getMessage());
                 }
+               
             }
 
             in.close();

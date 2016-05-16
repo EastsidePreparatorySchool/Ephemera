@@ -126,7 +126,7 @@ public class SpaceCritters extends Application {
 
             // now initialize
             this.field.init(this, engine, consolePane, species, logPath, width, height);
-            engine.initFromFile(field, gamePath, alienPath, "sc_config.csv");
+            engine.initFromFile(field, gamePath, alienPath, "sc_config.json");
 
             // need field to be alive before constructing this
             mainScene = new Scene3D(this, (int) screenBounds.getWidth() - 220, (int) screenBounds.getHeight() - 20);
