@@ -11,6 +11,9 @@ import gamelogic.*;
 import java.util.HashMap;
 
 
+
+
+
 /**
  *
  * @author gunnar
@@ -22,7 +25,7 @@ public class SysAds implements Alien, ResidentAlien {
     int id;
     HashMap<String, Integer> secrets;
 
-
+    
     @Override
     public void init(Context ctx, int id, int parent, String message) {
         this.ctx = ctx;
@@ -65,8 +68,6 @@ public class SysAds implements Alien, ResidentAlien {
         // SysAds are not to be trifled with ...
         rc.setEnergy(1000);
         rc.setTech(255);
-        System.out.println("SysAds resident alien interface initialized");
-        
         ctx.debugOut("SysAds resident alien interface initialized");
     }
 }

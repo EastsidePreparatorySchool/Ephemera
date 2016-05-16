@@ -10,6 +10,7 @@ import gameengineinterfaces.GameState;
 import gamelogic.*;
 import gameengineinterfaces.*;
 import java.lang.reflect.Field;
+import com.google.gson.*;
 
 /**
  *
