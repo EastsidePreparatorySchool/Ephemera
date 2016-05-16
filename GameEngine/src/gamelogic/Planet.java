@@ -33,7 +33,7 @@ public class Planet extends InternalSpaceObject {
         this.pb = pb;
     }
 
-    public void startOrbit() {
+    public void init() {
         // slight random eccentricity
         position.x += grid.rand.nextInt(3) - 1;
         position.y += grid.rand.nextInt(3) - 1;
@@ -54,6 +54,11 @@ public class Planet extends InternalSpaceObject {
         // create another iterator
         if (!gcIterator.hasNext()) {
             gcIterator = gc.iterator();
+        }
+        
+        // initialize planet behavior
+        if (pb != null) {
+            pb.init(this);
         }
 
     }
@@ -116,7 +121,7 @@ public class Planet extends InternalSpaceObject {
         }
 
         try {
-            pb.reviewInhabitants(this);
+            pb.reviewInhabitants();
         } catch (UnsupportedOperationException e) {
             // that's ok.
         }
@@ -129,7 +134,7 @@ public class Planet extends InternalSpaceObject {
         }
 
         try {
-            pb.reviewInhabitantActions(this);
+            pb.reviewInhabitantActions();
         } catch (UnsupportedOperationException e) {
             // that's ok.
         }

@@ -175,7 +175,7 @@ public class ViewImplementation implements View {
             GridCircle c = new GridCircle(centerX, centerY, d);
 
             // can make this parallel, but eats a lot of available CPU on Mac
-            c.stream().forEach(point -> {
+            c.parallelStream().forEach(point -> {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     for (AlienContainer ac : acs) {

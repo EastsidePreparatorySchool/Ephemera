@@ -5,11 +5,9 @@
  */
 package stockelements;
 
-
 import alieninterfaces.*;
 import gameengineinterfaces.*;
 import gamelogic.*;
-
 
 /**
  *
@@ -17,14 +15,21 @@ import gamelogic.*;
  */
 public class RMack implements PlanetBehavior {
 
+    Planet p;
+    
     @Override
-    public void reviewInhabitants(Planet p) {
-        AlienCell acs = p.grid.aliens.getAliensAt(p.position);
-        
+    public void init(Planet p) {
+        this.p = p;
+        p.grid.gridDebugOut("RMack planet behavior intialized.");
     }
 
     @Override
-    public void reviewInhabitantActions(Planet p) {
+    public void reviewInhabitants() {
+        AlienCell acs = p.grid.aliens.getAliensAt(p.position);
     }
-    
+
+    @Override
+    public void reviewInhabitantActions() {
+    }
+
 }

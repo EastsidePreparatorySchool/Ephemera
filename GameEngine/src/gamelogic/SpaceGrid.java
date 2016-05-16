@@ -287,7 +287,9 @@ public class SpaceGrid {
         for (Iterator<AlienContainer> iterator = aliens.iterator(); iterator.hasNext();) {
             AlienContainer ac = iterator.next();
             if (ac.energy <= 0) {
-                vis.showDeath(ac.getFullAlienSpec(), 0);
+                if (!ac.packageName.equalsIgnoreCase("stockelements")) {
+                    vis.showDeath(ac.getFullAlienSpec(), 0);
+                }
                 aliens.unplug(ac);
                 iterator.remove();
 
@@ -565,7 +567,7 @@ public class SpaceGrid {
                         }
 
                         thisAlien.energy += acs.energyPerAlien * thisAlien.tech / Constants.energyGainReducer;
-                        
+
                         // cap it
                         if (thisAlien.energy > Constants.energyCap) {
                             thisAlien.energy = Constants.energyCap;
@@ -676,7 +678,10 @@ public class SpaceGrid {
                 }
 
             }
-            vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
+
+            if (!element.packageName.equalsIgnoreCase("stockelements")) {
+                vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
+            }
         }
     }
 
@@ -684,8 +689,9 @@ public class SpaceGrid {
         addAlienWithParams(x, y, domainName, alienPackageName, alienClassName, 0, 1, 1, null);
     }
 
-    void addAlienWithParams(int x, int y, String domainName, String alienPackageName, String alienClassName,
+    AlienContainer addAlienWithParams(int x, int y, String domainName, String alienPackageName, String alienClassName,
             int parent, double tech, double power, String spawnMsg) {
+        AlienContainer ac = null;
 
         String speciesName = domainName + ":" + alienPackageName + ":" + alienClassName;
 
@@ -695,26 +701,32 @@ public class SpaceGrid {
             as = new InternalAlienSpecies(domainName, alienPackageName, alienClassName, speciesCounter);
             speciesMap.put(speciesName, as);
             speciesCounter++;
-            vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
+            if (!alienPackageName.equalsIgnoreCase("stockelements")) {
+                vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
+            }
         }
 
         if (as.counter < Constants.perSpeciesCap
                 && as.spawns < Constants.perSpeciesSpawnCap) {
             try {
-                AlienContainer ac = new AlienContainer(this, this.vis, x, y,
+                ac = new AlienContainer(this, this.vis, x, y,
                         domainName, alienPackageName, alienClassName, as.cns, as,
                         tech, power, // tech and power
                         parent, // no parent
                         spawnMsg); // no spawn state
 
                 aliens.addAlienAndPlug(ac);
-                vis.showSpawn(ac.getFullAlienSpec(), 0);
+                if (!ac.packageName.equalsIgnoreCase("stockelements")) {
+                    vis.showSpawn(ac.getFullAlienSpec(), 0);
+                }
                 as.counter++;
                 as.spawns++;
             } catch (InstantiationException e) {
-                gridDebugErr("sg: could not instantiate new " + domainName + ":" + alienPackageName + ":" + alienClassName);
+                gridDebugErr("sg: could not instantiate new " + speciesName);
             }
         }
+
+        return ac;
     }
 
     // Note: Having a seperate method for each InternalSpaceObject seems a little gross,
@@ -743,7 +755,7 @@ public class SpaceGrid {
                     planetCount++,
                     element.domainName, element.packageName, element.className,
                     element.energy, element.tech, element.parent, pb);
-            p.startOrbit();
+            p.init();
             objects.add(p);
             this.aliens.plugPlanet(p);
             vis.registerPlanet(p.position.x, p.position.y, element.className, p.index, element.energy, (int) element.tech);
@@ -759,29 +771,63 @@ public class SpaceGrid {
     }
 
     void addResident(GameElementSpec element) {
-        HashMap secrets = new HashMap();
+
+        Planet p = null;
+
+        AlienContainer ac;
+        for (InternalSpaceObject o : this.objects) {
+            if ((element.parent.equalsIgnoreCase(o.getFullName())) && (o instanceof Planet)) {
+                p = (Planet) o;
+                break;
+            }
+        }
+
+        if (p == null) {
+            return;
+        }
+
+        addSpecies(element);
+
+        ac = addAlienWithParams(p.position.x, p.position.y, element.domainName, element.packageName, element.className,
+                0, 1, 1, element.state);
+
+        if (ac == null) {
+            return;
+        }
+
+        if (ac.alien instanceof ResidentAlien) {
+            ResidentContextImplementation rc = new ResidentContextImplementation(ac);
+            ((ResidentAlien) ac.alien).init(rc);
+        }
+
         // TODO add code to seed Residents with secrets loaded from config file
-        // Unsure of how secrets will be added to config, see Github issue
-        Resident r = new Resident(this, element.x, element.y, residentCount++, element.domainName, element.packageName, element.className, element.energy, element.tech, secrets, element.parent);
+        // ac gets created with empty secrets, spacegrid looks up resident by race from list
+        // and adds secrets one by one
     }
 
     public void addElement(GameElementSpec element) throws IOException {
-        // can't use switch here because switch on enum causes weird error
-        // if you doubt that, uncomment this line:
-        // switch (element.kind) {}
 
-        if (element.kind == GameElementKind.ALIEN) {
-            // position (0,0) leads to random assignment
-            addAlien(0, 0, element.domainName, element.packageName, element.className);
-
-        } else if (element.kind == GameElementKind.SPECIES) {
-            addSpecies(element);
-        } else if (element.kind == GameElementKind.PLANET) {
-            addPlanet(element);
-        } else if (element.kind == GameElementKind.STAR) {
-            addStar(element);
-        } else if (element.kind == GameElementKind.RESIDENT) {
-            addResident(element);
+        if (null != element.kind) {
+            switch (element.kind) {
+                case ALIEN:
+                    // position (0,0) leads to random assignment
+                    addAlien(0, 0, element.domainName, element.packageName, element.className);
+                    break;
+                case SPECIES:
+                    addSpecies(element);
+                    break;
+                case PLANET:
+                    addPlanet(element);
+                    break;
+                case STAR:
+                    addStar(element);
+                    break;
+                case RESIDENT:
+                    addResident(element);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 

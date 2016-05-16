@@ -97,7 +97,7 @@ public class AlienContainer {
             this.alienHashCode = ++currentID;
         } catch (Throwable t) {
             this.alien = null;
-            debugOut("ac: Error constructing Alien");
+            grid.gridDebugErr("ac: Error constructing Alien");
             throw new InstantiationException();
         }
 

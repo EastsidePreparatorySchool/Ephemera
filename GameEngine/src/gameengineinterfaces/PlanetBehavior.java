@@ -12,6 +12,7 @@ import gamelogic.*;
  * @author gmein
  */
 public interface PlanetBehavior {
-    void reviewInhabitants(Planet p);
-    void reviewInhabitantActions(Planet p);
+    void init (Planet p);
+    void reviewInhabitants();
+    void reviewInhabitantActions();
 }

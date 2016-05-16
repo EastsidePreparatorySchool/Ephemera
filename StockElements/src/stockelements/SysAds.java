@@ -27,6 +27,7 @@ public class SysAds implements Alien, ResidentAlien {
     public void init(Context ctx, int id, int parent, String message) {
         this.ctx = ctx;
         this.id = id;
+        ctx.debugOut("SysAds initialized");
     }
 
     @Override
@@ -64,5 +65,8 @@ public class SysAds implements Alien, ResidentAlien {
         // SysAds are not to be trifled with ...
         rc.setEnergy(1000);
         rc.setTech(255);
+        System.out.println("SysAds resident alien interface initialized");
+        
+        ctx.debugOut("SysAds resident alien interface initialized");
     }
 }
