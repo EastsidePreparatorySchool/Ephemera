@@ -232,7 +232,7 @@ public class SpaceGrid {
     private void reviewInhabitants() {
         for (InternalSpaceObject so : this.objects) {
             if (so.isPlanet) {
-                Planet p = (Planet)so;
+                Planet p = (Planet) so;
                 p.reviewInhabitants();
             }
         }
@@ -358,9 +358,9 @@ public class SpaceGrid {
     }
 
     private void reviewInhabitantActions() {
-     for (InternalSpaceObject so : this.objects) {
+        for (InternalSpaceObject so : this.objects) {
             if (so.isPlanet) {
-                Planet p = (Planet)so;
+                Planet p = (Planet) so;
                 p.reviewInhabitantActions();
             }
         }
@@ -555,14 +555,21 @@ public class SpaceGrid {
 
                     break;
                 case Gain:
-                    // todo: dshare power only among those gaining
+                    // todo: share power only among those gaining
                     if (thisAlien.energy < Constants.energyCap) {
                         AlienCell acs = aliens.getAliensAt(thisAlien.x, thisAlien.y);
+                        // if this cell was not initialized in this turn, initialize it
+                        // todo: how does this get reset? should it?
                         if (acs.energyPerAlien == 0) {
                             acs.energyPerAlien = acs.energy / acs.size(); // aliens have to share harvest in one spot
                         }
 
                         thisAlien.energy += acs.energyPerAlien * thisAlien.tech / Constants.energyGainReducer;
+                        
+                        // cap it
+                        if (thisAlien.energy > Constants.energyCap) {
+                            thisAlien.energy = Constants.energyCap;
+                        }
                     }
                     break;
 

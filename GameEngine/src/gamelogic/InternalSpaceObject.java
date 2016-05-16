@@ -22,10 +22,10 @@ public abstract class InternalSpaceObject {
     public final String packageName;
     public final String className;
     private String fullName;
-    protected SpaceGrid grid;
-    protected boolean isPlanet = false;
-    protected int index; 
-    PlanetBehavior pb;
+    public SpaceGrid grid;
+    public boolean isPlanet = false;
+    public int index; 
+    public PlanetBehavior pb;
 
     public double energy; // Energy that aliens gain every turn from the planet
     public double tech; // Tech boost for the planet

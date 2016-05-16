@@ -16,12 +16,12 @@ import java.util.LinkedList;
  */
 public class Planet extends InternalSpaceObject {
 
-    final String parent;
+    public final String parent;
     public int radius;
     private GridCircle gc;
     Iterator<Position> gcIterator;
     int orbitalVelocityCounter;
-    Position parentPosition;
+    public Position parentPosition;
 
     public Planet(SpaceGrid grid, int parentx, int parenty, int radius, int index, String domainName, String packageName, String className,
             double energy, double tech, String parent, PlanetBehavior pb) {
@@ -110,39 +110,13 @@ public class Planet extends InternalSpaceObject {
         return this.position;
     }
 
-    public void communicateWithAliens() {
-
+   public void reviewInhabitants() {
         if (pb == null) {
             return;
         }
 
         try {
-            pb.communicateWithAliens();
-        } catch (UnsupportedOperationException e) {
-            // that's ok.
-        }
-    }
-
-    public void receive() {
-        if (pb == null) {
-            return;
-        }
-
-        try {
-            pb.receive();
-        } catch (UnsupportedOperationException e) {
-            // that's ok.
-        }
-
-    }
-
-    public void reviewInhabitants() {
-        if (pb == null) {
-            return;
-        }
-
-        try {
-            pb.reviewInhabitants();
+            pb.reviewInhabitants(this);
         } catch (UnsupportedOperationException e) {
             // that's ok.
         }
@@ -155,7 +129,7 @@ public class Planet extends InternalSpaceObject {
         }
 
         try {
-            pb.reviewInhabitantActions();
+            pb.reviewInhabitantActions(this);
         } catch (UnsupportedOperationException e) {
             // that's ok.
         }

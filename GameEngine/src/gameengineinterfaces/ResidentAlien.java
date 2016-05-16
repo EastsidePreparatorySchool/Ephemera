@@ -5,13 +5,10 @@
  */
 package gameengineinterfaces;
 
-import gamelogic.*;
-
 /**
  *
- * @author gmein
+ * @author gunnar
  */
-public interface PlanetBehavior {
-    void reviewInhabitants(Planet p);
-    void reviewInhabitantActions(Planet p);
+public interface ResidentAlien {
+    void init (ResidentContext rc);
 }
