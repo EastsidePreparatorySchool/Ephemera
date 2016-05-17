@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
 package SpaceCritters;
 
@@ -59,6 +58,8 @@ public class SpaceCritters extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        
+        ArrayList<GameElementSpec> elements;
 
         try {
             // kludge to enable otherwise static methods
@@ -128,7 +129,11 @@ public class SpaceCritters extends Application {
             
             // and engine
             engine.init(field, gamePath, alienPath);
-            ArrayList<GameElementSpec> elements  = engine.readConfigFile("sc_config.json");
+            elements  = engine.readConfigFile("sc_config.json");
+            engine.processGameElements(elements);
+            
+            // load a game and process it
+            elements  = engine.readConfigFile("sc_brawl.json");
             engine.processGameElements(elements);
             
 

@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
 package SpaceCritters;
 
@@ -332,7 +331,7 @@ public class Scene3D {
         s.setMaterial(new PhongMaterial(Color.rgb(255, 0, 0, 0.2)));
         s.setDrawMode(DrawMode.FILL);
         s.setTranslateX(xFromX(x));
-        s.setTranslateY(-fighting);
+        s.setTranslateY(-fighting+1);
         s.setTranslateZ(zFromY(y));
         s.setOpacity(0.1);
 

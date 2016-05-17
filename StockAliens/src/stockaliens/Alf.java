@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
 package stockaliens;
 
@@ -75,7 +74,8 @@ public class Alf implements Alien {
 
         // move at least 1 
         if (x == 0 && y == 0) {
-            y = 1;
+            x = ctx.getRandomInt(3) - 1;
+            y = ctx.getRandomInt(3) - 1;
         }
         //but don't move into star
         try {
