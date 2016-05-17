@@ -5,18 +5,22 @@
  */
 package gameengineinterfaces;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author gmein
  */
 public interface GameEngine {
-    void init(GameVisualizer v, String gameJarPath, GameElementSpec[] gameConfig);
 
-    void initFromFile(GameVisualizer v, String gameJarPath, String alienPath, String gameConfigFile);
+    void init(GameVisualizer v, String gamePath, String alienPath);
+
+    ArrayList<GameElementSpec> readConfigFile(String fileName);
+
+    void processGameElements(ArrayList<GameElementSpec> elements);
 
     void queueCommand(GameCommand gc);
 
-    GameElementSpec[] saveGame();
-
     boolean isAlive();
+
 }

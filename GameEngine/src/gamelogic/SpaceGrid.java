@@ -391,6 +391,9 @@ public class SpaceGrid {
                         // but don't let them fight
                         break;
                     }
+                    if (true) {
+                        break;
+                    }
                     List<AlienSpec> fightSpecs = new ArrayList<>();
                     HashMap<String, Double> fightSpecies = new HashMap<>();
 

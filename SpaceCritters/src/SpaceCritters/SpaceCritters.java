@@ -13,6 +13,7 @@ import gamelogic.Constants;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 import java.util.Iterator;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -29,7 +30,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
-import static javafx.application.Application.launch;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -61,8 +61,6 @@ public class SpaceCritters extends Application {
     public void start(Stage stage) throws IOException {
 
         try {
-            dstage = createSplashScreen();
-
             // kludge to enable otherwise static methods
             currentInstance = this;
 
@@ -121,12 +119,18 @@ public class SpaceCritters extends Application {
             // initialize Ephemera game engine and visualizer
             //
             //get some objects created (not initialized, nothing important happens here)
-            engine = new GameEngineV1();
+            this.engine = new GameEngineV1();
             this.field = new VisualizationGrid();
 
-            // now initialize
+            // now initialize visualization field
+            
             this.field.init(this, engine, consolePane, species, logPath, width, height);
-            engine.initFromFile(field, gamePath, alienPath, "sc_config.json");
+            
+            // and engine
+            engine.init(field, gamePath, alienPath);
+            ArrayList<GameElementSpec> elements  = engine.readConfigFile("sc_config.json");
+            engine.processGameElements(elements);
+            
 
             // need field to be alive before constructing this
             mainScene = new Scene3D(this, (int) screenBounds.getWidth() - 220, (int) screenBounds.getHeight() - 20);
@@ -134,7 +138,7 @@ public class SpaceCritters extends Application {
             // set a hook to shut down engine on game exit
             stage.setOnCloseRequest(e -> handleExit());
 
-            // load fancy earth
+            // load fancy planets
             Planet3D.preLoadPlanetImages();
 
             // set scene and stage
@@ -144,14 +148,9 @@ public class SpaceCritters extends Application {
             mainScene.outer.requestFocus();
 
             stage.setScene(scene);
-
             stage.show();
 
-            // show the splash sceen unless we have autostart
-            if (!(boolean) Constants.getValue("autoStart")) {
-                //dstage.show();
-            }
-            // and tell the engine (and through it, the shell) that we are done adding elements
+            // and tell the engine that we are done adding elements
             engine.queueCommand(new GameCommand(GameCommandCode.Ready));
         } catch (Exception e) {
             System.out.println(e.toString());

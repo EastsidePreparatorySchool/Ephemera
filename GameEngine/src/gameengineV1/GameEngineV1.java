@@ -10,12 +10,10 @@ import gamelogic.*;
 import gameengineinterfaces.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import com.google.gson.Gson;
-import java.io.FileWriter;
 
 /**
  *
@@ -25,11 +23,17 @@ public class GameEngineV1 implements GameEngine {
 
     public SpaceGrid grid;
     GameVisualizer vis;
-    Queue<GameCommand> queue;
+    final Queue<GameCommand> queue;
     GameEngineThread gameThread;
     GameState gameState;
     public String gamePath;
     public String alienPath;
+    Gson gson;
+
+    public GameEngineV1() {
+        this.gson = new Gson();
+        this.queue = new ConcurrentLinkedQueue<>();
+    }
 
     @Override
     public boolean isAlive() {
@@ -37,40 +41,49 @@ public class GameEngineV1 implements GameEngine {
     }
 
     @Override
-    public void initFromFile(GameVisualizer v, String gameJarPath, String alienPath, String savedGameFile) {
-        GameElementSpec[] savedGame;
-        GameElementSpec element = null;
-
-        Gson gson = new Gson();
+    public void init(GameVisualizer v, String gamePath, String alienPath) {
+        // 
+        // save the visualizer (how we report status)
+        // create a new Spacegrid (the game board)
+        // set up a transfer queue that we will use to post commands to the game thread
+        //
 
         this.vis = v;
-        this.gamePath = gameJarPath;
+        gameState = GameState.Paused;
+        this.gamePath = gamePath;
         this.alienPath = alienPath;
 
         //
-        // read initial config from file
+        // start the thread, return to shell
         //
-        v.debugOut("GameEngineV1: read config file: " + savedGameFile);
+        vis.debugOut("GameEngine: Starting thread");
+        this.gameThread = new GameEngineThread(this);
+        this.gameThread.start();
+    }
 
-        ArrayList<GameElementSpec> elements = new ArrayList<GameElementSpec>(50);
+    @Override
+    public ArrayList<GameElementSpec> readConfigFile(String fileName) {
+        ArrayList<GameElementSpec> elements = new ArrayList<>(100);
+        GameElementSpec element;
         //
         // Every line has kind, package, class, state in csv format
         //
         BufferedReader in;
-        
+
         try {
-            in = new BufferedReader(new FileReader(this.gamePath + savedGameFile));
-           
+            in = new BufferedReader(new FileReader(this.gamePath + fileName));
+
             String strLine;
             while ((strLine = in.readLine()) != null) {
                 try {
                     //vis.debugOut("GameEngineV1: read config line: " + strLine);
-                 
+                    strLine = strLine.trim();
+                    
                     // ignore empty lines
                     if (strLine.length() == 0) {
                         continue;
                     }
-                  
+
                     // ignore comments
                     if (strLine.startsWith("!")) {
                         continue;
@@ -85,62 +98,40 @@ public class GameEngineV1 implements GameEngine {
                     //        + element.state);
 
                 } catch (Exception e) {
-                    v.debugOut("GameEngineV1:init:File parse error");
-                    v.debugOut("GameEngineV1:init:     " + e.getMessage());
+                    vis.debugOut("GameEngineV1:init:File parse error");
+                    vis.debugOut("GameEngineV1:init:     " + e.getMessage());
+                    return null;
                 }
-               
+
             }
 
             in.close();
 
         } catch (Exception e) {
-            v.debugOut("GameEngineV1:init:File-related error");
-            v.debugOut("GameEngineV1:init:     " + e.getMessage());
-            return;
+            vis.debugOut("GameEngineV1:init:File-related error");
+            vis.debugOut("GameEngineV1:init:     " + e.getMessage());
+            return null;
         }
-
-        // convert list into array to process as if it had been saved
-        savedGame = new GameElementSpec[1]; // this array will be grown automatically by "toArray" below
-        savedGame = elements.toArray(savedGame);
-
-        this.init(v, gameJarPath, savedGame);
+        return elements;
     }
 
+  
+
     @Override
-    public void init(GameVisualizer v, String gameJarPath, GameElementSpec[] savedGame) {
-        // 
-        // save the visualizer (how we report status)
-        // create a new Spacegrid (the game board)
-        // set up a transfer queue that we will use to post commands to the game thread
-        //
-
-        this.vis = v;
-        this.queue = new ConcurrentLinkedQueue<GameCommand>();
-        gameState = GameState.Paused;
-        this.gamePath = gameJarPath;
-
-        vis.debugOut("GameEngine: Creating thread");
-        this.gameThread = new GameEngineThread(this);
-
+    public void processGameElements(ArrayList<GameElementSpec> elements) {
         //
         // queue every game element
         //
-        vis.debugOut("GameEngineV1: Elements in config: " + Integer.toString(savedGame.length));
-        for (GameElementSpec element : savedGame) {
+        for (GameElementSpec element : elements) {
             GameCommand gc = new GameCommand(GameCommandCode.AddElement);
-            GameElementSpec[] elements = new GameElementSpec[1];
-            elements[0] = element;
-            gc.parameters = elements;
+            GameElementSpec[] elementContainer = new GameElementSpec[1];
+            elementContainer[0] = element;
+            gc.parameters = elementContainer;
 
             //vis.debugOut("GameEngine: Queueing new game element");
             queueCommand(gc);
         }
 
-        //
-        // start the thread, return to shell
-        //
-        vis.debugOut("GameEngine: Starting thread");
-        this.gameThread.start();
     }
 
     @Override
@@ -158,8 +149,4 @@ public class GameEngineV1 implements GameEngine {
         }
     }
 
-    @Override
-    public GameElementSpec[] saveGame() {
-        return new GameElementSpec[1];
-    }
 }
