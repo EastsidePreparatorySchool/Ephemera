@@ -381,6 +381,10 @@ public class SpaceGrid {
             switch (thisAlien.currentActionCode) {
                 case Fight:
                     //vis.debugOut("SpaceGrid: Processing Fight");
+                    
+                    if (Constants.iSaidNoFighting) {
+                        break;
+                    }
 
                     // If the alien is in the safe zone
                     if (isInSafeZone(thisAlien)) {
