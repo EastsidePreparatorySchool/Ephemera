@@ -25,7 +25,7 @@ public class AlienCell extends LinkedList<AlienContainer> {
         currentMessages = null;
         star = null;
         planet = null;
-        energy = 1;
+        energy = Constants.emptySpaceEnergy;
         tech = 0;
         listening = false;
     }
