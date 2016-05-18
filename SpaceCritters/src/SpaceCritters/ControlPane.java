@@ -1,3 +1,7 @@
+/*
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
+ */
 package SpaceCritters;
 
 import javafx.event.ActionEvent;
@@ -5,7 +9,6 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;

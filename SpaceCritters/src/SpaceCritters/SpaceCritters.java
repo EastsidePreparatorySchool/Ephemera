@@ -12,7 +12,6 @@ import gamelogic.Constants;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
 import java.util.Iterator;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
