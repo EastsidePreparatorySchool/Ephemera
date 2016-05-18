@@ -12,11 +12,13 @@ import gameengineinterfaces.*;
  * @author guberti
  */
 public class AchievementHolder {
-    HashMap<String, int[]> map;
+    AchievementReq[] achievements;
+    HashMap<String, boolean[]> map;
     
     AchievementHolder() {
         
     }
+    
     void RecieveFlag(AchievementFlag flag) {
         
     }
