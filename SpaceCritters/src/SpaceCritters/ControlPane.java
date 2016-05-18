@@ -153,7 +153,10 @@ public final class ControlPane extends VBox {
         });
 
         buttonConsole.setPrefSize(100, 20);
-        buttonConsole.setOnAction((ActionEvent e) -> gameShell.consoleStage.show());
+        buttonConsole.setOnAction((ActionEvent e) -> {
+            gameShell.consoleStage.show();
+            gameShell.consoleStage.toFront();
+        });
 
         buttonHelp.setPrefSize(100, 20);
         buttonHelp.setOnAction((ActionEvent e) -> {
@@ -178,7 +181,7 @@ public final class ControlPane extends VBox {
         });
 
         gameControls.getChildren().addAll(buttonPause, buttonConsole, buttonHelp);
-        }
+    }
 
     public void createSpeciesView() {
         bottom.setPadding(new Insets(10)); // Set all sides to 10

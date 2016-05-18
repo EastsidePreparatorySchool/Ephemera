@@ -59,7 +59,7 @@ public class SpaceCritters extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         
-        ArrayList<GameElementSpec> elements;
+        GameElementSpec[] elements;
 
         try {
             // kludge to enable otherwise static methods

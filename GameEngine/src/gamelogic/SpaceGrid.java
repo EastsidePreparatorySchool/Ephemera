@@ -107,25 +107,29 @@ public class SpaceGrid {
         removeDeadAliens();
 
         currentTurn++;
-
-        /*
-        AlienContainer aUniqueAlien = null;
-        for (AlienContainer a : aliens) {
-            if (a != null) {
-                if (aUniqueAlien != null) {
-                    if (!aUniqueAlien.speciesName.equalsIgnoreCase(a.speciesName)) {
-                        // more than one species active, game not over
-                        return false;
+        if (currentTurn > Constants.maxTurns) {
+            return true;
+        }
+        
+        if (Constants.gameMode.equalsIgnoreCase("Brawl")) {
+            AlienContainer aUniqueAlien = null;
+            for (AlienContainer a : aliens) {
+                if (a != null) {
+                    if (aUniqueAlien != null) {
+                        if (!aUniqueAlien.speciesName.equalsIgnoreCase(a.speciesName)) {
+                            // more than one species active, game not over
+                            return false;
+                        }
+                    } else {
+                        // record this alien as the first species we found
+                        aUniqueAlien = a;
                     }
-                } else {
-                    // record this alien as the first species we found
-                    aUniqueAlien = a;
                 }
             }
+            // if we get to here, there was at most one species. Game Over.
+            return true;
         }
-        // if we get to here, there was at most one species. Game Over.
-        return true;
-         */
+        
         return false;
     }
 
@@ -381,7 +385,7 @@ public class SpaceGrid {
             switch (thisAlien.currentActionCode) {
                 case Fight:
                     //vis.debugOut("SpaceGrid: Processing Fight");
-                    
+
                     if (Constants.iSaidNoFighting) {
                         break;
                     }
@@ -393,7 +397,7 @@ public class SpaceGrid {
                         // but don't let them fight
                         break;
                     }
-              
+
                     List<AlienSpec> fightSpecs = new ArrayList<>();
                     HashMap<String, Double> fightSpecies = new HashMap<>();
 

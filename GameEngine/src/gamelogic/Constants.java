@@ -19,8 +19,10 @@ import java.lang.reflect.Field;
 //
 public class Constants {
 
+    public static String gameMode = "Brawl"; // Brawl, Play, or a specific mission file
+    public static int maxTurns = 20000; // in Brawl mode, stop after 20000 turns
     public static int randSeed = 1; // rand seed, controls random decision sequence in the game, set to 0 for fresh
-    public static boolean iSaidNoFighting = true; // for "play" mode, fights are useless
+    public static boolean iSaidNoFighting = false; // for "play" mode, fights are useless
     public static int researchTechCap = 30; // can't attain more tech than this by research alone
     public static int energyCap = 1000; // can't accumulate more energy than this
     public static int perSpeciesCap = 1000; // won't allow more aliens of a species than this

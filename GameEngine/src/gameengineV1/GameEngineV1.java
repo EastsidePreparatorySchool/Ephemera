@@ -2,7 +2,6 @@
  * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
  * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
-
 package gameengineV1;
 
 import gameengineinterfaces.GameState;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import com.google.gson.Gson;
+import java.io.FileWriter;
 
 /**
  *
@@ -62,63 +62,32 @@ public class GameEngineV1 implements GameEngine {
     }
 
     @Override
-    public ArrayList<GameElementSpec> readConfigFile(String fileName) {
-        ArrayList<GameElementSpec> elements = new ArrayList<>(100);
+    public GameElementSpec[] readConfigFile(String fileName) {
+        //ArrayList<GameElementSpec> elements = new ArrayList<>(100);
+        GameElementSpec[] elements;
         GameElementSpec element;
         //
         // Every line has kind, package, class, state in csv format
         //
-        BufferedReader in;
+        FileReader in;
 
         try {
-            in = new BufferedReader(new FileReader(this.gamePath + fileName));
-
-            String strLine;
-            while ((strLine = in.readLine()) != null) {
-                try {
-                    //vis.debugOut("GameEngineV1: read config line: " + strLine);
-                    strLine = strLine.trim();
-                    
-                    // ignore empty lines
-                    if (strLine.length() == 0) {
-                        continue;
-                    }
-
-                    // ignore comments
-                    if (strLine.startsWith("!")) {
-                        continue;
-                    }
-
-                    element = gson.fromJson(strLine, GameElementSpec.class);
-
-                    // add to list
-                    elements.add(element);
-                    //v.debugOut("GameEngineV1:init:Parsed element " + element.packageName + ":"
-                    //        + element.className + ", "
-                    //        + element.state);
-
-                } catch (Exception e) {
-                    vis.debugOut("GameEngineV1:init:File parse error");
-                    vis.debugOut("GameEngineV1:init:     " + e.getMessage());
-                    return null;
-                }
-
-            }
-
+            in = new FileReader(this.gamePath + fileName);
+            char[] buffer = new char[65000];
+            int n = in.read(buffer);
+            String s = new String (buffer).trim();
+            elements = gson.fromJson(s, GameElementSpec[].class);
             in.close();
-
         } catch (Exception e) {
-            vis.debugOut("GameEngineV1:init:File-related error");
+            vis.debugOut("GameEngineV1:init:File parse error");
             vis.debugOut("GameEngineV1:init:     " + e.getMessage());
             return null;
         }
         return elements;
     }
 
-  
-
     @Override
-    public void processGameElements(ArrayList<GameElementSpec> elements) {
+    public void processGameElements(GameElementSpec[] elements) {
         //
         // queue every game element
         //

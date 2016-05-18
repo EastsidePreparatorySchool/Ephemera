@@ -15,9 +15,9 @@ public interface GameEngine {
 
     void init(GameVisualizer v, String gamePath, String alienPath);
 
-    ArrayList<GameElementSpec> readConfigFile(String fileName);
+    GameElementSpec[] readConfigFile(String fileName);
 
-    void processGameElements(ArrayList<GameElementSpec> elements);
+    void processGameElements(GameElementSpec[] elements);
 
     void queueCommand(GameCommand gc);
 
