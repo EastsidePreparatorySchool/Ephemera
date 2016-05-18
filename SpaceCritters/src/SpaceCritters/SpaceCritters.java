@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
 package SpaceCritters;
 
@@ -29,7 +28,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
-import static javafx.application.Application.launch;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -59,10 +57,10 @@ public class SpaceCritters extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        
+        GameElementSpec[] elements;
 
         try {
-            dstage = createSplashScreen();
-
             // kludge to enable otherwise static methods
             currentInstance = this;
 
@@ -121,12 +119,22 @@ public class SpaceCritters extends Application {
             // initialize Ephemera game engine and visualizer
             //
             //get some objects created (not initialized, nothing important happens here)
-            engine = new GameEngineV1();
+            this.engine = new GameEngineV1();
             this.field = new VisualizationGrid();
 
-            // now initialize
+            // now initialize visualization field
+            
             this.field.init(this, engine, consolePane, species, logPath, width, height);
-            engine.initFromFile(field, gamePath, alienPath, "sc_config.csv");
+            
+            // and engine
+            engine.init(field, gamePath, alienPath);
+            elements  = engine.readConfigFile("sc_config.json");
+            engine.processGameElements(elements);
+            
+            // load a game and process it
+            elements  = engine.readConfigFile("sc_brawl.json");
+            engine.processGameElements(elements);
+            
 
             // need field to be alive before constructing this
             mainScene = new Scene3D(this, (int) screenBounds.getWidth() - 220, (int) screenBounds.getHeight() - 20);
@@ -134,8 +142,8 @@ public class SpaceCritters extends Application {
             // set a hook to shut down engine on game exit
             stage.setOnCloseRequest(e -> handleExit());
 
-            // load fancy earth
-            Planet3D.loadEarth();
+            // load fancy planets
+            Planet3D.preLoadPlanetImages();
 
             // set scene and stage
             border.setCenter(mainScene.outer);
@@ -144,14 +152,9 @@ public class SpaceCritters extends Application {
             mainScene.outer.requestFocus();
 
             stage.setScene(scene);
+            //stage.show(); // happens in showReady()
 
-            stage.show();
-
-            // show the splash sceen unless we have autostart
-            if (!(boolean) Constants.getValue("autoStart")) {
-                dstage.show();
-            }
-            // and tell the engine (and through it, the shell) that we are done adding elements
+            // and tell the engine that we are done adding elements
             engine.queueCommand(new GameCommand(GameCommandCode.Ready));
         } catch (Exception e) {
             System.out.println(e.toString());

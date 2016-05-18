@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
 package SpaceCritters;
 
@@ -14,45 +13,47 @@ import java.util.LinkedList;
  */
 class Cell {
 
+    int alienCount;
     SpaceCritters gameShell;
-    int fightCountDown;
     double energy;
     int totalFighters;
     final LinkedList<Alien3D> aliens;
 
     public Cell(SpaceCritters gameShellInstance, SpeciesSet s, int row, int col) { // Constructor
         gameShell = gameShellInstance;
-        fightCountDown = 0;
+        alienCount = 0;
         this.aliens = new LinkedList();
     }
 
     public void addAlien(Alien3D alien) {
         this.aliens.add(alien);
-        alien.zPos = this.aliens.indexOf(alien);
+        alien.zPos = this.alienCount;
+        alien.nextZ = this.alienCount;
+        this.alienCount++;
+
     }
 
     public void removeAlien(Alien3D alien) {
         Alien3D a;
         int count = 0;
-        int newZPos;
 
         Iterator<Alien3D> iter = aliens.iterator();
         while (iter.hasNext()) {
             a = iter.next();
             if (a == alien) {
                 iter.remove();
+                this.alienCount--;
             } else {
-                newZPos = count++;
-                if (a.zPos != newZPos) {
-                    a.zPos = newZPos;
+                if (a.zPos != count) {
+                    a.nextZ = count;
                     gameShell.mainScene.updateQueue.add(a);
                 }
+                count++;
             }
         }
     }
 
-  
-    public void fight(int num) {
-        totalFighters = num;
+    public void fight() {
+        totalFighters = this.alienCount;
     }
 }

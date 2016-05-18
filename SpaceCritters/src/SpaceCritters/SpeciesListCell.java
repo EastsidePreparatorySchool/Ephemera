@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
 package SpaceCritters;
 
@@ -10,10 +9,7 @@ import gameengineinterfaces.GameCommandCode;
 import gameengineinterfaces.GameElementSpec;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.util.Callback;
 

@@ -1,10 +1,10 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
 package SpaceCritters;
 
+import alieninterfaces.AlienShapeFactory;
 import gameengineinterfaces.AlienSpec;
 import gameengineinterfaces.*;
 import gamelogic.Constants;
@@ -82,6 +82,7 @@ public class VisualizationGrid implements GameVisualizer {
         }
     }
 
+    // translation of (x,y) to array element
     Cell getCell(int x, int y) {
         return grid[x + (width / 2)][y + (height / 2)];
     }
@@ -95,7 +96,6 @@ public class VisualizationGrid implements GameVisualizer {
             SpaceCritters.currentInstance.controlPane.alienNumber.setText(text);
 
             speciesSet.notifyListeners();
-
             gameShell.mainScene.update();
         });
     }
@@ -109,32 +109,13 @@ public class VisualizationGrid implements GameVisualizer {
 
             String text = "Turns:   " + paddedString(totalTurnCounter, 6);
             SpaceCritters.currentInstance.controlPane.turnCounter.setText(text);
-
-            /*
-            if (time > 100000000L) {
-                text += ", time for turn: " + paddedTimeString(time)
-                        + (numAliens > 0 ? ", time/#aliens: " + paddedTimeString(((long) time) / (((long) numAliens))) : "")
-                        + ", time/#aliens²: " + paddedTimeString(((long) time) / (((long) numAliens * (long) numAliens)));
-            }
-             */
+            
             text = "Aliens: " + paddedString(numAliens, 7);
             SpaceCritters.currentInstance.controlPane.alienNumber.setText(text);
 
             speciesSet.notifyListeners();
-
             gameShell.mainScene.update();
-        }
-        );
-
-        /*
-        if (totalTurnCounter
-                % 20 == 0) {
-            try {
-                //Thread.sleep(200);
-            } catch (Exception e) {
-            }
-        }
-         */
+        });
     }
 
     @Override
@@ -147,36 +128,16 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showFightBefore(int x, int y, List<AlienSpec> participants) {
-        if (showFights) {
-            println("Vis.showFightBefore at (" + x + "," + y + "):");
-            for (AlienSpec as : participants) {
-                print("Alien \"" + as.getFullName() + "\" ");
-                print(" is fighting with power " + as.actionPower);
-                println("");
-            }
-        }
-        getCell(x, y).fight(participants.size());
+    public void showFight(int x, int y) {
+        getCell(x, y).fight();
     }
 
-    @Override
-    public void showFightAfter(int x, int y, List<AlienSpec> participants) {
-        if (showFights) {
-            println("");
-            println("Here is what is left from that fight:");
-            for (AlienSpec as : participants) {
-                print("Alien \"" + as.getFullName() + "\" ");
-                print(" now has tech/energy " + as.getTechEnergyString());
-                println("");
-            }
-        }
-    }
-
+ 
     @Override
     public void showSpawn(AlienSpec as, double energyAtPos) {
         debugOut("Engine reporting Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
-        speciesSet.addAlien(as.getFullSpeciesName(), as.speciesID);
-        gameShell.mainScene.createAlien(as, as.hashCode, as.x, as.y);
+        AlienShapeFactory asf = speciesSet.addAlien(as.getFullSpeciesName(), as.speciesID);
+        gameShell.mainScene.createAlien(as, as.hashCode, as.x, as.y, asf);
     }
 
     @Override
@@ -195,7 +156,7 @@ public class VisualizationGrid implements GameVisualizer {
         } catch (Exception e) {
         }
         debugOut("Game Over");
-        Utilities.runSafe(() -> SpaceCritters.currentInstance.startOrPauseGame(new ActionEvent()));
+        Utilities.runAndWait(() -> SpaceCritters.currentInstance.startOrPauseGame(new ActionEvent()));
     }
 
     @Override
@@ -293,19 +254,19 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void registerSpecies(AlienSpec as) {
-        speciesSet.addAlienSpecies(as);
+    public void registerSpecies(AlienSpec as, AlienShapeFactory asf) {
+        speciesSet.addAlienSpecies(as, asf);
     }
 
     @Override
     public void registerStar(int x, int y, String name, int index, double luminosity) {
-        Utilities.runSafe(() -> gameShell.mainScene.createStar(x, y, name, index, luminosity));
+        Utilities.runAndWait(() -> gameShell.mainScene.createStar(x, y, name, index, luminosity));
 
     }
 
     @Override
     public void registerPlanet(int x, int y, String name, int index, double energy, int tech) {
-        Utilities.runSafe(() -> gameShell.mainScene.createPlanet(x, y, name, index, energy, tech));
+        Utilities.runAndWait(() -> gameShell.mainScene.createPlanet(x, y, name, index, energy, tech));
 
     }
 
@@ -321,8 +282,8 @@ public class VisualizationGrid implements GameVisualizer {
             SpaceCritters.currentInstance.controlPane.alienNumber.setText(text);
 
             speciesSet.notifyListeners();
-
             gameShell.mainScene.update();
+            gameShell.stage.show();
 
             if ((boolean) Constants.getValue("autoStart")) {
                 SpaceCritters.currentInstance.startGame();
@@ -367,4 +328,10 @@ public class VisualizationGrid implements GameVisualizer {
         }
     }
 
+    @Override
+    public void showUpdateAfterRequestedActions() {
+        Utilities.runAndWait(() -> {
+            gameShell.mainScene.update();
+        });
+    }
 }

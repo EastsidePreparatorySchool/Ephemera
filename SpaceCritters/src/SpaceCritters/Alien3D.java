@@ -1,9 +1,19 @@
+/*
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
+ */
 package SpaceCritters;
 
+import alieninterfaces.AlienShapeFactory;
 import gameengineinterfaces.AlienSpec;
+import gamelogic.Constants;
+import java.util.LinkedList;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.DrawMode;
+import javafx.scene.shape.Shape3D;
+import javafx.scene.transform.Transform;
+import javafx.scene.transform.Translate;
 
 /**
  *
@@ -16,66 +26,85 @@ public class Alien3D {
     int nextX;
     int nextY;
     int zPos;
+    int nextZ;
     boolean isNew;
     boolean killMe;
 
     final int id;
     final AlienSpec as;
     final SpaceCritters gameShell;
-    final Box alien;
+    Shape3D alien;
+    private LinkedList<Transform> intrinsicTransforms;
 
-    public Alien3D(SpaceCritters gameShellInstance, AlienSpec as, int id, int x, int y) {
+    public Alien3D(SpaceCritters gameShellInstance, AlienSpec as, int id, int x, int y,
+            AlienShapeFactory asf) {
         this.gameShell = gameShellInstance;
         this.nextX = x;
         this.nextY = y;
         this.x = Integer.MAX_VALUE;
         this.y = Integer.MAX_VALUE;
         this.zPos = 0;
+        this.nextZ = 0;
         this.id = id;
         this.as = as;
         this.isNew = true;
         this.killMe = false;
+        this.alien = null;
 
-        alien = new Box(0.5, 0.5, 0.5);
+        if (asf != null) {
+            alien = asf.getShape(Constants.shapeComplexityLimit);
+        }
+
+        if (alien == null) {
+            alien = new Box(0.5, 0.5, 0.5);
+        }
+
+        this.intrinsicTransforms = new LinkedList();
+        for(Transform t:alien.getTransforms()) {
+            this.intrinsicTransforms.add(t);
+        }
+      
+
         alien.setMaterial(new PhongMaterial(gameShell.field.speciesSet.getColor(as.speciesName, as.speciesID)));
         alien.setDrawMode(DrawMode.FILL);
-        alien.setTranslateX(gameShell.mainScene.xFromX(x));
-        alien.setTranslateY(gameShell.mainScene.yFromIndex(zPos));
-        alien.setTranslateZ(gameShell.mainScene.zFromY(y));
     }
 
     void updatePosition() {
         Cell cell;
 
-        if (nextX != x || nextY != y) {
-            if (!isNew) {
+        if (nextX != x || nextY != y || nextZ != zPos) {
+            if (nextX != x || nextY != y) { // if we are changing cells
+                if (!isNew) {
+                    cell = gameShell.field.getCell(x, y);
+                    cell.removeAlien(this);
+                }
+
+                x = nextX;
+                y = nextY;
+
                 cell = gameShell.field.getCell(x, y);
-                cell.removeAlien(this);
+                cell.addAlien(this);
+
+                if (isNew) {
+                    gameShell.mainScene.root.getChildren().add(this.alien);
+                    isNew = false;
+                }
+            } else {// we are only changing height
+                zPos = nextZ;
             }
-
-            x = nextX;
-            y = nextY;
-
-            alien.setTranslateX(gameShell.mainScene.xFromX(x));
-            alien.setTranslateY(gameShell.mainScene.yFromIndex(zPos));
-            alien.setTranslateZ(gameShell.mainScene.zFromY(y));
-
-            cell = gameShell.field.getCell(x, y);
-            cell.addAlien(this);
-
-            if (isNew) {
-                this.zPos = cell.aliens.size() - 1;
-
-                gameShell.mainScene.root.getChildren().add(this.alien);
-                isNew = false;
-            }
+            alien.getTransforms().clear();
+            alien.getTransforms().add(new Translate(
+                            gameShell.mainScene.xFromX(x),
+                            gameShell.mainScene.yFromIndex(zPos),
+                            gameShell.mainScene.zFromY(y)));
+            alien.getTransforms().addAll(intrinsicTransforms);
         }
     }
 
     public void recordMoveTo(int x, int y) {
         this.nextX = x;
         this.nextY = y;
-        
+
         gameShell.mainScene.updateQueue.add(this);
     }
 

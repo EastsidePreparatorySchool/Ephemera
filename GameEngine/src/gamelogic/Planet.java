@@ -1,11 +1,11 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
 package gamelogic;
 
 import alieninterfaces.Position;
+import gameengineinterfaces.PlanetBehavior;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -15,23 +15,24 @@ import java.util.LinkedList;
  */
 public class Planet extends InternalSpaceObject {
 
-    final String parent;
+    public final String parent;
     public int radius;
     private GridCircle gc;
     Iterator<Position> gcIterator;
     int orbitalVelocityCounter;
-    Position parentPosition;
+    public Position parentPosition;
 
     public Planet(SpaceGrid grid, int parentx, int parenty, int radius, int index, String domainName, String packageName, String className,
-            double energy, double tech, String parent) {
+            double energy, double tech, String parent, PlanetBehavior pb) {
         super(grid, parentx, parenty, index, domainName, packageName, className, energy, tech);
         this.parent = parent;
         this.parentPosition = new Position(parentx, parenty);
         this.radius = radius;
         this.isPlanet = true;
+        this.pb = pb;
     }
 
-    public void startOrbit() {
+    public void init() {
         // slight random eccentricity
         position.x += grid.rand.nextInt(3) - 1;
         position.y += grid.rand.nextInt(3) - 1;
@@ -40,6 +41,8 @@ public class Planet extends InternalSpaceObject {
         gc = new GridCircle(position.x, position.y, radius);
         gcIterator = gc.iterator();
         this.orbitalVelocityCounter = radius;
+
+        this.position = gcIterator.next();
 
         // randomize position in orbit
         for (int randomShift = grid.rand.nextInt(4 * radius); randomShift > 0; randomShift--) {
@@ -50,6 +53,11 @@ public class Planet extends InternalSpaceObject {
         // create another iterator
         if (!gcIterator.hasNext()) {
             gcIterator = gc.iterator();
+        }
+        
+        // initialize planet behavior
+        if (pb != null) {
+            pb.init(this);
         }
 
     }
@@ -87,11 +95,11 @@ public class Planet extends InternalSpaceObject {
             // do this on a cloned list to avoid comodification
             LinkedList<AlienContainer> acsClone = (LinkedList<AlienContainer>) acsFrom.clone();
             for (AlienContainer ac : acsClone) {
-              if (ac.nextX == ac.x && ac.nextY == ac.y) {
-                  // they didn't intend to move away, move with planet
-                  ac.nextX = this.position.x;
-                  ac.nextY = this.position.y;
-              }
+                if (ac.nextX == ac.x && ac.nextY == ac.y) {
+                    // they didn't intend to move away, move with planet
+                    ac.nextX = this.position.x;
+                    ac.nextY = this.position.y;
+                }
             }
 
             // update our position
@@ -101,8 +109,33 @@ public class Planet extends InternalSpaceObject {
             this.grid.aliens.plugPlanet(this);
 
             // visualize
-            this.grid.vis.showPlanetMove(pOld.x, pOld.y, pNew.x, pNew.y, className, this.index, energy, (int)tech);
+            this.grid.vis.showPlanetMove(pOld.x, pOld.y, pNew.x, pNew.y, className, this.index, energy, (int) tech);
         }
         return this.position;
+    }
+
+   public void reviewInhabitants() {
+        if (pb == null) {
+            return;
+        }
+
+        try {
+            pb.reviewInhabitants();
+        } catch (UnsupportedOperationException e) {
+            // that's ok.
+        }
+
+    }
+
+    public void reviewInhabitantActions() {
+        if (pb == null) {
+            return;
+        }
+
+        try {
+            pb.reviewInhabitantActions();
+        } catch (UnsupportedOperationException e) {
+            // that's ok.
+        }
     }
 }

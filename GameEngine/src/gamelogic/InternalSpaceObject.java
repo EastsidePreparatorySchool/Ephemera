@@ -1,14 +1,11 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
 package gamelogic;
 
 import alieninterfaces.Position;
-import gameengineinterfaces.GameVisualizer;
-import java.lang.reflect.Constructor;
-import java.util.*;
+import gameengineinterfaces.PlanetBehavior;
 
 /**
  *
@@ -21,9 +18,10 @@ public abstract class InternalSpaceObject {
     public final String packageName;
     public final String className;
     private String fullName;
-    protected SpaceGrid grid;
-    protected boolean isPlanet = false;
-    protected int index; 
+    public SpaceGrid grid;
+    public boolean isPlanet = false;
+    public int index; 
+    public PlanetBehavior pb;
 
     public double energy; // Energy that aliens gain every turn from the planet
     public double tech; // Tech boost for the planet
@@ -37,6 +35,7 @@ public abstract class InternalSpaceObject {
         this.className = className;
         this.grid = grid;
         this.index = index;
+        this.pb = null;
     }
 
     public String getFullName() {

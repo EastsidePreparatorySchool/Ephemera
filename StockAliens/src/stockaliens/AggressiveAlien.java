@@ -1,19 +1,28 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
 package stockaliens;
 
 import alieninterfaces.*;
+import com.interactivemesh.jfx.importer.stl.StlMeshImporter;
+import javafx.geometry.Point3D;
+import javafx.scene.shape.MeshView;
+import javafx.scene.shape.Shape3D;
+import javafx.scene.shape.TriangleMesh;
+import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Scale;
+import javafx.scene.transform.Translate;
 
 /**
  *
  * @author gmein
  */
-public class AggressiveAlien implements Alien {
+public class AggressiveAlien implements Alien, AlienShapeFactory {
 
     Context ctx;
+    static TriangleMesh dalekMesh;
+    boolean tooComplex = false;
 
     final boolean debug = true;
 
@@ -27,7 +36,6 @@ public class AggressiveAlien implements Alien {
                 + ctx.getPosition().toString()
                 + " E: " + Double.toString(ctx.getEnergy())
                 + " T: " + Double.toString(ctx.getTech()));
-
     }
 
     // Martians move left, right, left, right
@@ -62,7 +70,7 @@ public class AggressiveAlien implements Alien {
 
         // don't park, a planet might hit you
         if (dir.x == 0 & dir.y == 0) {
-            dir = new Direction (ctx.getRandomInt(2) == 0 ? -1 : 1,ctx.getRandomInt(2) == 0 ? -1 : 1);
+            dir = new Direction(ctx.getRandomInt(2) == 0 ? -1 : 1, ctx.getRandomInt(2) == 0 ? -1 : 1);
         }
 
         try {
@@ -160,4 +168,27 @@ public class AggressiveAlien implements Alien {
     public void processResults() {
     }
 
+    @Override
+    public Shape3D getShape(int complexityLimit) {
+        MeshView dalek;
+        if (dalekMesh == null) {
+            try {
+                StlMeshImporter importer = new StlMeshImporter();
+                importer.read(this.getClass().getResource("/Resources/DalekFull.stl"));
+                dalekMesh = importer.getImport();
+                tooComplex = (dalekMesh.getFaceElementSize() > complexityLimit);
+            } catch (Exception e) {
+                dalekMesh = null;
+            }
+        }
+
+        if (dalekMesh != null && !tooComplex) {
+            dalek = new MeshView(dalekMesh);
+            dalek.getTransforms().setAll(new Scale(0.01, 0.01, 0.01));
+            dalek.getTransforms().add(new Translate(0, 20, 0));
+            dalek.getTransforms().add(new Rotate(-90, new Point3D(1, 0, 0)));
+            return dalek;
+        }
+        return null;
+    }
 }

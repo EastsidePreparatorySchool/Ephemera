@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
 package gameengineinterfaces;
 
@@ -14,7 +13,7 @@ import java.util.List;
  */
 public interface GameVisualizer {
     
-    void registerSpecies(AlienSpec as);
+    void registerSpecies(AlienSpec as, AlienShapeFactory asf);
     
     void registerStar(int x, int y, String name, int index, double luminosity);
     
@@ -34,9 +33,7 @@ public interface GameVisualizer {
     
     void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition);
 
-    void showFightBefore(int x, int y, List<AlienSpec> aiens);
-
-    void showFightAfter(int x, int y, List<AlienSpec> aliens);
+    void showFight(int x, int y);
 
     void showSpawn(AlienSpec as, double energyAtPos);
             
@@ -45,6 +42,8 @@ public interface GameVisualizer {
     boolean showContinuePrompt();
 
     void showEngineStateChange(GameState gs);
+    
+    void showUpdateAfterRequestedActions();
 
     void showGameOver();
 

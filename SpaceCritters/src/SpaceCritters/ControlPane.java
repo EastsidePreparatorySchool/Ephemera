@@ -1,3 +1,7 @@
+/*
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
+ */
 package SpaceCritters;
 
 import javafx.event.ActionEvent;
@@ -5,7 +9,6 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
@@ -153,7 +156,10 @@ public final class ControlPane extends VBox {
         });
 
         buttonConsole.setPrefSize(100, 20);
-        buttonConsole.setOnAction((ActionEvent e) -> gameShell.consoleStage.show());
+        buttonConsole.setOnAction((ActionEvent e) -> {
+            gameShell.consoleStage.show();
+            gameShell.consoleStage.toFront();
+        });
 
         buttonHelp.setPrefSize(100, 20);
         buttonHelp.setOnAction((ActionEvent e) -> {
@@ -161,8 +167,6 @@ public final class ControlPane extends VBox {
                     "Arrow keys      Move camera around focal point"
                     + System.lineSeparator()
                     + "Double-click    Set focal point & zoom in"
-                    + System.lineSeparator()
-                    + "g                      Toggle grid"
                     + System.lineSeparator()
                     + "-                       Zoom out"
                     + System.lineSeparator()
@@ -180,7 +184,7 @@ public final class ControlPane extends VBox {
         });
 
         gameControls.getChildren().addAll(buttonPause, buttonConsole, buttonHelp);
-        }
+    }
 
     public void createSpeciesView() {
         bottom.setPadding(new Insets(10)); // Set all sides to 10

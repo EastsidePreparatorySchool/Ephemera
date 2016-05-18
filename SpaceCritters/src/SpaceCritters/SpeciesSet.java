@@ -1,10 +1,10 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
 package SpaceCritters;
 
+import alieninterfaces.AlienShapeFactory;
 import gameengineinterfaces.AlienSpec;
 import java.util.Iterator;
 import javafx.collections.FXCollections;
@@ -40,11 +40,11 @@ public class SpeciesSet {
         }
     }
 
-    public void addAlien(String speciesName, int id) {
+    public AlienShapeFactory addAlien(String speciesName, int id) {
         for (AlienSpeciesForDisplay as : speciesList) {
             if (as.id == id) {
                 as.count++;
-                return;
+                return as.asf;
             }
         }
 
@@ -52,11 +52,12 @@ public class SpeciesSet {
         AlienSpeciesForDisplay as = new AlienSpeciesForDisplay(gameShell, speciesName, id);
         Utilities.runSafe(() -> speciesList.add(as));
         as.setOn(true);
+        return null;
 
     }
 
-    public void addAlienSpecies(AlienSpec as) {
-        AlienSpeciesForDisplay asfd = new AlienSpeciesForDisplay(gameShell, as);
+    public void addAlienSpecies(AlienSpec as, AlienShapeFactory asf) {
+        AlienSpeciesForDisplay asfd = new AlienSpeciesForDisplay(gameShell, as, asf);
         Utilities.runSafe(() -> speciesList.add(asfd));
         asfd.setOn(true);
     }

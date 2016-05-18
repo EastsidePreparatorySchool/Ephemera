@@ -1,17 +1,14 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
 package SpaceCritters;
 
+import alieninterfaces.AlienShapeFactory;
 import gameengineinterfaces.AlienSpec;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
-import javafx.geometry.Point3D;
 import javafx.geometry.Pos;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
@@ -20,7 +17,6 @@ import javafx.scene.PointLight;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.effect.Glow;
-import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
@@ -30,8 +26,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
@@ -101,7 +95,7 @@ public class Scene3D {
         pLight = new PointLight(Color.ANTIQUEWHITE);
         pLight.getTransforms().setAll(
                 new Translate(focusX, 0, focusY),
-                new Rotate(yRot+45, Rotate.Y_AXIS),
+                new Rotate(yRot, Rotate.Y_AXIS),
                 new Rotate(xRot, Rotate.X_AXIS),
                 new Translate(0, 0, zTrans)
         );
@@ -115,7 +109,7 @@ public class Scene3D {
                 new Rotate(xRot, Rotate.X_AXIS),
                 new Translate(0, 0, zTrans)
         );
-        camera.setNearClip(1);
+        camera.setNearClip(0.1);
         camera.setFarClip(1500);
         root.getChildren().add(camera);
 
@@ -153,8 +147,8 @@ public class Scene3D {
         this.planets.put(index, planet);
     }
 
-    public void createAlien(AlienSpec as, int id, int x, int y) {
-        Alien3D alien = new Alien3D(gameShell, as, id, x, y);
+    public void createAlien(AlienSpec as, int id, int x, int y, AlienShapeFactory asf) {
+        Alien3D alien = new Alien3D(gameShell, as, id, x, y, asf);
         this.aliens.put(as.hashCode, alien);
 
         // alien is added with isNew == true, this leads to update() adding it to the visuals
@@ -226,16 +220,17 @@ public class Scene3D {
                 this.objectElevation = 0;
                 this.focusX = 0.0;
                 this.focusY = -80.0;
+                this.updatePlanetsAndStars();
                 break;
             case PLUS:
             case EQUALS:
                 if (zTrans < 1000) {
-                    zTrans += 10;
+                    zTrans += 5;
                 }
                 break;
             case MINUS:
                 if (zTrans > -1000) {
-                    zTrans -= 10;
+                    zTrans -= 5;
                 }
                 break;
             case RIGHT:
@@ -245,10 +240,23 @@ public class Scene3D {
                 yRot += 5;
                 break;
             case DOWN:
-                xRot += 2;
+                if (e.isShiftDown()) {
+                    objectElevation = 0;
+                    this.updatePlanetsAndStars();
+                } else {
+                    xRot += 2;
+                }
                 break;
             case UP:
-                xRot -= 2;
+                if (e.isShiftDown()) {
+                    if (objectElevation >= -20) {
+                        objectElevation -= 1;
+                        this.updatePlanetsAndStars();
+                    }
+                } else {
+                    xRot -= 2;
+
+                }
                 break;
 
             case PAGE_UP:
@@ -262,16 +270,8 @@ public class Scene3D {
                 this.updatePlanetsAndStars();
                 break;
 
-            case G:
-                if (gridVisible) {
-                    root.getChildren().removeAll(grid);
-                } else {
-                    root.getChildren().addAll(grid);
-                }
-                gridVisible = !gridVisible;
-                break;
             default:
-                return; // do not consumer this event if you can't handle it
+                return; // do not consume this event if you can't handle it
         }
 
         camera.getTransforms().setAll(
@@ -280,12 +280,12 @@ public class Scene3D {
                 new Rotate(xRot, Rotate.X_AXIS),
                 new Translate(0, 0, zTrans)
         );
-        pLight.getTransforms().setAll(
+        /*pLight.getTransforms().setAll(
                 new Translate(focusX, 0, focusY),
                 new Rotate(yRot, Rotate.Y_AXIS),
                 new Rotate(xRot, Rotate.X_AXIS),
                 new Translate(0, 0, zTrans)
-        );
+        );*/
 
         e.consume();
     }
@@ -331,7 +331,7 @@ public class Scene3D {
         s.setMaterial(new PhongMaterial(Color.rgb(255, 0, 0, 0.2)));
         s.setDrawMode(DrawMode.FILL);
         s.setTranslateX(xFromX(x));
-        s.setTranslateY(-fighting);
+        s.setTranslateY(-fighting+1);
         s.setTranslateZ(zFromY(y));
         s.setOpacity(0.1);
 

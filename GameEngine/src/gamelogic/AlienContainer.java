@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
+ * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
 package gamelogic;
 
@@ -97,7 +96,7 @@ public class AlienContainer {
             this.alienHashCode = ++currentID;
         } catch (Throwable t) {
             this.alien = null;
-            debugOut("ac: Error constructing Alien");
+            grid.gridDebugErr("ac: Error constructing Alien");
             throw new InstantiationException();
         }
 
