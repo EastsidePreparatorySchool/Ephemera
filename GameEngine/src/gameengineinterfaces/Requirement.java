@@ -8,6 +8,8 @@ package gameengineinterfaces;
  *
  * @author guberti
  */
-public enum AchievementFlag {
-    ExitSafeZone, TradeDenied, AlienKilledByFighting, LandOnPlanet
+
+
+public enum Requirement {
+    Energy, Tech, FightEnergy, Aliens, Broadcast
 }

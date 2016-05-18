@@ -6,16 +6,23 @@ package gamelogic;
 
 import gameengineinterfaces.*;
 
+
 /**
  *
  * @author guberti
  */
+
+
 public class AchievementReq {
-    int energyReq;
-    int techReq;
-    int tradeReq;
-    int fightingEnergyReq;
-    int aliensCountReq;
-    int broadcastReq;
+    Requirement numReq;
+    double amount;
     AchievementFlag flagReq;
+    
+    public AchievementReq(Requirement req, double amount) {
+        this.numReq = req;
+        this.amount = amount;
+    }
+    public AchievementReq(AchievementFlag flagReq) {
+        this.flagReq = flagReq;
+    }
 }
