@@ -152,7 +152,7 @@ public class SpaceCritters extends Application {
             mainScene.outer.requestFocus();
 
             stage.setScene(scene);
-            stage.show();
+            //stage.show(); // happens in showReady()
 
             // and tell the engine that we are done adding elements
             engine.queueCommand(new GameCommand(GameCommandCode.Ready));

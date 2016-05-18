@@ -283,6 +283,7 @@ public class VisualizationGrid implements GameVisualizer {
 
             speciesSet.notifyListeners();
             gameShell.mainScene.update();
+            gameShell.stage.show();
 
             if ((boolean) Constants.getValue("autoStart")) {
                 SpaceCritters.currentInstance.startGame();
