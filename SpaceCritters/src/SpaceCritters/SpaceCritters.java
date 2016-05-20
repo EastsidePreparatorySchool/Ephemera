@@ -97,6 +97,8 @@ public class SpaceCritters extends Application {
             if (gamePath.contains("ephemera" + System.getProperty("file.separator") + "spacecritters")) {
                 // probably started from netbeans
                 gamePath = gamePath.substring(0, gamePath.toLowerCase().indexOf("spacecritters"));
+                //TODO: Can't rely on constants before reading config file
+                // read config files earlier.Read constants first, then game constants, then init, then read stock elements, game elements
                 Constants.searchParentForAliens = false;
             } else {
                 // probably started from other folder
@@ -132,7 +134,7 @@ public class SpaceCritters extends Application {
             engine.processGameElements(elements);
             
             // load a game and process it
-            elements  = engine.readConfigFile("sc_brawl.json");
+            elements  = engine.readConfigFile(Constants.gameMode);
             engine.processGameElements(elements);
             
 

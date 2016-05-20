@@ -96,6 +96,15 @@ public class GameEngineV1 implements GameEngine {
 
             //vis.debugOut("GameEngine: Queueing new game element");
             queueCommand(gc);
+            
+            // this feels like cheating - 
+            // I am stripping the gameMode out here, 
+            // because I need it to read the right file, 
+            // and I cannot wait for the engine to process it.
+            if (element.kind == GameElementKind.CONSTANT
+                    && element.className.equalsIgnoreCase("gameMode")) {
+                Constants.gameMode = element.state;
+            }
         }
 
     }

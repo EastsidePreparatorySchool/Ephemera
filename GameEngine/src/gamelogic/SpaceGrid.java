@@ -111,7 +111,7 @@ public class SpaceGrid {
             return true;
         }
         
-        if (Constants.gameMode.equalsIgnoreCase("Brawl")) {
+        if (Constants.lastAlienWins) {
             AlienContainer aUniqueAlien = null;
             for (AlienContainer a : aliens) {
                 if (a != null) {
@@ -934,6 +934,11 @@ public class SpaceGrid {
     public void addCustomAliens(String folder, String domain) {
         String packageName;
         String className;
+        
+        if (folder.toLowerCase().endsWith("ephemera" + System.getProperty("file.separator"))) {
+            return;
+        }
+        
         File folderFile = new File(folder);
 
         if (folderFile != null) {
