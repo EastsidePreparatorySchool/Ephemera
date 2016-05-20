@@ -72,7 +72,7 @@ public class GameEngineV1 implements GameEngine {
             in = new FileReader(this.gamePath + fileName);
             char[] buffer = new char[65000];
             int n = in.read(buffer);
-            String s = new String (buffer).trim();
+            String s = new String(buffer).trim();
             elements = gson.fromJson(s, GameElementSpec[].class);
             in.close();
         } catch (Exception e) {
@@ -96,7 +96,7 @@ public class GameEngineV1 implements GameEngine {
 
             //vis.debugOut("GameEngine: Queueing new game element");
             queueCommand(gc);
-            
+
             // this feels like cheating - 
             // I am stripping the gameMode out here, 
             // because I need it to read the right file, 
@@ -110,8 +110,7 @@ public class GameEngineV1 implements GameEngine {
     }
 
     @Override
-    public void queueCommand(GameCommand gc
-    ) {
+    public void queueCommand(GameCommand gc) {
         //
         // queue alien info to synchronized queue
         //
@@ -120,8 +119,7 @@ public class GameEngineV1 implements GameEngine {
 
         synchronized (this.queue) {
             this.queue.add(gc);
-            this.queue.notify();
+            this.queue.notifyAll();
         }
     }
-
 }

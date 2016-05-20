@@ -42,6 +42,7 @@ public class GameEngineThread extends Thread {
                     while (!engine.queue.isEmpty()) {
                         gc = (GameCommand) engine.queue.remove();
                         // Process the work item, true means exit
+
                         endGame = processCommand(gc);
                         if (endGame) {
                             break;
@@ -53,9 +54,13 @@ public class GameEngineThread extends Thread {
                         engine.vis.showIdleUpdate(engine.grid.aliens.size());
                     }
 
-                    // don't absorb all the time
                     if (engine.gameState == GameState.Paused) {
-                        Thread.sleep(100);
+                        try {
+                            synchronized (engine.queue) {
+                                engine.queue.wait();
+                            }
+                        } catch (InterruptedException e) {
+                        }
                     }
                 } while (engine.gameState == GameState.Paused);
 
@@ -74,7 +79,7 @@ public class GameEngineThread extends Thread {
                 totalTurns++;
                 engine.vis.showCompletedTurn(totalTurns, engine.grid.aliens.size(), System.nanoTime() - startTurnTime);
             } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 engine.vis.debugErr("GameThread: Unknown exception: " + e.getMessage());
                 break;
             }
@@ -91,19 +96,16 @@ public class GameEngineThread extends Thread {
                 String variable = (String) gc.parameters[0];
                 String value = (String) gc.parameters[1];
 
-                for (Field field : Constants.class
-                        .getDeclaredFields()) {
+                for (Field field : Constants.class.getDeclaredFields()) {
                     if (variable.equalsIgnoreCase(field.getName())) {
                         if (field.getType().getName().equals("String")) {
                             field.set(Constants.class, value);
-
                         } else if (field.getType().getName().equals("int") || field.getType().getName().equals("Integer")) {
                             field.set(Constants.class, Integer.parseInt(value));
                         } else if (field.getType().getName().equalsIgnoreCase("boolean")) {
                             value = value.equalsIgnoreCase("on") ? "true" : value;
                             value = value.equalsIgnoreCase("off") ? "false" : value;
-                            field
-                                    .set(Constants.class, Boolean.parseBoolean(value));
+                            field.set(Constants.class, Boolean.parseBoolean(value));
                         }
                     }
                 }
@@ -149,8 +151,7 @@ public class GameEngineThread extends Thread {
                                 } else if (field.getType().getName().equalsIgnoreCase("boolean")) {
                                     element.state = element.state.equalsIgnoreCase("on") ? "true" : element.state;
                                     element.state = element.state.equalsIgnoreCase("off") ? "false" : element.state;
-                                    field
-                                            .set(Constants.class, Boolean.parseBoolean(element.state));
+                                    field.set(Constants.class, Boolean.parseBoolean(element.state));
                                 }
                             }
                         }
