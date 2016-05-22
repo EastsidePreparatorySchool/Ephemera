@@ -1,6 +1,6 @@
 [
     {"kind":"CONSTANT","domainName":"","packageName":"","className":"randseed","state":"0","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
-    {"kind":"CONSTANT","domainName":"","packageName":"","className":"gameMode","state":"sc_play.json","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
+    {"kind":"CONSTANT","domainName":"","packageName":"","className":"gameMode","state":"sc_brawl.json","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
     {"kind":"CONSTANT","domainName":"","packageName":"","className":"chatter","state":"off","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
     {"kind":"CONSTANT","domainName":"","packageName":"","className":"filters","state":"","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
     {"kind":"CONSTANT","domainName":"","packageName":"","className":"pauseOnError","state":"off","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},

@@ -22,12 +22,11 @@ public class RMack implements PlanetBehavior {
     }
 
     @Override
-    public void reviewInhabitants() {
-        AlienCell acs = p.grid.aliens.getAliensAt(p.position);
+    public void reviewInhabitants(AlienCell acs) {
     }
 
     @Override
-    public void reviewInhabitantActions() {
+    public void reviewInhabitantActions(AlienCell acs) {
     }
 
 }

@@ -51,7 +51,7 @@ public class GameEngineThread extends Thread {
 
                     // show idle updates
                     if (pastReady) {
-                        engine.vis.showIdleUpdate(engine.grid.aliens.size());
+                        engine.vis.showIdleUpdate(engine.grid.getNumAliens());
                     }
 
                     if (engine.gameState == GameState.Paused) {
@@ -77,7 +77,7 @@ public class GameEngineThread extends Thread {
                     //e.printStackTrace();
                 }
                 totalTurns++;
-                engine.vis.showCompletedTurn(totalTurns, engine.grid.aliens.size(), System.nanoTime() - startTurnTime);
+                engine.vis.showCompletedTurn(totalTurns, engine.grid.getNumAliens(), System.nanoTime() - startTurnTime);
             } catch (Exception e) {
                 //e.printStackTrace();
                 engine.vis.debugErr("GameThread: Unknown exception: " + e.getMessage());

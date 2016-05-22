@@ -1,9 +1,10 @@
 [
-    {"kind":"CONSTANT","domainName":"","packageName":"","className":"gameMode","state":"Brawl","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
-    {"kind":"CONSTANT","domainName":"","packageName":"","className":"lastAlienWins","state":"true","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
-    {"kind":"CONSTANT","domainName":"","packageName":"","className":"perSpeciesCap","state":"10000","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
-    {"kind":"CONSTANT","domainName":"","packageName":"","className":"perSpeciesSpawnCap","state":"10000","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
-    {"kind":"CONSTANT","domainName":"","packageName":"","className":"safeZoneRadius","state":"10","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
-    {"kind":"CONSTANT","domainName":"","packageName":"","className":"iSaidNoFighting","state":"false","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
-    {"kind":"CONSTANT","domainName":"","packageName":"","className":"maxTurns","state":"20000","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0}
+    {"kind":"CONSTANT","className":"gameMode","state":"Brawl"},
+    {"kind":"CONSTANT","className":"lastAlienWins","state":"true"},
+    {"kind":"CONSTANT","className":"perSpeciesCap","state":"10000"},
+    {"kind":"CONSTANT","className":"perSpeciesSpawnCap","state":"10000"},
+    {"kind":"CONSTANT","className":"safeZoneRadius","state":"10"},
+    {"kind":"CONSTANT","className":"iSaidNoFighting","state":"false"},
+    {"kind":"CONSTANT","className":"maxTurns","state":"20000"},
+    {"kind":"CONSTANT","className":"emptySpaceEnergy","state":"1"}
 ]

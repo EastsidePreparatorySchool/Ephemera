@@ -120,7 +120,7 @@ public class Planet extends InternalSpaceObject {
         }
 
         try {
-            pb.reviewInhabitants();
+            pb.reviewInhabitants(grid.aliens.getAliensAt(position));
         } catch (UnsupportedOperationException e) {
             // that's ok.
         }
@@ -133,7 +133,7 @@ public class Planet extends InternalSpaceObject {
         }
 
         try {
-            pb.reviewInhabitantActions();
+            pb.reviewInhabitantActions(grid.aliens.getAliensAt(position));
         } catch (UnsupportedOperationException e) {
             // that's ok.
         }

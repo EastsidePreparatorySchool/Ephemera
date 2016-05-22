@@ -17,7 +17,7 @@ import java.util.HashMap;
  */
 public class AlienContainer {
 
-    public static int currentID = 0;
+    private static int currentID = 0;
 
     public final String domainName;
     public final String packageName;
@@ -40,7 +40,6 @@ public class AlienContainer {
 
     double tech;
     double energy;
-    public static boolean chatter = false;
 
     public HashMap<String, Integer> secrets;
 

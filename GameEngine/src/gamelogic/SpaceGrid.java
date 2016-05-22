@@ -28,20 +28,21 @@ public class SpaceGrid {
 
     GameEngineV1 engine;
     GameVisualizer vis;
-    public AlienGrid aliens;    // Aliens are born and die, so our list needs to be able to grow and shrink
+    AlienGrid aliens;    // Aliens are born and die, so our list needs to be able to grow and shrink
     List<InternalSpaceObject> objects;  // Stars, planets, space stations, etc.
-    public HashMap<String, InternalAlienSpecies> speciesMap; // Maps alienSpeciesNames to indexes
+    HashMap<String, InternalAlienSpecies> speciesMap; // Maps alienSpeciesNames to indexes
     int width;
     int height;
     int planetCount = 0;
     int starCount = 0;
     int residentCount = 0;
+    int alienCount = 0;
 
     int currentTurn = 1;
     int speciesCounter = 1; // starting with ID 1
 
     // this is the only approved random generator for the game. Leave it alone!
-    public static Random rand;
+    public Random rand;
 
     public SpaceGrid(GameEngineV1 eng, GameVisualizer vis, int width, int height) {
         this.vis = vis;
@@ -55,6 +56,10 @@ public class SpaceGrid {
         rand = new Random(0);
     }
 
+    public int getNumAliens() {
+        return alienCount;
+    }
+    
     public void ready() {
         // this is also a good spot to 
         // prepare the random generator seed number
@@ -63,7 +68,7 @@ public class SpaceGrid {
             Constants.randSeed = (int) System.nanoTime();
         }
 
-        SpaceGrid.rand.setSeed(Constants.randSeed);
+        rand.setSeed(Constants.randSeed);
         // output randSeed into logfile
         vis.debugOut("RandSeed: " + Constants.randSeed);
 
@@ -294,6 +299,7 @@ public class SpaceGrid {
                 }
                 aliens.unplug(ac);
                 iterator.remove();
+                this.alienCount--;
 
                 InternalAlienSpecies as = speciesMap.get(ac.getFullSpeciesName());
                 if (as != null) {
@@ -371,7 +377,7 @@ public class SpaceGrid {
     }
 
     public void performAlienActions() {
-        LinkedList<AlienSpec> newAliens = new LinkedList();
+        LinkedList<AlienSpec> newAliens = new LinkedList<>();
 
         // now process all actions
         for (AlienContainer thisAlien : aliens) {
@@ -507,7 +513,8 @@ public class SpaceGrid {
                     // Make a SHALLOW copy of the aliens at the given position
                     // As long as we don't mutilate the aliens, we can mutilate
                     // the list as much as we want
-                    List<AlienContainer> aliensAtPos = (List<AlienContainer>) aliens.getAliensAt(thisAlien.x, thisAlien.y).clone();
+                    List<AlienContainer> aliensAtPos;
+                    aliensAtPos = (List<AlienContainer>) aliens.getAliensAt(thisAlien.x, thisAlien.y).clone();
                     for (AlienContainer ac : aliensAtPos) {
                         if (ac.currentActionCode == Action.ActionCode.Fight) {
                             break; // No trades can take place if there is war
@@ -728,6 +735,7 @@ public class SpaceGrid {
                 }
                 as.counter++;
                 as.spawns++;
+                this.alienCount++;
             } catch (InstantiationException e) {
                 gridDebugErr("sg: could not instantiate new " + speciesName);
             }
@@ -801,6 +809,8 @@ public class SpaceGrid {
         if (ac == null) {
             return;
         }
+        
+        this.alienCount--; // don't count this one, it's a resident
 
         if (ac.alien instanceof ResidentAlien) {
             ResidentContextImplementation rc = new ResidentContextImplementation(ac);

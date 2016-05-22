@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 /**
  *
@@ -75,9 +76,13 @@ public class GameEngineV1 implements GameEngine {
             String s = new String(buffer).trim();
             elements = gson.fromJson(s, GameElementSpec[].class);
             in.close();
+        }catch (JsonSyntaxException e) {
+            vis.debugErr("GameEngineV1:init:File parse error");
+            vis.debugErr("GameEngineV1:init:     " + e.getMessage() + e.toString());
+            return null;
         } catch (Exception e) {
-            vis.debugOut("GameEngineV1:init:File parse error");
-            vis.debugOut("GameEngineV1:init:     " + e.getMessage());
+            vis.debugErr("GameEngineV1:init:File parse error");
+            vis.debugErr("GameEngineV1:init:     " + e.getMessage() + e.toString());
             return null;
         }
         return elements;
