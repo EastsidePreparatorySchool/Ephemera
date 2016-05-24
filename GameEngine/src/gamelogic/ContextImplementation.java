@@ -199,4 +199,9 @@ public class ContextImplementation implements Context {
         return orbit;
     }
 
+    @Override
+    public AlienSpecies getMyAlienSpecies() {
+        return new AlienSpecies(ac.domainName, ac.packageName, ac.className, ac.speciesID, ac.x, ac.y);
+    }
+
 }
