@@ -30,7 +30,7 @@ public class SpaceGrid {
     GameVisualizer vis;
     public AlienGrid aliens;    // Aliens are born and die, so our list needs to be able to grow and shrink
     List<InternalSpaceObject> objects;  // Stars, planets, space stations, etc.
-    public HashMap<String, InternalAlienSpecies> speciesMap; // Maps alienSpeciesNames to indexes
+    public SpeciesMap<String, InternalAlienSpecies> speciesMap; // Maps alienSpeciesNames to indexes
     int width;
     int height;
     int planetCount = 0;
@@ -43,14 +43,14 @@ public class SpaceGrid {
     // this is the only approved random generator for the game. Leave it alone!
     public static Random rand;
 
-    public SpaceGrid(GameEngineV1 eng, GameVisualizer vis, int width, int height) {
+    public SpaceGrid(GameEngineV1 eng, GameVisualizer vis, int width, int height, Achievement[] achievements) {
         this.vis = vis;
         this.width = width;
         this.height = height;
         this.engine = eng;
         aliens = new AlienGrid(width, height); // AlienContainer type is inferred
         objects = new ArrayList<>();
-        speciesMap = new HashMap<>();
+        speciesMap = new SpeciesMap<>(achievements);
 
         rand = new Random(0);
     }
@@ -661,8 +661,8 @@ public class SpaceGrid {
         // add species if necessary
         InternalAlienSpecies as = speciesMap.get(speciesName);
         if (as == null) {
-
-            as = new InternalAlienSpecies(element.domainName, element.packageName, element.className, speciesCounter);
+            
+            as = new InternalAlienSpecies(element.domainName, element.packageName, element.className, speciesCounter, speciesMap.getAchievementCount());
             speciesMap.put(speciesName, as);
             speciesCounter++;
 
@@ -705,7 +705,7 @@ public class SpaceGrid {
         // add species if necessary
         InternalAlienSpecies as = speciesMap.get(speciesName);
         if (as == null) {
-            as = new InternalAlienSpecies(domainName, alienPackageName, alienClassName, speciesCounter);
+            as = new InternalAlienSpecies(domainName, alienPackageName, alienClassName, speciesCounter, speciesMap.getAchievementCount());
             speciesMap.put(speciesName, as);
             speciesCounter++;
             if (!alienPackageName.equalsIgnoreCase("stockelements")) {

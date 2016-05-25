@@ -9,5 +9,5 @@ package gameengineinterfaces;
  * @author guberti
  */
 public enum AchievementFlag {
-    ExitSafeZone, TradeDenied, AlienKilledByFighting, LandOnPlanet
+    ExitSafeZone, TradeDenied, SuccessfulTrade, AlienKilledByFighting, LandOnPlanet
 }

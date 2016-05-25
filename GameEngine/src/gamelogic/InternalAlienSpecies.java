@@ -17,10 +17,19 @@ public class InternalAlienSpecies extends AlienSpecies {
     public AlienShapeFactory shapeFactory;
     public long counter;
     public long spawns;
+    public boolean[] achievements;
 
-    public InternalAlienSpecies(String domainName, String packageName, String className, int id) {
+    public InternalAlienSpecies(String domainName, String packageName, String className, int id, int achievementCount) {
         super(domainName, packageName, className, id);
         counter = 0;
         spawns = 0;
+        achievements = new boolean[achievementCount];
+        resetAchievements();
+    }
+    
+    public void resetAchievements() {
+        for (int i = 0; i < achievements.length; i++) {
+            achievements[i] = false;
+        }
     }
 }

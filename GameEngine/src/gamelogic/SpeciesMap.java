@@ -2,29 +2,28 @@
  * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
  * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
-
 package gamelogic;
+
+import gameengineinterfaces.AchievementFlag;
 import java.util.HashMap;
-import gameengineinterfaces.*;
 
 /**
  *
  * @author guberti
  */
-public class AchievementHolder {
+
+/**
+ *
+ * @author guberti
+ * @param <K>
+ * @param <V>
+ */
+public class SpeciesMap<K extends String, V extends InternalAlienSpecies> extends HashMap<K,V> {
     Achievement[] achievements;
-    HashMap<String, boolean[]> map;
-    
-    AchievementHolder() {
-        
+    public SpeciesMap(Achievement[] achievements) {
+        this.achievements = achievements;
     }
     
-    void initiateSpecies(String fullname) { // Fullname = packagename + classname
-        map.put(fullname, newEmptyAchievementArray());
-    }
-    private boolean[] newEmptyAchievementArray() {
-        return new boolean[achievements.length];
-    }
     void recieveFlag(String fullname, AchievementFlag flag) {
         for (int i = 0; i < achievements.length; i++) {
             // TODO add code to see if achievement has already been achieved
@@ -45,8 +44,11 @@ public class AchievementHolder {
     }
     
     private void setAchievementForAlien(String fullname, int index) {
-        boolean[] newAchievements = map.get(fullname);
+        boolean[] newAchievements = get(fullname).achievements;
         newAchievements[index] = true;
-        map.put(fullname, newAchievements);
+    }
+    
+    public int getAchievementCount() {
+        return achievements.length;
     }
 }

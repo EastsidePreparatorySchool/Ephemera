@@ -17,12 +17,13 @@ public class AchievementReq {
     Requirement numReq;
     double amount;
     AchievementFlag flagReq;
+
+    public AchievementReq(AchievementFlag flagReq) {
+        this.flagReq = flagReq;
+    }
     
     public AchievementReq(Requirement req, double amount) {
         this.numReq = req;
         this.amount = amount;
-    }
-    public AchievementReq(AchievementFlag flagReq) {
-        this.flagReq = flagReq;
     }
 }

@@ -32,7 +32,12 @@ public class GameEngineThread extends Thread {
         boolean endGame = false;
 
         //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-        engine.grid = new SpaceGrid(engine, engine.vis, Constants.width, Constants.height);
+        Achievement[] achievements = new Achievement[1];
+        achievements[0] = new Achievement(1);
+        AchievementReq req = new AchievementReq(AchievementFlag.AlienKilledByFighting);
+        achievements[0].addReq(req, 0);
+        
+        engine.grid = new SpaceGrid(engine, engine.vis, Constants.width, Constants.height, achievements);
 
         engine.vis.debugOut("GameEngineThread: Started");
         do {

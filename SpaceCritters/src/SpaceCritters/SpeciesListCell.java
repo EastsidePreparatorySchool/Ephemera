@@ -35,7 +35,6 @@ public class SpeciesListCell extends CheckBoxListCell<AlienSpeciesForDisplay> {
                             item.gameShell.engine.queueCommand(new GameCommand(GameCommandCode.KillElement, element));
                         }
                     }
-                    //System.out.println("Check box for " + item + " changed from " + wasSelected + " to " + isNowSelected);
                 });
                 return observable;
             }
