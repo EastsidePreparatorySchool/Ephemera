@@ -12,6 +12,6 @@ import gamelogic.*;
  */
 public interface PlanetBehavior {
     void init (Planet p);
-    void reviewInhabitants();
-    void reviewInhabitantActions();
+    void reviewInhabitants(AlienCell acs);
+    void reviewInhabitantActions(AlienCell acs);
 }

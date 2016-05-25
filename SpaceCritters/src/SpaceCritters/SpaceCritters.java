@@ -42,14 +42,14 @@ import static javafx.application.Application.launch;
  */
 public class SpaceCritters extends Application {
 
-    public static boolean gameOver = false;
-    public static GameEngineV1 engine;
-    public static VisualizationGrid field;
-    public static SpeciesSet species;
-    public static SpectrumColor spectrum = new SpectrumColor();
-    public static Stage dstage;
+    boolean gameOver = false;
+    GameEngineV1 engine;
+    VisualizationGrid field;
+    SpeciesSet species;
+    SpectrumColor spectrum = new SpectrumColor();
+    Stage dstage;
     Stage stage;
-    static SpaceCritters currentInstance; // kludge until rework is done
+    //static SpaceCritters currentInstance; // kludge until rework is done
     ControlPane controlPane; // view and game controls
     Stage consoleStage; // the window for the console
     ConsolePane consolePane; // the console object with the print API
@@ -61,9 +61,6 @@ public class SpaceCritters extends Application {
         GameElementSpec[] elements;
 
         try {
-            // kludge to enable otherwise static methods
-            currentInstance = this;
-
             // Constants from current Ephemera game
             int width = Constants.width;
             int height = Constants.height;
@@ -97,6 +94,8 @@ public class SpaceCritters extends Application {
             if (gamePath.contains("ephemera" + System.getProperty("file.separator") + "spacecritters")) {
                 // probably started from netbeans
                 gamePath = gamePath.substring(0, gamePath.toLowerCase().indexOf("spacecritters"));
+                //TODO: Can't rely on constants before reading config file
+                // read config files earlier.Read constants first, then game constants, then init, then read stock elements, game elements
                 Constants.searchParentForAliens = false;
             } else {
                 // probably started from other folder
@@ -132,7 +131,7 @@ public class SpaceCritters extends Application {
             engine.processGameElements(elements);
             
             // load a game and process it
-            elements  = engine.readConfigFile("sc_brawl.json");
+            elements  = engine.readConfigFile(Constants.gameMode);
             engine.processGameElements(elements);
             
 
@@ -272,7 +271,7 @@ public class SpaceCritters extends Application {
     //
     // Visual helpers
     //
-    public static void setSize(Stage stage, javafx.geometry.Rectangle2D bounds) {
+    private void setSize(Stage stage, javafx.geometry.Rectangle2D bounds) {
         stage.setX(bounds.getMinX());
         stage.setY(bounds.getMinY());
         stage.setWidth(bounds.getWidth());

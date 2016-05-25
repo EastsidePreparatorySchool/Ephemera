@@ -38,4 +38,5 @@ public interface Context {
 
     void debugOut(String s);
     String getStateString ();
+    AlienSpecies getMyAlienSpecies();
 }

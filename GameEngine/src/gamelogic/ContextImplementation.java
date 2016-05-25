@@ -89,7 +89,7 @@ public class ContextImplementation implements Context {
 
     @Override
     public int getRandomInt(int ceiling) {
-        return SpaceGrid.rand.nextInt(ceiling);
+        return this.ac.grid.rand.nextInt(ceiling);
     }
 
     // messsaging API: record that this alien wants to send, and whether to receive
@@ -197,6 +197,11 @@ public class ContextImplementation implements Context {
         }
         
         return orbit;
+    }
+
+    @Override
+    public AlienSpecies getMyAlienSpecies() {
+        return new AlienSpecies(ac.domainName, ac.packageName, ac.className, ac.speciesID, ac.x, ac.y);
     }
 
 }

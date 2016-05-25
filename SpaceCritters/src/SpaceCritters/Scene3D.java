@@ -297,7 +297,7 @@ public class Scene3D {
 
         for (Alien3D a : updateQueue) {
             if (a.killMe) {
-                this.aliens.remove(a);
+                this.aliens.remove(a.as.hashCode);
                 this.gameShell.field.getCell(a.x, a.y).removeAlien(a);
                 this.root.getChildren().remove(a.alien);
             } else {

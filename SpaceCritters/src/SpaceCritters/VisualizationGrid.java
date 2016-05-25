@@ -30,7 +30,7 @@ public class VisualizationGrid implements GameVisualizer {
     public int width;
     public int height;
 
-    public ConsolePane console;
+    ConsolePane console;
 
     int turnCounter = 1;
     int totalTurnCounter = 0;
@@ -93,7 +93,7 @@ public class VisualizationGrid implements GameVisualizer {
 
         Utilities.runAndWait(() -> {
             String text = "Aliens: " + paddedString(numAliens, 7);
-            SpaceCritters.currentInstance.controlPane.alienNumber.setText(text);
+            this.gameShell.controlPane.alienNumber.setText(text);
 
             speciesSet.notifyListeners();
             gameShell.mainScene.update();
@@ -108,10 +108,10 @@ public class VisualizationGrid implements GameVisualizer {
         Utilities.runAndWait(() -> {
 
             String text = "Turns:   " + paddedString(totalTurnCounter, 6);
-            SpaceCritters.currentInstance.controlPane.turnCounter.setText(text);
-            
+            this.gameShell.controlPane.turnCounter.setText(text);
+
             text = "Aliens: " + paddedString(numAliens, 7);
-            SpaceCritters.currentInstance.controlPane.alienNumber.setText(text);
+            this.gameShell.controlPane.alienNumber.setText(text);
 
             speciesSet.notifyListeners();
             gameShell.mainScene.update();
@@ -124,7 +124,10 @@ public class VisualizationGrid implements GameVisualizer {
         int y = as.y;
 
         Alien3D alien = gameShell.mainScene.aliens.get(as.hashCode);
-        alien.recordMoveTo(x, y);
+        if (alien != null) {
+            // not done for residents
+            alien.recordMoveTo(x, y);
+        }
     }
 
     @Override
@@ -132,7 +135,6 @@ public class VisualizationGrid implements GameVisualizer {
         getCell(x, y).fight();
     }
 
- 
     @Override
     public void showSpawn(AlienSpec as, double energyAtPos) {
         debugOut("Engine reporting Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
@@ -150,18 +152,19 @@ public class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void showGameOver() {
-        SpaceCritters.gameOver = true;
+        gameShell.gameOver = true;
         try {
             logFile.close();
         } catch (Exception e) {
         }
         debugOut("Game Over");
-        Utilities.runAndWait(() -> SpaceCritters.currentInstance.startOrPauseGame(new ActionEvent()));
+        Utilities.runAndWait(() -> this.gameShell.startOrPauseGame(new ActionEvent()));
     }
 
     @Override
     public void debugErr(String s) {
         println(s);
+        System.out.println(s);
     }
 
     @Override
@@ -279,14 +282,14 @@ public class VisualizationGrid implements GameVisualizer {
     public void showReady() {
         Utilities.runAndWait(() -> {
             String text = "Aliens: " + paddedString(numAliens, 7);
-            SpaceCritters.currentInstance.controlPane.alienNumber.setText(text);
+            this.gameShell.controlPane.alienNumber.setText(text);
 
             speciesSet.notifyListeners();
             gameShell.mainScene.update();
             gameShell.stage.show();
 
             if ((boolean) Constants.getValue("autoStart")) {
-                SpaceCritters.currentInstance.startGame();
+                this.gameShell.startGame();
             }
         });
     }
@@ -296,7 +299,7 @@ public class VisualizationGrid implements GameVisualizer {
         filter = s;
         filters = null;
 
-        SpaceCritters.currentInstance.consolePane.filter.setText(s);
+        this.gameShell.consolePane.filter.setText(s);
         if (s != null) {
             filters = s.split(";");
             for (int i = 0; i < filters.length; i++) {
@@ -307,7 +310,7 @@ public class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void setChatter(boolean f) {
-        SpaceCritters.currentInstance.consolePane.chatter.setSelected(f);
+        this.gameShell.consolePane.chatter.setSelected(f);
     }
 
     @Override

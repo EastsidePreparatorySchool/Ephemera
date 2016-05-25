@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 /**
  *
@@ -72,12 +73,16 @@ public class GameEngineV1 implements GameEngine {
             in = new FileReader(this.gamePath + fileName);
             char[] buffer = new char[65000];
             int n = in.read(buffer);
-            String s = new String (buffer).trim();
+            String s = new String(buffer).trim();
             elements = gson.fromJson(s, GameElementSpec[].class);
             in.close();
+        }catch (JsonSyntaxException e) {
+            vis.debugErr("GameEngineV1:init:File parse error");
+            vis.debugErr("GameEngineV1:init:     " + e.getMessage() + e.toString());
+            return null;
         } catch (Exception e) {
-            vis.debugOut("GameEngineV1:init:File parse error");
-            vis.debugOut("GameEngineV1:init:     " + e.getMessage());
+            vis.debugErr("GameEngineV1:init:File parse error");
+            vis.debugErr("GameEngineV1:init:     " + e.getMessage() + e.toString());
             return null;
         }
         return elements;
@@ -96,13 +101,21 @@ public class GameEngineV1 implements GameEngine {
 
             //vis.debugOut("GameEngine: Queueing new game element");
             queueCommand(gc);
+
+            // this feels like cheating - 
+            // I am stripping the gameMode out here, 
+            // because I need it to read the right file, 
+            // and I cannot wait for the engine to process it.
+            if (element.kind == GameElementKind.CONSTANT
+                    && element.className.equalsIgnoreCase("gameMode")) {
+                Constants.gameMode = element.state;
+            }
         }
 
     }
 
     @Override
-    public void queueCommand(GameCommand gc
-    ) {
+    public void queueCommand(GameCommand gc) {
         //
         // queue alien info to synchronized queue
         //
@@ -111,8 +124,7 @@ public class GameEngineV1 implements GameEngine {
 
         synchronized (this.queue) {
             this.queue.add(gc);
-            this.queue.notify();
+            this.queue.notifyAll();
         }
     }
-
 }
