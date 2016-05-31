@@ -12,7 +12,7 @@ import java.util.Iterator;
  *
  * @author gmein
  *
- * helper class to iterate over a "circle" in our weird metric the interface to
+ * helper class to iterate over a "circle" in our weird metric. The interface to
  * this class - create and then use in enhanced for loop - can be used for any
  * metric we might choose
  */

@@ -47,6 +47,11 @@ public class ContextImplementation implements Context {
             throw new NotEnoughTechException();
         }
         
+        //if (!Constants.gameMode.equalsIgnoreCase("sc_play.json")) {
+        //    // views are only free in play mode
+        //    ac.energy -= size;
+        //}
+        
         // Make size at least 2 so people can see where they can move for free
         size = Math.max(size, 2);
 

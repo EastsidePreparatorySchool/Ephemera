@@ -945,7 +945,8 @@ public class SpaceGrid {
         String packageName;
         String className;
         
-        if (folder.toLowerCase().endsWith("ephemera" + System.getProperty("file.separator"))) {
+        if (folder.toLowerCase().endsWith("ephemera" + System.getProperty("file.separator"))
+                || folder.toLowerCase().endsWith("spacecritters" + System.getProperty("file.separator"))) {
             return;
         }
         
@@ -961,6 +962,7 @@ public class SpaceGrid {
                         addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), domain + f.getName() + System.getProperty("file.separator"));
                     } else if ((f.getName().toLowerCase().endsWith(".jar"))
                             && (!f.getName().toLowerCase().equals("stockaliens.jar"))
+                            && (!f.getName().toLowerCase().equals("stockelements.jar"))
                             && (!f.getName().toLowerCase().equals("alieninterfaces.jar"))) {
                         try {
                             // look for jar files and process
