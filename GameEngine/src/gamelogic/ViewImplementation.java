@@ -78,10 +78,11 @@ public class ViewImplementation implements View {
         AlienCell acs = ag.getAliensAt(p);
         if (acs != null) {
             if (acs.star != null) {
-                return new SpaceObject("Star", acs.star.className);
+                return new SpaceObject("Star", acs.star.className, acs.star.position);
             } else if (acs.planet != null) {
                 return new SpaceObject("Planet",
-                        distance(p.x, p.y, this.centerX, this.centerY) < 1 ? acs.planet.className : "");
+                        distance(p.x, p.y, this.centerX, this.centerY) < 1 ? acs.planet.className : "",
+                        acs.planet.position);
                 // you only get to know the name of a planet by landing on it
             }
         }
@@ -99,9 +100,9 @@ public class ViewImplementation implements View {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     if (acs.star != null) {
-                        so = new SpaceObject("Star", acs.star.className);
+                        so = new SpaceObject("Star", acs.star.className, acs.star.position);
                     } else if (acs.planet != null) {
-                        so = new SpaceObject("Planet", d == 0 ? acs.planet.className : "");
+                        so = new SpaceObject("Planet", (d == 0 ? acs.planet.className : ""), acs.planet.position);
                     }
                 }
 
