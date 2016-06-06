@@ -54,7 +54,7 @@ public class Planet extends InternalSpaceObject {
         if (!gcIterator.hasNext()) {
             gcIterator = gc.iterator();
         }
-        
+
         // initialize planet behavior
         if (pb != null) {
             pb.init(this);
@@ -63,6 +63,10 @@ public class Planet extends InternalSpaceObject {
     }
 
     public Position move() {
+
+        Position pOld = this.position;
+        Position pNew = this.position;
+
         --orbitalVelocityCounter;
         if (orbitalVelocityCounter == 0) {
             orbitalVelocityCounter = radius;
@@ -71,50 +75,50 @@ public class Planet extends InternalSpaceObject {
                 gcIterator = gc.iterator();
             }
 
-            Position pOld = this.position;
-            Position pNew = gcIterator.next();
-
-            // unplug planet from grid
-            this.grid.aliens.unplugPlanet(this);
-
-            // now worry about the aliens at the old and new positions
-            AlienCell acsFrom = this.grid.aliens.getAliensAt(pOld);
-            AlienCell acsTo = this.grid.aliens.getAliensAt(pNew);
-
-            // if aliens are where the planet is moving to, and not moving, they die.
-            if (acsTo != null) {
-                // we have a cell, let's look at aliens
-                for (AlienContainer ac : acsTo) {
-                    if (ac.nextX == ac.x && ac.nextY == ac.y) {
-                        ac.kill("Death by parking in path of planet " + this.className);
-                    }
-                }
-            }
-
-            // aliens that were on the planet, move with the planet
-            // do this on a cloned list to avoid comodification
-            LinkedList<AlienContainer> acsClone = (LinkedList<AlienContainer>) acsFrom.clone();
-            for (AlienContainer ac : acsClone) {
-                if (ac.nextX == ac.x && ac.nextY == ac.y) {
-                    // they didn't intend to move away, move with planet
-                    ac.nextX = this.position.x;
-                    ac.nextY = this.position.y;
-                }
-            }
-
-            // update our position
-            this.position = pNew;
-
-            // plug planet back into grid
-            this.grid.aliens.plugPlanet(this);
-
-            // visualize
-            this.grid.vis.showPlanetMove(pOld.x, pOld.y, pNew.x, pNew.y, className, this.index, energy, (int) tech);
+            pNew = gcIterator.next();
         }
+
+        // unplug planet from grid
+        this.grid.aliens.unplugPlanet(this);
+
+        // now worry about the aliens at the old and new positions
+        AlienCell acsFrom = this.grid.aliens.getAliensAt(pOld);
+        AlienCell acsTo = this.grid.aliens.getAliensAt(pNew);
+
+        // if aliens are where the planet is moving to, and not moving, they die.
+        if (acsTo != null) {
+            // we have a cell, let's look at aliens
+            for (AlienContainer ac : acsTo) {
+                if (ac.nextX == ac.x && ac.nextY == ac.y) {
+                    ac.kill("Death by parking in path of planet " + this.className);
+                }
+            }
+        }
+
+        // aliens that were on the planet, move with the planet
+        // do this on a cloned list to avoid comodification
+        LinkedList<AlienContainer> acsClone = (LinkedList<AlienContainer>) acsFrom.clone();
+        for (AlienContainer ac : acsClone) {
+            if (ac.nextX == ac.x && ac.nextY == ac.y) {
+                // they didn't intend to move away, move with planet
+                ac.nextX = this.position.x;
+                ac.nextY = this.position.y;
+            }
+        }
+
+        // update our position
+        this.position = pNew;
+
+        // plug planet back into grid
+        this.grid.aliens.plugPlanet(this);
+
+        // visualize
+        this.grid.vis.showPlanetMove(pOld.x, pOld.y, pNew.x, pNew.y, className, this.index, energy, (int) tech);
+
         return this.position;
     }
 
-   public void reviewInhabitants() {
+    public void reviewInhabitants() {
         if (pb == null) {
             return;
         }
