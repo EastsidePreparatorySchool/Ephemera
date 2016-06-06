@@ -55,7 +55,7 @@ public class Action {
     }
 
     public enum ActionCode {
-        None, Gain, Research, Spawn, TradeOrDefend, Fight
+        None, Gain, Research, Spawn, TradeOrDefend, Fight, Land, Launch
     }
 
 }

@@ -37,6 +37,7 @@ public class AlienContainer {
     public String currentActionMessage;
     public Action currentAction;
     public boolean listening;
+    Planet planet;
 
     double tech;
     double energy;
@@ -72,6 +73,7 @@ public class AlienContainer {
         this.listening = false;
         this.secrets = new HashMap<>();
         this.speciesID = as.speciesID;
+        this.planet = null;
 
         Alien a = null;
 
@@ -168,6 +170,11 @@ public class AlienContainer {
         } catch (UnsupportedOperationException e) {
             // we'll let that go
             direction = new Direction(0, 0);
+        }
+
+        // if on planet, ignore move
+        if (this.planet != null) {
+            return;
         }
 
         this.checkMove(direction); // Throws an exception if illegal

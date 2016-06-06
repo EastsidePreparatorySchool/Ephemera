@@ -85,12 +85,15 @@ public class Planet extends InternalSpaceObject {
         AlienCell acsFrom = this.grid.aliens.getAliensAt(pOld);
         AlienCell acsTo = this.grid.aliens.getAliensAt(pNew);
 
-        // if aliens are where the planet is moving to, and not moving, they die.
+        // if aliens are where the planet is moving to, and not landed, they die.
         if (acsTo != null) {
             // we have a cell, let's look at aliens
             for (AlienContainer ac : acsTo) {
-                if (ac.nextX == ac.x && ac.nextY == ac.y) {
-                    ac.kill("Death by parking in path of planet " + this.className);
+                // if not landed, and not freshly moved here, you die.
+                if (ac.planet != this
+                        && ac.nextX == ac.x
+                        && ac.nextY == ac.y) {
+                    ac.kill("Death by being in path of planet " + this.className);
                 }
             }
         }
@@ -99,7 +102,7 @@ public class Planet extends InternalSpaceObject {
         // do this on a cloned list to avoid comodification
         LinkedList<AlienContainer> acsClone = (LinkedList<AlienContainer>) acsFrom.clone();
         for (AlienContainer ac : acsClone) {
-            if (ac.nextX == ac.x && ac.nextY == ac.y) {
+            if (ac.planet == this) {
                 // they didn't intend to move away, move with planet
                 ac.nextX = this.position.x;
                 ac.nextY = this.position.y;
@@ -124,6 +127,7 @@ public class Planet extends InternalSpaceObject {
         }
 
         try {
+            // todo: need to make a new list with only the landed aliens
             pb.reviewInhabitants(grid.aliens.getAliensAt(position));
         } catch (UnsupportedOperationException e) {
             // that's ok.
@@ -137,6 +141,7 @@ public class Planet extends InternalSpaceObject {
         }
 
         try {
+            // todo: make a new list with only the landed aliens
             pb.reviewInhabitantActions(grid.aliens.getAliensAt(position));
         } catch (UnsupportedOperationException e) {
             // that's ok.

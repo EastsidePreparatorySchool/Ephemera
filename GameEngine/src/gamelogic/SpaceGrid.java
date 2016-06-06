@@ -59,7 +59,7 @@ public class SpaceGrid {
     public int getNumAliens() {
         return alienCount;
     }
-    
+
     public void ready() {
         // this is also a good spot to 
         // prepare the random generator seed number
@@ -115,7 +115,7 @@ public class SpaceGrid {
         if (currentTurn > Constants.maxTurns) {
             return true;
         }
-        
+
         if (Constants.lastAlienWins) {
             AlienContainer aUniqueAlien = null;
             for (AlienContainer a : aliens) {
@@ -134,7 +134,7 @@ public class SpaceGrid {
             // if we get to here, there was at most one species. Game Over.
             return true;
         }
-        
+
         return false;
     }
 
@@ -389,6 +389,23 @@ public class SpaceGrid {
             }
 
             switch (thisAlien.currentActionCode) {
+                case Land:
+                    Planet p = aliens.getAliensAt(thisAlien.x, thisAlien.y).planet;
+                    if (p != null) {
+                        thisAlien.planet = p;
+                    } else {
+                        thisAlien.kill("Died by landing on a planet that wasn't there.");
+                    }
+                    break;
+
+                case Launch:
+                    if (thisAlien.planet != null) {
+                        thisAlien.planet = null; 
+                    } else {
+                        thisAlien.kill("Died launching from a planet it hadn't landed on.");
+                    }
+                    break;
+
                 case Fight:
                     //vis.debugOut("SpaceGrid: Processing Fight");
 
@@ -668,7 +685,7 @@ public class SpaceGrid {
         // add species if necessary
         InternalAlienSpecies as = speciesMap.get(speciesName);
         if (as == null) {
-            
+
             as = new InternalAlienSpecies(element.domainName, element.packageName, element.className, speciesCounter, speciesMap.getAchievementCount());
             speciesMap.put(speciesName, as);
             speciesCounter++;
@@ -809,7 +826,7 @@ public class SpaceGrid {
         if (ac == null) {
             return;
         }
-        
+
         this.alienCount--; // don't count this one, it's a resident
 
         if (ac.alien instanceof ResidentAlien) {
@@ -944,12 +961,12 @@ public class SpaceGrid {
     public void addCustomAliens(String folder, String domain) {
         String packageName;
         String className;
-        
+
         if (folder.toLowerCase().endsWith("ephemera" + System.getProperty("file.separator"))
                 || folder.toLowerCase().endsWith("spacecritters" + System.getProperty("file.separator"))) {
             return;
         }
-        
+
         File folderFile = new File(folder);
 
         if (folderFile != null) {
