@@ -1,7 +1,10 @@
 /ConsoleAliensGame/nbproject/private/
-/AlienInterfaces/nbproject/private/
-/StockAliens/nbproject/private/
-/GameEngine/nbproject/private/
+/AlienInterfaces/nbproject/private
+/StockAliens/nbproject/private
+/GameEngine/nbproject/private
+/SpaceCritters/nbproject/private
+/StockElements/nbproject/private
+/ModelScaler/nbproject/private
 /ConsoleShell/private/
 
 /AlienInterfaces/build/
@@ -27,6 +30,9 @@
 /ConsoleAliensGame/nbproject/build-impl.xml
 /GameEngine/nbproject/build-impl.xml
 /ConsoleShell/nbproject/build-impl.xml
+/SpaceCritters/nbproject/build-impl.xml
+/ModelScaler/nbproject/build-impl.xml
+/StockElements/nbproject/build-impl.xml
 
 /logs/
 /ALIENS/*
@@ -88,3 +94,5 @@ GUIShell/nbproject/UPDATED.TXT
 /StockElements/build/
 /StockElements/dist/
 /ModelScaler/nbproject/private/
+ModelScaler/nbproject/build-impl.xml
+ModelScaler/nbproject/genfiles.properties
