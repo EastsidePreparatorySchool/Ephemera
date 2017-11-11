@@ -115,10 +115,10 @@ public class VisualizationGrid implements GameVisualizer {
             text = "Aliens:         " + paddedString(numAliens, 7);
             this.gameShell.controlPane.alienNumber.setText(text);
 
-            text = "s:              " + paddedTimeString(time);
+            text = "t(turn):        " + paddedTimeString(time);
             this.gameShell.controlPane.timeForTurn.setText(text);
 
-            text = "1000*s/#/tech^2:" + paddedTimeString((long)(1000*time/(numAliens == 0?numAliens:1)/(tech*tech)));
+            text = "1000*t/#/tech^2:" + paddedTimeString((long)(1000*time/(numAliens == 0?numAliens:1)/(tech*tech)));
             this.gameShell.controlPane.timeForTurnAndAlien.setText(text);
 
             speciesSet.notifyListeners();
