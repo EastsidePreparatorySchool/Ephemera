@@ -36,7 +36,7 @@ public class GameEngineThread extends Thread {
         achievements[0] = new Achievement(1);
         AchievementReq req = new AchievementReq(AchievementFlag.AlienKilledByFighting);
         achievements[0].addReq(req, 0);
-        
+
         engine.grid = new SpaceGrid(engine, engine.vis, Constants.width, Constants.height, achievements);
 
         engine.vis.debugOut("GameEngineThread: Started");
@@ -54,12 +54,11 @@ public class GameEngineThread extends Thread {
                         }
                     }
 
-                    // show idle updates
-                    if (pastReady) {
-                        engine.vis.showIdleUpdate(engine.grid.getNumAliens());
-                    }
-
                     if (engine.gameState == GameState.Paused) {
+                        // show idle updates
+                        if (pastReady) {
+                            engine.vis.showIdleUpdate(engine.grid.getNumAliens());
+                        }
                         try {
                             synchronized (engine.queue) {
                                 engine.queue.wait();
@@ -82,7 +81,7 @@ public class GameEngineThread extends Thread {
                     //e.printStackTrace();
                 }
                 totalTurns++;
-                engine.vis.showCompletedTurn(totalTurns, engine.grid.getNumAliens(), System.nanoTime() - startTurnTime);
+                engine.vis.showCompletedTurn(totalTurns, engine.grid.getNumAliens(), System.nanoTime() - startTurnTime, engine.grid.getTech());
             } catch (Exception e) {
                 //e.printStackTrace();
                 engine.vis.debugErr("GameThread: Unknown exception: " + e.getMessage());

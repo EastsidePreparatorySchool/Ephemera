@@ -25,7 +25,7 @@ public interface GameVisualizer {
     
     void showReady();
     
-    void showCompletedTurn(int totalTurns, int numAliens, long timeTaken);
+    void showCompletedTurn(int totalTurns, int numAliens, long timeTaken, double avgTech);
     
     void showIdleUpdate(int numAliens);
 

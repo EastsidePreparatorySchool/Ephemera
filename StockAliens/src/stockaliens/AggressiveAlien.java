@@ -174,7 +174,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
         if (dalekMesh == null) {
             try {
                 StlMeshImporter importer = new StlMeshImporter();
-                importer.read(this.getClass().getResource("/Resources/DalekFull.stl"));
+                importer.read(this.getClass().getResource("/Resources/DalekFull2.stl"));
                 dalekMesh = importer.getImport();
                 tooComplex = (dalekMesh.getFaceElementSize() > complexityLimit);
             } catch (Exception e) {

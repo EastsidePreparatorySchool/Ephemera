@@ -37,6 +37,7 @@ public class SpaceGrid {
     int starCount = 0;
     int residentCount = 0;
     int alienCount = 0;
+    double avgTech;
 
     int currentTurn = 1;
     int speciesCounter = 1; // starting with ID 1
@@ -58,6 +59,10 @@ public class SpaceGrid {
 
     public int getNumAliens() {
         return alienCount;
+    }
+
+   public double getTech() {
+        return avgTech;
     }
 
     public void ready() {
@@ -178,7 +183,7 @@ public class SpaceGrid {
 
     public void performReceives() {
         // phase 3: receive messages
-        aliens.parallelStream().forEach(ac -> {
+        for (AlienContainer ac : aliens) {
             //for (AlienContainer ac : aliens) {
             if (ac.listening) {
                 // get rid of stale views from prior phases
@@ -196,35 +201,34 @@ public class SpaceGrid {
                     }
                 }
             }
-        });
+        }
     }
 
     public void requestAlienMoves() {
         //vis.debugOut("Requesting moves for " + (aliens.size()) + " aliens");
-        aliens.parallelStream().forEach(ac
-                -> /*for (AlienContainer ac : aliens) */ {
-                    // get rid of stale views from prior moves
-                    ac.ctx.view = null;
+        for (AlienContainer ac : aliens) {
+            // get rid of stale views from prior moves
+            ac.ctx.view = null;
 
-                    int oldX = ac.x;
-                    int oldY = ac.y;
+            int oldX = ac.x;
+            int oldY = ac.y;
 
-                    // call the alien to move
-                    try {
-                        ac.move();
-                    } catch (UnsupportedOperationException e) {
-                        // we'll let that go
-                    } catch (Exception ex) {
-                        displayException("Unhandled exception in getMove(): ", ex);
-                        ac.kill("Death for unhandled exception in getMove(): " + ex.toString());
-                    }
+            // call the alien to move
+            try {
+                ac.move();
+            } catch (UnsupportedOperationException e) {
+                // we'll let that go
+            } catch (Exception ex) {
+                displayException("Unhandled exception in getMove(): ", ex);
+                ac.kill("Death for unhandled exception in getMove(): " + ex.toString());
+            }
 
-                    // charge only for moves > 1 in either direction
-                    int moveLength = GridCircle.distance(ac.x, ac.y, oldX, oldY - oldX);
-                    if (Math.abs(ac.x - oldX) > 1 || Math.abs(ac.y - oldY) > 1) {
-                        ac.energy -= moveLength;
-                    }
-                });
+            // charge only for moves > 1 in either direction
+            int moveLength = GridCircle.distance(ac.x, ac.y, oldX, oldY - oldX);
+            if (Math.abs(ac.x - oldX) > 1 || Math.abs(ac.y - oldY) > 1) {
+                ac.energy -= moveLength;
+            }
+        }
     }
 
     public void movePlanets() {
@@ -311,7 +315,7 @@ public class SpaceGrid {
     }
 
     public void resetAliens() {
-        aliens.parallelStream().forEach((alien) -> {
+        for (AlienContainer alien : aliens) {
             alien.participatedInAction = false;
             alien.ctx.view = null;
             alien.outgoingMessage = null;
@@ -321,11 +325,11 @@ public class SpaceGrid {
             acell.listening = false;
             acell.currentMessages = null;
             acell.energyPerAlien = 0;
-        });
+        }
     }
 
     public void processResults() {
-        aliens.parallelStream().forEach(ac -> {
+        for (AlienContainer ac:aliens) {
             //for (AlienContainer ac : aliens) {
             // get rid of stale views from prior moves
             ac.ctx.view = null;
@@ -339,16 +343,21 @@ public class SpaceGrid {
 
                 ac.kill("Death for unhandled exception in processResults(): " + ex.toString());
             }
-        });
+        }
     }
 
     public void requestAlienActions() {
 
+        this.avgTech = 0;
+        
         // first request all the actions from the aliens
-        aliens.parallelStream().forEach(thisAlien -> {
-            //for (AlienContainer thisAlien : aliens) {
+        for (AlienContainer thisAlien:aliens) {
             // get rid of stale views from prior phases
             thisAlien.ctx.view = null;
+            
+            // assess avg tech
+            
+            avgTech += thisAlien.tech;
 
             try {
                 // Note: getAction() checks validity
@@ -364,7 +373,7 @@ public class SpaceGrid {
                 thisAlien.currentActionPower = 0;
                 thisAlien.kill("Death for unhandled exception in getAction(): " + ex.toString());
             }
-        });
+        }
     }
 
     private void reviewInhabitantActions() {
@@ -400,7 +409,7 @@ public class SpaceGrid {
 
                 case Launch:
                     if (thisAlien.planet != null) {
-                        thisAlien.planet = null; 
+                        thisAlien.planet = null;
                     } else {
                         thisAlien.kill("Died launching from a planet it hadn't landed on.");
                     }

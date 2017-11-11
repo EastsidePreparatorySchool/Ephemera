@@ -61,9 +61,7 @@ public class ViewImplementation implements View {
             for (Position point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
-                    for (AlienContainer ac : acs) {
-                        as.add(ac.getAlienSpecies());
-                    }
+                    as.addAll(acs.speciesMap.keySet());
                 }
             }
         }
@@ -125,14 +123,13 @@ public class ViewImplementation implements View {
             for (Position point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
-                    for (AlienContainer ac : acs) {
-                        as.add(ac.getAlienSpecies());
-                    }
+                    as.addAll(acs.speciesMap.keySet());
                 }
-                // if any added in this circle, return
-                if (as.size() > 0) {
-                    return as;
-                }
+
+            }
+// if any added in this circle, return
+            if (as.size() > 0) {
+                return as;
             }
         }
 
@@ -142,21 +139,33 @@ public class ViewImplementation implements View {
     @Override
     public List<AlienSpecies> getClosestSpecificAliens(AlienSpecies thisOne) {
 
-        LinkedList<AlienSpecies> as = new LinkedList();
+        // map the request to a unique registered species object
+        final AlienSpecies specific;
+
+        if (thisOne == null) {
+            specific = this.ac.species;
+        } else {
+            specific = this.ac.grid.speciesMap.get(thisOne.getFullSpeciesName());
+        }
+
+        LinkedList<AlienSpecies> as = null;
 
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
             for (Position point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
-                    for (AlienContainer ac : acs) {
-                        if (ac.getFullSpeciesName().equalsIgnoreCase(thisOne.getFullSpeciesName())) {
-                            as.add(ac.getAlienSpecies());
+
+                    LinkedList<AlienSpecies> bunch = acs.getAllSpeciesWithPredicateAndPosition((species) -> species != specific, point);
+                    if (bunch != null) {
+                        if (as == null) {
+                            as = new LinkedList();
                         }
+                        as.addAll(bunch);
                     }
                 }
                 // if any added in this circle, return
-                if (as.size() > 0) {
+                if (as != null && as.size() > 0) {
                     return as;
                 }
             }
@@ -167,27 +176,35 @@ public class ViewImplementation implements View {
 
     @Override
     public List<AlienSpecies> getClosestXenos(AlienSpecies notThisOne) {
-
-        LinkedList<AlienSpecies> as = new LinkedList<>();
-        int notThisID = this.ac.speciesID;
+        final AlienSpecies avoid;
+        // if they didn't give us one, they probably meant their own 
+        if (notThisOne == null) {
+            avoid = this.ac.species;
+        } else {
+            // map the request to a unique registered species object
+            avoid = this.ac.grid.speciesMap.get(notThisOne.getFullSpeciesName());
+        }
+        LinkedList<AlienSpecies> as = null;
 
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
 
-            // can make this parallel, but eats a lot of available CPU on Mac
-            c.parallelStream().forEach(point -> {
+            for (Position point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
-                    for (AlienContainer ac : acs) {
-                        if (ac.speciesID != notThisID) {
-                            as.add(ac.getAlienSpecies());
+
+                    LinkedList<AlienSpecies> bunch = acs.getAllSpeciesWithPredicateAndPosition((species) -> species != avoid, point);
+                    if (bunch != null) {
+                        if (as == null) {
+                            as = new LinkedList<>();
                         }
+                        as.addAll(bunch);
                     }
                 }
 
-            });
+            }
             // if any added in this circle, return
-            if (as.size() > 0) {
+            if (as != null && as.size() > 0) {
                 return as;
             }
         }

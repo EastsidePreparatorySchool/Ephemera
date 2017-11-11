@@ -46,6 +46,8 @@ public class VisualizationGrid implements GameVisualizer {
     BufferedWriter logFile;
     GameEngine engine;
 
+    long msLastTurn;
+
     public void init(SpaceCritters gameShellInstance, GameEngine eng, ConsolePane console,
             SpeciesSet species, String logPath, int width, int height) {
         this.gameShell = gameShellInstance;
@@ -101,17 +103,23 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showCompletedTurn(int totalTurns, int numAliens, long time) {
+    public void showCompletedTurn(int totalTurns, int numAliens, long time, double tech) {
         ++totalTurnCounter;
         this.numAliens = numAliens;
         debugOut("Turn #" + totalTurnCounter + " complete.");
         Utilities.runAndWait(() -> {
 
-            String text = "Turns:   " + paddedString(totalTurnCounter, 6);
+            String text = "Turns:          " + paddedString(totalTurnCounter, 7);
             this.gameShell.controlPane.turnCounter.setText(text);
 
-            text = "Aliens: " + paddedString(numAliens, 7);
+            text = "Aliens:         " + paddedString(numAliens, 7);
             this.gameShell.controlPane.alienNumber.setText(text);
+
+            text = "s:              " + paddedTimeString(time);
+            this.gameShell.controlPane.timeForTurn.setText(text);
+
+            text = "1000*s/#/tech^2:" + paddedTimeString((long)(1000*time/(numAliens == 0?numAliens:1)/(tech*tech)));
+            this.gameShell.controlPane.timeForTurnAndAlien.setText(text);
 
             speciesSet.notifyListeners();
             gameShell.mainScene.update();
@@ -231,7 +239,7 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     String paddedString(String s, int space) {
-        s = "          ".substring(0, space) + s;
+        s = "              " + s;
         return s.substring(s.length() - space);
     }
 
