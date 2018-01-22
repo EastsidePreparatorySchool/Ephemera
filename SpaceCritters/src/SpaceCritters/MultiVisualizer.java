@@ -86,10 +86,10 @@ public class MultiVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showCompletedTurn(int totalTurns, int numAliens, long timeTaken) {
+    public void showCompletedTurn(int totalTurns, int numAliens, long time, double tech) {
         cgv.forEach(e -> {
             try {
-                e.showCompletedTurn(totalTurns, numAliens, timeTaken);
+                e.showCompletedTurn(totalTurns, numAliens, time, tech);
             } catch (UnsupportedOperationException ex) {
             }
         });

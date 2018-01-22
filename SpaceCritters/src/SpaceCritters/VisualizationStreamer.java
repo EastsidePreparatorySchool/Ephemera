@@ -55,7 +55,7 @@ public class VisualizationStreamer implements GameVisualizer {
     }
 
     @Override
-    public void showCompletedTurn(int totalTurns, int numAliens, long timeTaken) {
+    public void showCompletedTurn(int totalTurns, int numAliens, long timeTaken, double avgTech) {
     }
 
     @Override

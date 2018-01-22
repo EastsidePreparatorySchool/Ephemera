@@ -138,6 +138,7 @@ public class AlienContainer {
 
     public AlienSpecies getAlienSpecies() {
         if (this.species == null) {
+            assert false;
             species = new AlienSpecies(this.domainName, this.packageName, this.className, species.speciesID, this.x, this.y);
         }
         return species;

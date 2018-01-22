@@ -51,6 +51,8 @@ public final class ControlPane extends VBox {
     final Button buttonHelp;
     final Text turnCounter;
     final Text alienNumber;
+    final Text timeForTurn;
+    final Text timeForTurnAndAlien;
 
     //inside
     public ControlPane(SpaceCritters gameShellInstance) {
@@ -66,7 +68,9 @@ public final class ControlPane extends VBox {
         buttonConsole = new Button("Console");
         buttonHelp = new Button("Help");
         turnCounter = new Text("Turns:        0");
-        alienNumber = new Text("Aliens:       0");
+        alienNumber =         new Text("Aliens:       0");
+        timeForTurn =         new Text("s/turn:     0ms");
+        timeForTurnAndAlien = new Text("s/turn/#:   0ms");
         alienView = new RadioButton("Aliens");
         energyView = new RadioButton("Energy");
         techView = new RadioButton("Tech");
@@ -141,8 +145,16 @@ public final class ControlPane extends VBox {
         alienNumber.setFont(Font.font("Consolas", FontWeight.NORMAL, 14));
         alienNumber.setStyle("-fx-background-color: black;");
         alienNumber.setFill(Color.WHITE);
+        
+        timeForTurn.setFont(Font.font("Consolas", FontWeight.NORMAL, 14));
+        timeForTurn.setStyle("-fx-background-color: black;");
+        timeForTurn.setFill(Color.WHITE);
 
-        gameStats.getChildren().addAll(turnCounter, alienNumber);
+        timeForTurnAndAlien.setFont(Font.font("Consolas", FontWeight.NORMAL, 14));
+        timeForTurnAndAlien.setStyle("-fx-background-color: black;");
+        timeForTurnAndAlien.setFill(Color.WHITE);
+
+        gameStats.getChildren().addAll(turnCounter, alienNumber, timeForTurn, timeForTurnAndAlien);
     }
 
     public void addGameControls() {
