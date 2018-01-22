@@ -46,7 +46,7 @@ public class VisualizationGrid implements GameVisualizer {
     BufferedWriter logFile;
     GameEngine engine;
 
-    public void init(SpaceCritters gameShellInstance, GameEngine eng, ConsolePane console,
+    public void initField(SpaceCritters gameShellInstance, GameEngine eng, ConsolePane console,
             SpeciesSet species, String logPath, int width, int height) {
         this.gameShell = gameShellInstance;
         this.engine = eng;
@@ -336,5 +336,13 @@ public class VisualizationGrid implements GameVisualizer {
         Utilities.runAndWait(() -> {
             gameShell.mainScene.update();
         });
+    }
+
+    @Override
+    public void init() {
+    }
+
+    @Override
+    public void shutdown() {
     }
 }

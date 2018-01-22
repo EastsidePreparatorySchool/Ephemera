@@ -101,7 +101,7 @@ public final class ControlPane extends VBox {
         alienView.setSelected(true);
         alienView.setOnAction((e) -> {
             if (alienView.isSelected()) {
-                gameShell.field.setRenderMode("Aliens");
+                gameShell.fieldGrid.setRenderMode("Aliens");
             }
         });
 
@@ -111,7 +111,7 @@ public final class ControlPane extends VBox {
         energyView.setDisable(true);
         energyView.setOnAction((e) -> {
             if (energyView.isSelected()) {
-                gameShell.field.setRenderMode("Energy");
+                gameShell.fieldGrid.setRenderMode("Energy");
             }
         });
 
@@ -121,7 +121,7 @@ public final class ControlPane extends VBox {
         techView.setDisable(true);
         techView.setOnAction((e) -> {
             if (alienView.isSelected()) {
-                gameShell.field.setRenderMode("Tech");
+                gameShell.fieldGrid.setRenderMode("Tech");
             }
         });
 

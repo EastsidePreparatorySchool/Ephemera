@@ -65,7 +65,7 @@ public class Alien3D {
         }
       
 
-        alien.setMaterial(new PhongMaterial(gameShell.field.speciesSet.getColor(as.speciesName, as.speciesID)));
+        alien.setMaterial(new PhongMaterial(gameShell.fieldGrid.speciesSet.getColor(as.speciesName, as.speciesID)));
         alien.setDrawMode(DrawMode.FILL);
     }
 
@@ -75,14 +75,14 @@ public class Alien3D {
         if (nextX != x || nextY != y || nextZ != zPos) {
             if (nextX != x || nextY != y) { // if we are changing cells
                 if (!isNew) {
-                    cell = gameShell.field.getCell(x, y);
+                    cell = gameShell.fieldGrid.getCell(x, y);
                     cell.removeAlien(this);
                 }
 
                 x = nextX;
                 y = nextY;
 
-                cell = gameShell.field.getCell(x, y);
+                cell = gameShell.fieldGrid.getCell(x, y);
                 cell.addAlien(this);
 
                 if (isNew) {

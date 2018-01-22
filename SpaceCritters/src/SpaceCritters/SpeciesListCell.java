@@ -27,7 +27,7 @@ public class SpeciesListCell extends CheckBoxListCell<AlienSpeciesForDisplay> {
                 observable.addListener((obs, wasSelected, isNowSelected) -> {
                     item.setOn(isNowSelected);
                     GameElementSpec element = new GameElementSpec("ALIEN", item.domainName, item.packageName, item.className, null);
-                    if (item.gameShell.field.totalTurnCounter > 0) {
+                    if (item.gameShell.fieldGrid.totalTurnCounter > 0) {
                         if (isNowSelected) {
                             item.gameShell.engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
                         } else {

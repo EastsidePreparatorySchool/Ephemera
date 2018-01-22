@@ -298,12 +298,12 @@ public class Scene3D {
         for (Alien3D a : updateQueue) {
             if (a.killMe) {
                 this.aliens.remove(a.as.hashCode);
-                this.gameShell.field.getCell(a.x, a.y).removeAlien(a);
+                this.gameShell.fieldGrid.getCell(a.x, a.y).removeAlien(a);
                 this.root.getChildren().remove(a.alien);
             } else {
                 a.updatePosition();
 
-                Cell cell = gameShell.field.getCell(a.x, a.y);
+                Cell cell = gameShell.fieldGrid.getCell(a.x, a.y);
                 if (cell.totalFighters > 0) {
                     displayFight(a.x, a.y);
                     cell.totalFighters = 0;
@@ -324,7 +324,7 @@ public class Scene3D {
     }
 
     public void displayFight(int x, int y) {
-        Cell cell = gameShell.field.getCell(x, y);
+        Cell cell = gameShell.fieldGrid.getCell(x, y);
         int fighting = cell.totalFighters;
 
         Sphere s = new Sphere(fighting / (double) 2);
@@ -361,8 +361,8 @@ public class Scene3D {
     private Box buildPlate() {
 
         int scale = 5;
-        int w = gameShell.field.width * scale + 1;
-        int h = gameShell.field.height * scale + 1;
+        int w = gameShell.fieldGrid.width * scale + 1;
+        int h = gameShell.fieldGrid.height * scale + 1;
         WritableImage gridImg = new WritableImage(w, h);
         PixelWriter writer = gridImg.getPixelWriter();
 
@@ -385,7 +385,7 @@ public class Scene3D {
             }
         }
 
-        Box b = new Box(gameShell.field.width, 0.01, gameShell.field.height);
+        Box b = new Box(gameShell.fieldGrid.width, 0.01, gameShell.fieldGrid.height);
         PhongMaterial plateMaterial = new PhongMaterial();
         plateMaterial.setDiffuseMap(gridImg);
         b.setMaterial(plateMaterial);

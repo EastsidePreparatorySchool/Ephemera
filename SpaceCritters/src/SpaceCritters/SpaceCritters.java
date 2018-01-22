@@ -8,6 +8,7 @@ import gameengineV1.GameEngineV1;
 import gameengineinterfaces.GameCommand;
 import gameengineinterfaces.GameCommandCode;
 import gameengineinterfaces.GameElementSpec;
+import gameengineinterfaces.GameVisualizer;
 import gamelogic.Constants;
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +45,10 @@ public class SpaceCritters extends Application {
 
     boolean gameOver = false;
     GameEngineV1 engine;
-    VisualizationGrid field;
+//    VisualizationGrid field;
+    GameVisualizer field;
+    VisualizationGrid fieldGrid;
+    GameVisualizer streamer;
     SpeciesSet species;
     SpectrumColor spectrum = new SpectrumColor();
     Stage dstage;
@@ -57,7 +61,7 @@ public class SpaceCritters extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        
+
         GameElementSpec[] elements;
 
         try {
@@ -119,21 +123,29 @@ public class SpaceCritters extends Application {
             //
             //get some objects created (not initialized, nothing important happens here)
             this.engine = new GameEngineV1();
-            this.field = new VisualizationGrid();
+            this.fieldGrid = new VisualizationGrid();
 
             // now initialize visualization field
-            
-            this.field.init(this, engine, consolePane, species, logPath, width, height);
-            
+            this.fieldGrid.initField(this, engine, consolePane, species, logPath, width, height);
+
+            //
+            // test: viz streamer for web version
+            //
+            this.streamer = new VisualizationStreamer(logPath);
+
+            // make multiviz with both
+            this.field = new MultiVisualizer(
+                    new GameVisualizer[]{this.fieldGrid, this.streamer});
+            this.field.init(); // calls init on all
+
             // and engine
             engine.init(field, gamePath, alienPath);
-            elements  = engine.readConfigFile("sc_config.json");
+            elements = engine.readConfigFile("sc_config.json");
             engine.processGameElements(elements);
-            
+
             // load a game and process it
-            elements  = engine.readConfigFile(Constants.gameMode);
+            elements = engine.readConfigFile(Constants.gameMode);
             engine.processGameElements(elements);
-            
 
             // need field to be alive before constructing this
             mainScene = new Scene3D(this, (int) screenBounds.getWidth() - 220, (int) screenBounds.getHeight() - 20);
@@ -260,6 +272,9 @@ public class SpaceCritters extends Application {
     public void handleExit() {
         engine.queueCommand(new GameCommand(GameCommandCode.End));
         field.showGameOver(); // closes logfile
+        this.streamer.showGameOver();
+        this.streamer.shutdown();
+
         Platform.exit();
         System.exit(0);
     }
