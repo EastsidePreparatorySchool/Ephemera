@@ -5,6 +5,7 @@
 package SpaceCritters;
 
 import alieninterfaces.AlienShapeFactory;
+import alieninterfaces.PlanetSpec;
 import gameengineinterfaces.AlienSpec;
 import gameengineinterfaces.GameState;
 import gameengineinterfaces.GameVisualizer;
@@ -13,6 +14,9 @@ import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import com.google.gson.Gson;
+import alieninterfaces.StarSpec;
+
 
 /**
  *
@@ -23,23 +27,40 @@ public class VisualizationStreamer implements GameVisualizer {
     BufferedWriter stateLog;
     BufferedWriter progressLog;
     String path;
+    Gson gson;
 
     VisualizationStreamer(String path) {
         this.path = path;
+        this.gson = new Gson();
     }
 
+    String makeRecord(String p, Object o) {
+        String r = gson.toJson(o);
+        String s =  ("0000"+r.length());
+        p = p+"         ";
+        p = p.substring(0,9);
+        return p+"("+s.substring(s.length()-4)+"):"+r;
+    }
+    
     @Override
     public void registerSpecies(AlienSpec as, AlienShapeFactory asf) {
-        println(stateLog, "{species " + as.toString() + ", ");
-        println(progressLog, "{species " + as.toString() + ", ");
+        String s = makeRecord("REGSPEC",as);
+        println(stateLog, s);
+        println(progressLog, s);
     }
 
     @Override
     public void registerStar(int x, int y, String name, int index, double luminosity) {
+        String s = makeRecord("REGSTAR",new StarSpec(x, y, name, index, luminosity));
+        println(stateLog, s);
+        println(progressLog, s);
     }
 
     @Override
     public void registerPlanet(int x, int y, String name, int index, double energy, int tech) {
+        String s = makeRecord("REGPLANET",new PlanetSpec(x, y, name, index, energy, tech));
+        println(stateLog, s);
+        println(progressLog, s);
     }
 
     @Override
