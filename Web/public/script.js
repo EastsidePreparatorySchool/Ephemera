@@ -24,11 +24,6 @@ key[event.which || event.keyCode] = true;
 var rotation = 0;
 var key = {
 check: () => {
-
-
-  //quinn made the keying system originally, i then learned how it worked and could edit it/remake it if necassary
-
-
   if(key[65]) { //a
     cubeMesh.position.x -= 0.05;
     //console.log("left");
