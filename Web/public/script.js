@@ -11,7 +11,7 @@ scene.add(cubeMesh);
 
 camera.position.z = 5;
 camera.position.y = 5;
-camera.rotation.x = -Math.PI/4;
+//camera.rotation.x = -Math.PI/4;
 document.addEventListener('keyup', keyUp, false);
 document.addEventListener('keydown', keyDown, false);
 function keyUp(event) {
@@ -67,13 +67,18 @@ function tick(){
   /*cubeMesh.position.x += 0.01;
   cubeMesh.position.z += 0.01;*/
   key.check();
+
+
+  //camera.rotation.y = 0;
   camera.position.z = 5*Math.cos((rotation*Math.PI)/180);
   camera.position.x = 5*Math.sin((rotation*Math.PI)/180);
-  camera.rotation.y = (rotation*Math.PI)/180;
+  camera.rotation.x = 0;
+ camera.rotation.y = (rotation*Math.PI)/180;
+ camera.rotation.x = -Math.PI/4;
+
   //this needs to be fixed
-  camera.rotation.x = (rotation*Math.PI)/180;
-  camera.rotation.z = -(rotation*Math.PI)/180;
-  key.check();
+/*  camera.rotation.x = (rotation*Math.PI)/180;
+  camera.rotation.z = -(rotation*Math.PI)/180;*/
   //console.log('tick');
   renderer.render( scene, camera );
 }
