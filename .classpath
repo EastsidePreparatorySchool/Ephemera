@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="AlienInterfaces/src"/>
+	<classpathentry kind="src" path="GameEngine/src"/>
+	<classpathentry kind="src" path="ModelScaler/src"/>
+	<classpathentry kind="src" path="SpaceCritters/src"/>
+	<classpathentry kind="src" path="StockAliens/src"/>
+	<classpathentry kind="src" path="StockElements/src"/>
+	<classpathentry kind="lib" path="Lib/gson-2.6.2.jar"/>
+	<classpathentry kind="lib" path="Lib/jimStlMeshImporterJFX.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
