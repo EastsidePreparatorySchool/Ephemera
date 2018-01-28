@@ -14,19 +14,19 @@ import alieninterfaces.*;
 public class Gnomes implements Alien{
 	Context ctx;
 	final boolean debug = true;
-	
-	public void init(Context ctx, int id, int parent, String message) {
-
+	@Override
+	public void init(Context game_ctx, int id, int parent, String message) {
+		ctx = game_ctx;
 
 	}
 
-	
+	@Override
 	public Direction getMove() {
 
 		return null;
 	}
 
-	
+	@Override
 	public Action getAction() {
 
 		return null;

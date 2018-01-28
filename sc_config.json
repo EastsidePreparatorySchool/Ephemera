@@ -6,6 +6,7 @@
     {"kind":"CONSTANT","domainName":"","packageName":"","className":"pauseOnError","state":"off","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
     {"kind":"CONSTANT","domainName":"","packageName":"","className":"autoStart","state":"off","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
     {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockaliens","className":"AggressiveAlien","state":"","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
+    {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockaliens","className":"Gnomes","state":"","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
     {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockaliens","className":"Martian","state":"","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
     {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockaliens","className":"Venusian","state":"","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
     {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockaliens","className":"WeepingAngel","state":"","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
