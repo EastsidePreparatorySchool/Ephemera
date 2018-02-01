@@ -22,14 +22,32 @@ public class Gnomes implements Alien{
 
 	@Override
 	public Direction getMove() {
-
-		return null;
+		double techLevel = ctx.getTech();
+		int y = ctx.getRandomInt(3);
+		int x = ctx.getRandomInt(3);
+		//but don't move into star
+        try {
+            if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new Direction((int) x, (int) y))) != null) {
+                y -= y > 0 ? 1 : -1;
+            }
+        } catch (NotEnoughEnergyException | NotEnoughTechException | View.CantSeeSquareException ex) {
+        }
+		return new Direction(x,y);
 	}
 
 	@Override
 	public Action getAction() {
-
-		return null;
+		double techLevel = ctx.getTech();
+		  if (ctx.getEnergy() < 10) {
+              return new Action(Action.ActionCode.Gain);
+          }
+		  if(ctx.getTech()<5) {
+			  return new Action(Action.ActionCode.Research);
+		  }
+		  if(ctx.getTech()>=5&&ctx.getEnergy()>=14) {
+			  return new Action(Action.ActionCode.Spawn, 4);
+		  }
+		  return new Action(ctx.getRandomInt(1) == 1?Action.ActionCode.Gain:Action.ActionCode.Research);
 	}
 
 
