@@ -11,6 +11,7 @@
     {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockaliens","className":"WeepingAngel","state":"","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
     {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockaliens","className":"Alf","state":"","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
     {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockaliens","className":"EmptyAlien","state":"","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
+    {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockaliens","className":"Tribbles","state":"","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
     {"kind":"STAR","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"Sol","state":"","parent":"","x":0,"y":0,"energy":38.0,"tech":0.0},
     {"kind":"PLANET","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"Earth","state":"","parent":"ephemera.eastsideprep.org:stockelements:Sol","x":-2,"y":-2,"energy":8.0,"tech":8.0},
     {"kind":"STAR","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"ProximaCentauri","state":"","parent":"","x":-34,"y":-20,"energy":15.45,"tech":0.0},
