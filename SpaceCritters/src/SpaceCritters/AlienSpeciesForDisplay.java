@@ -33,7 +33,7 @@ public class AlienSpeciesForDisplay {
     private final BooleanProperty on = new SimpleBooleanProperty();
 
     static Color[] alienColors = {Color.LIGHTBLUE, Color.YELLOW, Color.LIGHTPINK, Color.LIGHTGREEN, Color.ORANGE};
-    static String[] alienStyles = {"lightblue", "yellow", "lightpink", "lightgreen", "orange"};
+    static String[] alienStyles = {"lightblue", "yellow", "lightpink", "lightgreen", "orange", "white"};
     static int colorCount = 0;
 
     AlienSpeciesForDisplay(SpaceCritters gameShellInstance, String speciesName, int id) {

@@ -8,12 +8,17 @@ import alieninterfaces.*;
 
 /**
  *
- * @author Tristan Haeger
+ * @author thaeger
  */
 public class Tribbles implements Alien {
     
     int myID = 0;
     Context ctx;
+    int alienCount = 0;
+    int distance = 500;
+    int x = 0;
+    int y = 0;
+    int r = 25;
 
     @Override
     public void init(Context ctx, int id, int parent, String message) {
@@ -23,27 +28,56 @@ public class Tribbles implements Alien {
 
     @Override
     public void communicate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
     }
 
     @Override
     public void receive(String[] messages) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
     }
 
     @Override
     public Direction getMove() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //find distance between here and corner
+        //find nearest star/planet for avoidance
+        
+        if(alienCount < 5000) {
+        distance = ctx.getDistance(ctx.getPosition(),ctx.getMinPosition());
+        if(distance > r) {
+            distance = ctx.getDistance(ctx.getPosition(),ctx.getMinPosition());
+            ctx.debugOut(Integer.toString(distance));
+            return new Direction(-1,-1);
+        }
+        if(distance <= r) {
+            distance = ctx.getDistance(ctx.getPosition(),ctx.getMinPosition());
+            x = ctx.getRandomInt(3) - 1;
+            y = ctx.getRandomInt(3) - 1;
+            return new Direction(x,y);
+        }
+        return new Direction(0,0);
+        } else {
+            x = ctx.getRandomInt(3) - 1;
+            y = ctx.getRandomInt(3) - 1;
+            return new Direction(x,y);
+        }
     }
 
     @Override
     public Action getAction() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(distance < r + 5 && ctx.getEnergy() > ctx.getSpawningCost() + 11){
+            alienCount++;
+            ctx.debugOut(Double.toString(ctx.getEnergy()));
+            return new Action(Action.ActionCode.Spawn,10);
+        } else  {
+            if(ctx.getEnergy() < ctx.getTech() + 5)
+                return new Action(Action.ActionCode.Gain);
+            else {
+                return new Action(Action.ActionCode.Research);
+            }
+        }
     }
 
     @Override
-    public void processResults() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void processResults(){
     }
-    
 }
