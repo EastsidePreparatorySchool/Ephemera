@@ -1,0 +1,15 @@
+{
+  "":"this is the tentative format for the information that will be sent to the client from the server",
+  "":"current position will definetly be sent, how the client will extrapolate if it does not reach the server is tentatively its current speed vector",
+  "location":{
+    "x":0,
+    "y":0,
+    "heading":{
+      "x":0,
+      "y":0
+    }
+  },
+  "tyoe":"eg. alien, planet, star",
+  "color":"the color to draw this, none if planet",
+  "":"planet may be sent by a different request instead, this is still tentative"
+}
