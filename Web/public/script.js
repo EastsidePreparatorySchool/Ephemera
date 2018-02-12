@@ -5,39 +5,16 @@ var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 var cubeGeo = new THREE.BoxGeometry( 1, 1, 1 );
-var silvMat = new THREE.MeshBasicMaterial({color:0xC0C0C0, wireframe:true});
-var cubeMesh = new THREE.Mesh(cubeGeo,silvMat);
-scene.add(cubeMesh);
-
-
-
-const alien  = class{
-  constructor(c,x,z){
-    this.mat = new THREE.MeshBasicMaterial({color:c, wireframe:false});
-    this.geo = new THREE.BoxGeometry( 1, 1, 1 );
-    this.mesh = new THREE.Mesh(this.geo,this.mat);
-    scene.add(this.mesh);
-    this.mesh.position.x = x;
-    this.mesh.position.z = z;
-  }
-  move(x,z){
-    this.mesh.position.x += x;
-    this.mesh.position.z += z;
-  }
-};
-
-
-
 camera.position.z = 5;
 camera.position.y = 5;
 //camera.rotation.x = -Math.PI/4;
 document.addEventListener('keyup', keyUp, false);
 document.addEventListener('keydown', keyDown, false);
 function keyUp(event) {
-key[event.which || event.keyCode] = false;
+  key[event.which || event.keyCode] = false;
 }
 function keyDown(event) {
-key[event.which || event.keyCode] = true;
+  key[event.which || event.keyCode] = true;
 //console.log(event.which);
 }
 var rotation = 0;
@@ -82,11 +59,35 @@ check: () => {
   }
 }
 }
+//the following is unnesasary, as it was previously used for camera rotating, but wasn't workings
 camera.position.z = 5*Math.cos((rotation*Math.PI)/180);
 camera.position.x = 5*Math.sin((rotation*Math.PI)/180);
 camera.rotation.x = 0;
 camera.rotation.y = (rotation*Math.PI)/180;
 camera.rotation.x = -Math.PI/4;
+
+
+
+const alien  = class{
+  constructor(c,x,z){
+    this.mat = new THREE.MeshBasicMaterial({color:c, wireframe:false});
+    this.mesh = new THREE.Mesh(cubeGeo,this.mat);
+    scene.add(this.mesh);
+    this.mesh.position.x = x;
+    this.mesh.position.z = z;
+  }
+  move(x,z){
+    this.mesh.position.x += x;
+    this.mesh.position.z += z;
+  }
+  kill(){
+    scene.remove(this.mesh);
+  }
+};
+
+
+
+
 function tick(){
   /*cubeMesh.position.x += 0.01;
   cubeMesh.position.z += 0.01;*/
