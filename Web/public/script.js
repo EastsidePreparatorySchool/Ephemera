@@ -70,12 +70,13 @@ function tick(){
 
 
   //camera.rotation.y = 0;
+  /*THE CAMERA CURRENTLY DOESNT WORK
   camera.position.z = 5*Math.cos((rotation*Math.PI)/180);
   camera.position.x = 5*Math.sin((rotation*Math.PI)/180);
   camera.rotation.x = 0;
  camera.rotation.y = (rotation*Math.PI)/180;
  camera.rotation.x = -Math.PI/4;
-
+*/
   //this needs to be fixed
 /*  camera.rotation.x = (rotation*Math.PI)/180;
   camera.rotation.z = -(rotation*Math.PI)/180;*/
