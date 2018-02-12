@@ -9,7 +9,7 @@
       "y":0
     }
   },
-  "tyoe":"eg. alien, planet, star",
+  "type":"eg. alien, planet, star",
   "color":"the color to draw this, none if planet",
   "":"planet may be sent by a different request instead, this is still tentative"
 }

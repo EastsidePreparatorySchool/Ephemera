@@ -9,6 +9,25 @@ var silvMat = new THREE.MeshBasicMaterial({color:0xC0C0C0, wireframe:true});
 var cubeMesh = new THREE.Mesh(cubeGeo,silvMat);
 scene.add(cubeMesh);
 
+
+
+const alien  = class{
+  constructor(l,c,x,y){
+    this.mat = new THREE.MeshBasicMaterial({color:c, wireframe:false});
+    this.geo = new THREE.BoxGeometry( 1, 1, 1 );
+    this.mesh = new THREE.Mesh(this.geo,this.mat);
+    scene.add(this.mesh);
+    this.mesh.posision.x = x;
+    this.mesh.posision.y = y;
+  }
+  move(x,y){
+    this.mesh.posision.x += x;
+    this.mesh.posision.y += y;
+  }
+};
+
+
+
 camera.position.z = 5;
 camera.position.y = 5;
 //camera.rotation.x = -Math.PI/4;
