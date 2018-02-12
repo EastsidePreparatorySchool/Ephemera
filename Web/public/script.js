@@ -12,17 +12,17 @@ scene.add(cubeMesh);
 
 
 const alien  = class{
-  constructor(l,c,x,y){
+  constructor(c,x,z){
     this.mat = new THREE.MeshBasicMaterial({color:c, wireframe:false});
     this.geo = new THREE.BoxGeometry( 1, 1, 1 );
     this.mesh = new THREE.Mesh(this.geo,this.mat);
     scene.add(this.mesh);
-    this.mesh.posision.x = x;
-    this.mesh.posision.y = y;
+    this.mesh.position.x = x;
+    this.mesh.position.z = z;
   }
-  move(x,y){
-    this.mesh.posision.x += x;
-    this.mesh.posision.y += y;
+  move(x,z){
+    this.mesh.position.x += x;
+    this.mesh.position.z += z;
   }
 };
 
@@ -82,6 +82,11 @@ check: () => {
   }
 }
 }
+camera.position.z = 5*Math.cos((rotation*Math.PI)/180);
+camera.position.x = 5*Math.sin((rotation*Math.PI)/180);
+camera.rotation.x = 0;
+camera.rotation.y = (rotation*Math.PI)/180;
+camera.rotation.x = -Math.PI/4;
 function tick(){
   /*cubeMesh.position.x += 0.01;
   cubeMesh.position.z += 0.01;*/
