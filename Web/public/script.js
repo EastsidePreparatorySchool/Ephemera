@@ -1,16 +1,16 @@
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 var renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-var cubeGeo = new THREE.BoxGeometry(1, 1, 1);
+var cubeGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
 
 var size = 501;
 var divisions = 501;
 
-var gridHelper = new THREE.GridHelper( size, divisions );
-scene.add( gridHelper );
+var gridHelper = new THREE.GridHelper(size, divisions);
+scene.add(gridHelper);
 
 camera.position.z = 100;
 camera.position.y = 100;
