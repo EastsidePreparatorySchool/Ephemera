@@ -58,11 +58,13 @@ const alien  = class{
 
 
 function tick(){
+  key.check();
+  $.get('/getAil', data=>{
+    //will be doing stuff here later
+  });
+
   /*cubeMesh.position.x += 0.01;
   cubeMesh.position.z += 0.01;*/
-  key.check();
-
-
   //camera.rotation.y = 0;
   /*THE CAMERA CURRENTLY DOESNT WORK
   camera.position.z = 5*Math.cos((rotation*Math.PI)/180);
@@ -75,6 +77,5 @@ function tick(){
 /*  camera.rotation.x = (rotation*Math.PI)/180;
   camera.rotation.z = -(rotation*Math.PI)/180;*/
   //console.log('tick');
-  renderer.render(scene,camera);
 }
-var interval = setInterval(tick,30);
+var interval = setInterval(tick,3000);
