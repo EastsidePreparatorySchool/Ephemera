@@ -5,7 +5,7 @@
 package stockaliens;
 
 import alieninterfaces.*;
-
+ 
 /**
  *
  * @author thaeger
@@ -14,11 +14,11 @@ public class Tribbles implements Alien {
     
     int myID = 0;
     Context ctx;
-    int alienCount = 0;
+    static int alienCount = 1;
     int distance = 500;
     int x = 0;
     int y = 0;
-    int r = 25;
+    int r = 50;
 
     @Override
     public void init(Context ctx, int id, int parent, String message) {
@@ -40,8 +40,8 @@ public class Tribbles implements Alien {
     public Direction getMove() {
         //find distance between here and corner
         //find nearest star/planet for avoidance
-        
-        if(alienCount < 5000) {
+        ctx.debugOut(Integer.toString(alienCount));
+        if(alienCount <= 10000) {
         distance = ctx.getDistance(ctx.getPosition(),ctx.getMinPosition());
         if(distance > r) {
             distance = ctx.getDistance(ctx.getPosition(),ctx.getMinPosition());
@@ -56,22 +56,22 @@ public class Tribbles implements Alien {
         }
         return new Direction(0,0);
         } else {
-            x = ctx.getRandomInt(3) - 1;
-            y = ctx.getRandomInt(3) - 1;
+            x = ctx.getRandomInt(2);
+            y = ctx.getRandomInt(2);
             return new Direction(x,y);
         }
     }
 
     @Override
     public Action getAction() {
-        if(distance < r + 5 && ctx.getEnergy() > ctx.getSpawningCost() + 11){
-            alienCount++;
+        if((distance < r + 5 || alienCount >= 5000) && ctx.getEnergy() > ctx.getSpawningCost() + 11){
             ctx.debugOut(Double.toString(ctx.getEnergy()));
+            alienCount += 1;
             return new Action(Action.ActionCode.Spawn,10);
         } else  {
-            if(ctx.getEnergy() < ctx.getTech() + 5)
+            if(ctx.getEnergy() < ctx.getTech() + 3) {
                 return new Action(Action.ActionCode.Gain);
-            else {
+            } else {
                 return new Action(Action.ActionCode.Research);
             }
         }
