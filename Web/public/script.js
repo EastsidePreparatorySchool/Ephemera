@@ -60,7 +60,7 @@ const alien  = class{
 function tick(){
   key.check();
   $.get('/getAil', data=>{
-    //will be doing stuff here later
+    renderer.render(scene,camera);
   });
 
   /*cubeMesh.position.x += 0.01;
