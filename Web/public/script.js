@@ -46,8 +46,8 @@ const alien  = class{
     this.mesh.position.y = 0.5;
   }
   move(x,z){
-    this.mesh.position.x += x;
-    this.mesh.position.z += z;
+    this.mesh.position.x = x;
+    this.mesh.position.z = z;
   }
   kill(){
     scene.remove(this.mesh);
@@ -77,4 +77,4 @@ function tick(){
   //console.log('tick');
   renderer.render(scene,camera);
 }
-var interval = setInterval(tick,30);
+var interval = setInterval(tick,3000);
