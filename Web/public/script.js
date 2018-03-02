@@ -46,8 +46,8 @@ const alien  = class{
     this.mesh.position.y = 0.5;
   }
   move(x,z){
-    this.mesh.position.x += x;
-    this.mesh.position.z += z;
+    this.mesh.position.x = x;
+    this.mesh.position.z = z;
   }
   kill(){
     scene.remove(this.mesh);
@@ -58,13 +58,20 @@ const alien  = class{
 
 
 function tick(){
+
   key.check();
   $.get('/getAil', data=>{
     renderer.render(scene,camera);
   });
 
-  /*cubeMesh.position.x += 0.01;
-  cubeMesh.position.z += 0.01;*/
+  renderer.render(scene,camera);
+}
+var interval = setInterval(tick,3000);
+
+
+//welcome to code purgatory, where all my code that i think might be useful iin the future but doesn't work right now goes
+/*
+
   //camera.rotation.y = 0;
   /*THE CAMERA CURRENTLY DOESNT WORK
   camera.position.z = 5*Math.cos((rotation*Math.PI)/180);
@@ -77,5 +84,3 @@ function tick(){
 /*  camera.rotation.x = (rotation*Math.PI)/180;
   camera.rotation.z = -(rotation*Math.PI)/180;*/
   //console.log('tick');
-}
-var interval = setInterval(tick,3000);
