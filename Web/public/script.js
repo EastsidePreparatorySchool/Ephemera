@@ -35,15 +35,19 @@ check: () => {
 }
 }
 
+var aliens = {};
 
-const alien  = class{
-  constructor(c,x,z){
+// alien class, use this to make aliens
+const Alien  = class{
+  constructor(c,x,z,id){
     this.mat = new THREE.MeshBasicMaterial({color:c, wireframe:false});
     this.mesh = new THREE.Mesh(cubeGeo,this.mat);
     scene.add(this.mesh);
     this.mesh.position.x = x;
     this.mesh.position.z = z;
     this.mesh.position.y = 0.5;
+    this.id = id;
+    aliens[this.id] = this;
   }
   move(x,z){
     this.mesh.position.x = x;
@@ -51,10 +55,15 @@ const alien  = class{
   }
   kill(){
     scene.remove(this.mesh);
+    delete aliens[this.id];
   }
 };
 
-
+$.get('/getcurrent',(data)=>{
+  for(i=0;i<data.length;i++){
+    aliens[data[i].id] = new Alien(data[i].color, data[i].location.x, data[i].location.y, data[i].id);
+  }
+});
 
 
 function tick(){
