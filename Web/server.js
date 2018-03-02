@@ -10,6 +10,14 @@ app.get('/example', (req, res)=>{
   //thats if you want /example to be an accessible page, you could also send plaintext or a json, which could be used by the client
 });
 
+app.get('/getcurrent',(req,res)=>{
+
+});
+
+app.get('/getupdates', (req,res)=>{
+
+});
+
 app.listen(port, (err) => {
   if (err) return console.log('error', err);
 

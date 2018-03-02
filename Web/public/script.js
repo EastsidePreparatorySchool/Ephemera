@@ -58,10 +58,16 @@ const alien  = class{
 
 
 function tick(){
-  /*cubeMesh.position.x += 0.01;
-  cubeMesh.position.z += 0.01;*/
+
   key.check();
 
+  renderer.render(scene,camera);
+}
+var interval = setInterval(tick,3000);
+
+
+//welcome to code purgatory, where all my code that i think might be useful iin the future but doesn't work right now goes
+/*
 
   //camera.rotation.y = 0;
   /*THE CAMERA CURRENTLY DOESNT WORK
@@ -75,6 +81,5 @@ function tick(){
 /*  camera.rotation.x = (rotation*Math.PI)/180;
   camera.rotation.z = -(rotation*Math.PI)/180;*/
   //console.log('tick');
-  renderer.render(scene,camera);
-}
-var interval = setInterval(tick,3000);
+  /*cubeMesh.position.x += 0.01;
+  cubeMesh.position.z += 0.01;*/
