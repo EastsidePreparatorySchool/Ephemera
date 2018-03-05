@@ -3,6 +3,8 @@ const express = require('express');
 var app = express();
 app.use(express.static(__dirname+'/public'));
 const port = 3000;
+var cookieParser = require('cookie-parser')
+app.use(cookieParser())
 
 //example app.get:
 app.get('/example', (req, res)=>{
@@ -21,6 +23,16 @@ app.get('/getcurrent',(req,res)=>{
 //handles requests from updates from last tick
 app.get('/getupdates', (req,res)=>{
 
+});
+var cookies;
+app.get('/manage',(req,res)=>{
+  cookies = req.cookies;
+  if(cookies.password == "ephemeralMein"){
+    res.sendFile('management.html');
+  }
+  else{
+
+  }
 });
 
 function update(){
