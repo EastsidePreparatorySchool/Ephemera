@@ -28,15 +28,21 @@ var cookies;
 app.get('/manage',(req,res)=>{
   cookies = req.cookies;
   if(cookies.password == "ephemeralMein"){
-    res.sendFile('management.html');
+    res.sendFile(__dirname +'/management.html');
   }
   else{
-
+    res.send(`
+      <!DOCTYPE html><html><head><script>
+        pass = prompt('You are not logged in, please enter the password');
+        document.cookie = "password = " + pass;
+        location.reload();
+      </script></head></html>
+  `);
   }
 });
 
 function update(){
-  //this is where stuff to update aliens will go
+  //this is where stuff to up`date aliens will go
 }
 
 //start tick and begin listening for requests
