@@ -1,3 +1,4 @@
+//initialize three and set all initial values
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 var renderer = new THREE.WebGLRenderer();
@@ -19,6 +20,7 @@ camera.rotation.x = -Math.PI/4;
 var light = new THREE.AmbientLight(0x404040);
 scene.add(light);
 
+//listeners for keypresses
 document.addEventListener('keyup', keyUp, false);
 document.addEventListener('keydown', keyDown, false);
 function keyUp(event) {
@@ -27,11 +29,33 @@ function keyUp(event) {
 function keyDown(event) {
   key[event.which || event.keyCode] = true;
 //console.log(event.which);
+if(event.which == 37){
+  camera.position.z = 100;
+  camera.position.y = 100;
+  camera.rotation.y = 0;
+  camera.rotation.z = 0;
+  camera.rotation.x = -Math.PI/4;
+  renderer.render(scene,camera);
+}
+if(event.which == 39){
+
+  //camera.rotation.x = -Math.PI/4;
+  camera.position.x = 100;
+  camera.position.y = 100;
+  camera.position.z = 0;
+  camera.rotation.x = 0;
+  camera.rotation.z = -Math.PI/4;
+  camera.rotation.y = Math.PI/2;
+
+  renderer.render(scene,camera);
+}
 }
 var rotation = 0;
+
+//will, in the future handle keypresses
 var key = {
 check: () => {
-  //put things that happen while keys are pushed here
+
 }
 }
 
@@ -58,19 +82,21 @@ const Alien  = class{
   }
 };
 
+//accquires current state
 $.get('/getcurrent',(data)=>{
   for(i=0;i<data.length;i++){
     aliens[data[i].id] = new Alien(data[i].color, data[i].location.x, data[i].location.y, data[i].id);
   }
 });
 
-
+//runs every three seconds and gets updates, then applies them
+//thngs like this DO update but after more than 3 seconds for some reason
 function tick(){
-
   key.check();
   $.get('/getupdates', data=>{
     for(i=0;i<data.length;i++){
-      content = data[i].data
+      content = data[i].data;
+      //data could be one of these types, will do different things based on type
       switch(data[i].type){
         case "new":
           aliens[content.id] = new Alien(content.color,content.location.x,content.location.y);
@@ -87,7 +113,7 @@ function tick(){
   });
 
 }
-var interval = setInterval(tick,3000);
+var interval = setInterval(tick,300);
 
 
 //welcome to code purgatory, where all my code that i think might be useful iin the future but doesn't work right now goes
