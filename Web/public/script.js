@@ -47,7 +47,6 @@ const Alien  = class{
     this.mesh.position.z = z;
     this.mesh.position.y = 0.5;
     this.id = id;
-    aliens[this.id] = this;
   }
   move(x,z){
     this.mesh.position.x = x;
@@ -69,11 +68,24 @@ $.get('/getcurrent',(data)=>{
 function tick(){
 
   key.check();
-  $.get('/getAil', data=>{
+  $.get('/getupdates', data=>{
+    for(i=0;i<data.length;i++){
+      content = data[i].data
+      switch(data[i].type){
+        case "new":
+          aliens[content.id] = new Alien(content.color,content.location.x,content.location.y);
+          break;
+        case "move":
+          aliens[content.id].move(content.x,content.y);
+          break;
+        case "kill":
+          aliens[content.id].kill();
+          break;
+        }
+    }
     renderer.render(scene,camera);
   });
 
-  renderer.render(scene,camera);
 }
 var interval = setInterval(tick,3000);
 

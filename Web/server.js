@@ -13,16 +13,39 @@ app.get('/example', (req, res)=>{
   //thats if you want /example to be an accessible page, you could also send plaintext or a json, which could be used by the client
 });
 //array to contain current aliens
+const Update = class{
+  constructor(type, data){
+      this.type = type;
+      this.data = data;
+  }
+}
+updates = [];
+
+const Alien = class{
+  constructor(c,x,y,id){
+    this.location = {};
+    this.location.x = x;
+    this.location.y = y;
+    this.id = id;
+    this.color = c;
+    updates.push(new Update("new", this));
+  }
+}
+
 aliens = [];
+
+for(i=0; i<10; i++){
+  aliens.push(new Alien(0xFF0000,1,i,i));
+}
 
 //handles request for all current aliens
 app.get('/getcurrent',(req,res)=>{
-
+ res.send(aliens);
 });
 
 //handles requests from updates from last tick
 app.get('/getupdates', (req,res)=>{
-
+  res.send('meme');
 });
 var cookies;
 app.get('/manage',(req,res)=>{
@@ -41,8 +64,17 @@ app.get('/manage',(req,res)=>{
   }
 });
 
+app.get('/testnewail',(req,res)=>{
+  cookies = req.cookies;
+  if(cookies.password == "ephemeralMein"){
+    aliens.push(new Alien(0xFF0000,1,Math.floor(Math.random()*51),aliens.length));
+  }
+  console.log('should do something');
+  console.log(aliens);
+});
+
 function update(){
-  //this is where stuff to up`date aliens will go
+  updates = [];
 }
 
 //start tick and begin listening for requests
