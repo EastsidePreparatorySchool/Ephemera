@@ -130,7 +130,7 @@ public class Scene3D {
 
     }
 
-    public void createStar(int x, int y, String name, int index, double energy) {
+    public void createStar(int x, int y, String name, int index, double energy) { //[Q]
 
         Star3D star = new Star3D(gameShell, x, y, name, index, energy);
 
@@ -139,7 +139,7 @@ public class Scene3D {
         this.stars.put(index, star);
     }
 
-    public void createPlanet(int x, int y, String name, int index, double energy, int tech) {
+    public void createPlanet(int x, int y, String name, int index, double energy, int tech) { //[Q]
 
         Planet3D planet = new Planet3D(gameShell, x, y, name, index, energy);
 
@@ -147,7 +147,7 @@ public class Scene3D {
         this.planets.put(index, planet);
     }
 
-    public void createAlien(AlienSpec as, int id, int x, int y, AlienShapeFactory asf) {
+    public void createAlien(AlienSpec as, int id, int x, int y, AlienShapeFactory asf) { //[Q]
         Alien3D alien = new Alien3D(gameShell, as, id, x, y, asf);
         this.aliens.put(as.hashCode, alien);
 
@@ -155,7 +155,7 @@ public class Scene3D {
         this.updateQueue.add(alien);
     }
 
-    public void destroyAlien(AlienSpec as, int id, int x, int y) {
+    public void destroyAlien(AlienSpec as, int id, int x, int y) { //[Q]
         Alien3D alien = this.aliens.get(as.hashCode);
         assert (alien != null);
 
@@ -165,15 +165,15 @@ public class Scene3D {
         this.updateQueue.add(alien);
     }
 
-    double xFromX(int x) {
+    double xFromX(int x) { //[Q]
         return (x) * spacing;
     }
 
-    double yFromIndex(int i) {
+    double yFromIndex(int i) { //[Q]
         return -i;
     }
 
-    double zFromY(int y) {
+    double zFromY(int y) { //[Q]
         return (y) * spacing;
     }
 
@@ -290,7 +290,7 @@ public class Scene3D {
         e.consume();
     }
 
-    void update() {
+    void update() { //[Q]
         for (Planet3D p : planets.values()) {
             p.updatePosition();
         }
@@ -314,7 +314,7 @@ public class Scene3D {
         updateQueue.clear();
     }
 
-    void updatePlanetsAndStars() {
+    void updatePlanetsAndStars() { //[Q]
         for (Star3D s : stars.values()) {
             s.forceUpdatePosition();
         }

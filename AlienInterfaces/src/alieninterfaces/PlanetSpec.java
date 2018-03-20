@@ -17,7 +17,7 @@ public class PlanetSpec {
     double energy;
     int tech;
 
-    public PlanetSpec(int x, int y, String name, int index, double energy, int tech) {
+    public PlanetSpec(int x, int y, String name, int index, double energy, int tech) { //[Q]
         this.x = x;
         this.y = y;
         this.name = name;

@@ -155,7 +155,7 @@ public class SpaceGrid {
         vis.debugOut("");
     }
 
-    public void performCommunications() {
+    public void performCommunications() { //[Q]
         // phase 1: take outgoing messages and store in ac
         for (AlienContainer ac : aliens) {
             // get rid of stale views from prior phases
@@ -204,7 +204,7 @@ public class SpaceGrid {
         }
     }
 
-    public void requestAlienMoves() {
+    public void requestAlienMoves() { //[Q]
         //vis.debugOut("Requesting moves for " + (aliens.size()) + " aliens");
         for (AlienContainer ac : aliens) {
             // get rid of stale views from prior moves
@@ -252,7 +252,7 @@ public class SpaceGrid {
 
     // now that moving is done and views don't matter anymore,
     // record the moves in AlienContainers and the grid
-    public void recordAlienMoves() {
+    public void recordAlienMoves() { //[Q]
         //vis.debugOut("Recording moves for " + (aliens.size()) + " aliens");
 
         // now for all the aliens
@@ -290,7 +290,7 @@ public class SpaceGrid {
         }
     }
 
-    public boolean isInSafeZone(AlienContainer ac) {
+    public boolean isInSafeZone(AlienContainer ac) { //[Q]
         return GridCircle.distance(0, 0, ac.x, ac.y) <= Constants.safeZoneRadius;
     }
 
@@ -385,7 +385,7 @@ public class SpaceGrid {
         }
     }
 
-    public void performAlienActions() {
+    public void performAlienActions() { //[Q]
         LinkedList<AlienSpec> newAliens = new LinkedList<>();
 
         // now process all actions
@@ -725,12 +725,12 @@ public class SpaceGrid {
         }
     }
 
-    void addAlien(int x, int y, String domainName, String alienPackageName, String alienClassName) {
+    void addAlien(int x, int y, String domainName, String alienPackageName, String alienClassName) { //[Q]
         addAlienWithParams(x, y, domainName, alienPackageName, alienClassName, 0, 1, 1, null);
     }
 
     AlienContainer addAlienWithParams(int x, int y, String domainName, String alienPackageName, String alienClassName,
-            int parent, double tech, double power, String spawnMsg) {
+            int parent, double tech, double power, String spawnMsg) { //[Q]
         AlienContainer ac = null;
 
         String speciesName = domainName + ":" + alienPackageName + ":" + alienClassName;
@@ -773,7 +773,7 @@ public class SpaceGrid {
     // Note: Having a seperate method for each InternalSpaceObject seems a little gross,
     // as there is already a large if statement in addElement and the code in
     // addPlanet and addStar is nearly identical
-    void addPlanet(GameElementSpec element) {
+    void addPlanet(GameElementSpec element) { //[Q]
         InternalSpaceObject soParent = null;
         PlanetBehavior pb = null;
 
@@ -803,7 +803,7 @@ public class SpaceGrid {
         }
     }
 
-    void addStar(GameElementSpec element) {
+    void addStar(GameElementSpec element) { //[Q]
         Star st = new Star(this, element.x, element.y, starCount++, element.domainName, element.packageName, element.className, element.energy, element.tech);
         objects.add(st);
         this.aliens.plugStar(st);

@@ -10,7 +10,7 @@ package gamelogic;
  */
 public class Star extends InternalSpaceObject{
     
-    public Star (SpaceGrid grid, int x, int y, int index, String domainName, String packageName, String className, double energy, double tech) {
+    public Star (SpaceGrid grid, int x, int y, int index, String domainName, String packageName, String className, double energy, double tech) { //[Q]
         super(grid, x, y, index, domainName, packageName, className, energy, tech);
     }
     

@@ -36,8 +36,7 @@ public class Alien3D {
     Shape3D alien;
     private LinkedList<Transform> intrinsicTransforms;
 
-    public Alien3D(SpaceCritters gameShellInstance, AlienSpec as, int id, int x, int y,
-            AlienShapeFactory asf) {
+    public Alien3D(SpaceCritters gameShellInstance, AlienSpec as, int id, int x, int y, AlienShapeFactory asf) { //[Q]
         this.gameShell = gameShellInstance;
         this.nextX = x;
         this.nextY = y;
@@ -69,7 +68,7 @@ public class Alien3D {
         alien.setDrawMode(DrawMode.FILL);
     }
 
-    void updatePosition() {
+    void updatePosition() { //[Q]
         Cell cell;
 
         if (nextX != x || nextY != y || nextZ != zPos) {
@@ -101,7 +100,7 @@ public class Alien3D {
         }
     }
 
-    public void recordMoveTo(int x, int y) {
+    public void recordMoveTo(int x, int y) { //[Q]
         this.nextX = x;
         this.nextY = y;
 

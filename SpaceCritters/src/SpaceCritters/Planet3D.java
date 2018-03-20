@@ -28,7 +28,7 @@ public class Planet3D {
     int nextY;
     double rotation = 0;
 
-    public Planet3D(SpaceCritters gameShellInstance, int x, int y, String name, int index, double energy) {
+    public Planet3D(SpaceCritters gameShellInstance, int x, int y, String name, int index, double energy) { //[Q]
         this.gameShell = gameShellInstance;
         this.x = x;
         this.y = y;
@@ -54,12 +54,12 @@ public class Planet3D {
 
     }
 
-    public void recordMoveTo(int x, int y) {
+    public void recordMoveTo(int x, int y) { //[Q]
         this.nextX = x;
         this.nextY = y;
     }
 
-    public void updatePosition() {
+    public void updatePosition() { //[Q]
         if (nextX != x || nextY != y) {
             forceUpdatePosition();
             this.s.setRotate(rotation);
@@ -70,7 +70,7 @@ public class Planet3D {
         }
     }
 
-    public void forceUpdatePosition() {
+    public void forceUpdatePosition() { //[Q]
         x = nextX;
         y = nextY;
         s.setTranslateX(gameShell.mainScene.xFromX(x));

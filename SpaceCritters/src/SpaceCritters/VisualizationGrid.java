@@ -84,7 +84,7 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     // translation of (x,y) to array element
-    Cell getCell(int x, int y) {
+    Cell getCell(int x, int y) { //[Q]
         return grid[x + (width / 2)][y + (height / 2)];
     }
 
@@ -126,7 +126,7 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showMove(AlienSpec as, int oldx, int oldy, double energyAtNew, double energyAtOld) {
+    public void showMove(AlienSpec as, int oldx, int oldy, double energyAtNew, double energyAtOld) { //[Q]
         int x = as.x;
         int y = as.y;
 
@@ -269,13 +269,13 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void registerStar(int x, int y, String name, int index, double luminosity) {
+    public void registerStar(int x, int y, String name, int index, double luminosity) { //[Q]
         Utilities.runAndWait(() -> gameShell.mainScene.createStar(x, y, name, index, luminosity));
 
     }
 
     @Override
-    public void registerPlanet(int x, int y, String name, int index, double energy, int tech) {
+    public void registerPlanet(int x, int y, String name, int index, double energy, int tech) { //[Q]
         Utilities.runAndWait(() -> gameShell.mainScene.createPlanet(x, y, name, index, energy, tech));
 
     }
@@ -321,7 +321,7 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) {
+    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) { //[Q]
         gameShell.mainScene.planets.get(index).recordMoveTo(x, y);
     }
 

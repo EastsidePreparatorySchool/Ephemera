@@ -100,7 +100,7 @@ public class ContextImplementation implements Context {
     // messsaging API: record that this alien wants to send, and whether to receive
     @Override
     public void broadcastAndListen(String message, int power, boolean listen)
-            throws NotEnoughTechException, NotEnoughEnergyException {
+            throws NotEnoughTechException, NotEnoughEnergyException { //[Q]
 
         if (power > ac.tech) {
             throw new NotEnoughTechException();
@@ -123,7 +123,7 @@ public class ContextImplementation implements Context {
     }
 
     // communicate phase 2: deliver messages to gridpoints
-    public void routeMessages() {
+    public void routeMessages() { //[Q]
         // poke around our current position,
         // tracing an imaginary square of increasing size,
         // in 8 line segments, hopefully without overlap
@@ -138,7 +138,7 @@ public class ContextImplementation implements Context {
     }
 
     // put a message at one grid point ONLY if someone is listening
-    public void depositMessageAt(Position p, String message) {
+    public void depositMessageAt(Position p, String message) { //[Q]
         int x = p.x;
         int y = p.y;
 
@@ -193,7 +193,7 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public List<Position> computeOrbit(Position center, int radius) {
+    public List<Position> computeOrbit(Position center, int radius) { //[Q]
         GridCircle gc = new GridCircle(center.x, center.y, radius);
         ArrayList<Position> orbit = new ArrayList<>();
         

@@ -50,21 +50,21 @@ public class VisualizationStreamer implements GameVisualizer {
     }
 
     @Override
-    public void registerStar(int x, int y, String name, int index, double luminosity) {
+    public void registerStar(int x, int y, String name, int index, double luminosity) { //[Q]
         String s = makeRecord("REGSTAR",new StarSpec(x, y, name, index, luminosity));
         println(stateLog, s);
         println(progressLog, s);
     }
 
     @Override
-    public void registerPlanet(int x, int y, String name, int index, double energy, int tech) {
+    public void registerPlanet(int x, int y, String name, int index, double energy, int tech) { //[Q]
         String s = makeRecord("REGPLANET",new PlanetSpec(x, y, name, index, energy, tech));
         println(stateLog, s);
         println(progressLog, s);
     }
 
     @Override
-    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) {
+    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) { //[Q]
     }
 
     @Override
@@ -88,7 +88,7 @@ public class VisualizationStreamer implements GameVisualizer {
     }
 
     @Override
-    public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition) {
+    public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition) { //[Q]
     }
 
     @Override

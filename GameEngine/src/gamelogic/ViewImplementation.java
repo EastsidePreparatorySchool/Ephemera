@@ -39,7 +39,7 @@ public class ViewImplementation implements View {
     }
 
     @Override
-    public List<AlienSpecies> getAliensAtPos(Position p) throws CantSeeSquareException {
+    public List<AlienSpecies> getAliensAtPos(Position p) throws CantSeeSquareException { //[Q]
         checkPos(p);
 
         LinkedList<AlienSpecies> as = new LinkedList();
@@ -53,7 +53,7 @@ public class ViewImplementation implements View {
     }
 
     @Override
-    public List<AlienSpecies> getAliensInView() {
+    public List<AlienSpecies> getAliensInView() { //[Q]
         LinkedList<AlienSpecies> as = new LinkedList();
 
         for (int d = 0; d <= size; d++) {
@@ -70,7 +70,7 @@ public class ViewImplementation implements View {
     }
 
     @Override
-    public SpaceObject getSpaceObjectAtPos(Position p) throws CantSeeSquareException {
+    public SpaceObject getSpaceObjectAtPos(Position p) throws CantSeeSquareException { //[Q]
         checkPos(p);
 
         AlienCell acs = ag.getAliensAt(p);
@@ -88,7 +88,7 @@ public class ViewImplementation implements View {
     }
 
     @Override
-    public List<SpaceObject> getSpaceObjectsInView() {
+    public List<SpaceObject> getSpaceObjectsInView() { //[Q]
         LinkedList<SpaceObject> sos = new LinkedList();
         SpaceObject so = null;
 
@@ -114,7 +114,7 @@ public class ViewImplementation implements View {
     }
 
     @Override
-    public List<AlienSpecies> getClosestAliens() {
+    public List<AlienSpecies> getClosestAliens() { //[Q]
 
         LinkedList<AlienSpecies> as = new LinkedList<>();
 
@@ -137,7 +137,7 @@ public class ViewImplementation implements View {
     }
 
     @Override
-    public List<AlienSpecies> getClosestSpecificAliens(AlienSpecies thisOne) {
+    public List<AlienSpecies> getClosestSpecificAliens(AlienSpecies thisOne) { //[Q]
 
         // map the request to a unique registered species object
         final AlienSpecies specific;
@@ -175,7 +175,7 @@ public class ViewImplementation implements View {
     }
 
     @Override
-    public List<AlienSpecies> getClosestXenos(AlienSpecies notThisOne) {
+    public List<AlienSpecies> getClosestXenos(AlienSpecies notThisOne) { //[Q]
         final AlienSpecies avoid;
         // if they didn't give us one, they probably meant their own 
         if (notThisOne == null) {
@@ -217,7 +217,7 @@ public class ViewImplementation implements View {
         checkPos(p.x, p.y);
     }
 
-    public void checkPos(int x, int y) throws CantSeeSquareException {
+    public void checkPos(int x, int y) throws CantSeeSquareException { //[Q]
         if (!GridCircle.isValidX(x)) {
             throw new CantSeeSquareException();
         }

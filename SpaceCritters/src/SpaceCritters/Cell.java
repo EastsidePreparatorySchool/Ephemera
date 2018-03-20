@@ -22,7 +22,7 @@ class Cell {
     public Cell(SpaceCritters gameShellInstance, SpeciesSet s, int row, int col) { // Constructor
         gameShell = gameShellInstance;
         alienCount = 0;
-        this.aliens = new LinkedList();
+        this.aliens = new LinkedList(); //probably where things are slowing down
     }
 
     public void addAlien(Alien3D alien) {

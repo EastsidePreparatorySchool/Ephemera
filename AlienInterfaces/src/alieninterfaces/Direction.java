@@ -13,7 +13,7 @@ public class Direction {
     public int x;
     public int y;
 
-    public Direction(int xChange, int yChange) {
+    public Direction(int xChange, int yChange) { //[Q]
         this.x = xChange;
         this.y = yChange;
     }
@@ -27,11 +27,11 @@ public class Direction {
         return new Direction(x+d1.x, y+d1.y);
     }
 
-    public int getLength() {
+    public int getLength() { //[Q]
         return Math.abs(x) + Math.abs(y);
     }
 
-    public Direction scaleToLength(int l) {
+    public Direction scaleToLength(int l) { //[Q]
         int currentLength = getLength();
         int newX = (int) (this.x * (double) l / (double) currentLength);
         int newY = (int) (this.y * (double) l / (double) currentLength);
@@ -39,7 +39,8 @@ public class Direction {
         return new Direction(newX, newY);
     }
 
-    public String toString() {
+    @Override
+    public String toString() { //[Q] (double will be messy)
         return "(" + x + "," + y + ")";
     }
 

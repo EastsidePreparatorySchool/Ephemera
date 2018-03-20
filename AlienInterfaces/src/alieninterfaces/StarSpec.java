@@ -16,7 +16,7 @@ public class StarSpec {
     int index;
     double luminosity;
 
-    public StarSpec(int x, int y, String name, int index, double luminosity) {
+    public StarSpec(int x, int y, String name, int index, double luminosity) { //[Q]
         this.x = x;
         this.y = y;
         this.name = name;

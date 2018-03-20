@@ -24,7 +24,7 @@ public class AlienSpecies {
         this.speciesID = id;
     }
 
-    public AlienSpecies(String domainName, String packageName, String className, int id, int x, int y) {
+    public AlienSpecies(String domainName, String packageName, String className, int id, int x, int y) { //[Q]
         this.domainName = domainName;
         this.packageName = packageName;
         this.className = className;

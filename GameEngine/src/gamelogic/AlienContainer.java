@@ -59,7 +59,7 @@ public class AlienContainer {
     //
     public AlienContainer(SpaceGrid sg, GameVisualizer vis, int x, int y,
             String alienDomainName, String alienPackageName, String alienClassName, Constructor<?> cns, AlienSpecies as,
-            double energy, double tech, int parent, String message) throws InstantiationException {
+            double energy, double tech, int parent, String message) throws InstantiationException { //[Q]
 
         this.domainName = alienDomainName;
         this.packageName = alienPackageName;
@@ -162,7 +162,7 @@ public class AlienContainer {
 
     }
 
-    public void move() throws NotEnoughTechException {
+    public void move() throws NotEnoughTechException { //[Q]
 
         // Whether the move goes off the board will be determined by the grid
         Direction direction = null;
@@ -196,7 +196,7 @@ public class AlienContainer {
     }
 
     // this does the actual checking
-    private void checkMove(Direction direction) throws NotEnoughTechException {
+    private void checkMove(Direction direction) throws NotEnoughTechException { //[Q]
         int moveLength = distance(0, 0, direction.x, direction.y);
 
         // let one x one moves go
@@ -217,7 +217,7 @@ public class AlienContainer {
         }
     }
 
-    public Direction containMove(int x, int y, Direction dir) {
+    public Direction containMove(int x, int y, Direction dir) { //[Q]
         int dxi, dyi;
 
         dxi = dir.x;

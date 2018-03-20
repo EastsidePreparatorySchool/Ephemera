@@ -36,7 +36,7 @@ public class MultiVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void registerStar(int x, int y, String name, int index, double luminosity) {
+    public void registerStar(int x, int y, String name, int index, double luminosity) { //[Q]
         cgv.forEach(e -> {
             try {
                 e.registerStar(x, y, name, index, luminosity);
@@ -46,7 +46,7 @@ public class MultiVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void registerPlanet(int x, int y, String name, int index, double energy, int tech) {
+    public void registerPlanet(int x, int y, String name, int index, double energy, int tech) { //[Q]
         cgv.forEach(e -> {
             try {
                 e.registerPlanet(x, y, name, index, energy, tech);
@@ -56,7 +56,7 @@ public class MultiVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) {
+    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) { //[Q]
         cgv.forEach(e -> {
             try {
                 e.showPlanetMove(oldx, oldy, x, y, name, index, energy, tech);
@@ -116,7 +116,7 @@ public class MultiVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition) {
+    public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition) { //[Q]
         cgv.forEach(e -> {
             try {
                 e.showMove(as, oldX, oldY, energyAtNewPosition, energyAtOldPosition);

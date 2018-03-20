@@ -28,7 +28,7 @@ public class AlienSpec {
 
     public AlienSpec(String domainName, String packageName, String className,
             int speciesID, int hashCode, int x, int y, double tech, double energy,
-            String fullName, String speciesName, String msg) {
+            String fullName, String speciesName, String msg) { //[Q]
         this.domainName = domainName;
         this.packageName = packageName;
         this.className = className;
@@ -45,7 +45,7 @@ public class AlienSpec {
 
     public AlienSpec(String domainName, String packageName, String className,
             int speciesID, int hashCode, int x, int y, double tech, double energy,
-            String fullName, String speciesName, double actionPower) {
+            String fullName, String speciesName, double actionPower) { //[Q]
         this.domainName = domainName;
         this.packageName = packageName;
         this.className = className;
@@ -95,7 +95,7 @@ public class AlienSpec {
         return fullName;
     }
 
-    public String getXYString() {
+    public String getXYString() { //[Q]
         return "(" + x + "," + y + ")";
     }
 

@@ -13,7 +13,7 @@ public class Position {
     public int x;
     public int y;
 
-    public Position(int x, int y) {
+    public Position(int x, int y) { //[Q]
         this.x = x;
         this.y = y;
     }
@@ -30,11 +30,11 @@ public class Position {
         return new Position(x + dir.x, y + dir.y);
     }
 
-    public String toString() {
+    public String toString() {  //[Q] (doubles will be messy)
         return "(" + x + "," + y + ")";
     }
 
-    public static Position fromString(String s) {
+    public static Position fromString(String s) { //[Q] (parsing!)
         try {
             int i = 1;
             int j;

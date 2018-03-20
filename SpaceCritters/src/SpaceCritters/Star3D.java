@@ -24,7 +24,7 @@ public class Star3D {
     final public Sphere s;
  
 
-    public Star3D(SpaceCritters gameShellInstance, int x, int y, String name, int index, double energy) {
+    public Star3D(SpaceCritters gameShellInstance, int x, int y, String name, int index, double energy) { //[Q]
         this.gameShell = gameShellInstance;
         this.x = x;
         this.y = y;
