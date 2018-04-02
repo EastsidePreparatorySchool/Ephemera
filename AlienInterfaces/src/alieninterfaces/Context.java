@@ -18,9 +18,9 @@ public interface Context {
 
     Position getPosition();
     View getView(int size) throws NotEnoughEnergyException, NotEnoughTechException;
-    Position getMinPosition();
-    Position getMaxPosition();
-    int getDistance(Position p1, Position p2); //[Q]
+    IntegerPosition getMinPosition();
+    IntegerPosition getMaxPosition();
+    double getDistance(Position p1, Position p2); //[Q]
     double getPresentEnergy();
 
     int getSpawningCost();
@@ -28,7 +28,7 @@ public interface Context {
 
     int getRandomInt(int ceiling);
     int getGameTurn();
-    List<Position> computeOrbit (Position center, int radius);
+    List<IntegerPosition> computeOrbit (IntegerPosition center, int radius);
 
     HashMap getSecrets();
     int getSecret(String key);

@@ -4,6 +4,7 @@
  */
 package gamelogic;
 
+import alieninterfaces.IntegerPosition;
 import alieninterfaces.Position;
 import java.util.AbstractCollection;
 import java.util.Iterator;
@@ -16,26 +17,26 @@ import java.util.Iterator;
  * this class - create and then use in enhanced for loop - can be used for any
  * metric we might choose
  */
-public class GridCircle extends AbstractCollection<Position> {
+public class GridCircle extends AbstractCollection<IntegerPosition> {
 
-    Position center;
+    IntegerPosition center;
     int radius;
-    Position view;
+    IntegerPosition view;
 
     public GridCircle(int centerX, int centerY, int radius) {
-        this.center = new Position(centerX, centerY);
+        this.center = new IntegerPosition(centerX, centerY);
         this.radius = radius;
-        this.view = new Position(centerX, centerY);
+        this.view = new IntegerPosition(centerX, centerY);
     }
 
     public GridCircle(int centerX, int centerY, int radius, int viewX, int viewY) {
-        this.center = new Position(centerX, centerY);
+        this.center = new IntegerPosition(centerX, centerY);
         this.radius = radius;
-        this.view = new Position(viewX, viewY);
+        this.view = new IntegerPosition(viewX, viewY);
     }
 
     @Override
-    public Iterator<Position> iterator() {
+    public Iterator<IntegerPosition> iterator() {
         return new PositionIterator();
     }
 
@@ -51,7 +52,7 @@ public class GridCircle extends AbstractCollection<Position> {
         
         // otherwise, we will have to count because it skips invalid cells
         int count = 0;
-        for (Position p : this) {
+        for (IntegerPosition p : this) {
             count++;
         }
         
@@ -59,11 +60,11 @@ public class GridCircle extends AbstractCollection<Position> {
     }
 
     // this is used in for(int[] point:circle)
-    private class PositionIterator implements Iterator<Position> {
+    private class PositionIterator implements Iterator<IntegerPosition> {
 
         int counter = 0;
         int phase = 0;
-        Position nextPoint;
+        IntegerPosition nextPoint;
         boolean computed = false;
 
         @Override
@@ -84,7 +85,7 @@ public class GridCircle extends AbstractCollection<Position> {
         }
 
         @Override
-        public Position next() {
+        public IntegerPosition next() {
             if (!computed) {
                 nextPoint = internalNext();
             }
@@ -93,24 +94,24 @@ public class GridCircle extends AbstractCollection<Position> {
             return nextPoint;
         }
 
-        public Position internalNext() {
-            Position point = null;
+        public IntegerPosition internalNext() {
+            IntegerPosition point = null;
 
             do {
                 if (phase == 0) {
-                    point = new Position(center.x + (counter), center.y + (radius - (counter)));
+                    point = new IntegerPosition(center.x + (counter), center.y + (radius - (counter)));
                 }
 
                 if (phase == 1) {
-                    point = new Position(center.x + (radius - counter), center.y - counter);
+                    point = new IntegerPosition(center.x + (radius - counter), center.y - counter);
                 }
 
                 if (phase == 2) {
-                    point = new Position(center.x - counter, center.y - (radius - counter));
+                    point = new IntegerPosition(center.x - counter, center.y - (radius - counter));
                 }
 
                 if (phase == 3) {
-                    point = new Position(center.x - (radius - counter), center.y + counter);
+                    point = new IntegerPosition(center.x - (radius - counter), center.y + counter);
                 }
 
                 if (++counter >= radius) {
@@ -124,19 +125,22 @@ public class GridCircle extends AbstractCollection<Position> {
     }
 
 // helper function: our metric
-    public static int distance(Position p1, Position p2) {
+    public static double distance(IntegerPosition p1, IntegerPosition p2) {
+        return distance(p1.x, p1.y, p2.x, p2.y);
+    }
+    public static double distance(Position p1, Position p2) {
         return distance(p1.x, p1.y, p2.x, p2.y);
     }
 
-    public static int distance(int x1, int y1, int x2, int y2) {
+    public static double distance(double x1, double y1, double x2, double y2) {
         return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
 
-    public boolean outOfView(Position point) {
-        return (distance(point, new Position(view.x, view.y)) > radius);
+    public boolean outOfView(IntegerPosition point) {
+        return (distance(point, new IntegerPosition(view.x, view.y)) > radius);
     }
 
-    public static boolean isValidPoint(Position point) {
+    public static boolean isValidPoint(IntegerPosition point) {
         return isValidX(point.x) && isValidY(point.y);
     }
 

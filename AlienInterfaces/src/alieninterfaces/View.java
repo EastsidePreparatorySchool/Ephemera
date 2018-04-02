@@ -12,11 +12,11 @@ import java.util.List;
  */
 public interface View {
 
-    List<AlienSpecies> getAliensAtPos(Position p) throws CantSeeSquareException;
+    List<AlienSpecies> getAliensAtPos(IntegerPosition p) throws CantSeeSquareException;
 
     List<AlienSpecies> getAliensInView();
 
-    SpaceObject getSpaceObjectAtPos(Position p) throws CantSeeSquareException;
+    SpaceObject getSpaceObjectAtPos(IntegerPosition p) throws CantSeeSquareException;
 
     List<SpaceObject> getSpaceObjectsInView();
 

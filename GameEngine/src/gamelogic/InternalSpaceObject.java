@@ -4,6 +4,7 @@
  */
 package gamelogic;
 
+import alieninterfaces.IntegerPosition;
 import alieninterfaces.Position;
 import gameengineinterfaces.PlanetBehavior;
 
@@ -26,8 +27,8 @@ public abstract class InternalSpaceObject {
     public double energy; // Energy that aliens gain every turn from the planet
     public double tech; // Tech boost for the planet
 
-    public InternalSpaceObject(SpaceGrid grid, int x, int y, int index, String domainName, String packageName, String className, double energy, double tech) { //[Q]
-        this.position = new Position (x,y);
+    public InternalSpaceObject(SpaceGrid grid, Position p, int index, String domainName, String packageName, String className, double energy, double tech) { //[Q]
+        this.position = p;
         this.energy = energy;
         this.tech = tech;
         this.domainName = domainName;

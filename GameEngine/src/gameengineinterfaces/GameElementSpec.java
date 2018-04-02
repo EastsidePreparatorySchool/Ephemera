@@ -4,6 +4,8 @@
  */
 package gameengineinterfaces;
 
+import alieninterfaces.Position;
+
 
 /**
  *
@@ -17,8 +19,7 @@ public class GameElementSpec {
     public String className;
     public String state;
     public String parent;
-    public int x; //[Q]
-    public int y; //[Q]
+    public Position p;
     public double energy;
     public double tech;
 

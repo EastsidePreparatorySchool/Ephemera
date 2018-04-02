@@ -37,7 +37,7 @@ public class ContextImplementation implements Context {
 
     @Override
     public Position getPosition() {
-        return new Position(ac.x, ac.y);
+        return ac.p;
     }
 
     @Override
@@ -56,13 +56,13 @@ public class ContextImplementation implements Context {
         size = Math.max(size, 2);
 
         // if we don't have one or they want a bigger one
-        this.view = new ViewImplementation(ac.grid.aliens, ac, ac.x, ac.y, size);
+        this.view = new ViewImplementation(ac.grid.aliens, ac, ac.p, size);
         return this.view;
     }
 
     @Override
     public double getPresentEnergy() {
-        return ac.grid.aliens.getEnergyAt(ac.x, ac.y);
+        return ac.grid.aliens.getEnergyAt(ac.p.round());
     }
 
     @Override
@@ -116,7 +116,7 @@ public class ContextImplementation implements Context {
         ac.outgoingPower = power;
 
         if (listen) {
-            AlienCell acell = this.ac.grid.aliens.getAliensAt(ac.x, ac.y);
+            AlienCell acell = this.ac.grid.aliens.getAliensAt(ac.p.round());
             ac.listening = true;
             acell.listening = true;
         }
@@ -128,8 +128,8 @@ public class ContextImplementation implements Context {
         // tracing an imaginary square of increasing size,
         // in 8 line segments, hopefully without overlap
         for (int d = 1; d <= ac.outgoingPower; d++) {
-            GridCircle c = new GridCircle(ac.x, ac.y, d);
-            for (Position point : c) {
+            GridCircle c = new GridCircle(ac.p.round().x, ac.p.round().y, d); //!!!!!!!!!!!!!!!!!!!!
+            for (IntegerPosition point : c) {
                 if (point != null) {
                     depositMessageAt(point, ac.outgoingMessage);
                 }
@@ -138,7 +138,7 @@ public class ContextImplementation implements Context {
     }
 
     // put a message at one grid point ONLY if someone is listening
-    public void depositMessageAt(Position p, String message) { //[Q]
+    public void depositMessageAt(IntegerPosition p, String message) { //[Q]
         int x = p.x;
         int y = p.y;
 
@@ -170,13 +170,13 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public Position getMinPosition() {
-        return new Position(-ac.grid.width / 2, -ac.grid.height / 2);
+    public IntegerPosition getMinPosition() {
+        return new IntegerPosition(-ac.grid.width / 2, -ac.grid.height / 2);
     }
 
     @Override
-    public Position getMaxPosition() {
-        return new Position(ac.grid.width / 2 - 1, ac.grid.height / 2 - 1);
+    public IntegerPosition getMaxPosition() {
+        return new IntegerPosition(ac.grid.width / 2 - 1, ac.grid.height / 2 - 1);
     }
 
     @Override
@@ -188,16 +188,16 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public int getDistance(Position p1, Position p2) {
+    public double getDistance(Position p1, Position p2) {
         return GridCircle.distance(p1, p2);
     }
 
     @Override
-    public List<Position> computeOrbit(Position center, int radius) { //[Q]
+    public List<IntegerPosition> computeOrbit(IntegerPosition center, int radius) { //[Q]
         GridCircle gc = new GridCircle(center.x, center.y, radius);
-        ArrayList<Position> orbit = new ArrayList<>();
+        ArrayList<IntegerPosition> orbit = new ArrayList<>();
         
-        for (Position p:gc) {
+        for (IntegerPosition p:gc) {
             orbit.add(p);
         }
         
@@ -206,7 +206,7 @@ public class ContextImplementation implements Context {
 
     @Override
     public AlienSpecies getMyAlienSpecies() {
-        return new AlienSpecies(ac.domainName, ac.packageName, ac.className, ac.speciesID, ac.x, ac.y);
+        return new AlienSpecies(ac.domainName, ac.packageName, ac.className, ac.speciesID, ac.p);
     }
 
 }

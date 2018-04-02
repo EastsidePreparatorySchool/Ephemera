@@ -53,19 +53,16 @@ public class AlienCell extends LinkedList<AlienContainer> {
         super.remove(ac);
     }
 
-    public LinkedList<AlienSpecies> getAllSpeciesWithPredicateAndPosition(Predicate<AlienSpecies> pred, Position pos) {
-        if (this.speciesMap.isEmpty()) {
-            return null;
-        }
+    public LinkedList<AlienSpecies> getAllSpeciesWithPredicateAndPosition(Predicate<AlienSpecies> pred) {
+        if (this.speciesMap.isEmpty()) return null;
         
         LinkedList<AlienSpecies> las = null;
 
         for (AlienSpecies as : this.speciesMap.keySet()) {
             if (pred.test(as)) {
-                if (las == null) {
-                    las = new LinkedList<>();
-                }
-                las.add(new AlienSpecies(as.domainName, as.packageName, as.className, as.speciesID, pos.x, pos.y));
+                if (las == null) las = new LinkedList<>();
+                
+                las.add(new AlienSpecies(as.domainName, as.packageName, as.className, as.speciesID, as.p));
             }
         }
         return las;

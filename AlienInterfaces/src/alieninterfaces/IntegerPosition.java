@@ -6,38 +6,35 @@ package alieninterfaces;
 
 /**
  *
- * @author qbowers
+ * @author gmein
  */
-public class Position extends Vector2 {
-    
+public class IntegerPosition {
 
-    public Position(double x, double y) { //[Q]
+    public int x;
+    public int y;
+
+    public IntegerPosition(int x, int y) { //[Q]
         this.x = x;
         this.y = y;
     }
-    public Position(Vector2 v) {
-        this.x = v.x;
-        this.y = v.y;
-    }
-    public Position clone() { return new Position(x,y); }
 
-    public Direction getDirectionTo(Position p2) {
-        return new Direction(p2.x - x, p2.y - y);
+    public IntegerDirection getDirectionTo(IntegerPosition p2) {
+        return new IntegerDirection(p2.x - x, p2.y - y);
     }
 
-    public Direction getDirectionFrom(Position p2) {
-        return new Direction(x - p2.x, y - p2.y);
+    public IntegerDirection getDirectionFrom(IntegerPosition p2) {
+        return new IntegerDirection(x - p2.x, y - p2.y);
     }
 
-    public Position add(Direction dir) {
-        return new Position(x + dir.x, y + dir.y);
+    public IntegerPosition add(IntegerDirection dir) {
+        return new IntegerPosition(x + dir.x, y + dir.y);
     }
 
     public String toString() {  //[Q] (doubles will be messy)
         return "(" + x + "," + y + ")";
     }
 
-    public static Position fromString(String s) { //[Q] (parsing!)
+    public static IntegerPosition fromString(String s) { //[Q] (parsing!)
         try {
             int i = 1;
             int j;
@@ -53,15 +50,12 @@ public class Position extends Vector2 {
                 i++;
             }
             y = Integer.parseInt(s.substring(j, i));
-            return new Position(x, y);
+            return new IntegerPosition(x, y);
             
         } catch (Exception e) {
         }
         
         return null;
     }
-    
-    public IntegerPosition round() {
-        return new IntegerPosition((int) Math.round(x), (int) Math.round(y));
-    }
+
 }

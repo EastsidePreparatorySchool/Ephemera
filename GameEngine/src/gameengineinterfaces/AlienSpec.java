@@ -5,6 +5,7 @@
 package gameengineinterfaces;
 
 import alieninterfaces.AlienSpecies;
+import alieninterfaces.Position;
 
 /**
  *
@@ -17,8 +18,7 @@ public class AlienSpec {
     public String className;
     public int speciesID;
     public int hashCode;
-    public int x;
-    public int y;
+    public Position p;
     public double tech;
     public double energy;
     public double actionPower;
@@ -27,14 +27,13 @@ public class AlienSpec {
     public String msg;
 
     public AlienSpec(String domainName, String packageName, String className,
-            int speciesID, int hashCode, int x, int y, double tech, double energy,
+            int speciesID, int hashCode, Position p, double tech, double energy,
             String fullName, String speciesName, String msg) { //[Q]
         this.domainName = domainName;
         this.packageName = packageName;
         this.className = className;
         this.hashCode = hashCode;
-        this.x = x;
-        this.y = y;
+        this.p = p;
         this.tech = tech;
         this.energy = energy;
         this.fullName = fullName;
@@ -44,14 +43,13 @@ public class AlienSpec {
     }
 
     public AlienSpec(String domainName, String packageName, String className,
-            int speciesID, int hashCode, int x, int y, double tech, double energy,
+            int speciesID, int hashCode, Position p, double tech, double energy,
             String fullName, String speciesName, double actionPower) { //[Q]
         this.domainName = domainName;
         this.packageName = packageName;
         this.className = className;
         this.hashCode = hashCode;
-        this.x = x;
-        this.y = y;
+        this.p = p;
         this.tech = tech;
         this.energy = energy;
         this.fullName = fullName;
@@ -96,7 +94,7 @@ public class AlienSpec {
     }
 
     public String getXYString() { //[Q]
-        return "(" + x + "," + y + ")";
+        return "(" + p.x + "," + p.y + ")";
     }
 
     public String getTechEnergyString() {
