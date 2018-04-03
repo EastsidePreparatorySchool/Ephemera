@@ -8,25 +8,26 @@ package alieninterfaces;
  *
  * @author gmein
  */
-public class Position extends Vector2 {
-    
-    public Position(Vector2 v) { super(v); }
-    public Position(double x, double y) { super(x,y); }
+public class IntegerPosition extends IntegerVector2 {
 
-    public Direction getDirectionTo(Position p2) {
-        return new Direction( p2.subtract(this) );
-    }
-    public Direction getDirectionFrom(Position p2) {
-        return new Direction( this.subtract(p2) );
-    }
+    public IntegerPosition(int x, int y) { super(x, y); }
+    public IntegerPosition(IntegerVector2 v) { super(v); }
+    public IntegerPosition(Vector2 v) { super(v); }
 
-    public Position add(IntegerDirection dir) {
-        return new Position( super.add(dir) );
+    public IntegerDirection getDirectionTo(IntegerPosition p2) {
+        return new IntegerDirection( p2.subtract(this) );
+    }
+    public IntegerDirection getDirectionFrom(IntegerPosition p2) {
+        return new IntegerDirection( this.subtract(p2) );
     }
 
-    
+    @Override
+    public IntegerPosition add(Vector2 dir) {
+        return new IntegerPosition( super.add(dir) );
+    }
 
-    public static Position fromString(String s) { //[Q] (parsing!)
+
+    public static IntegerPosition fromString(String s) { //[Q] (parsing!)
         try {
             int i = 1;
             int j;
@@ -42,7 +43,7 @@ public class Position extends Vector2 {
                 i++;
             }
             y = Integer.parseInt(s.substring(j, i));
-            return new Position(x, y);
+            return new IntegerPosition(x, y);
             
         } catch (Exception e) {
         }
