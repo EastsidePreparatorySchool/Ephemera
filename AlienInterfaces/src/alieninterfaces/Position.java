@@ -37,10 +37,6 @@ public class Position extends Vector2 {
         return "(" + x + "," + y + ")";
     }
 
-    @Override
-    public Position add(IntegerDirection d) {
-        return (Position) super.add(this, d);
-    }
     public static Position fromString(String s) { //[Q] (parsing!)
         try {
             int i = 1;

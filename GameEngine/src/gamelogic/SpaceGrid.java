@@ -790,7 +790,7 @@ public class SpaceGrid {
             }
 
             Planet p = new Planet(this, soParent.position,
-                    new OrbitalElements(new Position(element.x, element.y).magnitude()),
+                    new OrbitalElements(element.p.magnitude()),
                     planetCount++,
                     element.domainName, element.packageName, element.className,
                     element.energy, element.tech, element.parent, pb);
@@ -802,11 +802,11 @@ public class SpaceGrid {
     }
 
     void addStar(GameElementSpec element) { //[Q]
-        Star st = new Star(this, new Position(element.x, element.y), starCount++, element.domainName, element.packageName, element.className, element.energy, element.tech);
+        Star st = new Star(this, element.p, starCount++, element.domainName, element.packageName, element.className, element.energy, element.tech);
         objects.add(st);
         this.aliens.plugStar(st);
-        vis.registerStar(new Position(element.x, element.y), element.className, objects.indexOf(st), element.energy);
-        aliens.distributeStarEnergy(new Position(element.x, element.y), element.energy);
+        vis.registerStar(element.p, element.className, objects.indexOf(st), element.energy);
+        aliens.distributeStarEnergy(element.p, element.energy);
     }
 
     void addResident(GameElementSpec element) {

@@ -5,7 +5,6 @@
 package SpaceCritters;
 
 import alieninterfaces.AlienShapeFactory;
-import alieninterfaces.Position;
 import gameengineinterfaces.AlienSpec;
 import gameengineinterfaces.GameState;
 import gameengineinterfaces.GameVisualizer;
@@ -37,30 +36,30 @@ public class MultiVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void registerStar(Position p, String name, int index, double luminosity) { //[Q]
+    public void registerStar(int x, int y, String name, int index, double luminosity) { //[Q]
         cgv.forEach(e -> {
             try {
-                e.registerStar(p, name, index, luminosity);
+                e.registerStar(x, y, name, index, luminosity);
             } catch (UnsupportedOperationException ex) {
             }
         });
     }
 
     @Override
-    public void registerPlanet(Position p, String name, int index, double energy, int tech) { //[Q]
+    public void registerPlanet(int x, int y, String name, int index, double energy, int tech) { //[Q]
         cgv.forEach(e -> {
             try {
-                e.registerPlanet(p, name, index, energy, tech);
+                e.registerPlanet(x, y, name, index, energy, tech);
             } catch (UnsupportedOperationException ex) {
             }
         });
     }
 
     @Override
-    public void showPlanetMove(Position oldP, Position p, String name, int index, double energy, int tech) { //[Q]
+    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) { //[Q]
         cgv.forEach(e -> {
             try {
-                e.showPlanetMove(oldP, p, name, index, energy, tech);
+                e.showPlanetMove(oldx, oldy, x, y, name, index, energy, tech);
             } catch (UnsupportedOperationException ex) {
             }
         });
@@ -117,7 +116,7 @@ public class MultiVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showMove(AlienSpec as, double oldX, double oldY, double energyAtNewPosition, double energyAtOldPosition) { //[Q]
+    public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition) { //[Q]
         cgv.forEach(e -> {
             try {
                 e.showMove(as, oldX, oldY, energyAtNewPosition, energyAtOldPosition);

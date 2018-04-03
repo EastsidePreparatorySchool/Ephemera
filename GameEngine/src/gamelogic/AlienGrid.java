@@ -99,7 +99,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     }
 
     public void plugStar(Star st) {
-        // add alien to grid
+        // add alien to grid 
         AlienCell acs = acGrid[st.position.round().x + centerX][st.position.round().y + centerY];
         if (acs == null) {
             acs = new AlienCell();

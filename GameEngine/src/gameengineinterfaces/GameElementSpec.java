@@ -19,8 +19,7 @@ public class GameElementSpec {
     public String className;
     public String state;
     public String parent;
-    public double x;
-    public double y;
+    public Position p;
     public double energy;
     public double tech;
 
