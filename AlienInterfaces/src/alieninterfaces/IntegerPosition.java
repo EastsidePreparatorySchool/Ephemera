@@ -21,8 +21,8 @@ public class IntegerPosition extends IntegerVector2 {
         return new IntegerDirection( this.subtract(p2) );
     }
 
-    @Override
-    public IntegerPosition add(Vector2 dir) {
+    
+    public IntegerPosition add(IntegerDirection dir) {
         return new IntegerPosition( super.add(dir) );
     }
 
