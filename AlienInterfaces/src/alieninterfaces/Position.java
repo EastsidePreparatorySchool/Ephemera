@@ -49,5 +49,8 @@ public class Position extends Vector2 {
         
         return null;
     }
-
+    
+    
+    @Override
+    public IntegerPosition round() { return new IntegerPosition(this); }
 }

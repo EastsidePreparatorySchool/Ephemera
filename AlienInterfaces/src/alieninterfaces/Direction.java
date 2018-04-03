@@ -31,5 +31,8 @@ public class Direction extends Vector2 {
     public Direction scaleToLength(double scale) {
         return new Direction( super.scaleToLength(scale) );
     }
+    
+    @Override
+    public IntegerDirection round() { return new IntegerDirection(this); }
 
 }
