@@ -4,7 +4,7 @@
  */
 package gamelogic;
 
-import alieninterfaces.Position;
+import alieninterfaces.IntegerPosition;
 import gameengineinterfaces.PlanetBehavior;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -18,15 +18,15 @@ public class Planet extends InternalSpaceObject {
     public final String parent;
     public int radius;
     private GridCircle gc;
-    Iterator<Position> gcIterator;
+    Iterator<IntegerPosition> gcIterator;
     int orbitalVelocityCounter;
-    public Position parentPosition;
+    public IntegerPosition parentPosition;
 
     public Planet(SpaceGrid grid, int parentx, int parenty, int radius, int index, String domainName, String packageName, String className,
             double energy, double tech, String parent, PlanetBehavior pb) {
         super(grid, parentx, parenty, index, domainName, packageName, className, energy, tech);
         this.parent = parent;
-        this.parentPosition = new Position(parentx, parenty);
+        this.parentPosition = new IntegerPosition(parentx, parenty);
         this.radius = radius;
         this.isPlanet = true;
         this.pb = pb;
@@ -62,10 +62,10 @@ public class Planet extends InternalSpaceObject {
 
     }
 
-    public Position move() { //[Q]
+    public IntegerPosition move() { //[Q]
 
-        Position pOld = this.position;
-        Position pNew = this.position;
+        IntegerPosition pOld = this.position;
+        IntegerPosition pNew = this.position;
 
         --orbitalVelocityCounter;
         if (orbitalVelocityCounter == 0) {

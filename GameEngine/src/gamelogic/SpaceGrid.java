@@ -83,7 +83,7 @@ public class SpaceGrid {
         // send the whole energyMap to the display
         for (int x = -aliens.centerX; x < aliens.centerX; x++) {
             for (int y = -(aliens.centerY); y < (aliens.centerY); y++) {
-                vis.mapEnergy(x, y, aliens.getEnergyAt(new Position(x, y)));
+                vis.mapEnergy(x, y, aliens.getEnergyAt(new IntegerPosition(x, y)));
             }
         }
 
@@ -653,7 +653,7 @@ public class SpaceGrid {
                         thisAlien.kill("Death by spawning exhaustion - died in childbirth.");
                     }
 
-                    Direction dir = new Direction(x, y);
+                    IntegerDirection dir = new IntegerDirection(x, y);
                     dir = thisAlien.containMove(thisAlien.x, thisAlien.y, dir);
 
                     x = thisAlien.x + dir.x;

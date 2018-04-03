@@ -37,9 +37,9 @@ public class WeepingAngel implements Alien {
 
     }
 
-    public Direction getMove() {
+    public IntegerDirection getMove() {
         // doesn't move ever except to 1,1 where it shall stay
-        return new Direction(0,0);
+        return new IntegerDirection(0,0);
     }
 
     public Action getAction() {

@@ -36,8 +36,8 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public Position getPosition() {
-        return new Position(ac.x, ac.y);
+    public IntegerPosition getPosition() {
+        return new IntegerPosition(ac.x, ac.y);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class ContextImplementation implements Context {
         // in 8 line segments, hopefully without overlap
         for (int d = 1; d <= ac.outgoingPower; d++) {
             GridCircle c = new GridCircle(ac.x, ac.y, d);
-            for (Position point : c) {
+            for (IntegerPosition point : c) {
                 if (point != null) {
                     depositMessageAt(point, ac.outgoingMessage);
                 }
@@ -138,7 +138,7 @@ public class ContextImplementation implements Context {
     }
 
     // put a message at one grid point ONLY if someone is listening
-    public void depositMessageAt(Position p, String message) { //[Q]
+    public void depositMessageAt(IntegerPosition p, String message) { //[Q]
         int x = p.x;
         int y = p.y;
 
@@ -170,13 +170,13 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public Position getMinPosition() {
-        return new Position(-ac.grid.width / 2, -ac.grid.height / 2);
+    public IntegerPosition getMinPosition() {
+        return new IntegerPosition(-ac.grid.width / 2, -ac.grid.height / 2);
     }
 
     @Override
-    public Position getMaxPosition() {
-        return new Position(ac.grid.width / 2 - 1, ac.grid.height / 2 - 1);
+    public IntegerPosition getMaxPosition() {
+        return new IntegerPosition(ac.grid.width / 2 - 1, ac.grid.height / 2 - 1);
     }
 
     @Override
@@ -188,16 +188,16 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public int getDistance(Position p1, Position p2) {
+    public int getDistance(IntegerPosition p1, IntegerPosition p2) {
         return GridCircle.distance(p1, p2);
     }
 
     @Override
-    public List<Position> computeOrbit(Position center, int radius) { //[Q]
+    public List<IntegerPosition> computeOrbit(IntegerPosition center, int radius) { //[Q]
         GridCircle gc = new GridCircle(center.x, center.y, radius);
-        ArrayList<Position> orbit = new ArrayList<>();
+        ArrayList<IntegerPosition> orbit = new ArrayList<>();
         
-        for (Position p:gc) {
+        for (IntegerPosition p:gc) {
             orbit.add(p);
         }
         

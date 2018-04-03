@@ -53,7 +53,7 @@ public class AlienCell extends LinkedList<AlienContainer> {
         super.remove(ac);
     }
 
-    public LinkedList<AlienSpecies> getAllSpeciesWithPredicateAndPosition(Predicate<AlienSpecies> pred, Position pos) {
+    public LinkedList<AlienSpecies> getAllSpeciesWithPredicateAndPosition(Predicate<AlienSpecies> pred, IntegerPosition pos) {
         if (this.speciesMap.isEmpty()) {
             return null;
         }

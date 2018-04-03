@@ -15,7 +15,7 @@ public class AlienSpecies {
     public String className;
     private String speciesName;
     public int speciesID;
-    public Position position; // for view purposes
+    public IntegerPosition position; // for view purposes
 
     public AlienSpecies(String domainName, String packageName, String className, int id) {
         this.domainName = domainName;
@@ -29,7 +29,7 @@ public class AlienSpecies {
         this.packageName = packageName;
         this.className = className;
         this.speciesID = id;
-        this.position  = new Position (x, y);
+        this.position  = new IntegerPosition (x, y);
     }
     public String getFullSpeciesName() {
         if (speciesName == null) {

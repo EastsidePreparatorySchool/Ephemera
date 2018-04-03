@@ -11,9 +11,9 @@ package alieninterfaces;
 public class SpaceObject {
     final public String kind;
     final public String name;
-    final public Position position;
+    final public IntegerPosition position;
     
-    public SpaceObject(String kind, String name, Position position) {
+    public SpaceObject(String kind, String name, IntegerPosition position) {
         this.name = name;
         this.kind = kind;
         this.position = position;

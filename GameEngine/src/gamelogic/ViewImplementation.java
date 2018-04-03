@@ -39,7 +39,7 @@ public class ViewImplementation implements View {
     }
 
     @Override
-    public List<AlienSpecies> getAliensAtPos(Position p) throws CantSeeSquareException { //[Q]
+    public List<AlienSpecies> getAliensAtPos(IntegerPosition p) throws CantSeeSquareException { //[Q]
         checkPos(p);
 
         LinkedList<AlienSpecies> as = new LinkedList();
@@ -58,7 +58,7 @@ public class ViewImplementation implements View {
 
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
-            for (Position point : c) {
+            for (IntegerPosition point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     as.addAll(acs.speciesMap.keySet());
@@ -70,7 +70,7 @@ public class ViewImplementation implements View {
     }
 
     @Override
-    public SpaceObject getSpaceObjectAtPos(Position p) throws CantSeeSquareException { //[Q]
+    public SpaceObject getSpaceObjectAtPos(IntegerPosition p) throws CantSeeSquareException { //[Q]
         checkPos(p);
 
         AlienCell acs = ag.getAliensAt(p);
@@ -94,7 +94,7 @@ public class ViewImplementation implements View {
 
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
-            for (Position point : c) {
+            for (IntegerPosition point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     if (acs.star != null) {
@@ -120,7 +120,7 @@ public class ViewImplementation implements View {
 
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
-            for (Position point : c) {
+            for (IntegerPosition point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     as.addAll(acs.speciesMap.keySet());
@@ -152,7 +152,7 @@ public class ViewImplementation implements View {
 
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
-            for (Position point : c) {
+            for (IntegerPosition point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
 
@@ -189,7 +189,7 @@ public class ViewImplementation implements View {
         for (int d = 0; d <= size; d++) {
             GridCircle c = new GridCircle(centerX, centerY, d);
 
-            for (Position point : c) {
+            for (IntegerPosition point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
 
@@ -213,7 +213,7 @@ public class ViewImplementation implements View {
     }
 
     // helpers
-    public void checkPos(Position p) throws CantSeeSquareException {
+    public void checkPos(IntegerPosition p) throws CantSeeSquareException {
         checkPos(p.x, p.y);
     }
 

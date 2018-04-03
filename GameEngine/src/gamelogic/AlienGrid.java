@@ -4,7 +4,7 @@
  */
 package gamelogic;
 
-import alieninterfaces.Position;
+import alieninterfaces.IntegerPosition;
 import java.util.LinkedList;
 
 /**
@@ -80,7 +80,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         }
     }
     
-    public AlienCell getAliensAt(Position p) {
+    public AlienCell getAliensAt(IntegerPosition p) {
         return getAliensAt (p.x, p.y);
     }
 
@@ -142,7 +142,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
             }
 
             GridCircle g = new GridCircle(x, y, d);
-            for (Position point : g) {
+            for (IntegerPosition point : g) {
                 if (point != null) {
                     putEnergyAt(point, pointEnergy);
                 }
@@ -150,7 +150,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         }
     }
 
-    void putEnergyAt(Position p, double energy) { //[Q]
+    void putEnergyAt(IntegerPosition p, double energy) { //[Q]
         int x = p.x;
         int y = p.y;
 
@@ -172,7 +172,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         }
     }
 
-    public double getEnergyAt(Position p) {
+    public double getEnergyAt(IntegerPosition p) {
         return getEnergyAt(p.x, p.y);
     }
 
