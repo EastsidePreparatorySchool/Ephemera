@@ -47,6 +47,7 @@ public class GameEngineThread extends Thread {
                     while (!engine.queue.isEmpty()) {
                         gc = (GameCommand) engine.queue.remove();
                         // Process the work item, true means exit
+
                         endGame = processCommand(gc);
                         if (endGame) {
                             break;
@@ -82,7 +83,7 @@ public class GameEngineThread extends Thread {
                 totalTurns++;
                 engine.vis.showCompletedTurn(totalTurns, engine.grid.getNumAliens(), System.nanoTime() - startTurnTime, engine.grid.getTech());
             } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 engine.vis.debugErr("GameThread: Unknown exception: " + e.getMessage());
                 break;
             }
@@ -129,7 +130,7 @@ public class GameEngineThread extends Thread {
                     if (element.kind == GameElementKind.SPECIES) {
                         engine.grid.addElement(element);
                     }
-                    
+
                     // If it is a SpaceObject (there could be a cleaner way to do this)
                     if (element.kind == GameElementKind.STAR
                             || element.kind == GameElementKind.PLANET

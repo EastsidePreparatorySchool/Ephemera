@@ -63,6 +63,7 @@ public class GameEngineV1 implements GameEngine {
     public GameElementSpec[] readConfigFile(String fileName) {
         //ArrayList<GameElementSpec> elements = new ArrayList<>(100);
         GameElementSpec[] elements;
+        GameElementSpec element;
         //
         // Every line has kind, package, class, state in csv format
         //

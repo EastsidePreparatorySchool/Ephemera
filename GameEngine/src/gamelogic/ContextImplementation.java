@@ -170,13 +170,13 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public Position getMinPosition() {
-        return new Position(-ac.grid.width / 2, -ac.grid.height / 2);
+    public IntegerPosition getMinPosition() {
+        return new IntegerPosition(-ac.grid.width / 2, -ac.grid.height / 2);
     }
 
     @Override
-    public Position getMaxPosition() {
-        return new Position(ac.grid.width / 2 - 1, ac.grid.height / 2 - 1);
+    public IntegerPosition getMaxPosition() {
+        return new IntegerPosition(ac.grid.width / 2 - 1, ac.grid.height / 2 - 1);
     }
 
     @Override

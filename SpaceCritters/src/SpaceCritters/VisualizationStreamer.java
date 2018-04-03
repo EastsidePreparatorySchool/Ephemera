@@ -6,7 +6,6 @@ package SpaceCritters;
 
 import alieninterfaces.AlienShapeFactory;
 import alieninterfaces.PlanetSpec;
-import alieninterfaces.Position;
 import gameengineinterfaces.AlienSpec;
 import gameengineinterfaces.GameState;
 import gameengineinterfaces.GameVisualizer;
@@ -51,21 +50,21 @@ public class VisualizationStreamer implements GameVisualizer {
     }
 
     @Override
-    public void registerStar(Position p, String name, int index, double luminosity) { //[Q]
-        String s = makeRecord("REGSTAR",new StarSpec(p.round().x, p.round().y, name, index, luminosity)); //!!!!!!!!!!!!!!!!
+    public void registerStar(int x, int y, String name, int index, double luminosity) { //[Q]
+        String s = makeRecord("REGSTAR",new StarSpec(x, y, name, index, luminosity));
         println(stateLog, s);
         println(progressLog, s);
     }
 
     @Override
-    public void registerPlanet(Position p, String name, int index, double energy, int tech) { //[Q]
-        String s = makeRecord("REGPLANET",new PlanetSpec(p.round().x, p.round().y, name, index, energy, tech)); //!!!!!!!!!!!!!!
+    public void registerPlanet(int x, int y, String name, int index, double energy, int tech) { //[Q]
+        String s = makeRecord("REGPLANET",new PlanetSpec(x, y, name, index, energy, tech));
         println(stateLog, s);
         println(progressLog, s);
     }
 
     @Override
-    public void showPlanetMove(Position oldP, Position p, String name, int index, double energy, int tech) { //[Q]
+    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) { //[Q]
     }
 
     @Override
@@ -89,7 +88,7 @@ public class VisualizationStreamer implements GameVisualizer {
     }
 
     @Override
-    public void showMove(AlienSpec as, double oldX, double oldY, double energyAtNewPosition, double energyAtOldPosition) { //[Q]
+    public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition) { //[Q]
     }
 
     @Override

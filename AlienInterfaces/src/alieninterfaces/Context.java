@@ -18,8 +18,8 @@ public interface Context {
 
     Position getPosition();
     View getView(int size) throws NotEnoughEnergyException, NotEnoughTechException;
-    Position getMinPosition();
-    Position getMaxPosition();
+    IntegerPosition getMinPosition();
+    IntegerPosition getMaxPosition();
     double getDistance(Position p1, Position p2); //[Q]
     double getPresentEnergy();
 
