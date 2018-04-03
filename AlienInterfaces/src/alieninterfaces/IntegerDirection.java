@@ -39,9 +39,7 @@ public class IntegerDirection {
 
         return new IntegerDirection(newX, newY);
     }
-    public Direction toDirection() {
-        return new Direction(x,y);
-    }
+
     @Override
     public String toString() { //[Q] (double will be messy)
         return "(" + x + "," + y + ")";

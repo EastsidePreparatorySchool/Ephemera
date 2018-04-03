@@ -40,7 +40,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
 
     // Martians move left, right, left, right
     @Override
-    public Direction getMove() {
+    public IntegerDirection getMove() {
 
         ctx.debugOut("Move requested,"
                 + ctx.getStateString());
@@ -74,7 +74,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
         }
 
         try {
-            if (ctx.getView(move_energy).getSpaceObjectAtPos(ctx.getPosition().round().add(dir)) != null) {
+            if (ctx.getView(move_energy).getSpaceObjectAtPos(ctx.getPosition().add(dir)) != null) {
                 // don't be a dumbass, don't move into a star
                 ctx.debugOut("Avoiding Star at " + ctx.getPosition().add(dir).toString());
                 dir = new IntegerDirection(-dir.x, -dir.y);
@@ -86,7 +86,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
         }
 
         ctx.debugOut("Moving to " + ctx.getPosition().add(dir).toString() + ctx.getStateString());
-        return dir.toDirection();
+        return dir;
     }
 
     @Override
@@ -98,7 +98,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
         if (ctx.getEnergy() > 100) {
             try {
                 View view = ctx.getView((int) ctx.getTech());
-                if (view.getAliensAtPos(ctx.getPosition().round()).size() > 1) {
+                if (view.getAliensAtPos(ctx.getPosition()).size() > 1) {
                     ctx.debugOut("Uh-oh.There is someone else here."
                             + ctx.getStateString());
                 }
@@ -120,7 +120,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
                 }
 
                 // is there another alien on our position?
-                if (view.getAliensAtPos(ctx.getPosition().round()).size() > 1
+                if (view.getAliensAtPos(ctx.getPosition()).size() > 1
                         && ctx.getEnergy() > ctx.getFightingCost() + 2) {
                     ctx.debugOut("EXTERMINATE!!!!!"
                             + ctx.getStateString());

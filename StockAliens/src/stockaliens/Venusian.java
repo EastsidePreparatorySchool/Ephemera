@@ -27,7 +27,7 @@ public class Venusian implements Alien {
 
     }
 
-    public Direction getMove() {
+    public IntegerDirection getMove() {
 
         //ctx.debugOut("Move requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
@@ -39,7 +39,7 @@ public class Venusian implements Alien {
             List<AlienSpecies> nearestAliens = ctx.getView((int) ctx.getTech()).getClosestXenos(
                     new AlienSpecies("eastsideprep.org", "stockaliens", "Alf", 0));
             if (nearestAliens != null) {
-                IntegerPosition nearest = nearestAliens.get(0).p.round();
+                IntegerPosition nearest = nearestAliens.get(0).p;
 
                 if (nearest.x > ctx.getPosition().x) {
                     x = -1;
@@ -73,13 +73,13 @@ public class Venusian implements Alien {
         }
         //but don't move into star
         try {
-            if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().round().add(new IntegerDirection((int) x, (int) y))) != null) {
+            if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new IntegerDirection((int) x, (int) y))) != null) {
                 y -= y > 0? 1:-1;
             }
         } catch (NotEnoughEnergyException | NotEnoughTechException | View.CantSeeSquareException ex) {
         }
 
-        return new Direction(x, y);
+        return new IntegerDirection(x, y);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class Venusian implements Alien {
         // catch and shenanigans
         try {
             // is there another alien on our p?
-            if (view.getAliensAtPos(ctx.getPosition().round()).size() > 1) {
+            if (view.getAliensAtPos(ctx.getPosition()).size() > 1) {
                 // if so, do we have any energy?
                 if (ctx.getEnergy() < 10) {
                     // no, keep moving.
