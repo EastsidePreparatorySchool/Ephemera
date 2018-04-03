@@ -37,9 +37,9 @@ public class WeepingAngel implements Alien {
 
     }
 
-    public IntegerDirection getMove() {
+    public Direction getMove() {
         // doesn't move ever except to 1,1 where it shall stay
-        return new IntegerDirection(0,0);
+        return new Direction(0,0);
     }
 
     public Action getAction() {
@@ -57,7 +57,7 @@ public class WeepingAngel implements Alien {
         try {
            
             
-            if (view.getAliensAtPos(ctx.getPosition()).size() > 1) {
+            if (view.getAliensAtPos(ctx.getPosition().round()).size() > 1) {
                 ctx.debugOut("Don't Blink!!!!!"
                         + ctx.getStateString());
 

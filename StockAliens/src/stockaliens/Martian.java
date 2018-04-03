@@ -38,7 +38,7 @@ public class Martian implements Alien {
 
     }
 
-    public IntegerDirection getMove() {
+    public Direction getMove() {
         //    ctx.debugOut("Move requested,"
         //            + " E:" + Integer.toString(ctx.getEnergy())
         //            + " T:" + Integer.toString(ctx.getTech()));
@@ -61,7 +61,7 @@ public class Martian implements Alien {
             List<AlienSpecies> l = ctx.getView((int) ctx.getTech()).getClosestXenos(
                     new AlienSpecies("eastsideprep.org", "stockaliens", "Martian", 0));
             if (l.size() > 1) {
-                ClosestAlien = l.get(0).p;
+                ClosestAlien = l.get(0).p.round();
             }
         } catch (Exception e) {
             ClosestAlien = new IntegerPosition(5, 5);
@@ -73,10 +73,10 @@ public class Martian implements Alien {
         }
 
         //Checks to see if the closest alien is withen moving capability.
-        if (ctx.getDistance(ClosestAlien, ctx.getPosition()) <= (long) ctx.getTech()) {
+        if (ctx.getDistance(ClosestAlien.toPosition(), ctx.getPosition()) <= (long) ctx.getTech()) {
 
-            HorizontalMove = ClosestAlien.x - ctx.getPosition().x;
-            VerticalMove = ClosestAlien.y - ctx.getPosition().y;
+            HorizontalMove = ClosestAlien.x - ctx.getPosition().round().x;
+            VerticalMove = ClosestAlien.y - ctx.getPosition().round().y;
         }
 
         //sets the amount of energy to fight with by how much energy, and how muc technology
@@ -95,14 +95,14 @@ public class Martian implements Alien {
         }
         //but don't move into star
         try {
-            if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new IntegerDirection((int) HorizontalMove, (int) VerticalMove))) != null) {
+            if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().round().add(new IntegerDirection((int) HorizontalMove, (int) VerticalMove))) != null) {
                 VerticalMove -= VerticalMove > 0 ? 1 : -1;
             }
         } catch (NotEnoughEnergyException | NotEnoughTechException | View.CantSeeSquareException ex) {
         }
 
         //ctx.debugOut("Moving ("+ Integer.toString(HorizontalMove) + "," + Integer.toString(VerticalMove) + ")");
-        return new IntegerDirection((int) HorizontalMove, (int) VerticalMove);
+        return new Direction((int) HorizontalMove, (int) VerticalMove);
     }
 
     public Action getAction() {
@@ -112,7 +112,7 @@ public class Martian implements Alien {
 
         //checks if alien is on the same p, if so, then fights with the priorly designated amount of energy
         try {
-            if (ctx.getView((int) ctx.getTech()).getAliensAtPos(ctx.getPosition()).size() > 1) {
+            if (ctx.getView((int) ctx.getTech()).getAliensAtPos(ctx.getPosition().round()).size() > 1) {
                 ctx.debugOut("Fighting");
                 return new Action(Action.ActionCode.Fight, (fightStrength));
             }

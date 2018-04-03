@@ -57,5 +57,9 @@ public class IntegerPosition {
         
         return null;
     }
+    
+    public Position toPosition() {
+        return new Position(x,y);
+    }
 
 }
