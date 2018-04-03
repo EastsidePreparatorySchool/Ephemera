@@ -46,20 +46,23 @@ public class Vector2 {
         return Vector2.dot(this,v);
     }
     public Vector2 add(Vector2 v) {
-        this.set(Vector2.add(this,v));
-        return this;
+        return Vector2.add(this,v);
     }
+    public Vector2 add(IntegerDirection v) {
+        return Vector2.add(this,v);
+    }
+    public Vector2 add(IntegerPosition v) {
+        return Vector2.add(this,v);
+    }
+        
     public Vector2 scale(double scale) {
-        this.set(Vector2.scale(this, scale));
-        return this;
+        return Vector2.scale(this, scale);
     }
     public Vector2 scale(Vector2 scale) {
-        this.set(Vector2.scale(this, scale));
-        return this;
+        return Vector2.scale(this, scale);
     }
     public Vector2 unit() {
-        this.set(Vector2.unit(this));
-        return this;
+        return Vector2.unit(this);
     }
     
     public boolean equals(Vector2 v) {
@@ -74,6 +77,12 @@ public class Vector2 {
         return (a.x*b.y) + (a.y*b.y);
     }
     public static Vector2 add(Vector2 a, Vector2 b) {
+        return new Vector2(a.x+b.x, a.y+b.y);
+    }
+    public static Vector2 add(Vector2 a, IntegerDirection b) {
+        return new Vector2(a.x+b.x, a.y+b.y);
+    }
+    public static Vector2 add(Vector2 a, IntegerPosition b) {
         return new Vector2(a.x+b.x, a.y+b.y);
     }
     public static Vector2 scale(Vector2 v, double scale) {

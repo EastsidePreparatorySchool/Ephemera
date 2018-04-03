@@ -5,6 +5,7 @@
 package SpaceCritters;
 
 import alieninterfaces.AlienShapeFactory;
+import alieninterfaces.Position;
 import gameengineinterfaces.AlienSpec;
 import gameengineinterfaces.*;
 import gamelogic.Constants;
@@ -126,9 +127,9 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showMove(AlienSpec as, int oldx, int oldy, double energyAtNew, double energyAtOld) { //[Q]
-        int x = as.x;
-        int y = as.y;
+    public void showMove(AlienSpec as, double oldx, double oldy, double energyAtNew, double energyAtOld) { //[Q]
+        int x = as.p.round().x; //!!!!!!!!!!!!
+        int y = as.p.round().y;
 
         Alien3D alien = gameShell.mainScene.aliens.get(as.hashCode);
         if (alien != null) {
@@ -146,14 +147,14 @@ public class VisualizationGrid implements GameVisualizer {
     public void showSpawn(AlienSpec as, double energyAtPos) {
         debugOut("Engine reporting Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
         AlienShapeFactory asf = speciesSet.addAlien(as.getFullSpeciesName(), as.speciesID);
-        gameShell.mainScene.createAlien(as, as.hashCode, as.x, as.y, asf);
+        gameShell.mainScene.createAlien(as, as.hashCode, as.p.round().x, as.p.round().y, asf); //!!!!!!!!!!!!!!!
     }
 
     @Override
     public void showDeath(AlienSpec as, double energyAtPos) {
         debugOut("Engine reporting death: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
         speciesSet.removeAlien(as.getFullSpeciesName(), as.speciesID);
-        gameShell.mainScene.destroyAlien(as, as.hashCode, as.x, as.y);
+        gameShell.mainScene.destroyAlien(as, as.hashCode, as.p.round().x, as.p.round().y); //!!!!!!!!!!!!!!!!
 
     }
 
@@ -269,14 +270,14 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void registerStar(int x, int y, String name, int index, double luminosity) { //[Q]
-        Utilities.runAndWait(() -> gameShell.mainScene.createStar(x, y, name, index, luminosity));
+    public void registerStar(Position p, String name, int index, double luminosity) { //[Q]
+        Utilities.runAndWait(() -> gameShell.mainScene.createStar(p.round().x, p.round().y, name, index, luminosity)); //!!!!!!!!!!!!!!
 
     }
 
     @Override
-    public void registerPlanet(int x, int y, String name, int index, double energy, int tech) { //[Q]
-        Utilities.runAndWait(() -> gameShell.mainScene.createPlanet(x, y, name, index, energy, tech));
+    public void registerPlanet(Position p, String name, int index, double energy, int tech) { //[Q]
+        Utilities.runAndWait(() -> gameShell.mainScene.createPlanet(p.round().x, p.round().y, name, index, energy, tech)); //!!!!!!!!!!!!!!
 
     }
 
@@ -321,8 +322,8 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) { //[Q]
-        gameShell.mainScene.planets.get(index).recordMoveTo(x, y);
+    public void showPlanetMove(Position oldP, Position p, String name, int index, double energy, int tech) { //[Q]
+        gameShell.mainScene.planets.get(index).recordMoveTo(p.round().x, p.round().y); //!!!!!!!!!!!!
     }
 
     void setRenderMode(String renderMode) {

@@ -28,7 +28,7 @@ public class EmptyAlien implements Alien {
     }
 
     @Override
-    public IntegerDirection getMove() {
+    public Direction getMove() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
