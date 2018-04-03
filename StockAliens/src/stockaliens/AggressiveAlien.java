@@ -40,7 +40,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
 
     // Martians move left, right, left, right
     @Override
-    public IntegerDirection getMove() {
+    public Direction getMove() {
 
         ctx.debugOut("Move requested,"
                 + ctx.getStateString());
@@ -66,23 +66,23 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
         int x = powerX * (ctx.getRandomInt(2) == 0 ? -1 : 1);
         int y = powerY * (ctx.getRandomInt(2) == 0 ? -1 : 1);
 
-        IntegerDirection dir = new IntegerDirection(x, y);
+        Direction dir = new Direction(x, y);
 
         // don't park, a planet might hit you
         if (dir.x == 0 & dir.y == 0) {
-            dir = new IntegerDirection(ctx.getRandomInt(2) == 0 ? -1 : 1, ctx.getRandomInt(2) == 0 ? -1 : 1);
+            dir = new Direction(ctx.getRandomInt(2) == 0 ? -1 : 1, ctx.getRandomInt(2) == 0 ? -1 : 1);
         }
 
         try {
-            if (ctx.getView(move_energy).getSpaceObjectAtPos(ctx.getPosition().add(dir)) != null) {
+            if (ctx.getView(move_energy).getSpaceObjectAtPos(ctx.getPosition().add(dir).round()) != null) {
                 // don't be a dumbass, don't move into a star
                 ctx.debugOut("Avoiding Star at " + ctx.getPosition().add(dir).toString());
-                dir = new IntegerDirection(-dir.x, -dir.y);
+                dir = new Direction(-dir.x, -dir.y);
             }
         } catch (Exception e) {
             // do something here to deal with errors
             ctx.debugOut("EXPLAIN?????? " + e.toString());
-            dir = new IntegerDirection(1, 1);
+            dir = new Direction(1, 1);
         }
 
         ctx.debugOut("Moving to " + ctx.getPosition().add(dir).toString() + ctx.getStateString());
@@ -98,7 +98,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
         if (ctx.getEnergy() > 100) {
             try {
                 View view = ctx.getView((int) ctx.getTech());
-                if (view.getAliensAtPos(ctx.getPosition()).size() > 1) {
+                if (view.getAliensAtPos(ctx.getPosition().round()).size() > 1) {
                     ctx.debugOut("Uh-oh.There is someone else here."
                             + ctx.getStateString());
                 }
@@ -120,7 +120,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
                 }
 
                 // is there another alien on our position?
-                if (view.getAliensAtPos(ctx.getPosition()).size() > 1
+                if (view.getAliensAtPos(ctx.getPosition().round()).size() > 1
                         && ctx.getEnergy() > ctx.getFightingCost() + 2) {
                     ctx.debugOut("EXTERMINATE!!!!!"
                             + ctx.getStateString());
