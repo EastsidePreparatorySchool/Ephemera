@@ -18,11 +18,11 @@ public interface GameVisualizer {
     
     void registerSpecies(AlienSpec as, AlienShapeFactory asf);
     
-    void registerStar(Position p, String name, int index, double luminosity); //[Q]
+    void registerStar(int x, int y, String name, int index, double luminosity); //[Q]
     
-    void registerPlanet(Position p, String name, int index, double energy, int tech); //[Q]
+    void registerPlanet(int x, int y, String name, int index, double energy, int tech); //[Q]
     
-    void showPlanetMove(Position oldP, Position newP, String name, int index, double energy, int tech);  //[Q]
+    void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech);  //[Q]
     
     void mapEnergy(int x, int y, double energy);
     
@@ -34,7 +34,7 @@ public interface GameVisualizer {
 
     void showAliens(List<AlienSpec> aliens);
     
-    void showMove(AlienSpec as, double oldX, double oldY, double energyAtNewPosition, double energyAtOldPosition); //[Q]
+    void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition); //[Q]
 
     void showFight(int x, int y);
 

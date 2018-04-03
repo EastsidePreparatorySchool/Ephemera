@@ -6,20 +6,17 @@ package alieninterfaces;
 
 /**
  *
- * @author qbowers
+ * @author gmein
  */
-public class Position extends Vector2 {
-    
+public class Position {
 
-    public Position(double x, double y) { //[Q]
+    public int x;
+    public int y;
+
+    public Position(int x, int y) { //[Q]
         this.x = x;
         this.y = y;
     }
-    public Position(Vector2 v) {
-        this.x = v.x;
-        this.y = v.y;
-    }
-    public Position clone() { return new Position(x,y); }
 
     public Direction getDirectionTo(Position p2) {
         return new Direction(p2.x - x, p2.y - y);
@@ -60,8 +57,5 @@ public class Position extends Vector2 {
         
         return null;
     }
-    
-    public IntegerPosition round() {
-        return new IntegerPosition((int) Math.round(x), (int) Math.round(y));
-    }
+
 }

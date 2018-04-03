@@ -6,23 +6,18 @@ package alieninterfaces;
 
 /**
  *
- * @author qbowers
+ * @author gmein
  */
-public class Direction extends Vector2 {
+public class Direction {
 
-    public Direction(double xChange, double yChange) { //[Q]
+    public int x;
+    public int y;
+
+    public Direction(int xChange, int yChange) { //[Q]
         this.x = xChange;
         this.y = yChange;
     }
-    public Direction(Vector2 v) {
-        this.x = v.x;
-        this.y = v.y;
-    }
 
-    public Direction(IntegerPosition p1, IntegerPosition p2) {
-        this.x = p2.x - p1.x;
-        this.y = p2.y - p1.y;
-    }
     public Direction(Position p1, Position p2) {
         this.x = p2.x - p1.x;
         this.y = p2.y - p1.y;
@@ -32,14 +27,14 @@ public class Direction extends Vector2 {
         return new Direction(x+d1.x, y+d1.y);
     }
 
-    public double getLength() { //[Q]
-        return this.magnitude();
+    public int getLength() { //[Q]
+        return Math.abs(x) + Math.abs(y);
     }
 
-    public static Direction scaleToLength(Direction d, double l) { //[Q]
-        double currentLength = d.getLength();
-        double newX = d.x *  l / currentLength;
-        double newY = d.y *  l / currentLength;
+    public Direction scaleToLength(int l) { //[Q]
+        int currentLength = getLength();
+        int newX = (int) (this.x * (double) l / (double) currentLength);
+        int newY = (int) (this.y * (double) l / (double) currentLength);
 
         return new Direction(newX, newY);
     }
@@ -47,10 +42,6 @@ public class Direction extends Vector2 {
     @Override
     public String toString() { //[Q] (double will be messy)
         return "(" + x + "," + y + ")";
-    }
-    
-    public IntegerDirection round() {
-        return new IntegerDirection((int) Math.round(x),(int) Math.round(y));
     }
 
 }

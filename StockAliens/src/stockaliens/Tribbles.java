@@ -37,7 +37,7 @@ public class Tribbles implements Alien {
     }
 
     @Override
-    public IntegerDirection getMove() {
+    public Direction getMove() {
         //find distance between here and corner
         //find nearest star/planet for avoidance
         
@@ -46,19 +46,19 @@ public class Tribbles implements Alien {
         if(distance > r) {
             distance = ctx.getDistance(ctx.getPosition(),ctx.getMinPosition());
             ctx.debugOut(Integer.toString(distance));
-            return new IntegerDirection(-1,-1);
+            return new Direction(-1,-1);
         }
         if(distance <= r) {
             distance = ctx.getDistance(ctx.getPosition(),ctx.getMinPosition());
             x = ctx.getRandomInt(3) - 1;
             y = ctx.getRandomInt(3) - 1;
-            return new IntegerDirection(x,y);
+            return new Direction(x,y);
         }
-        return new IntegerDirection(0,0);
+        return new Direction(0,0);
         } else {
             x = ctx.getRandomInt(3) - 1;
             y = ctx.getRandomInt(3) - 1;
-            return new IntegerDirection(x,y);
+            return new Direction(x,y);
         }
     }
 

@@ -14,8 +14,6 @@ public class Vector2 {
     public double x;
     public double y;
     
-    
-    public Vector2() {}
     public Vector2(double x, double y) {
         this.x = x;
         this.y = y;
@@ -62,9 +60,6 @@ public class Vector2 {
         return this;
     }
     
-    public boolean equals(Vector2 v) {
-        return x == v.x && y == v.y;
-    } 
     
     
     public static double cross(Vector2 a, Vector2 b) {

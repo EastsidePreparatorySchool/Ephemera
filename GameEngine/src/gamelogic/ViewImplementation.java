@@ -19,24 +19,27 @@ public class ViewImplementation implements View {
 
     private AlienGrid ag;
     public AlienContainer ac;
-    private Position center;
+    private int centerX;
+    private int centerY;
     public int size;
 
     public ViewImplementation(AlienGrid ag) {
         this.ag = ag;
-        this.center = new Position(0,0);
+        this.centerX = 0;
+        this.centerY = 0;
         this.size = 0;
     }
 
-    public ViewImplementation(AlienGrid ag, AlienContainer ac, Position p, int size) {
+    public ViewImplementation(AlienGrid ag, AlienContainer ac, int centerX, int centerY, int size) {
         this.ag = ag;
         this.ac = ac;
-        this.center = p.clone();
+        this.centerX = centerX;
+        this.centerY = centerY;
         this.size = size;
     }
 
     @Override
-    public List<AlienSpecies> getAliensAtPos(IntegerPosition p) throws CantSeeSquareException { //[Q]
+    public List<AlienSpecies> getAliensAtPos(Position p) throws CantSeeSquareException { //[Q]
         checkPos(p);
 
         LinkedList<AlienSpecies> as = new LinkedList();
@@ -54,8 +57,8 @@ public class ViewImplementation implements View {
         LinkedList<AlienSpecies> as = new LinkedList();
 
         for (int d = 0; d <= size; d++) {
-            GridCircle c = new GridCircle(center.round().x, center.round().y, d);  //!!!!!!!!!!!!!
-            for (IntegerPosition point : c) {
+            GridCircle c = new GridCircle(centerX, centerY, d);
+            for (Position point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     as.addAll(acs.speciesMap.keySet());
@@ -67,7 +70,7 @@ public class ViewImplementation implements View {
     }
 
     @Override
-    public SpaceObject getSpaceObjectAtPos(IntegerPosition p) throws CantSeeSquareException { //[Q]
+    public SpaceObject getSpaceObjectAtPos(Position p) throws CantSeeSquareException { //[Q]
         checkPos(p);
 
         AlienCell acs = ag.getAliensAt(p);
@@ -76,7 +79,7 @@ public class ViewImplementation implements View {
                 return new SpaceObject("Star", acs.star.className, acs.star.position);
             } else if (acs.planet != null) {
                 return new SpaceObject("Planet",
-                        distance(p.x, p.y, center.round().x, center.round().y) < 1 ? acs.planet.className : "", //!!!!!!!!!!!!!!
+                        distance(p.x, p.y, this.centerX, this.centerY) < 1 ? acs.planet.className : "",
                         acs.planet.position);
                 // you only get to know the name of a planet by landing on it
             }
@@ -90,8 +93,8 @@ public class ViewImplementation implements View {
         SpaceObject so = null;
 
         for (int d = 0; d <= size; d++) {
-            GridCircle c = new GridCircle(center.round().x, center.round().y, d); //!!!!!!!!!!
-            for (IntegerPosition point : c) {
+            GridCircle c = new GridCircle(centerX, centerY, d);
+            for (Position point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     if (acs.star != null) {
@@ -116,8 +119,8 @@ public class ViewImplementation implements View {
         LinkedList<AlienSpecies> as = new LinkedList<>();
 
         for (int d = 0; d <= size; d++) {
-            GridCircle c = new GridCircle(center.round().x, center.round().y, d); //!!!!!!!!!!!!!!
-            for (IntegerPosition point : c) {
+            GridCircle c = new GridCircle(centerX, centerY, d);
+            for (Position point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
                     as.addAll(acs.speciesMap.keySet());
@@ -148,12 +151,12 @@ public class ViewImplementation implements View {
         LinkedList<AlienSpecies> as = null;
 
         for (int d = 0; d <= size; d++) {
-            GridCircle c = new GridCircle(center.round().x, center.round().y, d); //!!!!!!!!!!!!!!!!!!!
-            for (IntegerPosition point : c) {
+            GridCircle c = new GridCircle(centerX, centerY, d);
+            for (Position point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
-                    //!!!!!!!!!!!!!
-                    LinkedList<AlienSpecies> bunch = acs.getAllSpeciesWithPredicateAndPosition((species) -> species != specific);
+
+                    LinkedList<AlienSpecies> bunch = acs.getAllSpeciesWithPredicateAndPosition((species) -> species != specific, point);
                     if (bunch != null) {
                         if (as == null) {
                             as = new LinkedList();
@@ -184,13 +187,13 @@ public class ViewImplementation implements View {
         LinkedList<AlienSpecies> as = null;
 
         for (int d = 0; d <= size; d++) {
-            GridCircle c = new GridCircle(center.round().x, center.round().y, d); //!!!!!!!!!!!!!
+            GridCircle c = new GridCircle(centerX, centerY, d);
 
-            for (IntegerPosition point : c) {
+            for (Position point : c) {
                 AlienCell acs = ag.getAliensAt(point);
                 if (acs != null) {
-                    //!!!!!!!!!!!!!!!!!
-                    LinkedList<AlienSpecies> bunch = acs.getAllSpeciesWithPredicateAndPosition((species) -> species != avoid);
+
+                    LinkedList<AlienSpecies> bunch = acs.getAllSpeciesWithPredicateAndPosition((species) -> species != avoid, point);
                     if (bunch != null) {
                         if (as == null) {
                             as = new LinkedList<>();
@@ -210,7 +213,7 @@ public class ViewImplementation implements View {
     }
 
     // helpers
-    public void checkPos(IntegerPosition p) throws CantSeeSquareException {
+    public void checkPos(Position p) throws CantSeeSquareException {
         checkPos(p.x, p.y);
     }
 
@@ -223,7 +226,7 @@ public class ViewImplementation implements View {
             throw new CantSeeSquareException();
         }
 
-        if (GridCircle.distance(x, y, center.round().x, center.round().y) > this.size) { //!!!!!!!!!!!!!
+        if (GridCircle.distance(x, y, this.centerX, this.centerY) > this.size) {
             throw new CantSeeSquareException();
         }
     }

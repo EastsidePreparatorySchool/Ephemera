@@ -4,7 +4,6 @@
  */
 package gamelogic;
 
-import alieninterfaces.IntegerPosition;
 import alieninterfaces.Position;
 import java.util.LinkedList;
 
@@ -34,10 +33,10 @@ public class AlienGrid extends LinkedList<AlienContainer> {
 
     public boolean addAlienAndPlug(AlienContainer ac) { //[Q]
         // add alien to grid as well as to master list
-        AlienCell acs = acGrid[ac.p.round().x + centerX][ac.p.round().y + centerY];
+        AlienCell acs = acGrid[ac.x + centerX][ac.y + centerY];
         if (acs == null) {
             acs = new AlienCell();
-            acGrid[ac.p.round().x + centerX][ac.p.round().y + centerY] = acs;
+            acGrid[ac.x + centerX][ac.y + centerY] = acs;
         }
         acs.add(ac);
         //ac.debugOut("Grid: added to list " + getXYString(ac.x, ac.y));
@@ -73,15 +72,15 @@ public class AlienGrid extends LinkedList<AlienContainer> {
 
     public void unplug(AlienContainer ac) { //[Q]
         // remove alien from grid 
-        AlienCell acs = acGrid[ac.p.round().x + centerX][ac.p.round().y + centerY];
+        AlienCell acs = acGrid[ac.x + centerX][ac.y + centerY];
         //ac.debugOut("Grid: removing from list " + getXYString(ac.x, ac.y));
         acs.remove(ac);
         if (canBeRemoved(acs)) {
-            acGrid[ac.p.round().x + centerX][ac.p.round().y + centerY] = null;
+            acGrid[ac.x + centerX][ac.y + centerY] = null;
         }
     }
     
-    public AlienCell getAliensAt(IntegerPosition p) {
+    public AlienCell getAliensAt(Position p) {
         return getAliensAt (p.x, p.y);
     }
 
@@ -100,10 +99,10 @@ public class AlienGrid extends LinkedList<AlienContainer> {
 
     public void plugStar(Star st) {
         // add alien to grid 
-        AlienCell acs = acGrid[st.position.round().x + centerX][st.position.round().y + centerY];
+        AlienCell acs = acGrid[st.position.x + centerX][st.position.y + centerY];
         if (acs == null) {
             acs = new AlienCell();
-            acGrid[st.position.round().x + centerX][st.position.round().y + centerY] = acs;
+            acGrid[st.position.x + centerX][st.position.y + centerY] = acs;
         }
         acs.star = st;
         acs.energy = st.energy;
@@ -111,10 +110,10 @@ public class AlienGrid extends LinkedList<AlienContainer> {
 
     public void plugPlanet(Planet p) { //[Q]
         // add alien to grid 
-        AlienCell acs = acGrid[p.position.round().x + centerX][p.position.round().y + centerY];
+        AlienCell acs = acGrid[p.position.x + centerX][p.position.y + centerY];
         if (acs == null) {
             acs = new AlienCell();
-            acGrid[p.position.round().x + centerX][p.position.round().y + centerY] = acs;
+            acGrid[p.position.x + centerX][p.position.y + centerY] = acs;
         }
         acs.planet = p;
         acs.energy += p.energy;
@@ -123,13 +122,13 @@ public class AlienGrid extends LinkedList<AlienContainer> {
 
     public void unplugPlanet(Planet p) { //[Q]
         // add alien to grid 
-        AlienCell acs = acGrid[p.position.round().x + centerX][p.position.round().y + centerY];
+        AlienCell acs = acGrid[p.position.x + centerX][p.position.y + centerY];
         acs.planet = null;
         acs.energy -= p.energy;
         acs.tech = 0;
     }
 
-    public void distributeStarEnergy(Position p, double energy) { //[Q]
+    public void distributeStarEnergy(int x, int y, double energy) { //[Q]
         // probe around our current position,
         // tracing an imaginary square of increasing size,
         // starting from the midpoints of the sides
@@ -142,8 +141,8 @@ public class AlienGrid extends LinkedList<AlienContainer> {
                 break; // at the level of empty space, get out
             }
 
-            GridCircle g = new GridCircle(p.round().x, p.round().y, d);
-            for (IntegerPosition point : g) {
+            GridCircle g = new GridCircle(x, y, d);
+            for (Position point : g) {
                 if (point != null) {
                     putEnergyAt(point, pointEnergy);
                 }
@@ -151,7 +150,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         }
     }
 
-    void putEnergyAt(IntegerPosition p, double energy) { //[Q]
+    void putEnergyAt(Position p, double energy) { //[Q]
         int x = p.x;
         int y = p.y;
 
@@ -173,7 +172,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         }
     }
 
-    public double getEnergyAt(IntegerPosition p) {
+    public double getEnergyAt(Position p) {
         return getEnergyAt(p.x, p.y);
     }
 

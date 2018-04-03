@@ -8,6 +8,7 @@ import gameengineinterfaces.AlienSpec;
 import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
+import static gamelogic.GridCircle.distance;
 import java.util.HashMap;
 
 /**
@@ -44,8 +45,10 @@ public class AlienContainer {
     public HashMap<String, Integer> secrets;
 
     boolean participatedInAction;
-    public Position p;
-    public Position nextP;
+    public int x;
+    public int y;
+    public int nextX;
+    public int nextY;
     public String outgoingMessage;
     public double outgoingPower;
     int turnsInSafeZone;
@@ -54,7 +57,7 @@ public class AlienContainer {
     //
     // Heads up: This constructs an AlienContainer and contained Alien
     //
-    public AlienContainer(SpaceGrid sg, GameVisualizer vis, Position p,
+    public AlienContainer(SpaceGrid sg, GameVisualizer vis, int x, int y,
             String alienDomainName, String alienPackageName, String alienClassName, Constructor<?> cns, AlienSpecies as,
             double energy, double tech, int parent, String message) throws InstantiationException { //[Q]
 
@@ -74,15 +77,15 @@ public class AlienContainer {
 
         Alien a = null;
 
-        // if p = (0,0) assign random p in safe zone
-        if (p.x == 0 && p.y == 0) {
-            this.p.x = ctx.getRandomInt(Constants.safeZoneRadius + 1);
-            this.p.x *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
-            this.p.y = ctx.getRandomInt(Constants.safeZoneRadius + 1);
-            this.p.y *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
+        // if position = (0,0) assign random position in safe zone
+        if (x == 0 && y == 0) {
+            this.x = ctx.getRandomInt(Constants.safeZoneRadius + 1);
+            this.x *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
+            this.y = ctx.getRandomInt(Constants.safeZoneRadius + 1);
+            this.y *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
         } else {
-            this.p.x = p.x;
-            this.p.y = p.y;
+            this.x = x;
+            this.y = y;
         }
 
         this.alienHashCode = 0;
@@ -125,7 +128,7 @@ public class AlienContainer {
     }
 
     public AlienSpec getFullAlienSpec() {
-        return new AlienSpec(this.domainName, this.packageName, this.className, this.species.speciesID, this.alienHashCode, this.p,
+        return new AlienSpec(this.domainName, this.packageName, this.className, this.species.speciesID, this.alienHashCode, this.x, this.y,
                 this.tech, this.energy, this.fullName, this.speciesName, this.currentActionPower);
     }
 
@@ -136,7 +139,7 @@ public class AlienContainer {
     public AlienSpecies getAlienSpecies() {
         if (this.species == null) {
             assert false;
-            species = new AlienSpecies(this.domainName, this.packageName, this.className, species.speciesID, this.p);
+            species = new AlienSpecies(this.domainName, this.packageName, this.className, species.speciesID, this.x, this.y);
         }
         return species;
 
@@ -144,11 +147,11 @@ public class AlienContainer {
 
     public String toStringExpensive() {
         return getFullName() + ": "
-                + "X:" + (p.x)
-                + " Y:" + (p.y)
+                + "X:" + (x)
+                + " Y:" + (y)
                 + " E:" + (energy)
                 + " T:" + (tech)
-                + " r:" + ((int) Math.floor(Math.hypot( p.x,  p.y)));
+                + " r:" + ((int) Math.floor(Math.hypot((double) x, (double) y)));
     }
 
     public void processResults() {
@@ -171,54 +174,66 @@ public class AlienContainer {
         }
 
         // if on planet, ignore move
-        if (this.planet != null) return;
+        if (this.planet != null) {
+            return;
+        }
 
         this.checkMove(direction); // Throws an exception if illegal
 
         // we want to contain aliens in the 250 sphere, so apply the "cosmic drift"
-        direction = this.containMove(p, direction);
+        direction = this.containMove(x, y, direction);
 
-        
-        nextP = p.add(direction);
+        int oldx = x;
+        int oldy = y;
+        nextX = x + direction.x;
+        nextY = y + direction.y;
 
         int width = Constants.width;
         int height = Constants.height;
-        if (nextP.x > (width / 2) || nextP.x < (0 - width / 2) || nextP.y > (height / 2) || nextP.y < (0 - height / 2)) {
-            debugErr("ac.move: Out of bounds: (" + p.x + ":" + p.y + ")");
+        if (nextX > (width / 2) || nextX < (0 - width / 2) || nextY > (height / 2) || nextY < (0 - height / 2)) {
+            debugErr("ac.move: Out of bounds: (" + x + ":" + y + ")");
         }
     }
 
     // this does the actual checking
     private void checkMove(Direction direction) throws NotEnoughTechException { //[Q]
-        double moveLength = direction.magnitude();
+        int moveLength = distance(0, 0, direction.x, direction.y);
 
         // let one x one moves go
-        if (Math.abs(direction.x) <= 1 && Math.abs(direction.y) <= 1) return;
+        if (Math.abs(direction.x) <= 1 && Math.abs(direction.y) <= 1) {
+            return;
+        }
 
         // If the move is farther than the alien has the power to move
         if (moveLength > tech) {
             debugErr("Illegal move(" + moveLength + "): " + (direction.x) + "," + (direction.y) + " tech " + tech);
             throw new NotEnoughTechException();
         }
+
+        // If the move is farther than the alien has the tech to move
+        if (moveLength > tech) {
+            debugErr("Illegal move: " + (direction.x) + "," + (direction.y) + " tech " + tech);
+            throw new NotEnoughTechException();
+        }
     }
 
-    public Direction containMove(Position p, Direction dir) { //[Q]
-        double dxi, dyi;
+    public Direction containMove(int x, int y, Direction dir) { //[Q]
+        int dxi, dyi;
 
         dxi = dir.x;
         dyi = dir.y;
 
-        if (p.x + dxi > Constants.width / 2) {
-            dxi = Constants.width / 2 - p.x;
+        if (x + dxi > Constants.width / 2) {
+            dxi = Constants.width / 2 - x;
         }
-        if (p.x + dxi < -Constants.width / 2) {
-            dxi = -Constants.width / 2 - p.x;
+        if (x + dxi < -Constants.width / 2) {
+            dxi = -Constants.width / 2 - x;
         }
-        if (p.y + dyi > Constants.width / 2) {
-            dyi = Constants.width / 2 - p.y;
+        if (y + dyi > Constants.width / 2) {
+            dyi = Constants.width / 2 - y;
         }
-        if (p.y + dyi < -Constants.width / 2) {
-            dyi = -Constants.width / 2 - p.y;
+        if (y + dyi < -Constants.width / 2) {
+            dyi = -Constants.width / 2 - y;
         }
         return new Direction(dxi, dyi);
     }
