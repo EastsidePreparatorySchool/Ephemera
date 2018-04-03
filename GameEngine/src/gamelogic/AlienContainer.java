@@ -71,11 +71,13 @@ public class AlienContainer {
         this.secrets = new HashMap<>();
         this.speciesID = as.speciesID;
         this.planet = null;
+        this.p = p;
 
         Alien a = null;
 
         // if p = (0,0) assign random p in safe zone
         if (p.x == 0 && p.y == 0) {
+            System.out.println(this.p);
             this.p.x = ctx.getRandomInt(Constants.safeZoneRadius + 1);
             this.p.x *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
             this.p.y = ctx.getRandomInt(Constants.safeZoneRadius + 1);
