@@ -27,7 +27,7 @@ public class Venusian implements Alien {
 
     }
 
-    public Direction getMove() {
+    public IntegerDirection getMove() {
 
         //ctx.debugOut("Move requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
@@ -79,7 +79,7 @@ public class Venusian implements Alien {
         } catch (NotEnoughEnergyException | NotEnoughTechException | View.CantSeeSquareException ex) {
         }
 
-        return new Direction(x, y);
+        return new IntegerDirection(x, y);
     }
 
     @Override
