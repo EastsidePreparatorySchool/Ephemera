@@ -32,6 +32,11 @@ public class IntegerVector2 extends Vector2 {
         this.y = array[1];
     }
     
+    @Override
+    public IntegerVector2 round() {
+        return this;
+    }
+    
     private void set(Vector2 v) {
         set(new IntegerVector2(v));
     }

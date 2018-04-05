@@ -13,7 +13,7 @@ public interface Alien
     void init(Context ctx, int id, int parent, String message);
     void communicate();
     void receive(String[] messages);
-    Direction getMove();
+    Vector2 getMove();
     Action getAction();
     void processResults();
 

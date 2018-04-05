@@ -653,7 +653,7 @@ public class SpaceGrid {
                         thisAlien.kill("Death by spawning exhaustion - died in childbirth.");
                     }
 
-                    IntegerDirection dir = new IntegerDirection(x, y);
+                    IntegerVector2 dir = new IntegerVector2(x, y);
                     dir = thisAlien.containMove(thisAlien.x, thisAlien.y, dir);
 
                     x = thisAlien.x + dir.x;

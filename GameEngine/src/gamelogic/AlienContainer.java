@@ -165,7 +165,7 @@ public class AlienContainer {
     public void move() throws NotEnoughTechException { //[Q]
 
         // Whether the move goes off the board will be determined by the grid
-        IntegerDirection direction = null;
+        IntegerVector2 direction = null;
         try {
             direction = alien.getMove().round();
         } catch (UnsupportedOperationException e) {
@@ -196,7 +196,7 @@ public class AlienContainer {
     }
 
     // this does the actual checking
-    private void checkMove(IntegerDirection direction) throws NotEnoughTechException { //[Q]
+    private void checkMove(IntegerVector2 direction) throws NotEnoughTechException { //[Q]
         int moveLength = distance(0, 0, direction.x, direction.y);
 
         // let one x one moves go
@@ -217,7 +217,7 @@ public class AlienContainer {
         }
     }
 
-    public IntegerDirection containMove(int x, int y, IntegerDirection dir) { //[Q]
+    public IntegerDirection containMove(int x, int y, IntegerVector2 dir) { //[Q]
         int dxi, dyi;
 
         dxi = dir.x;

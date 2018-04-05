@@ -14,6 +14,8 @@ import java.lang.reflect.Field;
  *
  * @author gmein
  */
+
+
 public class GameEngineThread extends Thread {
 
     final private GameEngineV1 engine;
@@ -83,7 +85,7 @@ public class GameEngineThread extends Thread {
                 totalTurns++;
                 engine.vis.showCompletedTurn(totalTurns, engine.grid.getNumAliens(), System.nanoTime() - startTurnTime, engine.grid.getTech());
             } catch (Exception e) {
-                //e.printStackTrace();
+                e.printStackTrace();
                 engine.vis.debugErr("GameThread: Unknown exception: " + e.getMessage());
                 break;
             }
