@@ -38,7 +38,7 @@ public class Martian implements Alien {
 
     }
 
-    public IntegerDirection getMove() {
+    public Direction getMove() {
         //    ctx.debugOut("Move requested,"
         //            + " E:" + Integer.toString(ctx.getEnergy())
         //            + " T:" + Integer.toString(ctx.getTech()));
@@ -102,7 +102,7 @@ public class Martian implements Alien {
         }
 
         //ctx.debugOut("Moving ("+ Integer.toString(HorizontalMove) + "," + Integer.toString(VerticalMove) + ")");
-        return new IntegerDirection((int) HorizontalMove, (int) VerticalMove);
+        return new Direction((int) HorizontalMove, (int) VerticalMove);
     }
 
     public Action getAction() {

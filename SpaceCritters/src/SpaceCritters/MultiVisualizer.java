@@ -207,6 +207,7 @@ public class MultiVisualizer implements GameVisualizer {
     public void debugOut(String s) {
         cgv.forEach(e -> {
             try {
+                e.debugOut("yep");
                 e.debugOut(s);
             } catch (UnsupportedOperationException ex) {
             }
@@ -217,6 +218,7 @@ public class MultiVisualizer implements GameVisualizer {
     public void debugErr(String s) {
         cgv.forEach(e -> {
             try {
+                e.debugOut("more yep");
                 e.debugErr(s);
             } catch (UnsupportedOperationException ex) {
             }

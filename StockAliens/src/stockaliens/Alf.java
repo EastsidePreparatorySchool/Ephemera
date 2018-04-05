@@ -35,7 +35,7 @@ public class Alf implements Alien {
          */
     }
 
-    public IntegerDirection getMove() {
+    public Direction getMove() {
 
         //ctx.debugOut("Move requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
@@ -85,7 +85,7 @@ public class Alf implements Alien {
         } catch (NotEnoughEnergyException | NotEnoughTechException | View.CantSeeSquareException ex) {
         }
 
-        return new IntegerDirection(x, y);
+        return new Direction(x, y);
     }
 
     public Action getAction() {
