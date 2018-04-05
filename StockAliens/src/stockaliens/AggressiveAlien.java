@@ -40,7 +40,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
 
     // Martians move left, right, left, right
     @Override
-    public Direction getMove() {
+    public IntegerDirection getMove() {
 
         ctx.debugOut("Move requested,"
                 + ctx.getStateString());
@@ -86,7 +86,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
         }
 
         ctx.debugOut("Moving to " + ctx.getPosition().add(dir).toString() + ctx.getStateString());
-        return new Direction(dir);
+        return dir;
     }
 
     @Override

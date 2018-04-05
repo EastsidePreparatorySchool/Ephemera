@@ -38,9 +38,9 @@ public class SpawningAlien implements Alien {
 
     }
 
-    public Direction getMove() {
+    public IntegerDirection getMove() {
         if(count%ctx.getTech() == 0){
-            return new Direction(HorizontalMove,VerticalMove);
+            return new IntegerDirection(HorizontalMove,VerticalMove);
         }
        
         if(ctx.getPosition().x == ctx.getMaxPosition().x && ctx.getPosition().y == ctx.getMaxPosition().y ){
@@ -48,7 +48,7 @@ public class SpawningAlien implements Alien {
             VerticalMove = 1;
         }
         // doesn't move ever except to 1,1 where it shall stay
-        return new Direction(0,0);
+        return new IntegerDirection(0,0);
     }
 
     public Action getAction() {
