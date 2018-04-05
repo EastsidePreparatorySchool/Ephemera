@@ -167,7 +167,7 @@ public class AlienContainer {
         // Whether the move goes off the board will be determined by the grid
         IntegerDirection direction = null;
         try {
-            direction = alien.getMove();
+            direction = alien.getMove().round();
         } catch (UnsupportedOperationException e) {
             // we'll let that go
             direction = new IntegerDirection(0, 0);
