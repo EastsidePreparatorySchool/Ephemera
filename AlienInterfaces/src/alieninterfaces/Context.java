@@ -20,7 +20,7 @@ public interface Context {
     View getView(int size) throws NotEnoughEnergyException, NotEnoughTechException;
     IntegerPosition getMinPosition();
     IntegerPosition getMaxPosition();
-    int getDistance(IntegerPosition p1, IntegerPosition p2); //[Q]
+    double getDistance(Vector2 p1, Vector2 p2); //[Q]
     double getPresentEnergy();
 
     int getSpawningCost();

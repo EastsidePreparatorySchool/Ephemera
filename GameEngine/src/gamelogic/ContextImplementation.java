@@ -188,7 +188,7 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public int getDistance(IntegerPosition p1, IntegerPosition p2) {
+    public double getDistance(Vector2 p1, Vector2 p2) {
         return GridCircle.distance(p1, p2);
     }
 

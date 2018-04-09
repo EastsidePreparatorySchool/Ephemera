@@ -5,6 +5,8 @@
 package gamelogic;
 
 import alieninterfaces.IntegerPosition;
+import alieninterfaces.IntegerVector2;
+import alieninterfaces.Vector2;
 import java.util.AbstractCollection;
 import java.util.Iterator;
 
@@ -123,13 +125,14 @@ public class GridCircle extends AbstractCollection<IntegerPosition> {
         }
     }
 
-// helper function: our metric
-    public static int distance(IntegerPosition p1, IntegerPosition p2) {
-        return distance(p1.x, p1.y, p2.x, p2.y);
+// helper function: references metric in Vector2
+    static int time = 0;
+    public static double distance(Vector2 p1, Vector2 p2) {
+        return p1.subtract(p2).magnitude();
     }
 
-    public static int distance(int x1, int y1, int x2, int y2) {
-        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    public static double distance(int x1, int y1, int x2, int y2) {
+        return new IntegerVector2(x1-x2,y1-y2).magnitude();
     }
 
     public boolean outOfView(IntegerPosition point) {

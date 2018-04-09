@@ -16,13 +16,13 @@ import java.util.LinkedList;
 public class Planet extends InternalSpaceObject {
 
     public final String parent;
-    public int radius;
+    public double radius;
     private GridCircle gc;
     Iterator<IntegerPosition> gcIterator;
     int orbitalVelocityCounter;
     public IntegerPosition parentPosition;
 
-    public Planet(SpaceGrid grid, int parentx, int parenty, int radius, int index, String domainName, String packageName, String className,
+    public Planet(SpaceGrid grid, int parentx, int parenty, double radius, int index, String domainName, String packageName, String className,
             double energy, double tech, String parent, PlanetBehavior pb) {
         super(grid, parentx, parenty, index, domainName, packageName, className, energy, tech);
         this.parent = parent;
@@ -38,14 +38,14 @@ public class Planet extends InternalSpaceObject {
         position.y += grid.rand.nextInt(3) - 1;
 
         // make the orbit
-        gc = new GridCircle(position.x, position.y, radius);
+        gc = new GridCircle(position.x, position.y, (int) radius);
         gcIterator = gc.iterator();
-        this.orbitalVelocityCounter = radius;
+        this.orbitalVelocityCounter = (int) radius;
 
         this.position = gcIterator.next();
 
         // randomize position in orbit
-        for (int randomShift = grid.rand.nextInt(4 * radius); randomShift > 0; randomShift--) {
+        for (int randomShift = grid.rand.nextInt((int) (4 * radius)); randomShift > 0; randomShift--) {
             this.position = gcIterator.next();
         }
 
@@ -69,7 +69,7 @@ public class Planet extends InternalSpaceObject {
 
         --orbitalVelocityCounter;
         if (orbitalVelocityCounter == 0) {
-            orbitalVelocityCounter = radius;
+            orbitalVelocityCounter = (int) radius;
 
             if (!gcIterator.hasNext()) {
                 gcIterator = gc.iterator();

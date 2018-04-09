@@ -224,7 +224,7 @@ public class SpaceGrid {
             }
 
             // charge only for moves > 1 in either direction
-            int moveLength = GridCircle.distance(ac.x, ac.y, oldX, oldY - oldX);
+            int moveLength = (int) GridCircle.distance(ac.x, ac.y, oldX, oldY - oldX); //[kludge]
             if (Math.abs(ac.x - oldX) > 1 || Math.abs(ac.y - oldY) > 1) {
                 ac.energy -= moveLength;
             }
@@ -653,11 +653,11 @@ public class SpaceGrid {
                         thisAlien.kill("Death by spawning exhaustion - died in childbirth.");
                     }
 
-                    IntegerVector2 dir = new IntegerVector2(x, y);
+                    Vector2 dir = new IntegerVector2(x, y);
                     dir = thisAlien.containMove(thisAlien.x, thisAlien.y, dir);
 
-                    x = thisAlien.x + dir.x;
-                    y = thisAlien.y + dir.y;
+                    x = thisAlien.x + (int) dir.x; //[kludge]
+                    y = thisAlien.y + (int) dir.y;
 
                     // Add in the alien spec to a new arraylist
                     // to be processed later so the master list is not disrupted
@@ -790,7 +790,8 @@ public class SpaceGrid {
             } catch (Exception e) {
                 vis.debugOut("sg.addPlanet: behavior not found: " + element.className);
             }
-
+            
+            System.out.println("HERE: " + element.x + "   " + element.y);
             Planet p = new Planet(this, soParent.position.x, soParent.position.y,
                     GridCircle.distance(element.x, element.y, 0, 0),
                     planetCount++,

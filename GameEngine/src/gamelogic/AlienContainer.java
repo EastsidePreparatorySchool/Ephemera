@@ -165,7 +165,7 @@ public class AlienContainer {
     public void move() throws NotEnoughTechException { //[Q]
 
         // Whether the move goes off the board will be determined by the grid
-        IntegerVector2 direction = null;
+        Vector2 direction = null;
         try {
             direction = alien.getMove().round();
         } catch (UnsupportedOperationException e) {
@@ -185,8 +185,8 @@ public class AlienContainer {
 
         int oldx = x;
         int oldy = y;
-        nextX = x + direction.x;
-        nextY = y + direction.y;
+        nextX = x + (int) direction.x; //[kludge]
+        nextY = y + (int) direction.y;
 
         int width = Constants.width;
         int height = Constants.height;
@@ -196,8 +196,8 @@ public class AlienContainer {
     }
 
     // this does the actual checking
-    private void checkMove(IntegerVector2 direction) throws NotEnoughTechException { //[Q]
-        int moveLength = distance(0, 0, direction.x, direction.y);
+    private void checkMove(Vector2 direction) throws NotEnoughTechException { //[Q]
+        int moveLength = (int) direction.magnitude();
 
         // let one x one moves go
         if (Math.abs(direction.x) <= 1 && Math.abs(direction.y) <= 1) {
@@ -217,8 +217,8 @@ public class AlienContainer {
         }
     }
 
-    public IntegerDirection containMove(int x, int y, IntegerVector2 dir) { //[Q]
-        int dxi, dyi;
+    public Direction containMove(int x, int y, Vector2 dir) { //[Q]
+        double dxi, dyi;
 
         dxi = dir.x;
         dyi = dir.y;
@@ -235,7 +235,7 @@ public class AlienContainer {
         if (y + dyi < -Constants.width / 2) {
             dyi = -Constants.width / 2 - y;
         }
-        return new IntegerDirection(dxi, dyi);
+        return new Direction(dxi, dyi);
     }
 
     // easy way to kill an alien
