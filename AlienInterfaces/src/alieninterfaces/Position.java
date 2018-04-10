@@ -11,6 +11,7 @@ package alieninterfaces;
 public class Position extends Vector2 {
     
     public Position(Vector2 v) { super(v); }
+    public Position(IntegerVector2 v) { super(v); }
     public Position(double x, double y) { super(x,y); }
 
     public Direction getDirectionTo(Position p2) {
@@ -21,7 +22,7 @@ public class Position extends Vector2 {
     }
 
     public Position add(IntegerDirection dir) {
-        return new Position( super.add(dir) );
+        return new Position( super.add(dir.v2()) );
     }
 
     

@@ -36,8 +36,8 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public IntegerPosition getPosition() {
-        return new IntegerPosition(ac.x, ac.y);
+    public Position getPosition() {
+        return ac.p;
     }
 
     @Override
@@ -56,13 +56,13 @@ public class ContextImplementation implements Context {
         size = Math.max(size, 2);
 
         // if we don't have one or they want a bigger one
-        this.view = new ViewImplementation(ac.grid.aliens, ac, ac.x, ac.y, size);
+        this.view = new ViewImplementation(ac.grid.aliens, ac, ac.p.round().x, ac.p.round().y, size); //[kludge]
         return this.view;
     }
 
     @Override
     public double getPresentEnergy() {
-        return ac.grid.aliens.getEnergyAt(ac.x, ac.y);
+        return ac.grid.aliens.getEnergyAt(ac.p.round().x, ac.p.round().y); //[kludge]
     }
 
     @Override
@@ -116,7 +116,7 @@ public class ContextImplementation implements Context {
         ac.outgoingPower = power;
 
         if (listen) {
-            AlienCell acell = this.ac.grid.aliens.getAliensAt(ac.x, ac.y);
+            AlienCell acell = this.ac.grid.aliens.getAliensAt(ac.p.round().x, ac.p.round().y); //[kludge]
             ac.listening = true;
             acell.listening = true;
         }
@@ -128,7 +128,7 @@ public class ContextImplementation implements Context {
         // tracing an imaginary square of increasing size,
         // in 8 line segments, hopefully without overlap
         for (int d = 1; d <= ac.outgoingPower; d++) {
-            GridCircle c = new GridCircle(ac.x, ac.y, d);
+            GridCircle c = new GridCircle(ac.p.round().x, ac.p.round().y, d); //[kludge]
             for (IntegerPosition point : c) {
                 if (point != null) {
                     depositMessageAt(point, ac.outgoingMessage);
@@ -206,7 +206,7 @@ public class ContextImplementation implements Context {
 
     @Override
     public AlienSpecies getMyAlienSpecies() {
-        return new AlienSpecies(ac.domainName, ac.packageName, ac.className, ac.speciesID, ac.x, ac.y);
+        return new AlienSpecies(ac.domainName, ac.packageName, ac.className, ac.speciesID, ac.p.round().x, ac.p.round().y); //[kludge]
     }
 
 }

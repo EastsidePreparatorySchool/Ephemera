@@ -5,6 +5,7 @@
 package gamelogic;
 
 import alieninterfaces.IntegerPosition;
+import alieninterfaces.Position;
 import gameengineinterfaces.PlanetBehavior;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -20,33 +21,33 @@ public class Planet extends InternalSpaceObject {
     private GridCircle gc;
     Iterator<IntegerPosition> gcIterator;
     int orbitalVelocityCounter;
-    public IntegerPosition parentPosition;
+    public Position parentPosition;
 
-    public Planet(SpaceGrid grid, int parentx, int parenty, double radius, int index, String domainName, String packageName, String className,
+    public Planet(SpaceGrid grid, Position parentP, double radius, int index, String domainName, String packageName, String className,
             double energy, double tech, String parent, PlanetBehavior pb) {
-        super(grid, parentx, parenty, index, domainName, packageName, className, energy, tech);
+        super(grid, parentP, index, domainName, packageName, className, energy, tech);
         this.parent = parent;
-        this.parentPosition = new IntegerPosition(parentx, parenty);
+        this.parentPosition = parentP;
         this.radius = radius;
         this.isPlanet = true;
         this.pb = pb;
     }
 
-    public void init() { //[Q]
+    public void init() {
         // slight random eccentricity
         position.x += grid.rand.nextInt(3) - 1;
         position.y += grid.rand.nextInt(3) - 1;
 
         // make the orbit
-        gc = new GridCircle(position.x, position.y, (int) radius);
+        gc = new GridCircle(position.round().x, position.round().y, (int) radius); //[kludge]
         gcIterator = gc.iterator();
         this.orbitalVelocityCounter = (int) radius;
 
-        this.position = gcIterator.next();
+        this.position = new Position(gcIterator.next()); //[kludge]
 
         // randomize position in orbit
         for (int randomShift = grid.rand.nextInt((int) (4 * radius)); randomShift > 0; randomShift--) {
-            this.position = gcIterator.next();
+            this.position = new Position(gcIterator.next()); //[kludge]
         }
 
         // if we somehow exhausted the circle (shouldn't happen, but you know)
@@ -62,10 +63,10 @@ public class Planet extends InternalSpaceObject {
 
     }
 
-    public IntegerPosition move() { //[Q]
+    public Position move() {
 
-        IntegerPosition pOld = this.position;
-        IntegerPosition pNew = this.position;
+        Position pOld = this.position;
+        Position pNew = this.position;
 
         --orbitalVelocityCounter;
         if (orbitalVelocityCounter == 0) {
@@ -75,15 +76,15 @@ public class Planet extends InternalSpaceObject {
                 gcIterator = gc.iterator();
             }
 
-            pNew = gcIterator.next();
+            pNew = new Position(gcIterator.next()); //[kludge]
         }
 
         // unplug planet from grid
         this.grid.aliens.unplugPlanet(this);
 
         // now worry about the aliens at the old and new positions
-        AlienCell acsFrom = this.grid.aliens.getAliensAt(pOld);
-        AlienCell acsTo = this.grid.aliens.getAliensAt(pNew);
+        AlienCell acsFrom = this.grid.aliens.getAliensAt(pOld.round());
+        AlienCell acsTo = this.grid.aliens.getAliensAt(pNew.round());
 
         // if aliens are where the planet is moving to, and not landed, they die.
         if (acsTo != null) {
@@ -91,8 +92,7 @@ public class Planet extends InternalSpaceObject {
             for (AlienContainer ac : acsTo) {
                 // if not landed, and not freshly moved here, you die.
                 if (ac.planet != this
-                        && ac.nextX == ac.x
-                        && ac.nextY == ac.y) {
+                        && ac.nextP.equals(ac.p)) {
                     ac.kill("Death by being in path of planet " + this.className);
                 }
             }
@@ -104,8 +104,7 @@ public class Planet extends InternalSpaceObject {
         for (AlienContainer ac : acsClone) {
             if (ac.planet == this) {
                 // they didn't intend to move away, move with planet
-                ac.nextX = this.position.x;
-                ac.nextY = this.position.y;
+                ac.nextP = this.position;
             }
         }
 
@@ -116,7 +115,10 @@ public class Planet extends InternalSpaceObject {
         this.grid.aliens.plugPlanet(this);
 
         // visualize
-        this.grid.vis.showPlanetMove(pOld.x, pOld.y, pNew.x, pNew.y, className, this.index, energy, (int) tech);
+        IntegerPosition pOldInt = pOld.round();
+        IntegerPosition pNewInt = pNew.round();
+        
+        this.grid.vis.showPlanetMove(pOldInt.x, pOldInt.y, pNewInt.x, pNewInt.y, className, this.index, energy, (int) tech);
 
         return this.position;
     }
@@ -128,7 +130,7 @@ public class Planet extends InternalSpaceObject {
 
         try {
             // todo: need to make a new list with only the landed aliens
-            pb.reviewInhabitants(grid.aliens.getAliensAt(position));
+            pb.reviewInhabitants(grid.aliens.getAliensAt(position.round()));
         } catch (UnsupportedOperationException e) {
             // that's ok.
         }
@@ -142,7 +144,7 @@ public class Planet extends InternalSpaceObject {
 
         try {
             // todo: make a new list with only the landed aliens
-            pb.reviewInhabitantActions(grid.aliens.getAliensAt(position));
+            pb.reviewInhabitantActions(grid.aliens.getAliensAt(position.round()));
         } catch (UnsupportedOperationException e) {
             // that's ok.
         }

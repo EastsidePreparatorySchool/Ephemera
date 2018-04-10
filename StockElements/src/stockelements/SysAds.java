@@ -42,7 +42,7 @@ public class SysAds implements Alien, ResidentAlien {
     }
 
     @Override
-    public IntegerDirection getMove() {
+    public Direction getMove() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

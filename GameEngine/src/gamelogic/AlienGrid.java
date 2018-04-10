@@ -5,6 +5,8 @@
 package gamelogic;
 
 import alieninterfaces.IntegerPosition;
+import alieninterfaces.IntegerVector2;
+import alieninterfaces.Vector2;
 import java.util.LinkedList;
 
 /**
@@ -33,10 +35,12 @@ public class AlienGrid extends LinkedList<AlienContainer> {
 
     public boolean addAlienAndPlug(AlienContainer ac) { //[Q]
         // add alien to grid as well as to master list
-        AlienCell acs = acGrid[ac.x + centerX][ac.y + centerY];
+        IntegerPosition p = ac.p.round();
+        
+        AlienCell acs = acGrid[p.x + centerX][p.y + centerY];
         if (acs == null) {
             acs = new AlienCell();
-            acGrid[ac.x + centerX][ac.y + centerY] = acs;
+            acGrid[p.x + centerX][p.y + centerY] = acs;
         }
         acs.add(ac);
         //ac.debugOut("Grid: added to list " + getXYString(ac.x, ac.y));
@@ -72,15 +76,23 @@ public class AlienGrid extends LinkedList<AlienContainer> {
 
     public void unplug(AlienContainer ac) { //[Q]
         // remove alien from grid 
-        AlienCell acs = acGrid[ac.x + centerX][ac.y + centerY];
+        IntegerPosition p = ac.p.round();
+        
+        AlienCell acs = acGrid[p.x + centerX][p.y + centerY];
         //ac.debugOut("Grid: removing from list " + getXYString(ac.x, ac.y));
         acs.remove(ac);
         if (canBeRemoved(acs)) {
-            acGrid[ac.x + centerX][ac.y + centerY] = null;
+            acGrid[p.x + centerX][p.y + centerY] = null;
         }
     }
     
-    public AlienCell getAliensAt(IntegerPosition p) {
+    public AlienCell getAliensAt(double x, double y) {
+        return getAliensAt (new Vector2(x,y));
+    }
+    public AlienCell getAliensAt(Vector2 p) {
+        return getAliensAt(p.round());
+    }
+    public AlienCell getAliensAt(IntegerVector2 p) {
         return getAliensAt (p.x, p.y);
     }
 
@@ -98,31 +110,37 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     }
 
     public void plugStar(Star st) {
-        // add alien to grid 
-        AlienCell acs = acGrid[st.position.x + centerX][st.position.y + centerY];
+        // add alien to grid
+        IntegerPosition p = st.position.round();
+        
+        AlienCell acs = acGrid[p.x + centerX][p.y + centerY];
         if (acs == null) {
             acs = new AlienCell();
-            acGrid[st.position.x + centerX][st.position.y + centerY] = acs;
+            acGrid[p.x + centerX][p.y + centerY] = acs;
         }
         acs.star = st;
         acs.energy = st.energy;
     }
 
-    public void plugPlanet(Planet p) { //[Q]
+    public void plugPlanet(Planet planet) { //[Q]
         // add alien to grid 
-        AlienCell acs = acGrid[p.position.x + centerX][p.position.y + centerY];
+        IntegerPosition p = planet.position.round();
+        
+        AlienCell acs = acGrid[p.x + centerX][p.y + centerY];
         if (acs == null) {
             acs = new AlienCell();
-            acGrid[p.position.x + centerX][p.position.y + centerY] = acs;
+            acGrid[p.x + centerX][p.y + centerY] = acs;
         }
-        acs.planet = p;
-        acs.energy += p.energy;
-        acs.tech = p.tech;
+        acs.planet = planet;
+        acs.energy += planet.energy;
+        acs.tech = planet.tech;
     }
 
     public void unplugPlanet(Planet p) { //[Q]
         // add alien to grid 
-        AlienCell acs = acGrid[p.position.x + centerX][p.position.y + centerY];
+        IntegerPosition pos = p.position.round();
+        
+        AlienCell acs = acGrid[pos.x + centerX][pos.y + centerY];
         acs.planet = null;
         acs.energy -= p.energy;
         acs.tech = 0;

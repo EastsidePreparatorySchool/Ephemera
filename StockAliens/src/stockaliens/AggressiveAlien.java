@@ -40,7 +40,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
 
     // Martians move left, right, left, right
     @Override
-    public IntegerDirection getMove() {
+    public Vector2 getMove() {
 
         ctx.debugOut("Move requested,"
                 + ctx.getStateString());
@@ -74,7 +74,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
         }
 
         try {
-            if (ctx.getView(move_energy).getSpaceObjectAtPos(ctx.getPosition().add(dir)) != null) {
+            if (ctx.getView(move_energy).getSpaceObjectAtPos(ctx.getPosition().add(dir).round()) != null) {
                 // don't be a dumbass, don't move into a star
                 ctx.debugOut("Avoiding Star at " + ctx.getPosition().add(dir).toString());
                 dir = new IntegerDirection(-dir.x, -dir.y);
@@ -86,7 +86,7 @@ public class AggressiveAlien implements Alien, AlienShapeFactory {
         }
 
         ctx.debugOut("Moving to " + ctx.getPosition().add(dir).toString() + ctx.getStateString());
-        return dir;
+        return dir.v2();
     }
 
     @Override

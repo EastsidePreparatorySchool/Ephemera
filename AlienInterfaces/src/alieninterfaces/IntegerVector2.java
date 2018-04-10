@@ -52,9 +52,11 @@ public class IntegerVector2 {
     }
     
     
+    public double magnitude() { return Vector2.magnitude(v2()); }
     
-    public IntegerVector2 add(Vector2 v) { return IntegerVector2.add(this,v); }
-    public IntegerVector2 subtract(Vector2 v) { return IntegerVector2.subtract(this,v); }
+    
+    public IntegerVector2 add(IntegerVector2 v) { return IntegerVector2.add(this,v); }
+    public IntegerVector2 subtract(IntegerVector2 v) { return IntegerVector2.subtract(this,v); }
     public IntegerVector2 scale(double scale) { return IntegerVector2.scale(this, scale); }
     public IntegerVector2 scale(Vector2 scale) { return IntegerVector2.scale(this, scale); }
     public IntegerVector2 scaleToLength(double scale) { return IntegerVector2.scaleToLength(this, scale); }
@@ -65,10 +67,10 @@ public class IntegerVector2 {
     public static IntegerVector2 scale(Vector2 v, Vector2 scale) { return Vector2.scale(v, scale).round(); }
     public static IntegerVector2 scaleToLength(Vector2 v, double scale) { return Vector2.scaleToLength(v, scale).round(); }
     
-    public static IntegerVector2 add(IntegerVector2 a, IntegerVector2 b) { return Vector2.add(a, b).round(); }
-    public static IntegerVector2 subtract(IntegerVector2 a, IntegerVector2 b) { return Vector2.subtract(a, b).round(); }
-    public static IntegerVector2 scale(IntegerVector2 v, double scale) { return Vector2.scale(v, scale).round(); }
-    public static IntegerVector2 scale(IntegerVector2 v, IntegerVector2 scale) { return Vector2.scale(v, scale).round(); }
-    public static IntegerVector2 scaleToLength(IntegerVector2 v, double scale) { return Vector2.scaleToLength(v, scale).round(); }
+    public static IntegerVector2 add(IntegerVector2 a, IntegerVector2 b) { return Vector2.add(a.v2(), b.v2()).round(); }
+    public static IntegerVector2 subtract(IntegerVector2 a, IntegerVector2 b) { return Vector2.subtract(a.v2(), b.v2()).round(); }
+    public static IntegerVector2 scale(IntegerVector2 v, double scale) { return Vector2.scale(v.v2(), scale).round(); }
+    public static IntegerVector2 scale(IntegerVector2 v, Vector2 scale) { return Vector2.scale(v.v2(), scale).round(); }
+    public static IntegerVector2 scaleToLength(IntegerVector2 v, double scale) { return Vector2.scaleToLength(v.v2(), scale).round(); }
     
 }

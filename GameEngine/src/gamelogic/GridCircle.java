@@ -130,9 +130,15 @@ public class GridCircle extends AbstractCollection<IntegerPosition> {
     public static double distance(Vector2 p1, Vector2 p2) {
         return p1.subtract(p2).magnitude();
     }
+    public static double distance(IntegerVector2 p1, IntegerVector2 p2) {
+        return p1.subtract(p2).magnitude();
+    }
 
     public static double distance(int x1, int y1, int x2, int y2) {
         return new IntegerVector2(x1-x2,y1-y2).magnitude();
+    }
+    public static double distance(double x1, double y1, double x2, double y2) {
+        return new Vector2(x1-x2,y1-y2).magnitude();
     }
 
     public boolean outOfView(IntegerPosition point) {

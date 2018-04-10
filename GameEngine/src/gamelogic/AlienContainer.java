@@ -8,7 +8,6 @@ import gameengineinterfaces.AlienSpec;
 import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
-import static gamelogic.GridCircle.distance;
 import java.util.HashMap;
 
 /**
@@ -45,10 +44,8 @@ public class AlienContainer {
     public HashMap<String, Integer> secrets;
 
     boolean participatedInAction;
-    public int x;
-    public int y;
-    public int nextX;
-    public int nextY;
+    public Position p = new Position(0,0);
+    public Position nextP;
     public String outgoingMessage;
     public double outgoingPower;
     int turnsInSafeZone;
@@ -79,13 +76,13 @@ public class AlienContainer {
 
         // if position = (0,0) assign random position in safe zone
         if (x == 0 && y == 0) {
-            this.x = ctx.getRandomInt(Constants.safeZoneRadius + 1);
-            this.x *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
-            this.y = ctx.getRandomInt(Constants.safeZoneRadius + 1);
-            this.y *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
+            this.p.x = ctx.getRandomInt(Constants.safeZoneRadius + 1);
+            this.p.x *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
+            this.p.y = ctx.getRandomInt(Constants.safeZoneRadius + 1);
+            this.p.y *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
         } else {
-            this.x = x;
-            this.y = y;
+            this.p.x = x;
+            this.p.y = y;
         }
 
         this.alienHashCode = 0;
@@ -128,7 +125,7 @@ public class AlienContainer {
     }
 
     public AlienSpec getFullAlienSpec() {
-        return new AlienSpec(this.domainName, this.packageName, this.className, this.species.speciesID, this.alienHashCode, this.x, this.y,
+        return new AlienSpec(this.domainName, this.packageName, this.className, this.species.speciesID, this.alienHashCode, this.p.round().x, this.p.round().y,
                 this.tech, this.energy, this.fullName, this.speciesName, this.currentActionPower);
     }
 
@@ -139,7 +136,7 @@ public class AlienContainer {
     public AlienSpecies getAlienSpecies() {
         if (this.species == null) {
             assert false;
-            species = new AlienSpecies(this.domainName, this.packageName, this.className, species.speciesID, this.x, this.y);
+            species = new AlienSpecies(this.domainName, this.packageName, this.className, species.speciesID, this.p.round().x, this.p.round().y);
         }
         return species;
 
@@ -147,11 +144,11 @@ public class AlienContainer {
 
     public String toStringExpensive() {
         return getFullName() + ": "
-                + "X:" + (x)
-                + " Y:" + (y)
+                + "X:" + (p.x)
+                + " Y:" + (p.y)
                 + " E:" + (energy)
                 + " T:" + (tech)
-                + " r:" + ((int) Math.floor(Math.hypot((double) x, (double) y)));
+                + " r:" + ((int) Math.floor(Math.hypot(p.x, p.y)));
     }
 
     public void processResults() {
@@ -167,10 +164,10 @@ public class AlienContainer {
         // Whether the move goes off the board will be determined by the grid
         Vector2 direction = null;
         try {
-            direction = alien.getMove().round();
+            direction = alien.getMove();
         } catch (UnsupportedOperationException e) {
             // we'll let that go
-            direction = new IntegerDirection(0, 0);
+            direction = new Direction(0, 0);
         }
 
         // if on planet, ignore move
@@ -181,17 +178,16 @@ public class AlienContainer {
         this.checkMove(direction); // Throws an exception if illegal
 
         // we want to contain aliens in the 250 sphere, so apply the "cosmic drift"
-        direction = this.containMove(x, y, direction);
+        direction = this.containMove(p.x, p.y, direction);
 
-        int oldx = x;
-        int oldy = y;
-        nextX = x + (int) direction.x; //[kludge]
-        nextY = y + (int) direction.y;
+        double oldx = p.x;
+        double oldy = p.y;
+        nextP = new Position(p.add(direction));
 
         int width = Constants.width;
         int height = Constants.height;
-        if (nextX > (width / 2) || nextX < (0 - width / 2) || nextY > (height / 2) || nextY < (0 - height / 2)) {
-            debugErr("ac.move: Out of bounds: (" + x + ":" + y + ")");
+        if (nextP.x > (width / 2) || nextP.x < (0 - width / 2) || nextP.y > (height / 2) || nextP.y < (0 - height / 2)) {
+            debugErr("ac.move: Out of bounds: (" + p.x + ":" + p.y + ")");
         }
     }
 
@@ -217,7 +213,7 @@ public class AlienContainer {
         }
     }
 
-    public Direction containMove(int x, int y, Vector2 dir) { //[Q]
+    public Direction containMove(double x, double y, Vector2 dir) { //[Q]
         double dxi, dyi;
 
         dxi = dir.x;

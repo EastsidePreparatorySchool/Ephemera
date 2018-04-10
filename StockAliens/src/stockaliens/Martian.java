@@ -38,7 +38,7 @@ public class Martian implements Alien {
 
     }
 
-    public IntegerDirection getMove() {
+    public Direction getMove() {
         //    ctx.debugOut("Move requested,"
         //            + " E:" + Integer.toString(ctx.getEnergy())
         //            + " T:" + Integer.toString(ctx.getTech()));
@@ -73,10 +73,10 @@ public class Martian implements Alien {
         }
 
         //Checks to see if the closest alien is withen moving capability.
-        if (ctx.getDistance(ClosestAlien, ctx.getPosition()) <= (long) ctx.getTech()) {
+        if (ctx.getDistance(ClosestAlien.v2(), ctx.getPosition()) <= (long) ctx.getTech()) {
 
-            HorizontalMove = ClosestAlien.x - ctx.getPosition().x;
-            VerticalMove = ClosestAlien.y - ctx.getPosition().y;
+            HorizontalMove = ClosestAlien.x - ctx.getPosition().round().x;
+            VerticalMove = ClosestAlien.y - ctx.getPosition().round().y;
         }
 
         //sets the amount of energy to fight with by how much energy, and how muc technology
@@ -102,7 +102,7 @@ public class Martian implements Alien {
         }
 
         //ctx.debugOut("Moving ("+ Integer.toString(HorizontalMove) + "," + Integer.toString(VerticalMove) + ")");
-        return new IntegerDirection((int) HorizontalMove, (int) VerticalMove);
+        return new Direction((int) HorizontalMove, (int) VerticalMove);
     }
 
     public Action getAction() {

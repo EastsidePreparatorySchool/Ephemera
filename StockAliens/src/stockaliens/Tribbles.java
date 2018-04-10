@@ -42,14 +42,14 @@ public class Tribbles implements Alien {
         //find nearest star/planet for avoidance
         
         if(alienCount < 5000) {
-        distance = ctx.getDistance(ctx.getPosition(),ctx.getMinPosition());
+        distance = (int) ctx.getDistance(ctx.getPosition(),ctx.getMinPosition().v2());
         if(distance > r) {
-            distance = ctx.getDistance(ctx.getPosition(),ctx.getMinPosition());
+            distance = (int) ctx.getDistance(ctx.getPosition(),ctx.getMinPosition().v2());
             ctx.debugOut(Integer.toString(distance));
             return new Direction(-1,-1);
         }
         if(distance <= r) {
-            distance = ctx.getDistance(ctx.getPosition(),ctx.getMinPosition());
+            distance = (int) ctx.getDistance(ctx.getPosition(),ctx.getMinPosition().v2());
             x = ctx.getRandomInt(3) - 1;
             y = ctx.getRandomInt(3) - 1;
             return new Direction(x,y);

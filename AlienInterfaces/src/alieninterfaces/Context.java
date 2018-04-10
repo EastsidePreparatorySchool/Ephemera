@@ -16,7 +16,7 @@ public interface Context {
     double getEnergy();
     int getTech();
 
-    IntegerPosition getPosition();
+    Position getPosition();
     View getView(int size) throws NotEnoughEnergyException, NotEnoughTechException;
     IntegerPosition getMinPosition();
     IntegerPosition getMaxPosition();

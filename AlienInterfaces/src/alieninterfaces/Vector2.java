@@ -27,9 +27,13 @@ public class Vector2 {
         this.x = array[0];
         this.y = array[1];
     }
+    public Vector2(IntegerVector2 v) {
+        this.x = v.x;
+        this.y = v.y;
+    }
     
     
-    private void set(Vector2 v) {
+    public void set(Vector2 v) {
         this.x = v.x;
         this.y = v.y;
     }
@@ -45,10 +49,9 @@ public class Vector2 {
         return "(" + x + "," + y + ")";
     }
     
-    
-    
-    
-    
+    public boolean equals(Vector2 v) {
+        return v.x == x && v.y == y;
+    }
     
     
     

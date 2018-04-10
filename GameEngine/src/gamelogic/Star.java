@@ -4,6 +4,8 @@
  */
 package gamelogic;
 
+import alieninterfaces.Position;
+
 /**
  *
  * @author guberti
@@ -11,7 +13,7 @@ package gamelogic;
 public class Star extends InternalSpaceObject{
     
     public Star (SpaceGrid grid, int x, int y, int index, String domainName, String packageName, String className, double energy, double tech) { //[Q]
-        super(grid, x, y, index, domainName, packageName, className, energy, tech);
+        super(grid, new Position(x,y), index, domainName, packageName, className, energy, tech);
     }
     
     // Add code here to detail the working of stars
