@@ -40,6 +40,7 @@ public class SpaceGrid {
     double avgTech;
 
     int currentTurn = 1;
+    double time = 0;
     int speciesCounter = 1; // starting with ID 1
 
     // this is the only approved random generator for the game. Leave it alone!
@@ -61,7 +62,7 @@ public class SpaceGrid {
         return alienCount;
     }
 
-   public double getTech() {
+    public double getTech() {
         return avgTech;
     }
 
@@ -91,6 +92,8 @@ public class SpaceGrid {
     }
 
     public boolean executeGameTurn() {
+        time += Constants.deltaT;
+
         performCommunications();
         removeDeadAliens();
         performReceives();
@@ -328,7 +331,7 @@ public class SpaceGrid {
     }
 
     public void processResults() {
-        for (AlienContainer ac:aliens) {
+        for (AlienContainer ac : aliens) {
             //for (AlienContainer ac : aliens) {
             // get rid of stale views from prior moves
             ac.ctx.view = null;
@@ -348,14 +351,13 @@ public class SpaceGrid {
     public void requestAlienActions() {
 
         this.avgTech = 0;
-        
+
         // first request all the actions from the aliens
-        for (AlienContainer thisAlien:aliens) {
+        for (AlienContainer thisAlien : aliens) {
             // get rid of stale views from prior phases
             thisAlien.ctx.view = null;
-            
+
             // assess avg tech
-            
             avgTech += thisAlien.tech;
 
             try {
@@ -789,24 +791,24 @@ public class SpaceGrid {
             } catch (Exception e) {
                 vis.debugOut("sg.addPlanet: behavior not found: " + element.className);
             }
-            
+
             Planet p = new Planet(this, soParent.position,
                     GridCircle.distance(element.x, element.y, 0, 0),
                     planetCount++,
                     element.domainName, element.packageName, element.className,
-                    element.energy, element.tech, element.parent, pb);
+                    element.energy, element.tech, element.parent, pb, element.mass);
             p.init();
             objects.add(p);
             this.aliens.plugPlanet(p);
-            vis.registerPlanet(p.position.round().x, p.position.round().y, element.className, p.index, element.energy, (int) element.tech);
+            vis.registerPlanet(p.position.round().x, p.position.round().y, element.className, p.index, element.energy, (int) element.tech, element.mass);
         }
     }
 
     void addStar(GameElementSpec element) { //[Q]
-        Star st = new Star(this, element.x, element.y, starCount++, element.domainName, element.packageName, element.className, element.energy, element.tech);
+        Star st = new Star(this, element.x, element.y, starCount++, element.domainName, element.packageName, element.className, element.energy, element.tech, element.mass);
         objects.add(st);
         this.aliens.plugStar(st);
-        vis.registerStar(element.x, element.y, element.className, objects.indexOf(st), element.energy);
+        vis.registerStar(element.x, element.y, element.className, objects.indexOf(st), element.energy, element.mass);
         aliens.distributeStarEnergy(element.x, element.y, element.energy);
     }
 

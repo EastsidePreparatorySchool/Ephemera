@@ -36,20 +36,20 @@ public class MultiVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void registerStar(int x, int y, String name, int index, double luminosity) { //[Q]
+    public void registerStar(int x, int y, String name, int index, double luminosity, double mass) { //[Q]
         cgv.forEach(e -> {
             try {
-                e.registerStar(x, y, name, index, luminosity);
+                e.registerStar(x, y, name, index, luminosity, mass);
             } catch (UnsupportedOperationException ex) {
             }
         });
     }
 
     @Override
-    public void registerPlanet(int x, int y, String name, int index, double energy, int tech) { //[Q]
+    public void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass) { //[Q]
         cgv.forEach(e -> {
             try {
-                e.registerPlanet(x, y, name, index, energy, tech);
+                e.registerPlanet(x, y, name, index, energy, tech, mass);
             } catch (UnsupportedOperationException ex) {
             }
         });

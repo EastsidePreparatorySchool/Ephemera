@@ -21,6 +21,7 @@ public class GameElementSpec {
     public int y; //[Q]
     public double energy;
     public double tech;
+    public double mass;
 
     public GameElementSpec(String kindString) {
         try {

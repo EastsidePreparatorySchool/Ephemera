@@ -18,9 +18,9 @@ public interface GameVisualizer {
     
     void registerSpecies(AlienSpec as, AlienShapeFactory asf);
     
-    void registerStar(int x, int y, String name, int index, double luminosity); //[Q]
+    void registerStar(int x, int y, String name, int index, double luminosity, double mass); //[Q]
     
-    void registerPlanet(int x, int y, String name, int index, double energy, int tech); //[Q]
+    void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass); //[Q]
     
     void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech);  //[Q]
     

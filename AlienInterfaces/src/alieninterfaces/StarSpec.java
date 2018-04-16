@@ -15,13 +15,17 @@ public class StarSpec {
     String name;
     int index;
     double luminosity;
+    
+    double mass;
 
-    public StarSpec(int x, int y, String name, int index, double luminosity) { //[Q]
+    public StarSpec(int x, int y, String name, int index, double luminosity, double mass) { //[Q]
         this.x = x;
         this.y = y;
         this.name = name;
         this.index = index;
         this.luminosity = luminosity;
+        
+        this.mass = mass;
     }
 
 }

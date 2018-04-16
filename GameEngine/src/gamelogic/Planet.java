@@ -24,8 +24,8 @@ public class Planet extends InternalSpaceObject {
     public Position parentPosition;
 
     public Planet(SpaceGrid grid, Position parentP, double radius, int index, String domainName, String packageName, String className,
-            double energy, double tech, String parent, PlanetBehavior pb) {
-        super(grid, parentP, index, domainName, packageName, className, energy, tech);
+            double energy, double tech, String parent, PlanetBehavior pb, double mass) {
+        super(grid, parentP, index, domainName, packageName, className, energy, tech, mass);
         this.parent = parent;
         this.parentPosition = parentP;
         this.radius = radius;

@@ -39,6 +39,15 @@ public class ContextImplementation implements Context {
     public Position getPosition() {
         return ac.p;
     }
+    @Override
+    public double getMass() {
+        return ac.getMass();
+    }
+    
+    @Override
+    public double getTime() {
+        return ac.grid.time;
+    }
 
     @Override
     public View getView(int size) throws NotEnoughEnergyException, NotEnoughTechException {

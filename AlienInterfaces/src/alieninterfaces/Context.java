@@ -28,6 +28,7 @@ public interface Context {
 
     int getRandomInt(int ceiling);
     int getGameTurn();
+    double getTime();
     List<IntegerPosition> computeOrbit (IntegerPosition center, int radius);
 
     HashMap getSecrets();
@@ -39,4 +40,6 @@ public interface Context {
     void debugOut(String s);
     String getStateString ();
     AlienSpecies getMyAlienSpecies();
+    
+    double getMass();
 }

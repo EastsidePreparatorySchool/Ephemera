@@ -49,7 +49,7 @@ public class AlienContainer {
     public String outgoingMessage;
     public double outgoingPower;
     int turnsInSafeZone;
-
+    
     // Declare stats here
     //
     // Heads up: This constructs an AlienContainer and contained Alien
@@ -109,6 +109,9 @@ public class AlienContainer {
 
     }
     // class-related helpers
+    
+    
+    public double getMass() { return Constants.alienMass; }
 
     public String getFullSpeciesName() {
         if (speciesName == null) {
