@@ -13,6 +13,7 @@ import java.lang.reflect.Constructor;
  * @author gunnar
  */
 public class InternalAlienSpecies extends AlienSpecies {
+
     public Constructor<?> cns;
     public AlienShapeFactory shapeFactory;
     public long counter;
@@ -26,7 +27,7 @@ public class InternalAlienSpecies extends AlienSpecies {
         achievements = new boolean[achievementCount];
         resetAchievements();
     }
-    
+
     public void resetAchievements() {
         for (int i = 0; i < achievements.length; i++) {
             achievements[i] = false;

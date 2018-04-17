@@ -9,18 +9,22 @@ package alieninterfaces;
  * @author gmein
  */
 public class Direction extends Vector2 {
-    
-    
-    
-    public Direction(Vector2 v) { super(v); }
-    public Direction(double x, double y) { super(x,y); }
+
+    public Direction(Vector2 v) {
+        super(v);
+    }
+
+    public Direction(double x, double y) {
+        super(x, y);
+    }
+
     public Direction(Position p1, Position p2) {
         this.x = p2.x - p1.x;
         this.y = p2.y - p1.y;
     }
-    
+
     public Direction add(Direction d1) {
-        return new Direction(x+d1.x, y+d1.y);
+        return new Direction(x + d1.x, y + d1.y);
     }
 
     public double getLength() {
@@ -29,10 +33,12 @@ public class Direction extends Vector2 {
 
     @Override
     public Direction scaleToLength(double scale) {
-        return new Direction( super.scaleToLength(scale) );
+        return new Direction(super.scaleToLength(scale));
     }
-    
+
     @Override
-    public IntegerDirection round() { return new IntegerDirection(this); }
+    public IntegerDirection round() {
+        return new IntegerDirection(this);
+    }
 
 }

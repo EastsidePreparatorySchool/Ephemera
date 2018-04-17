@@ -9,5 +9,6 @@ package gameengineinterfaces;
  * @author gunnar
  */
 public interface ResidentAlien {
-    void init (ResidentContext rc);
+
+    void init(ResidentContext rc);
 }

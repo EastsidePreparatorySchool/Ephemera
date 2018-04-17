@@ -6,14 +6,12 @@ package gamelogic;
 
 import gameengineinterfaces.*;
 
-
 /**
  *
  * @author guberti
  */
-
-
 public class AchievementReq {
+
     Requirement numReq;
     double amount;
     AchievementFlag flagReq;
@@ -21,7 +19,7 @@ public class AchievementReq {
     public AchievementReq(AchievementFlag flagReq) {
         this.flagReq = flagReq;
     }
-    
+
     public AchievementReq(Requirement req, double amount) {
         this.numReq = req;
         this.amount = amount;

@@ -21,7 +21,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 
-
 /**
  *
  * @author gmein, stolen from StackOverflow member skiwi
@@ -41,7 +40,7 @@ public class ConsolePane extends BorderPane {
     private Consumer<String> onMessageReceivedHandler;
 
     public ConsolePane(SpaceCritters gameShellInstance) {
-        
+
         this.gameShell = gameShellInstance;
 
         setTop(createControls());
@@ -97,7 +96,7 @@ public class ConsolePane extends BorderPane {
         textField.requestFocus();
     }
 
-    private  void setOnMessageReceivedHandler(final Consumer<String> onMessageReceivedHandler) {
+    private void setOnMessageReceivedHandler(final Consumer<String> onMessageReceivedHandler) {
         this.onMessageReceivedHandler = onMessageReceivedHandler;
     }
 
@@ -123,17 +122,15 @@ public class ConsolePane extends BorderPane {
     public void println() {
         Utilities.runAndWait(() -> textArea.appendText(System.lineSeparator()));
     }
-    
-    
-    private HBox createControls () {
-     
+
+    private HBox createControls() {
+
         HBox hBox = new HBox();
         hBox.setPadding(new Insets(15, 12, 15, 12));
-        hBox.setSpacing(10);  
+        hBox.setSpacing(10);
         hBox.setStyle("-fx-background-color: black;");
         hBox.setAlignment(Pos.CENTER_LEFT);
 
-    
         chatter.setStyle("-fx-text-fill: white;");
         chatter.setOnAction((e) -> {
             gameShell.engine.queueCommand(
@@ -141,13 +138,13 @@ public class ConsolePane extends BorderPane {
         });
 
         filter.setEditable(true);
-        filter.setOnAction((e) -> gameShell.field.setFilter(filter.getText().trim().equals("") ? null:filter.getText()));
+        filter.setOnAction((e) -> gameShell.field.setFilter(filter.getText().trim().equals("") ? null : filter.getText()));
 
         Label l = new Label("   Filter:");
         l.setStyle("-fx-text-fill: white;");
 
         Button b1 = new Button("Set");
-        b1.setOnAction((e) -> gameShell.field.setFilter(filter.getText().trim().equals("") ? null:filter.getText()));
+        b1.setOnAction((e) -> gameShell.field.setFilter(filter.getText().trim().equals("") ? null : filter.getText()));
 
         hBox.getChildren().addAll(chatter, l, filter, b1);
 

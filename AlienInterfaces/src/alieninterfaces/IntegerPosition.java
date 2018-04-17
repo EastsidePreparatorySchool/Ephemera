@@ -10,22 +10,29 @@ package alieninterfaces;
  */
 public class IntegerPosition extends IntegerVector2 {
 
-    public IntegerPosition(int x, int y) { super(x, y); }
-    public IntegerPosition(IntegerVector2 v) { super(v); }
-    public IntegerPosition(Vector2 v) { super(v); }
+    public IntegerPosition(int x, int y) {
+        super(x, y);
+    }
+
+    public IntegerPosition(IntegerVector2 v) {
+        super(v);
+    }
+
+    public IntegerPosition(Vector2 v) {
+        super(v);
+    }
 
     public IntegerDirection getDirectionTo(IntegerPosition p2) {
-        return new IntegerDirection( p2.subtract(this) );
+        return new IntegerDirection(p2.subtract(this));
     }
+
     public IntegerDirection getDirectionFrom(IntegerPosition p2) {
-        return new IntegerDirection( this.subtract(p2) );
+        return new IntegerDirection(this.subtract(p2));
     }
 
-    
     public IntegerPosition add(IntegerDirection dir) {
-        return new IntegerPosition( super.add(dir) );
+        return new IntegerPosition(super.add(dir));
     }
-
 
     public static IntegerPosition fromString(String s) { //[Q] (parsing!)
         try {
@@ -44,10 +51,10 @@ public class IntegerPosition extends IntegerVector2 {
             }
             y = Integer.parseInt(s.substring(j, i));
             return new IntegerPosition(x, y);
-            
+
         } catch (Exception e) {
         }
-        
+
         return null;
     }
 

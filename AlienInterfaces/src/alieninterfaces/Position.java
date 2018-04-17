@@ -9,23 +9,30 @@ package alieninterfaces;
  * @author gmein
  */
 public class Position extends Vector2 {
-    
-    public Position(Vector2 v) { super(v); }
-    public Position(IntegerVector2 v) { super(v); }
-    public Position(double x, double y) { super(x,y); }
+
+    public Position(Vector2 v) {
+        super(v);
+    }
+
+    public Position(IntegerVector2 v) {
+        super(v);
+    }
+
+    public Position(double x, double y) {
+        super(x, y);
+    }
 
     public Direction getDirectionTo(Position p2) {
-        return new Direction( p2.subtract(this) );
+        return new Direction(p2.subtract(this));
     }
+
     public Direction getDirectionFrom(Position p2) {
-        return new Direction( this.subtract(p2) );
+        return new Direction(this.subtract(p2));
     }
 
     public Position add(IntegerDirection dir) {
-        return new Position( super.add(dir.v2()) );
+        return new Position(super.add(dir.v2()));
     }
-
-    
 
     public static Position fromString(String s) { //[Q] (parsing!)
         try {
@@ -44,14 +51,15 @@ public class Position extends Vector2 {
             }
             y = Integer.parseInt(s.substring(j, i));
             return new Position(x, y);
-            
+
         } catch (Exception e) {
         }
-        
+
         return null;
     }
-    
-    
+
     @Override
-    public IntegerPosition round() { return new IntegerPosition(this); }
+    public IntegerPosition round() {
+        return new IntegerPosition(this);
+    }
 }

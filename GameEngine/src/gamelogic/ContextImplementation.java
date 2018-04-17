@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class ContextImplementation implements Context {
 
-    private AlienContainer ac;
+    private final AlienContainer ac;
     public GameVisualizer vis;
     public ViewImplementation view;
 
@@ -39,14 +39,15 @@ public class ContextImplementation implements Context {
     public Position getPosition() {
         return ac.p;
     }
+
     @Override
     public double getMass() {
         return ac.getMass();
     }
-    
+
     @Override
     public double getTime() {
-        return ac.grid.time;
+        return ac.grid.getTime();
     }
 
     @Override
@@ -55,12 +56,11 @@ public class ContextImplementation implements Context {
         if (size > 2 && size > (int) ac.tech) {
             throw new NotEnoughTechException();
         }
-        
+
         //if (!Constants.gameMode.equalsIgnoreCase("sc_play.json")) {
         //    // views are only free in play mode
         //    ac.energy -= size;
         //}
-        
         // Make size at least 2 so people can see where they can move for free
         size = Math.max(size, 2);
 
@@ -88,11 +88,12 @@ public class ContextImplementation implements Context {
     public HashMap getSecrets() {
         return new HashMap<>(ac.secrets);
     }
-    
+
     @Override
     public int getSecret(String key) {
         return ac.secrets.get(key);
     }
+
     // alien chatter is prefixed with full info, and only talks when chatter is on
     @Override
     public void debugOut(String s) {
@@ -205,11 +206,11 @@ public class ContextImplementation implements Context {
     public List<IntegerPosition> computeOrbit(IntegerPosition center, int radius) { //[Q]
         GridCircle gc = new GridCircle(center.x, center.y, radius);
         ArrayList<IntegerPosition> orbit = new ArrayList<>();
-        
-        for (IntegerPosition p:gc) {
+
+        for (IntegerPosition p : gc) {
             orbit.add(p);
         }
-        
+
         return orbit;
     }
 

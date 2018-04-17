@@ -21,9 +21,9 @@ public abstract class InternalSpaceObject {
     private String fullName;
     public SpaceGrid grid;
     public boolean isPlanet = false;
-    public int index; 
+    public int index;
     public PlanetBehavior pb;
-    
+
     double mass;
 
     public double energy; // Energy that aliens gain every turn from the planet

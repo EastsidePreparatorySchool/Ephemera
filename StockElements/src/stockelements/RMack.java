@@ -14,7 +14,7 @@ import gamelogic.*;
 public class RMack implements PlanetBehavior {
 
     Planet p;
-    
+
     @Override
     public void init(Planet p) {
         this.p = p;

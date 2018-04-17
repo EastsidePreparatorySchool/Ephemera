@@ -36,7 +36,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     public boolean addAlienAndPlug(AlienContainer ac) { //[Q]
         // add alien to grid as well as to master list
         IntegerPosition p = ac.p.round();
-        
+
         AlienCell acs = acGrid[p.x + centerX][p.y + centerY];
         if (acs == null) {
             acs = new AlienCell();
@@ -77,7 +77,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     public void unplug(AlienContainer ac) { //[Q]
         // remove alien from grid 
         IntegerPosition p = ac.p.round();
-        
+
         AlienCell acs = acGrid[p.x + centerX][p.y + centerY];
         //ac.debugOut("Grid: removing from list " + getXYString(ac.x, ac.y));
         acs.remove(ac);
@@ -85,15 +85,17 @@ public class AlienGrid extends LinkedList<AlienContainer> {
             acGrid[p.x + centerX][p.y + centerY] = null;
         }
     }
-    
+
     public AlienCell getAliensAt(double x, double y) {
-        return getAliensAt (new Vector2(x,y));
+        return getAliensAt(new Vector2(x, y));
     }
+
     public AlienCell getAliensAt(Vector2 p) {
         return getAliensAt(p.round());
     }
+
     public AlienCell getAliensAt(IntegerVector2 p) {
-        return getAliensAt (p.x, p.y);
+        return getAliensAt(p.x, p.y);
     }
 
     public AlienCell getAliensAt(int x, int y) {
@@ -112,7 +114,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     public void plugStar(Star st) {
         // add alien to grid
         IntegerPosition p = st.position.round();
-        
+
         AlienCell acs = acGrid[p.x + centerX][p.y + centerY];
         if (acs == null) {
             acs = new AlienCell();
@@ -125,7 +127,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     public void plugPlanet(Planet planet) { //[Q]
         // add alien to grid 
         IntegerPosition p = planet.position.round();
-        
+
         AlienCell acs = acGrid[p.x + centerX][p.y + centerY];
         if (acs == null) {
             acs = new AlienCell();
@@ -139,7 +141,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     public void unplugPlanet(Planet p) { //[Q]
         // add alien to grid 
         IntegerPosition pos = p.position.round();
-        
+
         AlienCell acs = acGrid[pos.x + centerX][pos.y + centerY];
         acs.planet = null;
         acs.energy -= p.energy;

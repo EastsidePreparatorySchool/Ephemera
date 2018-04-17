@@ -76,7 +76,7 @@ public class GameEngineV1 implements GameEngine {
             String s = new String(buffer).trim();
             elements = gson.fromJson(s, GameElementSpec[].class);
             in.close();
-        }catch (JsonSyntaxException e) {
+        } catch (JsonSyntaxException e) {
             vis.debugErr("GameEngineV1:init:File parse error");
             vis.debugErr("GameEngineV1:init:     " + e.getMessage() + e.toString());
             return null;

@@ -59,10 +59,9 @@ public class Alien3D {
         }
 
         this.intrinsicTransforms = new LinkedList();
-        for(Transform t:alien.getTransforms()) {
+        for (Transform t : alien.getTransforms()) {
             this.intrinsicTransforms.add(t);
         }
-      
 
         alien.setMaterial(new PhongMaterial(gameShell.fieldGrid.speciesSet.getColor(as.speciesName, as.speciesID)));
         alien.setDrawMode(DrawMode.FILL);
@@ -93,9 +92,9 @@ public class Alien3D {
             }
             alien.getTransforms().clear();
             alien.getTransforms().add(new Translate(
-                            gameShell.mainScene.xFromX(x),
-                            gameShell.mainScene.yFromIndex(zPos),
-                            gameShell.mainScene.zFromY(y)));
+                    gameShell.mainScene.xFromX(x),
+                    gameShell.mainScene.yFromIndex(zPos),
+                    gameShell.mainScene.zFromY(y)));
             alien.getTransforms().addAll(intrinsicTransforms);
         }
     }

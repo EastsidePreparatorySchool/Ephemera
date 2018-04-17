@@ -8,8 +8,6 @@ package gameengineinterfaces;
  *
  * @author guberti
  */
-
-
 public enum Requirement {
     Energy, Tech, FightEnergy, Aliens, Broadcast
 }

@@ -67,7 +67,6 @@ public class Venusian implements Alien {
         }
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
 
-        
         // move at least 1 
         if (x == 0 && y == 0) {
             x = ctx.getRandomInt(3) - 1;
@@ -76,7 +75,7 @@ public class Venusian implements Alien {
         //but don't move into star
         try {
             if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new IntegerDirection((int) x, (int) y))) != null) {
-                y -= y > 0? 1:-1;
+                y -= y > 0 ? 1 : -1;
             }
         } catch (NotEnoughEnergyException | NotEnoughTechException | View.CantSeeSquareException ex) {
         }

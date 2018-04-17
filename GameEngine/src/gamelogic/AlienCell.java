@@ -57,7 +57,7 @@ public class AlienCell extends LinkedList<AlienContainer> {
         if (this.speciesMap.isEmpty()) {
             return null;
         }
-        
+
         LinkedList<AlienSpecies> las = null;
 
         for (AlienSpecies as : this.speciesMap.keySet()) {

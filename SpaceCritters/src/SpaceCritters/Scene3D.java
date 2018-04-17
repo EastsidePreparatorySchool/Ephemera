@@ -331,7 +331,7 @@ public class Scene3D {
         s.setMaterial(new PhongMaterial(Color.rgb(255, 0, 0, 0.2)));
         s.setDrawMode(DrawMode.FILL);
         s.setTranslateX(xFromX(x));
-        s.setTranslateY(-fighting+1);
+        s.setTranslateY(-fighting + 1);
         s.setTranslateZ(zFromY(y));
         s.setOpacity(0.1);
 

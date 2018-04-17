@@ -40,7 +40,7 @@ public class SpaceGrid {
     double avgTech;
 
     int currentTurn = 1;
-    double time = 0;
+    private static double time = 0;
     int speciesCounter = 1; // starting with ID 1
 
     // this is the only approved random generator for the game. Leave it alone!
@@ -64,6 +64,10 @@ public class SpaceGrid {
 
     public double getTech() {
         return avgTech;
+    }
+
+    public double getTime() {
+        return time;
     }
 
     public void ready() {

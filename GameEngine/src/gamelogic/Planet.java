@@ -117,7 +117,7 @@ public class Planet extends InternalSpaceObject {
         // visualize
         IntegerPosition pOldInt = pOld.round();
         IntegerPosition pNewInt = pNew.round();
-        
+
         this.grid.vis.showPlanetMove(pOldInt.x, pOldInt.y, pNewInt.x, pNewInt.y, className, this.index, energy, (int) tech);
 
         return this.position;

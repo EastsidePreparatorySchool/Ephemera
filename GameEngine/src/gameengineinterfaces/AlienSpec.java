@@ -60,13 +60,13 @@ public class AlienSpec {
         this.actionPower = actionPower;
 
     }
-    
+
     public AlienSpec(AlienSpecies as) {
         this.domainName = as.domainName;
         this.packageName = as.packageName;
         this.className = as.className;
         this.speciesID = as.speciesID;
-        
+
     }
 
     // for purposes of describing a species of alien
@@ -100,6 +100,6 @@ public class AlienSpec {
     }
 
     public String getTechEnergyString() {
-        return "(" + Math.round(tech*10)/10 + "," + Math.round(energy*10)/10 + ")";
+        return "(" + Math.round(tech * 10) / 10 + "," + Math.round(energy * 10) / 10 + ")";
     }
 }

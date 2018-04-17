@@ -17,7 +17,6 @@ import java.util.List;
 import com.google.gson.Gson;
 import alieninterfaces.StarSpec;
 
-
 /**
  *
  * @author gm
@@ -36,29 +35,29 @@ public class VisualizationStreamer implements GameVisualizer {
 
     String makeRecord(String p, Object o) {
         String r = gson.toJson(o);
-        String s =  ("0000"+r.length());
-        p = p+"         ";
-        p = p.substring(0,9);
-        return p+"("+s.substring(s.length()-4)+"):"+r;
+        String s = ("0000" + r.length());
+        p = p + "         ";
+        p = p.substring(0, 9);
+        return p + "(" + s.substring(s.length() - 4) + "):" + r;
     }
-    
+
     @Override
     public void registerSpecies(AlienSpec as, AlienShapeFactory asf) {
-        String s = makeRecord("REGSPEC",as);
+        String s = makeRecord("REGSPEC", as);
         println(stateLog, s);
         println(progressLog, s);
     }
 
     @Override
     public void registerStar(int x, int y, String name, int index, double luminosity, double mass) { //[Q]
-        String s = makeRecord("REGSTAR",new StarSpec(x, y, name, index, luminosity, mass));
+        String s = makeRecord("REGSTAR", new StarSpec(x, y, name, index, luminosity, mass));
         println(stateLog, s);
         println(progressLog, s);
     }
 
     @Override
     public void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass) { //[Q]
-        String s = makeRecord("REGPLANET",new PlanetSpec(x, y, name, index, energy, tech, mass));
+        String s = makeRecord("REGPLANET", new PlanetSpec(x, y, name, index, energy, tech, mass));
         println(stateLog, s);
         println(progressLog, s);
     }

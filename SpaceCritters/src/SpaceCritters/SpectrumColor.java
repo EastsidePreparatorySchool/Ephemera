@@ -19,7 +19,7 @@ public class SpectrumColor {
 
     public SpectrumColor() {
         for (int i = 0; i < colors.length; i++) {
-            colors[i] = waveLengthToRGB(380 + (Math.cbrt(1/(double)(i+1))*(780-380)));
+            colors[i] = waveLengthToRGB(380 + (Math.cbrt(1 / (double) (i + 1)) * (780 - 380)));
         }
     }
 
@@ -85,9 +85,9 @@ public class SpectrumColor {
         };
 
         // Don't want 0^x = 1 for x <> 0
-        Color color = new Color((Red == 0.0 ? 0 : IntensityMax * Math.pow(Red * factor, Gamma)/255),
-                (Green == 0.0 ? 0 : IntensityMax * Math.pow(Green * factor, Gamma)/255),
-                (Blue == 0.0 ? 0 : IntensityMax * Math.pow(Blue * factor, Gamma)/255),
+        Color color = new Color((Red == 0.0 ? 0 : IntensityMax * Math.pow(Red * factor, Gamma) / 255),
+                (Green == 0.0 ? 0 : IntensityMax * Math.pow(Green * factor, Gamma) / 255),
+                (Blue == 0.0 ? 0 : IntensityMax * Math.pow(Blue * factor, Gamma) / 255),
                 1.0);
 
         return color;

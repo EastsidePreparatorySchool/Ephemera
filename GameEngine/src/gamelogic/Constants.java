@@ -17,19 +17,15 @@ import java.lang.reflect.Field;
 // element state for value
 //
 public class Constants {
-    
+
     //orbital parameters
     //selected randomly
-    public static double alienMass = 100;
-    public static double deltaT = 0.001;
-    public static double G = 6e-8;
-    public static double deltaX = 50;
-    
-    
-    
-    
-    
-    
+    public static final double alienMass = 100;
+    public static final double deltaT = 0.001;
+    public static final double G = 6e-8;
+    public static final double deltaX = 50;
+    public static final double accuracy = 1e-2;
+
     public static String gameMode = "sc_play.json"; // Brawl, Play, or a specific mission file
     public static int maxTurns = 100000; // 
     public static int randSeed = 0; // rand seed, controls random decision sequence in the game, set to 0 for fresh

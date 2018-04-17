@@ -10,14 +10,24 @@ package alieninterfaces;
  */
 public class IntegerDirection extends IntegerVector2 {
 
-    public IntegerDirection(int x, int y) { super(x,y); }
-    public IntegerDirection(IntegerVector2 v) { super(v); }
-    public IntegerDirection(Vector2 v) { super(v); }
+    public IntegerDirection(int x, int y) {
+        super(x, y);
+    }
 
-    public IntegerDirection(IntegerVector2 p1, IntegerVector2 p2) { super(p2.subtract(p1)); }
-    
+    public IntegerDirection(IntegerVector2 v) {
+        super(v);
+    }
+
+    public IntegerDirection(Vector2 v) {
+        super(v);
+    }
+
+    public IntegerDirection(IntegerVector2 p1, IntegerVector2 p2) {
+        super(p2.subtract(p1));
+    }
+
     public IntegerDirection add(IntegerDirection d1) {
-        return new IntegerDirection( super.add(d1) );
+        return new IntegerDirection(super.add(d1));
     }
 
     public int getLength() { //[Q]
@@ -25,7 +35,7 @@ public class IntegerDirection extends IntegerVector2 {
     }
 
     public IntegerDirection scaleToLength(int scale) {
-        return new IntegerDirection( super.scaleToLength(scale) );
+        return new IntegerDirection(super.scaleToLength(scale));
     }
 
 }

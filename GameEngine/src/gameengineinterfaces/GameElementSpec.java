@@ -4,7 +4,6 @@
  */
 package gameengineinterfaces;
 
-
 /**
  *
  * @author gmein

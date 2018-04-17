@@ -158,8 +158,6 @@ public class SpaceCritters extends Application {
         }
     }
 
-    
-
     // handle shutdown gracefully
     public void handleExit() {
         engine.queueCommand(new GameCommand(GameCommandCode.End));
@@ -256,9 +254,8 @@ public class SpaceCritters extends Application {
         } catch (Exception e) {
         }
     }
-    */
-    
-    /*
+     */
+ /*
     private Stage createSplashScreen() {
         Stage dialog = new Stage();
         dialog.setTitle("About SpaceCritters");
@@ -353,5 +350,5 @@ public class SpaceCritters extends Application {
         //dialog.setFullScreen(true);
         return dialog;
     }
-    */
+     */
 }

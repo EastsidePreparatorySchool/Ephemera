@@ -8,6 +8,6 @@ package alieninterfaces;
  *
  * @author gmein
  */
-public class NotEnoughEnergyException extends Exception{
-    
+public class NotEnoughEnergyException extends Exception {
+
 }

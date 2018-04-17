@@ -37,11 +37,12 @@ public class ViewImplementation implements View {
         this.centerY = centerY;
         this.size = size;
     }
-    
+
     @Override
     public List<AlienSpecies> getAliensAtPos(Position p) throws CantSeeSquareException {
         return getAliensAtPos(p.round());
     }
+
     @Override
     public List<AlienSpecies> getAliensAtPos(IntegerPosition p) throws CantSeeSquareException { //[Q]
         checkPos(p);
@@ -77,6 +78,7 @@ public class ViewImplementation implements View {
     public SpaceObject getSpaceObjectAtPos(Position p) throws CantSeeSquareException {
         return getSpaceObjectAtPos(p.round());
     }
+
     @Override
     public SpaceObject getSpaceObjectAtPos(IntegerPosition p) throws CantSeeSquareException { //[Q]
         checkPos(p);

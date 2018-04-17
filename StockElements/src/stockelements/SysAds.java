@@ -8,22 +8,17 @@ import alieninterfaces.*;
 import gameengineinterfaces.*;
 import java.util.HashMap;
 
-
-
-
-
 /**
  *
  * @author gunnar
  */
 public class SysAds implements Alien, ResidentAlien {
-    
+
     Context ctx;
     ResidentContext rc;
     int id;
     HashMap<String, Integer> secrets;
 
-    
     @Override
     public void init(Context ctx, int id, int parent, String message) {
         this.ctx = ctx;
@@ -55,14 +50,12 @@ public class SysAds implements Alien, ResidentAlien {
     public void processResults() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    
-    // resident interface implementation starts here
 
+    // resident interface implementation starts here
     @Override
     public void init(ResidentContext rc) {
         this.rc = rc;
-        
+
         // SysAds are not to be trifled with ...
         rc.setEnergy(1000);
         rc.setTech(255);

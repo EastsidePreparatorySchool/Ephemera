@@ -14,8 +14,6 @@ import java.lang.reflect.Field;
  *
  * @author gmein
  */
-
-
 public class GameEngineThread extends Thread {
 
     final private GameEngineV1 engine;

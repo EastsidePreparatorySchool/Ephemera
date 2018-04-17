@@ -16,7 +16,7 @@ public class PlanetSpec {
     int index;
     double energy;
     int tech;
-    
+
     double mass;
 
     public PlanetSpec(int x, int y, String name, int index, double energy, int tech, double mass) { //[Q]

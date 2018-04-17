@@ -29,8 +29,9 @@ public class AlienSpecies {
         this.packageName = packageName;
         this.className = className;
         this.speciesID = id;
-        this.position  = new IntegerPosition (x, y);
+        this.position = new IntegerPosition(x, y);
     }
+
     public String getFullSpeciesName() {
         if (speciesName == null) {
             speciesName = domainName + ":" + packageName + ":" + className;

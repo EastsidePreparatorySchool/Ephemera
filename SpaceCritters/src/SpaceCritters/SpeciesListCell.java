@@ -23,7 +23,7 @@ public class SpeciesListCell extends CheckBoxListCell<AlienSpeciesForDisplay> {
         this.setSelectedStateCallback(new Callback<AlienSpeciesForDisplay, ObservableValue<Boolean>>() {
             @Override
             public ObservableValue<Boolean> call(AlienSpeciesForDisplay item) {
-                BooleanProperty observable = new SimpleBooleanProperty(item != null?item.isOn():false);
+                BooleanProperty observable = new SimpleBooleanProperty(item != null ? item.isOn() : false);
                 observable.addListener((obs, wasSelected, isNowSelected) -> {
                     item.setOn(isNowSelected);
                     GameElementSpec element = new GameElementSpec("ALIEN", item.domainName, item.packageName, item.className, null);

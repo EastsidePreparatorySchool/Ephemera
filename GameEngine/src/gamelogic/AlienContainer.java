@@ -44,12 +44,12 @@ public class AlienContainer {
     public HashMap<String, Integer> secrets;
 
     boolean participatedInAction;
-    public Position p = new Position(0,0);
+    public Position p = new Position(0, 0);
     public Position nextP;
     public String outgoingMessage;
     public double outgoingPower;
     int turnsInSafeZone;
-    
+
     // Declare stats here
     //
     // Heads up: This constructs an AlienContainer and contained Alien
@@ -109,9 +109,10 @@ public class AlienContainer {
 
     }
     // class-related helpers
-    
-    
-    public double getMass() { return Constants.alienMass; }
+
+    public double getMass() {
+        return Constants.alienMass;
+    }
 
     public String getFullSpeciesName() {
         if (speciesName == null) {

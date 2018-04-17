@@ -14,6 +14,7 @@ import javafx.application.Platform;
  * @author gmein
  */
 public class Utilities {
+
     private Utilities() {
         throw new UnsupportedOperationException();
     }
@@ -22,24 +23,22 @@ public class Utilities {
         Objects.requireNonNull(runnable, "runnable");
         if (Platform.isFxApplicationThread()) {
             runnable.run();
-        }
-        else {
+        } else {
             Platform.runLater(runnable);
         }
     }
-    
-    
+
     public static void createFolder(String folder) {
         File file = new File(folder);
         if (!file.exists()) {
             if (!file.mkdirs()) {
-                System.err.println ("Folder " + folder + "does not exist and cannot be created");
+                System.err.println("Folder " + folder + "does not exist and cannot be created");
             }
         }
 
     }
-    
-       /**
+
+    /**
      * Runs the specified {@link Runnable} on the JavaFX application thread and
      * waits for completion.
      *
