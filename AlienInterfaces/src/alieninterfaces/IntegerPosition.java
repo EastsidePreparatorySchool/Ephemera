@@ -30,8 +30,13 @@ public class IntegerPosition extends IntegerVector2 {
         return new IntegerDirection(this.subtract(p2));
     }
 
-    public IntegerPosition add(IntegerDirection dir) {
+    public IntegerPosition add(IntegerVector2 dir) {
         return new IntegerPosition(super.add(dir));
+    }
+    
+    @Override
+    public Position v2() {
+        return new Position(x,y);
     }
 
     public static IntegerPosition fromString(String s) { //[Q] (parsing!)
