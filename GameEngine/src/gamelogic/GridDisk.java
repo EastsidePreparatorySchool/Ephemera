@@ -7,7 +7,6 @@ import alieninterfaces.Vector2;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 
 /**
@@ -16,31 +15,50 @@ import java.util.Iterator;
  */
 public class GridDisk extends AbstractCollection<IntegerPosition> {
 
-    private static final HashMap<Double, IntegerPosition[]> disk = new HashMap();
-    private final IntegerPosition[] specificDisk;
-    private final double radius;
-    private final Position center;
+    static final HashMap<Double, IntegerPosition[]> disk = new HashMap();
+    IntegerPosition[] specificDisk;
+    double radius;
+    Position center;
 
+    GridDisk() {}
     public GridDisk(Position center, int radius) {
         this.center = center;
         this.radius = radius;
         
         if (disk.get((double) radius) == null) createDisk(radius);
         
-        specificDisk = specificDisk();
+        specificDisk = specificDisk(false);
     }
     public GridDisk(double x, double y, int radius) {
         this.center = new Position(x,y);
         this.radius = radius;
         
         if (disk.get((double) radius) == null) createDisk(radius);
-        specificDisk = specificDisk();
+        specificDisk = specificDisk(false);
     }
     
-    private IntegerPosition[] specificDisk() {
+    
+    public GridDisk(Position center, int radius, boolean includeCenter) {
+        this.center = center;
+        this.radius = radius;
+        
+        if (disk.get((double) radius) == null) createDisk(radius);
+        specificDisk = specificDisk(includeCenter);
+    }
+    public GridDisk(double x, double y, int radius, boolean includeCenter) {
+        this.center = new Position(x,y);
+        this.radius = radius;
+        
+        if (disk.get((double) radius) == null) createDisk(radius);
+        specificDisk = specificDisk(includeCenter);
+    }
+    
+    
+    
+    IntegerPosition[] specificDisk(boolean includeCenter) {
         IntegerPosition[] potentialPositions = disk.get(radius);
         ArrayList<IntegerPosition> goodPositions = new ArrayList<>();
-        
+        if(includeCenter && isValidPoint(center.round())) goodPositions.add(new IntegerPosition(0,0));
         
         for (IntegerPosition p: potentialPositions) {
             if(isValidPoint(p.add(center.round()))) goodPositions.add(p);
@@ -68,7 +86,7 @@ public class GridDisk extends AbstractCollection<IntegerPosition> {
         @Override
         public IntegerPosition next() {
             if (!hasNext()) return null;
-            return specificDisk[index++];
+            return new IntegerPosition(specificDisk[index++]);
         }
     }
     
@@ -111,7 +129,7 @@ public class GridDisk extends AbstractCollection<IntegerPosition> {
     
     
     
-    public static void createDisk(int radius) {
+    static void createDisk(int radius) {
         ArrayList<IntegerPosition> newdisk = new ArrayList<>();
         
         
@@ -154,7 +172,7 @@ public class GridDisk extends AbstractCollection<IntegerPosition> {
     }
     
     
-    private static IntegerPosition[] toArray(ArrayList<IntegerPosition> al) {
+    static IntegerPosition[] toArray(ArrayList<IntegerPosition> al) {
         IntegerPosition[] p = new IntegerPosition[al.size()];
         for(int i = 0; i < p.length; i++ ) {
             p[i] = al.get(i);

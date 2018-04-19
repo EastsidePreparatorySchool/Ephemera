@@ -37,6 +37,11 @@ public class IntegerVector2 {
         this.y = array[1];
     }
 
+    
+    @Override
+    public String toString() {
+        return x + " " + y;
+    }
     public IntegerVector2 round() {
         return this;
     }
