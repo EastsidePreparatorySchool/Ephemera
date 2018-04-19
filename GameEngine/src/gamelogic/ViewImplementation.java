@@ -120,24 +120,6 @@ public class ViewImplementation implements View {
 
         LinkedList<AlienSpecies> as = new LinkedList<>();
         
-        /*for (int d = 0; d <= size; d++) {
-            GridCircle c = new GridCircle(centerX, centerY, d);
-            for (IntegerPosition point : c) {
-                AlienCell acs = ag.getAliensAt(point);
-                if (acs != null) {
-                    as.addAll(acs.speciesMap.keySet());
-                }
-
-            }
-// if any added in this circle, return
-            if (as.size() > 0) {
-                return as;
-            }
-        }
-        
-        */
-        
-        
         SortedGridDisk gd = new SortedGridDisk(centerX, centerY, size);
         for (IntegerPosition p: gd) {
             AlienCell acs = ag.getAliensAt(p);
@@ -165,26 +147,6 @@ public class ViewImplementation implements View {
 
         LinkedList<AlienSpecies> as = null;
 
-        /*for (int d = 0; d <= size; d++) {
-            GridCircle c = new GridCircle((int)centerX, (int)centerY, d);
-            for (IntegerPosition point : c) {
-                AlienCell acs = ag.getAliensAt(point);
-                if (acs != null) {
-
-                    LinkedList<AlienSpecies> bunch = acs.getAllSpeciesWithPredicateAndPosition((species) -> species != specific, point);
-                    if (bunch != null) {
-                        if (as == null) {
-                            as = new LinkedList();
-                        }
-                        as.addAll(bunch);
-                    }
-                }
-                // if any added in this circle, return
-                if (as != null && as.size() > 0) {
-                    return as;
-                }
-            }
-        }*/
         SortedGridDisk gd = new SortedGridDisk(centerX, centerY, size, true);
         for (IntegerPosition p: gd) {
             AlienCell acs = ag.getAliensAt(p);
@@ -218,30 +180,6 @@ public class ViewImplementation implements View {
             avoid = this.ac.grid.speciesMap.get(notThisOne.getFullSpeciesName());
         }
         LinkedList<AlienSpecies> as = null;
-
-        /*for (int d = 0; d <= size; d++) {
-            GridCircle c = new GridCircle((int)centerX, (int)centerY, d);
-
-            for (IntegerPosition point : c) {
-                AlienCell acs = ag.getAliensAt(point);
-                if (acs != null) {
-
-                    LinkedList<AlienSpecies> bunch = acs.getAllSpeciesWithPredicateAndPosition((species) -> species != avoid, point);
-                    if (bunch != null) {
-                        if (as == null) {
-                            as = new LinkedList<>();
-                        }
-                        as.addAll(bunch);
-                    }
-                }
-
-            }
-            // if any added in this circle, return
-            if (as != null && as.size() > 0) return as;
-            
-        }*/
-        
-        
         
         SortedGridDisk gd = new SortedGridDisk(centerX, centerY, size);
         for (IntegerPosition p:gd) {

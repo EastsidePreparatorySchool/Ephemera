@@ -98,7 +98,7 @@ public class Vector2 {
 
     public static double magnitude(Vector2 v) {
         //return Math.abs(v.x) + Math.abs(v.y);
-        return Math.pow(v.x * v.x + v.y * v.y, 0.5);
+        return Math.sqrt(v.x * v.x + v.y * v.y);
     }   //!!!!: Universal Distance Metric. IMPORTANT.
 
     public static double distance(Vector2 a, Vector2 b) {
