@@ -16,7 +16,7 @@ import java.util.Iterator;
  */
 public class GridDisk extends AbstractCollection<IntegerPosition> {
 
-    private static final HashMap<Integer, IntegerPosition[]> disk = new HashMap();
+    private static final HashMap<Double, IntegerPosition[]> disk = new HashMap();
     private final IntegerPosition[] specificDisk;
     private final double radius;
     private final Position center;
@@ -25,20 +25,27 @@ public class GridDisk extends AbstractCollection<IntegerPosition> {
         this.center = center;
         this.radius = radius;
         
-        if (disk.get(radius) == null) createDisk(radius);
+        if (disk.get((double) radius) == null) createDisk(radius);
         
+        specificDisk = specificDisk();
+    }
+    public GridDisk(double x, double y, int radius) {
+        this.center = new Position(x,y);
+        this.radius = radius;
+        
+        if (disk.get((double) radius) == null) createDisk(radius);
+        specificDisk = specificDisk();
+    }
+    
+    private IntegerPosition[] specificDisk() {
         IntegerPosition[] potentialPositions = disk.get(radius);
         ArrayList<IntegerPosition> goodPositions = new ArrayList<>();
         
         
-        HashSet iffy = new HashSet();
-        
         for (IntegerPosition p: potentialPositions) {
-            if (iffy.contains(p.x+" "+p.y)) System.out.println("THERE ARE REPEATS");
-            iffy.add(p.x+" "+p.y);
             if(isValidPoint(p.add(center.round()))) goodPositions.add(p);
         }
-        specificDisk = toArray(goodPositions);
+        return toArray(goodPositions);
     }
 
     @Override
@@ -143,7 +150,7 @@ public class GridDisk extends AbstractCollection<IntegerPosition> {
             i--;
         }
         
-        disk.put(radius, toArray(newdisk));
+        disk.put((double) radius, toArray(newdisk));
     }
     
     

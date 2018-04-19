@@ -152,22 +152,13 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         // probe around our current position,
         // tracing an imaginary square of increasing size,
         // starting from the midpoints of the sides
-        for (int d = 1; d <= energy; d++) {
-            // energy is multiplied by an arbitrary factor 16, but goes down by the square of the distance
-            // todo: make this properly depend on our rect metric
-            double pointEnergy = ((double) (energy * Constants.starEnergyPerLuminosity) / (double) ((long) d * (long) d));
-
-            if (pointEnergy <= 1) {
-                break; // at the level of empty space, get out
-            }
-
-            GridCircle g = new GridCircle(x, y, d);
-            for (IntegerPosition point : g) {
-                if (point != null) {
-                    putEnergyAt(point, pointEnergy);
-                }
-            }
+        for (IntegerPosition p:new GridDisk(x,y, (int) Math.round(energy))) {
+            double r = p.magnitude();
+            double pointEnergy = ((double) (energy * Constants.starEnergyPerLuminosity) / (r*r));
+            putEnergyAt(p, pointEnergy);
         }
+        
+        
     }
 
     void putEnergyAt(IntegerPosition p, double energy) { //[Q]

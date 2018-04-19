@@ -231,7 +231,8 @@ public class SpaceGrid {
             }
 
             // charge only for moves > 1 in either direction
-            int moveLength = (int) GridCircle.distance(ac.p.x, ac.p.y, oldX, oldY - oldX); //[kludge]
+                                                                    //TODISCUSS
+            int moveLength = (int) ac.p.subtract(new Position(oldX, oldY - oldX)).magnitude();
             if (Math.abs(ac.p.x - oldX) > 1 || Math.abs(ac.p.y - oldY) > 1) {
                 ac.energy -= moveLength;
             }
@@ -781,7 +782,7 @@ public class SpaceGrid {
     void addPlanet(GameElementSpec element) { //[Q]
         InternalSpaceObject soParent = null;
         PlanetBehavior pb = null;
-
+        
         for (InternalSpaceObject o : this.objects) {
             if (element.parent.equalsIgnoreCase(o.getFullName())) {
                 soParent = o;
@@ -795,9 +796,9 @@ public class SpaceGrid {
             } catch (Exception e) {
                 vis.debugOut("sg.addPlanet: behavior not found: " + element.className);
             }
-
+            
             Planet p = new Planet(this, soParent.position,
-                    GridCircle.distance(element.x, element.y, 0, 0),
+                    new Vector2(element.x, element.y).magnitude(),
                     planetCount++,
                     element.domainName, element.packageName, element.className,
                     element.energy, element.tech, element.parent, pb, element.mass);

@@ -137,13 +137,8 @@ public class ContextImplementation implements Context {
         // poke around our current position,
         // tracing an imaginary square of increasing size,
         // in 8 line segments, hopefully without overlap
-        for (int d = 1; d <= ac.outgoingPower; d++) {
-            GridCircle c = new GridCircle(ac.p.round().x, ac.p.round().y, d); //[kludge]
-            for (IntegerPosition point : c) {
-                if (point != null) {
-                    depositMessageAt(point, ac.outgoingMessage);
-                }
-            }
+        for (IntegerPosition p:new GridDisk(ac.p, (int) ac.outgoingPower)) {
+            depositMessageAt(p, ac.outgoingMessage);
         }
     }
 
@@ -199,17 +194,17 @@ public class ContextImplementation implements Context {
 
     @Override
     public double getDistance(Vector2 p1, Vector2 p2) {
-        return GridCircle.distance(p1, p2);
+        return p1.subtract(p2).magnitude();
     }
 
     @Override
-    public List<IntegerPosition> computeOrbit(IntegerPosition center, int radius) { //[Q]
-        GridCircle gc = new GridCircle(center.x, center.y, radius);
+    public List<IntegerPosition> computeOrbit(IntegerPosition center, int radius) { //Note: DISABLED. No one uses it and it needs to be rewtirren with conics anyway
+        //GridCircle gc = new GridCircle(center.x, center.y, radius);
         ArrayList<IntegerPosition> orbit = new ArrayList<>();
 
-        for (IntegerPosition p : gc) {
+        /*for (IntegerPosition p : gc) {
             orbit.add(p);
-        }
+        }*/
 
         return orbit;
     }

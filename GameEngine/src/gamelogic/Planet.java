@@ -7,7 +7,6 @@ package gamelogic;
 import alieninterfaces.IntegerPosition;
 import alieninterfaces.Position;
 import gameengineinterfaces.PlanetBehavior;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -18,8 +17,8 @@ public class Planet extends InternalSpaceObject {
 
     public final String parent;
     public double radius;
-    private GridCircle gc;
-    Iterator<IntegerPosition> gcIterator;
+    //private GridCircle gc;
+    //Iterator<IntegerPosition> gcIterator;
     int orbitalVelocityCounter;
     public Position parentPosition;
 
@@ -35,26 +34,26 @@ public class Planet extends InternalSpaceObject {
 
     public void init() {
         // slight random eccentricity
-        position.x += grid.rand.nextInt(3) - 1;
-        position.y += grid.rand.nextInt(3) - 1;
+        position.x += 4;//grid.rand.nextInt(3) - 1;
+        position.y += 4;//grid.rand.nextInt(3) - 1;
 
         // make the orbit
-        gc = new GridCircle(position.round().x, position.round().y, (int) radius); //[kludge]
-        gcIterator = gc.iterator();
+        //gc = new GridCircle(position.round().x, position.round().y, (int) radius); //[kludge]
+        //gcIterator = gc.iterator();
         this.orbitalVelocityCounter = (int) radius;
 
-        this.position = new Position(gcIterator.next()); //[kludge]
+        //this.position = new Position(gcIterator.next()); //[kludge]
 
         // randomize position in orbit
-        for (int randomShift = grid.rand.nextInt((int) (4 * radius)); randomShift > 0; randomShift--) {
+        /*for (int randomShift = grid.rand.nextInt((int) (4 * radius)); randomShift > 0; randomShift--) {
             this.position = new Position(gcIterator.next()); //[kludge]
-        }
+        }*/
 
         // if we somehow exhausted the circle (shouldn't happen, but you know)
         // create another iterator
-        if (!gcIterator.hasNext()) {
+        /*if (!gcIterator.hasNext()) {
             gcIterator = gc.iterator();
-        }
+        }*/
 
         // initialize planet behavior
         if (pb != null) {
@@ -72,11 +71,12 @@ public class Planet extends InternalSpaceObject {
         if (orbitalVelocityCounter == 0) {
             orbitalVelocityCounter = (int) radius;
 
-            if (!gcIterator.hasNext()) {
+            /*if (!gcIterator.hasNext()) {
                 gcIterator = gc.iterator();
             }
 
             pNew = new Position(gcIterator.next()); //[kludge]
+            */
         }
 
         // unplug planet from grid
