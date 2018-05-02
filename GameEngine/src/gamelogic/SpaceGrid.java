@@ -96,6 +96,7 @@ public class SpaceGrid {
     }
 
     public boolean executeGameTurn() {
+        System.out.println("\n\n\nTURN ONE NOW \n\n");
         time += Constants.deltaT;
 
         performCommunications();
@@ -243,7 +244,50 @@ public class SpaceGrid {
         for (InternalSpaceObject so : this.objects) {
             if (so.isPlanet) {
                 Planet p = (Planet) so;
+                
+                // unplug planet from grid
+                aliens.unplugPlanet(p);
+                
+                Position pOld = p.position;
                 p.move();
+                Position pNew = p.position;
+                
+                // plug planet back into grid
+                aliens.plugPlanet(p);
+                
+                
+                
+                // now worry about the aliens at the old and new positions
+                AlienCell acsFrom = aliens.getAliensAt(pOld.round());
+                AlienCell acsTo = aliens.getAliensAt(pNew.round());
+                
+                // if aliens are where the planet is moving to, and not landed, they die.
+                if (acsTo != null) {
+                // we have a cell, let's look at aliens
+                    for (AlienContainer ac : acsTo) {
+                    // if not landed, and not freshly moved here, you die.
+                        if (ac.planet != p && ac.nextP.equals(ac.p)) {
+                            ac.kill("Death by being in path of planet " + p.className);
+                        }
+                    }
+                }
+                
+                // aliens that were on the planet, move with the planet
+                // do this on a cloned list to avoid comodification
+                LinkedList<AlienContainer> acsClone = (LinkedList<AlienContainer>) acsFrom.clone();
+                for (AlienContainer ac : acsClone) {
+                    if (ac.planet == p) {
+                        // they didn't intend to move away, move with planet
+                        ac.nextP = p.position;
+                    }
+                }
+                
+                
+                // visualize
+                IntegerPosition pOldInt = pOld.round();
+                IntegerPosition pNewInt = pNew.round();
+                
+                vis.showPlanetMove(pOldInt.x, pOldInt.y, pNewInt.x, pNewInt.y, p.className, p.index, p.energy, (int) p.tech);
             }
         }
     }
@@ -797,7 +841,7 @@ public class SpaceGrid {
                 vis.debugOut("sg.addPlanet: behavior not found: " + element.className);
             }
             
-            Planet p = new Planet(this, soParent.position,
+            Planet p = new Planet(this, soParent,
                     new Vector2(element.x, element.y).magnitude(),
                     planetCount++,
                     element.domainName, element.packageName, element.className,

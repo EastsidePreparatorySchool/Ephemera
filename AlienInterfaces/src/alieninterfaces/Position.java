@@ -33,6 +33,12 @@ public class Position extends Vector2 {
     public Position add(IntegerDirection dir) {
         return new Position(super.add(dir.v2()));
     }
+    @Override
+    public Position add(Vector2 v) {
+        return new Position(super.add(v));
+    }
+    @Override
+    public Position scale(double scale) { return new Position(super.scale(scale)); }
 
     public static Position fromString(String s) { //[Q] (parsing!)
         try {

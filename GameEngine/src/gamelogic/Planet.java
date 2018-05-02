@@ -8,6 +8,7 @@ import alieninterfaces.IntegerPosition;
 import alieninterfaces.Position;
 import gameengineinterfaces.PlanetBehavior;
 import java.util.LinkedList;
+import orbit.Trajectory;
 
 /**
  *
@@ -15,118 +16,43 @@ import java.util.LinkedList;
  */
 public class Planet extends InternalSpaceObject {
 
-    public final String parent;
-    public double radius;
-    //private GridCircle gc;
-    //Iterator<IntegerPosition> gcIterator;
-    int orbitalVelocityCounter;
+    public final String parentString;
+    private final InternalSpaceObject parent;
+    private Trajectory trajectory;
     public Position parentPosition;
+    
+    private double radius;
 
-    public Planet(SpaceGrid grid, Position parentP, double radius, int index, String domainName, String packageName, String className,
-            double energy, double tech, String parent, PlanetBehavior pb, double mass) {
-        super(grid, parentP, index, domainName, packageName, className, energy, tech, mass);
-        this.parent = parent;
-        this.parentPosition = parentP;
-        this.radius = radius;
+    public Planet(SpaceGrid grid, InternalSpaceObject parent, double radius, int index, String domainName, String packageName, String className,
+            double energy, double tech, String parentString, PlanetBehavior pb, double mass) {
+        super(grid, parent.position, index, domainName, packageName, className, energy, tech, mass);
+        this.parentString = parentString;
+        this.parentPosition = parent.position;
+        this.radius = radius * Constants.deltaX;
         this.isPlanet = true;
         this.pb = pb;
+        
+        this.parent = parent;
+        this.radius = radius;
     }
 
     public void init() {
         // slight random eccentricity
-        position.x += 4;//grid.rand.nextInt(3) - 1;
-        position.y += 4;//grid.rand.nextInt(3) - 1;
-
-        // make the orbit
-        //gc = new GridCircle(position.round().x, position.round().y, (int) radius); //[kludge]
-        //gcIterator = gc.iterator();
-        this.orbitalVelocityCounter = (int) radius;
-
-        //this.position = new Position(gcIterator.next()); //[kludge]
-
-        // randomize position in orbit
-        /*for (int randomShift = grid.rand.nextInt((int) (4 * radius)); randomShift > 0; randomShift--) {
-            this.position = new Position(gcIterator.next()); //[kludge]
-        }*/
-
-        // if we somehow exhausted the circle (shouldn't happen, but you know)
-        // create another iterator
-        /*if (!gcIterator.hasNext()) {
-            gcIterator = gc.iterator();
-        }*/
-
+        this.trajectory = new Trajectory(parent,radius,grid.rand.nextDouble()* 0.5,grid.rand.nextDouble()*Math.PI,grid.rand.nextDouble()*Math.PI,grid);
+        position = trajectory.positionAtTime(grid.getTime());
+        
         // initialize planet behavior
-        if (pb != null) {
-            pb.init(this);
-        }
-
+        if (pb != null) pb.init(this);
     }
 
-    public Position move() {
-
-        Position pOld = this.position;
-        Position pNew = this.position;
-
-        --orbitalVelocityCounter;
-        if (orbitalVelocityCounter == 0) {
-            orbitalVelocityCounter = (int) radius;
-
-            /*if (!gcIterator.hasNext()) {
-                gcIterator = gc.iterator();
-            }
-
-            pNew = new Position(gcIterator.next()); //[kludge]
-            */
-        }
-
-        // unplug planet from grid
-        this.grid.aliens.unplugPlanet(this);
-
-        // now worry about the aliens at the old and new positions
-        AlienCell acsFrom = this.grid.aliens.getAliensAt(pOld.round());
-        AlienCell acsTo = this.grid.aliens.getAliensAt(pNew.round());
-
-        // if aliens are where the planet is moving to, and not landed, they die.
-        if (acsTo != null) {
-            // we have a cell, let's look at aliens
-            for (AlienContainer ac : acsTo) {
-                // if not landed, and not freshly moved here, you die.
-                if (ac.planet != this
-                        && ac.nextP.equals(ac.p)) {
-                    ac.kill("Death by being in path of planet " + this.className);
-                }
-            }
-        }
-
-        // aliens that were on the planet, move with the planet
-        // do this on a cloned list to avoid comodification
-        LinkedList<AlienContainer> acsClone = (LinkedList<AlienContainer>) acsFrom.clone();
-        for (AlienContainer ac : acsClone) {
-            if (ac.planet == this) {
-                // they didn't intend to move away, move with planet
-                ac.nextP = this.position;
-            }
-        }
-
-        // update our position
-        this.position = pNew;
-
-        // plug planet back into grid
-        this.grid.aliens.plugPlanet(this);
-
-        // visualize
-        IntegerPosition pOldInt = pOld.round();
-        IntegerPosition pNewInt = pNew.round();
-
-        this.grid.vis.showPlanetMove(pOldInt.x, pOldInt.y, pNewInt.x, pNewInt.y, className, this.index, energy, (int) tech);
-
-        return this.position;
+    public void move() {
+        System.out.println("planet.move");
+        this.position = new Position(trajectory.positionAtTime(grid.getTime()));
+        System.out.println("end planet.move");
     }
 
     public void reviewInhabitants() {
-        if (pb == null) {
-            return;
-        }
+        if (pb == null) return;
 
         try {
             // todo: need to make a new list with only the landed aliens
@@ -138,9 +64,7 @@ public class Planet extends InternalSpaceObject {
     }
 
     public void reviewInhabitantActions() {
-        if (pb == null) {
-            return;
-        }
+        if (pb == null) return;
 
         try {
             // todo: make a new list with only the landed aliens

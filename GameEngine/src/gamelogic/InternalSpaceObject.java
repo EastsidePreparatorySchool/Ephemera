@@ -7,12 +7,13 @@ package gamelogic;
 import alieninterfaces.IntegerPosition;
 import alieninterfaces.Position;
 import gameengineinterfaces.PlanetBehavior;
+import orbit.Orbitable;
 
 /**
  *
  * @author guberti
  */
-public abstract class InternalSpaceObject {
+public abstract class InternalSpaceObject implements Orbitable {
 
     public Position position;
     public final String domainName;
@@ -30,7 +31,7 @@ public abstract class InternalSpaceObject {
     public double tech; // Tech boost for the planet
 
     public InternalSpaceObject(SpaceGrid grid, Position p, int index, String domainName, String packageName, String className, double energy, double tech, double mass) { //[Q]
-        this.position = p;
+        this.position = new Position(p);
         this.energy = energy;
         this.tech = tech;
         this.domainName = domainName;
@@ -50,4 +51,8 @@ public abstract class InternalSpaceObject {
         return fullName;
 
     }
+    
+    @Override
+    public double mass() { return mass; }
+    public Position position() { return new Position(position); }
 }
