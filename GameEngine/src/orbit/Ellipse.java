@@ -22,16 +22,13 @@ public class Ellipse extends Conic {
 
         M0 = theta; //TO DO
         prevE = M0;
-        n = mu * mu * Math.pow(1 - e * e, 2f / 3f);
-        System.out.println("mu: " + mu);
-        //System.out.println("Period in turns: " + (1f/n) / Constants.deltaT);
-
+        n = mu * mu * Math.pow(1 - e * e, 2f / 3f) / h*h*h;
+        
         orbits = 0;
     }
 
     @Override
     public double angleAtTime(double t) {
-        System.out.println("ellipse.angle at time");
         //T = (2 pi / mu^2) * (h / root(1 - ||e||^2))^3
         //M = 2 pi t / T = n*t = E - ||e|| sin E
         //n = 2 pi / T
@@ -39,14 +36,12 @@ public class Ellipse extends Conic {
 
         //find mean anomaly
         double M = (n * t) - (orbits * 2 * Math.PI) + M0;
-        System.out.println("n: " + n);
-        System.out.println("M: " + M);
+        //System.out.println("M: " + M);
         while (M > Math.PI) {
             M -= 2 * Math.PI;
             orbits++;
             //System.out.println("loop: " + orbits);
         }
-        System.out.println("end ellipse.angleattime");
         //find eccentric anomaly
         double E = (t == sg.getTime()) ? prevE : M;
         double dE;

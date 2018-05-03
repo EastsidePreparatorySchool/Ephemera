@@ -37,9 +37,7 @@ public class Trajectory {
     }
 
     public Position positionAtTime(double t) {
-        System.out.println("trajector.position");
         Position temp = conics.get(0).positionAtTime(t);
-        System.out.println("end trajector.position");
         return temp;
     }
 }

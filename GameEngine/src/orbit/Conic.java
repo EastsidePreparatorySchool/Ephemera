@@ -39,7 +39,6 @@ public abstract class Conic {
     SpaceGrid sg;
 
     public static Conic newConic(Orbitable focus, double p, double e, double theta, double tNaught, double rotation, SpaceGrid sg) {
-        p *= Constants.deltaX;
         if (e == 0) {
             return new Circle(focus, p, e, theta, tNaught, rotation, sg);
         }
@@ -57,7 +56,7 @@ public abstract class Conic {
     }
 
     Conic(Orbitable focus, double p, double e, double theta, double tNaught, double rotation, SpaceGrid sg) {
-        this.p = p;
+        this.p = p * Constants.deltaX;
         this.e = e;
         this.rotation = rotation;
 

@@ -96,7 +96,6 @@ public class SpaceGrid {
     }
 
     public boolean executeGameTurn() {
-        System.out.println("\n\n\nTURN ONE NOW \n\n");
         time += Constants.deltaT;
 
         performCommunications();

@@ -46,9 +46,7 @@ public class Planet extends InternalSpaceObject {
     }
 
     public void move() {
-        System.out.println("planet.move");
-        this.position = new Position(trajectory.positionAtTime(grid.getTime()));
-        System.out.println("end planet.move");
+        this.position = trajectory.positionAtTime(grid.getTime());
     }
 
     public void reviewInhabitants() {

@@ -22,7 +22,7 @@ public class Constants {
     //selected randomly
     public static final double alienMass = 100;
     public static final double deltaT = 0.001;
-    public static final double G = 6e-20;
+    public static final double G = 2e-6;
     public static final double deltaX = 5e4;
     public static final double accuracy = 1e-2;
 
