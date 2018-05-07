@@ -176,7 +176,7 @@ public class AlienContainer {
         // if on planet, ignore move
         if (this.planet != null) return;
         
-        if (isComplex) movecomplex();
+        //if (isComplex) movecomplex();
         else movestandard();
     }
     
@@ -228,6 +228,8 @@ public class AlienContainer {
             System.out.println("ISSUES ARE PRESENT");
             debugErr("ac.move: Out of bounds: (" + p.x + ":" + p.y + ")");
         }*/
+        
+        this.energy -= direction.magnitude();
     }
 
     // this does the actual checking

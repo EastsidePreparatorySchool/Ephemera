@@ -230,8 +230,7 @@ public class SpaceGrid {
                 ac.kill("Death for unhandled exception in getMove()/getAccelerate(): " + ex.toString());
             }
 
-            // charge only for moves > 1 in either direction
-                                                                    //TODISCUSS
+            
             int moveLength = (int) ac.p.subtract(new Position(oldX, oldY)).magnitude();
             if (Math.abs(ac.p.x - oldX) > 1 || Math.abs(ac.p.y - oldY) > 1) {
                 ac.energy -= moveLength; 
