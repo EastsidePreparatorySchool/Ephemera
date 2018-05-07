@@ -128,7 +128,7 @@ public class SpaceGrid {
             return true;
         }
 
-        if (Constants.lastAlienWins) {
+        if (Constants.lastAlienWins && false) {
             AlienContainer aUniqueAlien = null;
             for (AlienContainer a : aliens) {
                 if (a != null) {
@@ -234,7 +234,7 @@ public class SpaceGrid {
                                                                     //TODISCUSS
             int moveLength = (int) ac.p.subtract(new Position(oldX, oldY - oldX)).magnitude();
             if (Math.abs(ac.p.x - oldX) > 1 || Math.abs(ac.p.y - oldY) > 1) {
-                ac.energy -= moveLength;
+                ac.energy -= moveLength; 
             }
         }
     }

@@ -35,6 +35,14 @@ public class Trajectory {
             bottomBound = dTheta - Math.PI;
         }
     }
+    
+    public boolean isBound() {
+        return conics.get(0).e < 0;
+    }
+    
+    public void accelerate(Vector2 deltaV) {
+        
+    }
 
     public Position positionAtTime(double t) {
         Position temp = conics.get(0).positionAtTime(t);

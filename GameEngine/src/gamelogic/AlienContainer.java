@@ -9,6 +9,7 @@ import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import orbit.Trajectory;
 
 /**
  *
@@ -26,6 +27,7 @@ public class AlienContainer {
     public AlienSpecies species;
     public final Constructor<?> constructor;
     public Alien alien;
+    public AlienComplex calien;
     public final ContextImplementation ctx;
     public final SpaceGrid grid;
     public int alienHashCode;
@@ -49,6 +51,9 @@ public class AlienContainer {
     public String outgoingMessage;
     public double outgoingPower;
     int turnsInSafeZone;
+    
+    boolean isComplex;
+    Trajectory trajectory;
 
     // Declare stats here
     //
@@ -91,6 +96,10 @@ public class AlienContainer {
         try {
             a = (Alien) cns.newInstance();
             this.alien = a;
+            if (a instanceof AlienComplex) {
+                calien = (AlienComplex) a;
+                isComplex = true;
+            }
             this.alienHashCode = ++currentID;
         } catch (Throwable t) {
             this.alien = null;
@@ -163,7 +172,37 @@ public class AlienContainer {
 
     }
 
-    public void move() throws NotEnoughTechException { //[Q]
+    public void move() throws NotEnoughTechException {
+        // if on planet, ignore move
+        if (this.planet != null) return;
+        
+        if (isComplex) movecomplex();
+        else movestandard();
+    }
+    
+    
+    
+    public void movecomplex() throws NotEnoughTechException {
+        Vector2 deltaV;
+        try {
+            deltaV = calien.getAccelarate();
+        } catch (UnsupportedOperationException e) {
+            deltaV = new Vector2(0,0);
+        }
+        
+        nextP = trajectory.positionAtTime(grid.getTime());
+        
+        if (GridDisk.isValidPoint(nextP.round())) {
+            
+            double m = deltaV.magnitude();
+            if (m < Constants.maxDeltaV(tech)) trajectory.accelerate(deltaV);
+            
+        } else if (!trajectory.isBound()) kill("Floated into the abyss");
+        
+    }
+    
+    
+    public void movestandard() throws NotEnoughTechException { //[Q]
 
         // Whether the move goes off the board will be determined by the grid
         Vector2 direction = null;
@@ -174,25 +213,21 @@ public class AlienContainer {
             direction = new Direction(0, 0);
         }
 
-        // if on planet, ignore move
-        if (this.planet != null) {
-            return;
-        }
+        
 
-        this.checkMove(direction); // Throws an exception if illegal
+        checkMove(direction); // Throws an exception if illegal
 
         // we want to contain aliens in the 250 sphere, so apply the "cosmic drift"
         direction = this.containMove(p.x, p.y, direction);
-
-        double oldx = p.x;
-        double oldy = p.y;
+        
         nextP = new Position(p.add(direction));
-
-        int width = Constants.width;
+        
+        /*int width = Constants.width;
         int height = Constants.height;
         if (nextP.x > (width / 2) || nextP.x < (0 - width / 2) || nextP.y > (height / 2) || nextP.y < (0 - height / 2)) {
+            System.out.println("ISSUES ARE PRESENT");
             debugErr("ac.move: Out of bounds: (" + p.x + ":" + p.y + ")");
-        }
+        }*/
     }
 
     // this does the actual checking

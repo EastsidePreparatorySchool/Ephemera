@@ -25,6 +25,17 @@ public class Constants {
     public static final double G = 2e-6;
     public static final double deltaX = 5e4;
     public static final double accuracy = 1e-2;
+    
+    public static final double minAllowedDeltaV = 5;
+    public static double maxDeltaV(double tech) {
+        double dv = tech * 5;
+        return (dv < minAllowedDeltaV) ? minAllowedDeltaV:dv;
+    }
+    public static double energyCost(double deltaV) {
+        return deltaV * 10;
+    }
+    
+    
 
     public static String gameMode = "sc_play.json"; // Brawl, Play, or a specific mission file
     public static int maxTurns = 100000; // 
