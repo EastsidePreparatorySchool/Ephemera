@@ -227,12 +227,12 @@ public class SpaceGrid {
                 // we'll let that go
             } catch (Exception ex) {
                 displayException("Unhandled exception in getMove(): ", ex);
-                ac.kill("Death for unhandled exception in getMove(): " + ex.toString());
+                ac.kill("Death for unhandled exception in getMove()/getAccelerate(): " + ex.toString());
             }
 
             // charge only for moves > 1 in either direction
                                                                     //TODISCUSS
-            int moveLength = (int) ac.p.subtract(new Position(oldX, oldY - oldX)).magnitude();
+            int moveLength = (int) ac.p.subtract(new Position(oldX, oldY)).magnitude();
             if (Math.abs(ac.p.x - oldX) > 1 || Math.abs(ac.p.y - oldY) > 1) {
                 ac.energy -= moveLength; 
             }
