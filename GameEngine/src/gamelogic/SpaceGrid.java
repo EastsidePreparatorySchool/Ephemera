@@ -224,7 +224,7 @@ public class SpaceGrid {
             }
 
             // charge only for moves > 1 in either direction
-            int moveLength = GridCircle.distance(ac.x, ac.y, oldX, oldY - oldX);
+            int moveLength = GridCircle.distance(ac.x, ac.y, oldX, oldY);
             if (Math.abs(ac.x - oldX) > 1 || Math.abs(ac.y - oldY) > 1) {
                 ac.energy -= moveLength;
             }
