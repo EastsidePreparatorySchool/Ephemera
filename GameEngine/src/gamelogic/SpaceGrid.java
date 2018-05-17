@@ -19,6 +19,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import orbit.DummyTrajectory;
+import orbit.Trajectory;
 
 /**
  *
@@ -45,6 +47,8 @@ public class SpaceGrid {
 
     // this is the only approved random generator for the game. Leave it alone!
     public Random rand;
+    
+    public SpaceGrid() {}
 
     public SpaceGrid(GameEngineV1 eng, GameVisualizer vis, int width, int height, Achievement[] achievements) {
         this.vis = vis;
@@ -71,7 +75,7 @@ public class SpaceGrid {
     }
 
     public void ready() {
-        // this is also a good spot to 
+        // this is also a good spot to
         // prepare the random generator seed number
         // if not set from config file
         if (Constants.randSeed == 0) {
@@ -217,9 +221,6 @@ public class SpaceGrid {
             // get rid of stale views from prior moves
             ac.ctx.view = null;
 
-            double oldX = ac.p.x;
-            double oldY = ac.p.y;
-
             // call the alien to move
             try {
                 ac.move();
@@ -230,11 +231,6 @@ public class SpaceGrid {
                 ac.kill("Death for unhandled exception in getMove()/getAccelerate(): " + ex.toString());
             }
 
-            
-            int moveLength = (int) ac.p.subtract(new Position(oldX, oldY)).magnitude();
-            if (Math.abs(ac.p.x - oldX) > 1 || Math.abs(ac.p.y - oldY) > 1) {
-                ac.energy -= moveLength; 
-            }
         }
     }
 
@@ -242,23 +238,23 @@ public class SpaceGrid {
         for (InternalSpaceObject so : this.objects) {
             if (so.isPlanet) {
                 Planet p = (Planet) so;
-                
+
                 // unplug planet from grid
                 aliens.unplugPlanet(p);
-                
+
                 Position pOld = p.position;
                 p.move();
                 Position pNew = p.position;
-                
+
                 // plug planet back into grid
                 aliens.plugPlanet(p);
-                
-                
-                
+
+
+
                 // now worry about the aliens at the old and new positions
                 AlienCell acsFrom = aliens.getAliensAt(pOld.round());
                 AlienCell acsTo = aliens.getAliensAt(pNew.round());
-                
+
                 // if aliens are where the planet is moving to, and not landed, they die.
                 if (acsTo != null) {
                 // we have a cell, let's look at aliens
@@ -269,7 +265,7 @@ public class SpaceGrid {
                         }
                     }
                 }
-                
+
                 // aliens that were on the planet, move with the planet
                 // do this on a cloned list to avoid comodification
                 LinkedList<AlienContainer> acsClone = (LinkedList<AlienContainer>) acsFrom.clone();
@@ -279,12 +275,12 @@ public class SpaceGrid {
                         ac.nextP = p.position;
                     }
                 }
-                
-                
+
+
                 // visualize
                 IntegerPosition pOldInt = pOld.round();
                 IntegerPosition pNewInt = pNew.round();
-                
+
                 vis.showPlanetMove(pOldInt.x, pOldInt.y, pNewInt.x, pNewInt.y, p.className, p.index, p.energy, (int) p.tech);
             }
         }
@@ -316,7 +312,7 @@ public class SpaceGrid {
                     aliens.move(ac, oldX, oldY, ac.p.round().x, ac.p.round().y);
                 }
 
-                // need to go through all the rest to mark cell fresh for display, 
+                // need to go through all the rest to mark cell fresh for display,
                 // TODO: Fix this in visualizer instead, go away from fillRect and to painting individual cells.
                 AlienCell acs = aliens.getAliensAt(ac.p);
 
@@ -416,7 +412,7 @@ public class SpaceGrid {
                 thisAlien.currentActionCode = Action.ActionCode.None;
                 thisAlien.currentActionPower = 0;
             } catch (Exception ex) {
-                // for all other exceptions, we'll kill it. 
+                // for all other exceptions, we'll kill it.
                 thisAlien.currentActionCode = Action.ActionCode.None;
                 thisAlien.currentActionPower = 0;
                 thisAlien.kill("Death for unhandled exception in getAction(): " + ex.toString());
@@ -435,15 +431,14 @@ public class SpaceGrid {
 
     public void performAlienActions() { //[Q]
         LinkedList<AlienSpec> newAliens = new LinkedList<>();
-
+        HashMap<AlienSpec, Trajectory> trajectories = new HashMap<>();
         // now process all actions
         for (AlienContainer thisAlien : aliens) {
             //thisAlien.debugOut(thisAlien.currentActionCode.toString());
 
             // if this guy was part of a fight, don't bother with more actions
-            if (thisAlien.participatedInAction) {
-                continue;
-            }
+            if (thisAlien.participatedInAction) continue;
+
 
             switch (thisAlien.currentActionCode) {
                 case Land:
@@ -685,9 +680,8 @@ public class SpaceGrid {
                     }
 
                     // no spawning in safezone. makes sure squatters can't win the games.
-                    if (isInSafeZone(thisAlien)) {
-                        break;
-                    }
+                    if (isInSafeZone(thisAlien)) break;
+                    
 
                     // construct a random move for the new alien depending on power and send that move through drift correction
                     // spend thisAction.power randomly on x move, y move and initital power
@@ -709,7 +703,7 @@ public class SpaceGrid {
 
                     // Add in the alien spec to a new arraylist
                     // to be processed later so the master list is not disrupted
-                    newAliens.add(new AlienSpec(
+                    AlienSpec spec = new AlienSpec(
                             thisAlien.domainName,
                             thisAlien.packageName,
                             thisAlien.className,
@@ -721,8 +715,11 @@ public class SpaceGrid {
                             thisAlien.tech, // tech inherited undiminished from parent, TODO: This is questionable
                             null,
                             null,
-                            thisAlien.currentActionMessage
-                    ));
+                            thisAlien.currentActionMessage,
+                            thisAlien
+                    );
+                    newAliens.add(spec);
+                    trajectories.put(spec,thisAlien.trajectory);
 
                     break;
             }
@@ -732,7 +729,7 @@ public class SpaceGrid {
         // add all new aliens
         for (AlienSpec as : newAliens) {
             addAlienWithParams(as.x, as.y, as.domainName, as.packageName, as.className,
-                    as.hashCode, as.tech, as.energy, as.msg);
+                    as.hashCode, as.tech, as.energy, as.msg, trajectories.get(as));
         }
     }
 
@@ -773,12 +770,10 @@ public class SpaceGrid {
         }
     }
 
-    void addAlien(int x, int y, String domainName, String alienPackageName, String alienClassName) { //[Q]
-        addAlienWithParams(x, y, domainName, alienPackageName, alienClassName, 0, 1, 1, null);
-    }
+
 
     AlienContainer addAlienWithParams(int x, int y, String domainName, String alienPackageName, String alienClassName,
-            int parent, double tech, double power, String spawnMsg) { //[Q]
+            int parent, double tech, double power, String spawnMsg, Trajectory trajectory) {
         AlienContainer ac = null;
 
         String speciesName = domainName + ":" + alienPackageName + ":" + alienClassName;
@@ -794,14 +789,14 @@ public class SpaceGrid {
             }
         }
 
-        if (as.counter < Constants.perSpeciesCap
-                && as.spawns < Constants.perSpeciesSpawnCap) {
+        if (as.counter < Constants.perSpeciesCap && as.spawns < Constants.perSpeciesSpawnCap) {
             try {
                 ac = new AlienContainer(this, this.vis, x, y,
                         domainName, alienPackageName, alienClassName, as.cns, as,
                         tech, power, // tech and power
                         parent, // no parent
-                        spawnMsg); // no spawn state
+                        spawnMsg,  // no spawn state
+                        trajectory); //no trajectory
 
                 aliens.addAlienAndPlug(ac);
                 if (!ac.packageName.equalsIgnoreCase("stockelements")) {
@@ -824,7 +819,6 @@ public class SpaceGrid {
     void addPlanet(GameElementSpec element) { //[Q]
         InternalSpaceObject soParent = null;
         PlanetBehavior pb = null;
-        
         for (InternalSpaceObject o : this.objects) {
             if (element.parent.equalsIgnoreCase(o.getFullName())) {
                 soParent = o;
@@ -838,7 +832,7 @@ public class SpaceGrid {
             } catch (Exception e) {
                 vis.debugOut("sg.addPlanet: behavior not found: " + element.className);
             }
-            
+
             Planet p = new Planet(this, soParent,
                     new Vector2(element.x, element.y).magnitude(),
                     planetCount++,
@@ -878,7 +872,7 @@ public class SpaceGrid {
         addSpecies(element);
 
         ac = addAlienWithParams(p.position.round().x, p.position.round().y, element.domainName, element.packageName, element.className,
-                0, 1, 1, element.state);
+                0, 1, 1, element.state, null);
 
         if (ac == null) {
             return;
@@ -902,7 +896,17 @@ public class SpaceGrid {
             switch (element.kind) {
                 case ALIEN:
                     // position (0,0) leads to random assignment
-                    addAlien(0, 0, element.domainName, element.packageName, element.className);
+                    InternalSpaceObject soParent = null;
+                    element.parent = "ephemera.eastsideprep.org:stockelements:Sol"; // BIG FAT KLUDGE
+                    for (InternalSpaceObject o : this.objects) {
+                        if (element.parent != null && element.parent.equalsIgnoreCase(o.getFullName())) {
+                            soParent = o;
+                            break;
+                        }
+                    }
+
+                    addAlienWithParams(0, 0, element.domainName, element.packageName, element.className, 0, 1, 1, null,
+                            (soParent != null)? new DummyTrajectory(soParent):null);
                     break;
                 case SPECIES:
                     addSpecies(element);

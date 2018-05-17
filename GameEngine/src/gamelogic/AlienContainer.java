@@ -9,6 +9,7 @@ import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import orbit.DummyTrajectory;
 import orbit.Trajectory;
 
 /**
@@ -61,7 +62,7 @@ public class AlienContainer {
     //
     public AlienContainer(SpaceGrid sg, GameVisualizer vis, int x, int y,
             String alienDomainName, String alienPackageName, String alienClassName, Constructor<?> cns, AlienSpecies as,
-            double energy, double tech, int parent, String message) throws InstantiationException { //[Q]
+            double energy, double tech, int parent, String message, Trajectory trajectory) throws InstantiationException { //[Q]
 
         this.domainName = alienDomainName;
         this.packageName = alienPackageName;
@@ -97,8 +98,7 @@ public class AlienContainer {
             a = (Alien) cns.newInstance();
             this.alien = a;
             if (a instanceof AlienComplex) {
-                calien = (AlienComplex) a;
-                isComplex = true;
+                initComplex(a, trajectory);
             }
             this.alienHashCode = ++currentID;
         } catch (Throwable t) {
@@ -118,7 +118,39 @@ public class AlienContainer {
 
     }
     // class-related helpers
-
+    
+    public void initComplex(Alien a, Trajectory trajectory) throws InstantiationException {
+        calien = (AlienComplex) a;
+        isComplex = true;
+        
+        System.out.println("Initializing Complex Alien");
+        
+        if (trajectory == null) {
+            grid.gridDebugErr("ac: No trajectory or focus given");
+            throw new InstantiationException();
+        }
+        
+        
+        
+        if (trajectory instanceof DummyTrajectory){
+            this.trajectory = new Trajectory(
+                    trajectory.currentFocus, //focus from the dummy trajectory
+                    grid.rand.nextDouble()*3 + 5, //semi-latus rectum
+                    Math.pow(grid.rand.nextDouble(),2), //Eccentricity
+                    grid.rand.nextDouble()*2*Math.PI, //mNaught
+                    grid.rand.nextDouble()*2*Math.PI, //rotation
+                    grid);
+        } else this.trajectory = trajectory.clone();
+        
+        
+        p = this.trajectory.positionAtTime(0);
+        
+    }
+    
+    
+    
+    
+    
     public double getMass() {
         return Constants.alienMass;
     }
@@ -142,9 +174,9 @@ public class AlienContainer {
                 this.tech, this.energy, this.fullName, this.speciesName, this.currentActionPower);
     }
 
-    public AlienSpec getSimpleAlienSpec() {
+    /*public AlienSpec getSimpleAlienSpec() {
         return new AlienSpec(this.domainName, this.packageName, this.className, this.species.speciesID, this.fullName, this.speciesName);
-    }
+    }*/
 
     public AlienSpecies getAlienSpecies() {
         if (this.species == null) {
@@ -176,7 +208,7 @@ public class AlienContainer {
         // if on planet, ignore move
         if (this.planet != null) return;
         
-        //if (isComplex) movecomplex();
+        if (isComplex) movecomplex();
         else movestandard();
     }
     
@@ -185,7 +217,7 @@ public class AlienContainer {
     public void movecomplex() throws NotEnoughTechException {
         Vector2 deltaV;
         try {
-            deltaV = calien.getAccelarate();
+            deltaV = calien.getAccelarate().scale(1f/getMass());
         } catch (UnsupportedOperationException e) {
             deltaV = new Vector2(0,0);
         }
@@ -193,10 +225,11 @@ public class AlienContainer {
         nextP = trajectory.positionAtTime(grid.getTime());
         
         if (GridDisk.isValidPoint(nextP.round())) {
-            
             double m = deltaV.magnitude();
-            if (m < Constants.maxDeltaV(tech)) trajectory.accelerate(deltaV);
-            
+            if (m < Constants.maxDeltaV(tech)) {
+                trajectory.accelerate(deltaV, grid.getTime());
+                this.energy -= Constants.accelerationCost(m);
+            }
         } else if (!trajectory.isBound()) kill("Floated into the abyss");
         
     }
@@ -222,14 +255,7 @@ public class AlienContainer {
         
         nextP = new Position(p.add(direction));
         
-        /*int width = Constants.width;
-        int height = Constants.height;
-        if (nextP.x > (width / 2) || nextP.x < (0 - width / 2) || nextP.y > (height / 2) || nextP.y < (0 - height / 2)) {
-            System.out.println("ISSUES ARE PRESENT");
-            debugErr("ac.move: Out of bounds: (" + p.x + ":" + p.y + ")");
-        }*/
-        
-        this.energy -= direction.magnitude();
+        this.energy -= direction.magnitude() * Constants.standardMoveCost;
     }
 
     // this does the actual checking

@@ -48,8 +48,6 @@ public class Hyperbola extends Conic {
             F -= dF / (e * Math.cosh(F) - 1);
         } while (dF > Constants.accuracy);
 
-        System.out.println(F);
-
         return Math.acos((Math.cosh(F) - e) / (1 - e * Math.cosh(F))) * ((F < 0 || F > Math.PI) ? -1 : 1);
     }
 

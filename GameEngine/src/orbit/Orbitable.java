@@ -2,6 +2,7 @@
 package orbit;
 
 import alieninterfaces.Position;
+import alieninterfaces.Vector2;
 
 /**
  *
@@ -11,5 +12,6 @@ import alieninterfaces.Position;
 
 public interface Orbitable {
     public double mass();
-    public Position position();
+    public Position position(double t);
+    public Vector2 velocity(double t);
 }

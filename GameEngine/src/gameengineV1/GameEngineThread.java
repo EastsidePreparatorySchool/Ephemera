@@ -123,6 +123,7 @@ public class GameEngineThread extends Thread {
 
                 if (element.kind != GameElementKind.INVALID) {
                     if (element.kind == GameElementKind.ALIEN) {
+                        System.out.println(element.className +element.parent);
                         engine.grid.addElement(element);
                     }
 

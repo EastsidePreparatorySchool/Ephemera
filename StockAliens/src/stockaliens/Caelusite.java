@@ -18,7 +18,7 @@ import javafx.scene.transform.Translate;
  *
  * @author gmein
  */
-public class Caelusite implements Alien {
+public class Caelusite implements Alien,AlienComplex {
 
     Context ctx;
     boolean tooComplex = false;
@@ -41,7 +41,7 @@ public class Caelusite implements Alien {
     @Override
     public Vector2 getMove() {
 
-        ctx.debugOut("Move requested,"
+        /*ctx.debugOut("Move requested,"
                 + ctx.getStateString());
         int move_energy;
 
@@ -85,60 +85,15 @@ public class Caelusite implements Alien {
         }
 
         ctx.debugOut("Moving to " + ctx.getPosition().add(dir).toString() + ctx.getStateString());
-        return dir.v2();
+        return dir.v2();*/
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Action getAction() {
 
-        ctx.debugOut("Action requested," + ctx.getStateString());
-
-        // catch any shenanigans
-        if (ctx.getEnergy() > 100) {
-            try {
-                View view = ctx.getView((int) ctx.getTech());
-                if (view.getAliensAtPos(ctx.getPosition()).size() > 1) {
-                    ctx.debugOut("Uh-oh.There is someone else here."
-                            + ctx.getStateString());
-                }
-
-                // do we have enough energy?
-                if (ctx.getEnergy() < 10) {
-                    // no, charge
-                    ctx.debugOut("Choosing to gain energy,"
-                            + ctx.getStateString());
-                    return new Action(Action.ActionCode.Gain);
-                }
-
-                // do we have enough tech?
-                if (ctx.getTech() < 30 && ctx.getEnergy() > ctx.getTech()) {
-                    // no, research
-                    ctx.debugOut("Choosing to research"
-                            + ctx.getStateString());
-                    return new Action(Action.ActionCode.Research);
-                }
-
-                // is there another alien on our position?
-                if (view.getAliensAtPos(ctx.getPosition()).size() > 1
-                        && ctx.getEnergy() > ctx.getFightingCost() + 2) {
-                    ctx.debugOut("EXTERMINATE!!!!!"
-                            + ctx.getStateString());
-
-                    return new Action(Action.ActionCode.Fight, (int) ctx.getEnergy() - 2 - ctx.getFightingCost());
-                }
-
-                if (ctx.getEnergy() > (ctx.getSpawningCost() + 10)) {
-                    // no other aliens here, have enough stuff, spawn!
-                    ctx.debugOut("AAs RULE SUPREME! SPAWNING!"
-                            + ctx.getStateString());
-
-                    return new Action(Action.ActionCode.Spawn, 5);
-                }
-            } catch (Exception e) {
-                // do something here to deal with errors
-                ctx.debugOut("EXPLAIN?????? " + e.toString());
-            }
-        }
+        //if(ctx.getEnergy() > 100) return new Action(Action.ActionCode.Spawn, 5);
+        
         ctx.debugOut("Gaining energy"
                 + ctx.getStateString());
         return new Action(Action.ActionCode.Gain);
@@ -156,5 +111,12 @@ public class Caelusite implements Alien {
 
     @Override
     public void processResults() {
+    }
+
+    @Override
+    public Vector2 getAccelarate() {
+        if (ctx.getGameTurn() % 15 == 0) return new Vector2(1,0);
+        
+        return new Vector2(0,0); 
     }
 }

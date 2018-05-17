@@ -4,12 +4,15 @@
  */
 package SpaceCritters;
 
+import alieninterfaces.Vector2;
+import alieninterfaces.Vector3;
 import gameengineV1.GameEngineV1;
 import gameengineinterfaces.GameCommand;
 import gameengineinterfaces.GameCommandCode;
 import gameengineinterfaces.GameElementSpec;
 import gameengineinterfaces.GameVisualizer;
 import gamelogic.Constants;
+import gamelogic.SpaceGrid;
 import java.io.IOException;
 import java.util.Iterator;
 import javafx.application.Platform;
@@ -21,6 +24,9 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import static javafx.application.Application.launch;
+import orbit.DummyMass;
+import orbit.Orbitable;
+import orbit.Trajectory;
 
 /**
  *
@@ -46,7 +52,27 @@ public class SpaceCritters extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-
+        
+        /*Orbitable center = new DummyMass();
+        double p = 10;
+        double e = 0.9;
+        double rotation = 1;
+        double theta = 1;
+        Trajectory trajectory = new Trajectory(center, p, e, theta, rotation, new SpaceGrid());
+        Vector2 r = trajectory.positionAtTime(0);
+        System.out.println("Position: "  + r);
+        double a = r.angle();
+        double m = r.magnitude();
+        System.out.println("Real angle: " + a);
+        System.out.println("x: " + m*Math.cos(a));
+        System.out.println("y: " + m*Math.sin(a));
+        
+        
+        trajectory.accelerate(new Vector2(0,0), 0);
+        
+        
+        if (true) throw new java.lang.RuntimeException();*/
+        
         GameElementSpec[] elements;
 
         try {
@@ -127,7 +153,6 @@ public class SpaceCritters extends Application {
             engine.init(field, gamePath, alienPath);
             elements = engine.readConfigFile("sc_config.json");
             engine.processGameElements(elements);
-
             // load a game and process it
             elements = engine.readConfigFile(Constants.gameMode);
             engine.processGameElements(elements);
@@ -136,7 +161,7 @@ public class SpaceCritters extends Application {
             mainScene = new Scene3D(this, (int) screenBounds.getWidth() - 220, (int) screenBounds.getHeight() - 20);
 
             // set a hook to shut down engine on game exit
-            stage.setOnCloseRequest(e -> handleExit());
+            stage.setOnCloseRequest(ex -> handleExit());
 
             // load fancy planets
             Planet3D.preLoadPlanetImages();
@@ -144,7 +169,7 @@ public class SpaceCritters extends Application {
             // set scene and stage
             border.setCenter(mainScene.outer);
             Scene scene = new Scene(border);
-            scene.setOnKeyPressed((e) -> mainScene.controlCamera(e));
+            scene.setOnKeyPressed((ex) -> mainScene.controlCamera(ex));
             mainScene.outer.requestFocus();
 
             stage.setScene(scene);
@@ -152,8 +177,8 @@ public class SpaceCritters extends Application {
 
             // and tell the engine that we are done adding elements
             engine.queueCommand(new GameCommand(GameCommandCode.Ready));
-        } catch (Exception e) {
-            System.out.println(e.toString());
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
             System.in.read();
         }
     }

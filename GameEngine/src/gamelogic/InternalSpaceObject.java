@@ -6,8 +6,10 @@ package gamelogic;
 
 import alieninterfaces.IntegerPosition;
 import alieninterfaces.Position;
+import alieninterfaces.Vector2;
 import gameengineinterfaces.PlanetBehavior;
 import orbit.Orbitable;
+import orbit.Trajectory;
 
 /**
  *
@@ -26,6 +28,7 @@ public abstract class InternalSpaceObject implements Orbitable {
     public PlanetBehavior pb;
 
     double mass;
+    Trajectory trajectory;
 
     public double energy; // Energy that aliens gain every turn from the planet
     public double tech; // Tech boost for the planet
@@ -54,5 +57,14 @@ public abstract class InternalSpaceObject implements Orbitable {
     
     @Override
     public double mass() { return mass; }
-    public Position position() { return new Position(position); }
+    @Override
+    public Position position(double t) { 
+        if (trajectory != null) return trajectory.positionAtTime(t);
+        return new Position(position);
+    }
+    @Override
+    public Vector2 velocity(double t) {
+        if (trajectory == null) return new Vector2(0,0);
+        return trajectory.velocityAtTime(t);
+    }
 }

@@ -7,6 +7,7 @@ package orbit;
 
 import alieninterfaces.Position;
 import alieninterfaces.Vector2;
+import alieninterfaces.Vector3;
 import gamelogic.Constants;
 import gamelogic.SpaceGrid;
 
@@ -35,9 +36,46 @@ public abstract class Conic {
     double mu;
     double M0;
     double n;
+    
+    double theta;
+    double tNaught;
 
     SpaceGrid sg;
-
+    
+    
+    public static Conic newConic(Orbitable focus, Vector2 r, Vector2 v, double t, SpaceGrid sg) {
+        v = v.subtract(focus.velocity(sg.getTime()));
+        r = r.subtract(focus.position(sg.getTime())).scale(Constants.deltaX);
+        //System.out.println("Measured angle: " + r.angle());
+        
+        Vector3 h = r.cross(v);
+        double hm = h.magnitude();
+        //System.out.println("New H: " + hm);
+        
+        double mu = focus.mass() * Constants.G;
+        
+        double rm = r.magnitude();
+        
+        Vector3 e = v.cross(h).scale(1/mu).subtract(r.unit());
+        
+        double em = e.magnitude();
+        
+        double p = hm*hm/mu;
+        double rotation = Math.atan2(e.y, e.x);//Math.asin( v.dot(r.unit()) * hm / (mu*em) ) - theta;
+        double theta = r.angle() - rotation;//Math.acos((p/rm - 1) / em);//Math.acos(e.dot(r) / (em*rm));
+        double tNaught = 0; //M at time = 0
+        
+        
+        //System.out.println("some values:");
+        //System.out.println("e: " + em);
+        //System.out.println("p: " + p/Constants.deltaX);
+        //System.out.println("theta: " + theta);
+        //System.out.println("rotation of conic: " + rotation);
+        //System.out.println(r.toString());
+        
+        
+        return newConic(focus, p/Constants.deltaX, em, theta, tNaught, rotation, sg);
+    }
     public static Conic newConic(Orbitable focus, double p, double e, double theta, double tNaught, double rotation, SpaceGrid sg) {
         if (e == 0) {
             return new Circle(focus, p, e, theta, tNaught, rotation, sg);
@@ -51,7 +89,6 @@ public abstract class Conic {
         if (e > 1) {
             return new Hyperbola(focus, p, e, theta, tNaught, rotation, sg);
         }
-
         throw new OrbitException("Invalid Eccentricity: " + e);
     }
 
@@ -64,8 +101,13 @@ public abstract class Conic {
         this.mu = Constants.G * focus.mass();
 
         this.sg = sg;
-
-        this.h = Math.sqrt(p * mu);
+        
+        
+        this.h = Math.sqrt(this.p * mu);
+        
+        
+        this.theta = theta;
+        this.tNaught = tNaught; //thetaNaught?
 
         //p = h^2 / mu              semi-latus rectum
         //r = p / (1 + ||e|| cos theta)
@@ -89,13 +131,28 @@ public abstract class Conic {
     public Position positionAtAngle(double theta) {
         double r = p / (1 + e * Math.cos(theta));
         if (r < 0 && Math.abs(theta) < Math.PI) {
-            System.out.println(theta);
+            System.out.println("Radius was negative at angle " + theta);
         }
-        return new Position(r * Math.cos(theta + rotation), r * Math.sin(theta + rotation)).scale(1f / Constants.deltaX).add(focus.position());
+        return new Position(r * Math.cos(theta + rotation), r * Math.sin(theta + rotation)).scale(1f / Constants.deltaX);
     }
 
     public Position positionAtTime(double t) {
         double theta = angleAtTime(t);
-        return positionAtAngle(theta);
+        return positionAtAngle(theta).add(focus.position(t));
+    }
+    
+    
+    @Override
+    public Conic clone() {
+        return newConic(focus, p/Constants.deltaX, e, theta, tNaught, rotation, sg);
+    }
+    public Vector2 getVelocityAtTime(double t) {
+        double theta = angleAtTime(t);
+        
+        double vperp = mu * (1+ e*Math.cos(theta)) / h;
+        double vrad = mu * e * Math.sin(theta) / h;
+        
+        Vector2 v = new Vector2(vrad, vperp).rotate(rotation + theta);
+        return v;
     }
 }

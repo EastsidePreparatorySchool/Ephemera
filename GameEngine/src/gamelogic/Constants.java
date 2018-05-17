@@ -31,9 +31,12 @@ public class Constants {
         double dv = tech * 5;
         return (dv < minAllowedDeltaV) ? minAllowedDeltaV:dv;
     }
-    public static double energyCost(double deltaV) {
-        return deltaV * 10;
+    public static double accelerationCost(double deltaV) {
+        double c = deltaV * 0.1 - 5;
+        return (c < 0) ? 0:c;
     }
+    
+    public static final double standardMoveCost = 0.1;
     
     
 

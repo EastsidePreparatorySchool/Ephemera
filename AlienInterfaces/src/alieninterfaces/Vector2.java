@@ -9,15 +9,13 @@ package alieninterfaces;
  *
  * @author qbowers
  */
-public class Vector2 {
-
-    public double x;
-    public double y;
+public class Vector2 extends Vector3 {
+    
 
     public Vector2() {
     }
 
-    public Vector2(Vector2 v) {
+    public Vector2(Vector3 v) {
         this.x = v.x;
         this.y = v.y;
     }
@@ -37,7 +35,7 @@ public class Vector2 {
         this.y = v.y;
     }
 
-    public void set(Vector2 v) {
+    public void set(Vector3 v) {
         this.x = v.x;
         this.y = v.y;
     }
@@ -52,7 +50,7 @@ public class Vector2 {
     }
 
     @Override
-    public String toString() {  //[Q] (doubles will be messy)
+    public String toString() {
         return "(" + x + "," + y + ")";
     }
 
@@ -61,23 +59,30 @@ public class Vector2 {
     }
 
     public double magnitude() {
-        return Vector2.magnitude(this);
+        return Vector3.magnitude(this);
     }
 
-    public double cross(Vector2 v) {
-        return Vector2.cross(this, v);
+    public Vector3 cross(Vector3 v) {
+        return Vector3.cross(this, v);
     }
 
     public double dot(Vector2 v) {
-        return Vector2.dot(this, v);
+        return Vector3.dot(this, v);
     }
 
     public Vector2 add(Vector2 v) {
         return Vector2.add(this, v);
     }
+    
+    public Vector3 add(Vector3 v) {
+        return Vector3.add(this, v);
+    }
 
     public Vector2 subtract(Vector2 v) {
         return Vector2.subtract(this, v);
+    }
+    public Vector3 subtract(Vector3 v) {
+        return Vector3.subtract(this, v);
     }
 
     public Vector2 scale(double scale) {
@@ -95,23 +100,31 @@ public class Vector2 {
     public Vector2 scaleToLength(double scale) {
         return Vector2.scaleToLength(this, scale);
     }
-
-    public static double magnitude(Vector2 v) {
-        //return Math.abs(v.x) + Math.abs(v.y);
-        return Math.sqrt(v.x * v.x + v.y * v.y);
-    }   //!!!!: Universal Distance Metric. IMPORTANT.
-
-    public static double distance(Vector2 a, Vector2 b) {
-        return magnitude(a.subtract(b));
+    
+    
+    public Vector2 rotate(double theta) {
+        return Vector2.rotate(this, theta);
+    }
+    
+    public double angle() {
+        double angle = Math.atan2(y,x);
+        return angle + (angle < 0 ? 2*Math.PI:0);
+    }
+    
+    
+    public static Vector2 rotate(Vector2 v, double theta) {
+        double x = v.x*Math.cos(theta) - v.y*Math.sin(theta);
+        double y = v.x*Math.sin(theta) + v.y*Math.cos(theta);
+        
+        return new Vector2(x,y);
     }
 
-    public static double cross(Vector2 a, Vector2 b) {
-        return (a.x * b.y) - (a.y * b.y);
-    }
+    
+    
 
-    public static double dot(Vector2 a, Vector2 b) {
-        return (a.x * b.y) + (a.y * b.y);
-    }
+    
+
+    
 
     public static Vector2 add(Vector2 a, Vector2 b) {
         return new Vector2(a.x + b.x, a.y + b.y);

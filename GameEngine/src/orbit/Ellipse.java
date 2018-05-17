@@ -26,9 +26,11 @@ public class Ellipse extends Conic {
         
         orbits = 0;
     }
-
-    @Override
-    public double angleAtTime(double t) {
+    
+    public double trueFromEccentric(double E) {
+        return Math.acos((Math.cos(E) - e) / (1 - e * Math.cos(E))) * ((E < 0 || E > Math.PI) ? -1 : 1);
+    }
+    public double EAtTime(double t) {
         //T = (2 pi / mu^2) * (h / root(1 - ||e||^2))^3
         //M = 2 pi t / T = n*t = E - ||e|| sin E
         //n = 2 pi / T
@@ -50,11 +52,12 @@ public class Ellipse extends Conic {
             E -= dE / (1 - e * Math.cos(E));
         } while (Math.abs(dE) >= Constants.accuracy);
 
-        prevE = E;
-
-        //find true anomaly
-        
-        return Math.acos((Math.cos(E) - e) / (1 - e * Math.cos(E))) * ((E < 0 || E > Math.PI) ? -1 : 1);
+        if (t == sg.getTime()) prevE = E;
+        return E;
+    }
+    @Override
+    public double angleAtTime(double t) {
+        return trueFromEccentric(EAtTime(t));
     }
 
     @Override
