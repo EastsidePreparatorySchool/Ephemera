@@ -25,6 +25,10 @@ public class Circle extends Conic {
     public double angleAtTime(double t) {
         return n * t + M0;
     }
+    @Override
+    public double MAtAngle(double theta){
+        return theta;
+    }
 
     @Override
     public double timeAtAngle(double theta) {

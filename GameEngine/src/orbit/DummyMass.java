@@ -27,4 +27,8 @@ public class DummyMass implements Orbitable {
         return new Vector2(0,0);
     }
     
+    public double hillRadius() {
+        return 0;
+    }
+    
 }

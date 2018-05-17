@@ -66,12 +66,11 @@ public abstract class Conic {
         double tNaught = 0; //M at time = 0
         
         
-        //System.out.println("some values:");
-        //System.out.println("e: " + em);
-        //System.out.println("p: " + p/Constants.deltaX);
-        //System.out.println("theta: " + theta);
-        //System.out.println("rotation of conic: " + rotation);
-        //System.out.println(r.toString());
+        System.out.println("some values:");
+        System.out.println("e: " + em);
+        System.out.println("p: " + p/Constants.deltaX);
+        System.out.println("theta: " + theta);
+        System.out.println("rotation of conic: " + rotation);
         
         
         return newConic(focus, p/Constants.deltaX, em, theta, tNaught, rotation, sg);
@@ -106,7 +105,7 @@ public abstract class Conic {
         this.h = Math.sqrt(this.p * mu);
         
         
-        this.theta = theta;
+        this.M0 = MAtAngle(theta);
         this.tNaught = tNaught; //thetaNaught?
 
         //p = h^2 / mu              semi-latus rectum
@@ -127,6 +126,8 @@ public abstract class Conic {
     public abstract double timeAtAngle(double theta);
 
     public abstract double nextTimeAtAngle(double theta, double t);
+    
+    public abstract double MAtAngle(double theta);
 
     public Position positionAtAngle(double theta) {
         double r = p / (1 + e * Math.cos(theta));
@@ -154,5 +155,9 @@ public abstract class Conic {
         
         Vector2 v = new Vector2(vrad, vperp).rotate(rotation + theta);
         return v;
+    }
+    
+    public double partialHillRadius() {
+        return p  * (1-e)/ ( (1-e*e) * Math.pow(3*focus.mass(), 1f/3) );
     }
 }

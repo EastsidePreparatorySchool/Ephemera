@@ -26,6 +26,8 @@ public abstract class InternalSpaceObject implements Orbitable {
     public boolean isPlanet = false;
     public int index;
     public PlanetBehavior pb;
+    
+    public double hillRadius = 0;
 
     double mass;
     Trajectory trajectory;
@@ -66,5 +68,9 @@ public abstract class InternalSpaceObject implements Orbitable {
     public Vector2 velocity(double t) {
         if (trajectory == null) return new Vector2(0,0);
         return trajectory.velocityAtTime(t);
+    }
+    
+    public double hillRadius() {
+        return hillRadius;
     }
 }

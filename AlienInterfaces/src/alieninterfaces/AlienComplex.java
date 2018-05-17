@@ -10,6 +10,6 @@ package alieninterfaces;
  */
 public interface AlienComplex {
 
-    Vector2 getAccelarate();
+    Vector2 getAccelerate();
 
 }

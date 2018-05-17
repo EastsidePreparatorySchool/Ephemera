@@ -132,7 +132,7 @@ public class SpaceGrid {
             return true;
         }
 
-        if (Constants.lastAlienWins && false) {
+        if (Constants.lastAlienWins) {
             AlienContainer aUniqueAlien = null;
             for (AlienContainer a : aliens) {
                 if (a != null) {

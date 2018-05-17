@@ -18,7 +18,6 @@ public class Planet extends InternalSpaceObject {
 
     public final String parentString;
     private final InternalSpaceObject parent;
-    private Trajectory trajectory;
     public Position parentPosition;
     
     private double radius;
@@ -40,6 +39,8 @@ public class Planet extends InternalSpaceObject {
         // slight random eccentricity
         this.trajectory = new Trajectory(parent,radius,grid.rand.nextDouble()* 0.5,grid.rand.nextDouble()*Math.PI,grid.rand.nextDouble()*Math.PI,grid);
         position = trajectory.positionAtTime(grid.getTime());
+        
+        hillRadius = trajectory.partialHillRadius() * Math.pow(mass, 1f/3);
         
         // initialize planet behavior
         if (pb != null) pb.init(this);

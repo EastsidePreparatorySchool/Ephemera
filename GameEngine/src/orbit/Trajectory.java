@@ -22,6 +22,11 @@ public class Trajectory {
     public SpaceGrid sg;
     
     public Trajectory () {}
+    public Trajectory(Orbitable focus, Vector2 r, Vector2 v, SpaceGrid sg) {
+        this.sg = sg;
+        conics.add(Conic.newConic(focus, r, v, sg.getTime(), sg));
+        currentFocus = focus;
+    }
     public Trajectory(Orbitable focus, double p, double e, double mNaught, double rotation, SpaceGrid sg) {
         this.sg = sg;
         conics.add(Conic.newConic(focus, p, e, mNaught, sg.getTime(), rotation, sg));
@@ -29,13 +34,13 @@ public class Trajectory {
         
         currentFocus = focus;
         
-        double dTheta = Math.PI / 200;
         
+        
+        //useless code for drawing conics
+        //unneccessary as of yet
+        double dTheta = Math.PI / 200;
         double topBound;
         double bottomBound;
-        
-        
-        
         if (conics.get(0) instanceof Hyperbola) {
             topBound = Math.acos(-1f / e) + conics.get(0).rotation;
             bottomBound = conics.get(0).rotation - Math.acos(-1f / e);
@@ -43,6 +48,10 @@ public class Trajectory {
             topBound = Math.PI;
             bottomBound = dTheta - Math.PI;
         }
+    }
+    
+    public double partialHillRadius() {
+        return conics.get(0).partialHillRadius();
     }
     
     public boolean isBound() {

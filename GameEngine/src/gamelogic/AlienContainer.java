@@ -10,6 +10,7 @@ import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import orbit.DummyTrajectory;
+import orbit.Orbitable;
 import orbit.Trajectory;
 
 /**
@@ -215,23 +216,92 @@ public class AlienContainer {
     
     
     public void movecomplex() throws NotEnoughTechException {
+        /* FIND DELTAV */
+        
         Vector2 deltaV;
         try {
-            deltaV = calien.getAccelarate().scale(1f/getMass());
-        } catch (UnsupportedOperationException e) {
-            deltaV = new Vector2(0,0);
-        }
+            deltaV = calien.getAccelerate().scale(1f/getMass());
+        } catch (UnsupportedOperationException e) { deltaV = null; }
+        
+        if (deltaV.x == 0 && deltaV.y == 0) deltaV = null; //if there is no acceleration, don't do anything
         
         nextP = trajectory.positionAtTime(grid.getTime());
         
-        if (GridDisk.isValidPoint(nextP.round())) {
+        
+        
+        
+        /* CHARGE ALIEN FOR DELTAV */
+        
+        //aliens cannot change their trajectory if they ar enot in the game limits
+        if (GridDisk.isValidPoint(nextP.round()) && deltaV != null) {
             double m = deltaV.magnitude();
             if (m < Constants.maxDeltaV(tech)) {
-                trajectory.accelerate(deltaV, grid.getTime());
                 this.energy -= Constants.accelerationCost(m);
-            }
-        } else if (!trajectory.isBound()) kill("Floated into the abyss");
+            } else deltaV = null;
+        } else if (!trajectory.isBound()) {
+            kill("Floated into the abyss");
+            return;
+        }
         
+        
+        
+        
+        
+        
+        
+        /* DETERMINE CURRENT FOCUS */
+        Orbitable focus = findFocus();
+        
+        
+        /* FINALLY, COMPUTE NEW TRAJECTORY */
+        
+        if (focus != trajectory.currentFocus) { //make a new trajectory if the focus has changed
+            Vector2 v = trajectory.velocityAtTime(grid.getTime());
+            if (deltaV != null) v = v.add(deltaV);
+            trajectory = new Trajectory(focus, nextP, v, grid);
+        } else if (deltaV != null) { //if not, alter the old one
+            trajectory.accelerate(deltaV, grid.getTime());
+        }
+    }
+    
+    public Orbitable findFocus() {
+        Orbitable focus = trajectory.currentFocus;
+        boolean altered = false;
+        
+        //if orbiting a planet and within that planet's hill sphere, you're staying there
+        //if not, enter the parent star's orbit
+        if (focus instanceof Planet) {
+            if (focus.position(grid.getTime()).subtract(nextP).magnitude() <= focus.hillRadius()) return focus;
+            else {
+                focus = ((Planet) focus).trajectory.currentFocus;
+            }
+        }
+        
+        //parent must be a star if code gets here
+        
+        double F = focus.mass() / focus.position(grid.getTime()).subtract(nextP).magnitude();
+        
+        //for each star
+        //if it exerts more force on you than your parent star, it becomes your new parent
+        for(InternalSpaceObject iso: grid.objects) if (iso instanceof Star && iso != focus) {
+            if (iso.mass() / iso.position(grid.getTime()).subtract(nextP).magnitude() > F) {
+                focus = iso;
+                altered = true;
+                F = focus.mass() / focus.position(grid.getTime()).subtract(nextP).magnitude();
+            }
+        }
+        
+        //for each planet orbiting your parent star
+        //if you're in their hill sphere, they are your new parent
+        //TODO: does not account for overlapping hill spheres
+        for(InternalSpaceObject iso: grid.objects) if (iso instanceof Planet && iso.trajectory.currentFocus == focus) {
+            if (iso.position(grid.getTime()).subtract(nextP).magnitude() <= iso.hillRadius()) {
+                focus = iso;
+                altered = true;
+            }
+        }
+        
+        return focus;
     }
     
     

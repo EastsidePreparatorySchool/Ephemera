@@ -26,6 +26,15 @@ public class Hyperbola extends Conic {
 
         orbits = 0;
     }
+    
+    public double trueAtF(double F) {
+        return Math.acos((Math.cosh(F) - e) / (1 - e * Math.cosh(F))) * ((F < 0 || F > Math.PI) ? -1 : 1);
+    }
+    public double FAtTrue(double theta) {
+        double coshF = (Math.cos(theta) + e) / (1 + e * Math.cos(theta));
+        return Math.log(coshF + Math.sqrt(coshF*coshF - 1)) * ((theta < 0 || theta > Math.PI) ? -1 : 1);
+    }
+    
 
     @Override
     public double angleAtTime(double t) {
@@ -48,7 +57,13 @@ public class Hyperbola extends Conic {
             F -= dF / (e * Math.cosh(F) - 1);
         } while (dF > Constants.accuracy);
 
-        return Math.acos((Math.cosh(F) - e) / (1 - e * Math.cosh(F))) * ((F < 0 || F > Math.PI) ? -1 : 1);
+        return trueAtF(F);
+    }
+    
+    @Override
+    public double MAtAngle(double theta) {
+        double F = FAtTrue(theta);
+        return e * Math.sinh(F) - F;
     }
 
     @Override

@@ -53,25 +53,23 @@ public class SpaceCritters extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         
-        /*Orbitable center = new DummyMass();
+        Orbitable center = new DummyMass();
         double p = 10;
-        double e = 0.9;
+        double e = 0.8;
         double rotation = 1;
-        double theta = 1;
+        double theta = 0.6;
         Trajectory trajectory = new Trajectory(center, p, e, theta, rotation, new SpaceGrid());
         Vector2 r = trajectory.positionAtTime(0);
-        System.out.println("Position: "  + r);
-        double a = r.angle();
-        double m = r.magnitude();
-        System.out.println("Real angle: " + a);
-        System.out.println("x: " + m*Math.cos(a));
-        System.out.println("y: " + m*Math.sin(a));
+        Vector2 v = trajectory.velocityAtTime(0);
+        System.out.println("Position: " + r);
+        System.out.println("Velocity: " + v);
+        System.out.println("speed: " + v.magnitude());
         
         
         trajectory.accelerate(new Vector2(0,0), 0);
         
         
-        if (true) throw new java.lang.RuntimeException();*/
+        if (true) throw new java.lang.RuntimeException();
         
         GameElementSpec[] elements;
 

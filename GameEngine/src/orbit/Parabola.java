@@ -34,6 +34,11 @@ public class Parabola extends Conic {
 
         //always returns the same number. This is probably an issue
     }
+    
+    @Override
+    public double MAtAngle(double theta) {
+        return Math.tan(theta/2)/2 + Math.pow(Math.tan(theta/2), 2)/6;
+    }
 
     @Override
     public double timeAtAngle(double theta) {
