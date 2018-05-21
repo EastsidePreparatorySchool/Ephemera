@@ -53,7 +53,7 @@ public class SpaceCritters extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         
-        Orbitable center = new DummyMass();
+        /*Orbitable center = new DummyMass();
         double p = 10;
         double e = 0.8;
         double rotation = 1;
@@ -63,13 +63,13 @@ public class SpaceCritters extends Application {
         Vector2 v = trajectory.velocityAtTime(0);
         System.out.println("Position: " + r);
         System.out.println("Velocity: " + v);
-        System.out.println("speed: " + v.magnitude());
+        System.out.println("a: " + r.angle());
         
         
-        trajectory.accelerate(new Vector2(0,0), 0);
+        trajectory.accelerate(new Vector2(0,0), 0);*/
         
         
-        if (true) throw new java.lang.RuntimeException();
+        //if (true) throw new java.lang.RuntimeException();
         
         GameElementSpec[] elements;
 
@@ -167,8 +167,13 @@ public class SpaceCritters extends Application {
             // set scene and stage
             border.setCenter(mainScene.outer);
             Scene scene = new Scene(border);
-            scene.setOnKeyPressed((ex) -> mainScene.controlCamera(ex));
+            //scene.setOnKeyPressed((ex) -> mainScene.controlCamera(ex));
+            scene.setOnKeyPressed((ex) -> mainScene.handleKeyPress(ex));
+            scene.setOnMouseDragged((ex) -> mainScene.handleDrag(ex));
+            scene.setOnMousePressed((ex) -> mainScene.handleClick(ex));
+            scene.setOnScroll((ex) -> mainScene.handleScroll(ex));
             mainScene.outer.requestFocus();
+            
 
             stage.setScene(scene);
             //stage.show(); // happens in showReady()
@@ -180,6 +185,9 @@ public class SpaceCritters extends Application {
             System.in.read();
         }
     }
+//    public void logFocus() {
+//        return 
+//    }
 
     // handle shutdown gracefully
     public void handleExit() {
