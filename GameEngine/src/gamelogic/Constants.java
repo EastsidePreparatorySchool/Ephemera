@@ -20,9 +20,9 @@ public class Constants {
 
     //orbital parameters
     //selected randomly
-    public static final double alienMass = 100;
+    public static final double alienMass = 1e4;
     public static final double deltaT = 0.001;
-    public static final double G = 2e-6;
+    public static final double G = 0.8e-6; 
     public static final double deltaX = 5e4;
     public static final double accuracy = 1e-2;
     
@@ -33,6 +33,7 @@ public class Constants {
     }
     public static double accelerationCost(double deltaV) {
         double c = deltaV * 0.1 - 5;
+        if (c > 0) System.out.println("some one is getting charged. Moved " + deltaV);
         return (c < 0) ? 0:c;
     }
     

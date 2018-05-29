@@ -34,16 +34,16 @@ public class Star3D {
         this.s = new Sphere(1.0);
         s.setMaterial(new PhongMaterial(Color.rgb(255, 255, 255, 0.9)));
         s.setDrawMode(DrawMode.FILL);
-        s.setTranslateX(gameShell.mainScene.xFromX(x));
+        s.setTranslateX(Scene3D.xFromX(x));
         s.setTranslateY(gameShell.mainScene.objectElevation);
-        s.setTranslateZ(gameShell.mainScene.zFromY(y));
+        s.setTranslateZ(Scene3D.zFromY(y));
 
     }
 
     public void forceUpdatePosition() {
-        s.setTranslateX(gameShell.mainScene.xFromX(x));
+        s.setTranslateX(Scene3D.xFromX(x));
         s.setTranslateY(gameShell.mainScene.objectElevation);
-        s.setTranslateZ(gameShell.mainScene.zFromY(y));
+        s.setTranslateZ(Scene3D.zFromY(y));
 
     }
 

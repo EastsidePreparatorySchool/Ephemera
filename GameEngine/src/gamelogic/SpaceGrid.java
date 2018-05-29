@@ -229,6 +229,7 @@ public class SpaceGrid {
             } catch (Exception ex) {
                 displayException("Unhandled exception in getMove(): ", ex);
                 ac.kill("Death for unhandled exception in getMove()/getAccelerate(): " + ex.toString());
+                ex.printStackTrace();
             }
 
         }
@@ -323,7 +324,9 @@ public class SpaceGrid {
                             oldX,
                             oldY,
                             0,
-                            0);
+                            0,
+                            ac.updated,
+                            ac.trajectory);
                 } catch (Exception e) {
                     displayException("Unhandled exception in showMove(): ", e);
                 }
@@ -720,7 +723,7 @@ public class SpaceGrid {
                     );
                     newAliens.add(spec);
                     trajectories.put(spec,thisAlien.trajectory);
-
+                    
                     break;
             }
             // this ends our big switch statement
@@ -800,7 +803,7 @@ public class SpaceGrid {
 
                 aliens.addAlienAndPlug(ac);
                 if (!ac.packageName.equalsIgnoreCase("stockelements")) {
-                    vis.showSpawn(ac.getFullAlienSpec(), 0);
+                    vis.showSpawn(ac.getFullAlienSpec(), 0, ac.trajectory);
                 }
                 as.counter++;
                 as.spawns++;
@@ -841,7 +844,7 @@ public class SpaceGrid {
             p.init();
             objects.add(p);
             this.aliens.plugPlanet(p);
-            vis.registerPlanet(p.position.round().x, p.position.round().y, element.className, p.index, element.energy, (int) element.tech, element.mass);
+            vis.registerPlanet(p.position.round().x, p.position.round().y, element.className, p.index, element.energy, (int) element.tech, element.mass, p.trajectory);
         }
     }
 
@@ -870,7 +873,6 @@ public class SpaceGrid {
         }
 
         addSpecies(element);
-
         ac = addAlienWithParams(p.position.round().x, p.position.round().y, element.domainName, element.packageName, element.className,
                 0, 1, 1, element.state, null);
 

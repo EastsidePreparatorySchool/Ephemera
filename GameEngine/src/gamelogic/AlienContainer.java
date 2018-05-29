@@ -56,6 +56,8 @@ public class AlienContainer {
     
     boolean isComplex;
     Trajectory trajectory;
+    
+    public boolean updated = true;
 
     // Declare stats here
     //
@@ -124,7 +126,6 @@ public class AlienContainer {
         calien = (AlienComplex) a;
         isComplex = true;
         
-        System.out.println("Initializing Complex Alien");
         
         if (trajectory == null) {
             grid.gridDebugErr("ac: No trajectory or focus given");
@@ -145,7 +146,6 @@ public class AlienContainer {
         
         
         p = this.trajectory.positionAtTime(0);
-        
     }
     
     
@@ -217,7 +217,7 @@ public class AlienContainer {
     
     public void movecomplex() throws NotEnoughTechException {
         /* FIND DELTAV */
-        
+        updated = true;
         Vector2 deltaV;
         try {
             deltaV = calien.getAccelerate().scale(1f/getMass());
@@ -233,12 +233,15 @@ public class AlienContainer {
         /* CHARGE ALIEN FOR DELTAV */
         
         //aliens cannot change their trajectory if they ar enot in the game limits
-        if (GridDisk.isValidPoint(nextP.round()) && deltaV != null) {
-            double m = deltaV.magnitude();
-            if (m < Constants.maxDeltaV(tech)) {
-                this.energy -= Constants.accelerationCost(m);
-            } else deltaV = null;
+        if (GridDisk.isValidPoint(nextP.round())) {
+            if (deltaV != null) {
+                double m = deltaV.magnitude();
+                if (m < Constants.maxDeltaV(tech)) {
+                    this.energy -= Constants.accelerationCost(m);
+                } else deltaV = null;
+            }
         } else if (!trajectory.isBound()) {
+            System.out.println("Murderd for nonexistance");
             kill("Floated into the abyss");
             return;
         }
@@ -256,12 +259,21 @@ public class AlienContainer {
         /* FINALLY, COMPUTE NEW TRAJECTORY */
         
         if (focus != trajectory.currentFocus) { //make a new trajectory if the focus has changed
+            System.out.println("WHO?? ");
+            if (focus instanceof Planet) {
+                System.out.println("TWAS A PLANET");
+                System.out.println(((Planet) focus).className);
+            }
+            if (focus instanceof Star) System.out.println("TWAS A STAR");
             Vector2 v = trajectory.velocityAtTime(grid.getTime());
             if (deltaV != null) v = v.add(deltaV);
             trajectory = new Trajectory(focus, nextP, v, grid);
+            return;
         } else if (deltaV != null) { //if not, alter the old one
             trajectory.accelerate(deltaV, grid.getTime());
+            return;
         }
+        updated = false;
     }
     
     public Orbitable findFocus() {
@@ -271,6 +283,7 @@ public class AlienContainer {
         //if orbiting a planet and within that planet's hill sphere, you're staying there
         //if not, enter the parent star's orbit
         if (focus instanceof Planet) {
+            System.out.println(focus.hillRadius());
             if (focus.position(grid.getTime()).subtract(nextP).magnitude() <= focus.hillRadius()) return focus;
             else {
                 focus = ((Planet) focus).trajectory.currentFocus;

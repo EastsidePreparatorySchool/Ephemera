@@ -6,6 +6,7 @@ package gameengineinterfaces;
 
 import alieninterfaces.*;
 import java.util.List;
+import orbit.Trajectory;
 
 /**
  *
@@ -21,7 +22,7 @@ public interface GameVisualizer {
 
     void registerStar(int x, int y, String name, int index, double luminosity, double mass); //[Q]
 
-    void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass); //[Q]
+    void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass, Trajectory t); //[Q]
 
     void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech);  //[Q]
 
@@ -35,11 +36,11 @@ public interface GameVisualizer {
 
     void showAliens(List<AlienSpec> aliens);
 
-    void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition); //[Q]
+    void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition, boolean update, Trajectory t); //[Q]
 
     void showFight(int x, int y);
 
-    void showSpawn(AlienSpec as, double energyAtPos);
+    void showSpawn(AlienSpec as, double energyAtPos, Trajectory t);
 
     void showDeath(AlienSpec as, double energyAtPos);
 

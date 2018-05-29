@@ -5,6 +5,7 @@
 package SpaceCritters;
 
 import alieninterfaces.AlienShapeFactory;
+import alieninterfaces.Vector2;
 import gameengineinterfaces.AlienSpec;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -28,11 +29,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.DrawMode;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.util.Duration;
+import orbit.Trajectory;
 
 /**
  *
@@ -65,7 +68,7 @@ public class Scene3D {
     private double zTrans;
 
     // object positioning
-    double spacing;
+    static double spacing;
     double objectElevation;
 
     public Scene3D(SpaceCritters gameShellInstance, int widthPX, int heightPX) {
@@ -91,7 +94,8 @@ public class Scene3D {
         this.grid = buildAxes();
         this.gridVisible = true;
         this.root.getChildren().addAll(this.grid);
-
+        
+        
         AmbientLight aLight = new AmbientLight(Color.rgb(10, 10, 10));
         pLight = new PointLight(Color.ANTIQUEWHITE);
         pLight.getTransforms().setAll(
@@ -283,12 +287,7 @@ public class Scene3D {
 
             zTrans *= 0.7;
 
-            camera.getTransforms().setAll(
-                    new Translate(focusX, 0, focusY),
-                    new Rotate(yRot, Rotate.Y_AXIS),
-                    new Rotate(xRot, Rotate.X_AXIS),
-                    new Translate(0, 0, zTrans)
-            );
+            updateCamera();
         }
         //e.consume();
     }
@@ -313,16 +312,18 @@ public class Scene3D {
         this.stars.put(index, star);
     }
 
-    public void createPlanet(int x, int y, String name, int index, double energy, int tech) { //[Q]
+    public void createPlanet(int x, int y, String name, int index, double energy, int tech, Trajectory t) { //[Q]
 
-        Planet3D planet = new Planet3D(gameShell, x, y, name, index, energy);
+        Planet3D planet = new Planet3D(gameShell, x, y, name, index, energy, t);
 
-        this.root.getChildren().add(planet.s);
+        //this.root.getChildren().add(planet.s);
+        root.getChildren().add(planet);
         this.planets.put(index, planet);
     }
 
-    public void createAlien(AlienSpec as, int id, int x, int y, AlienShapeFactory asf) { //[Q]
+    public void createAlien(AlienSpec as, int id, int x, int y, AlienShapeFactory asf, Trajectory t) { //[Q]
         Alien3D alien = new Alien3D(gameShell, as, id, x, y, asf);
+        if (t != null) alien.buildTrajectory(t, Color.RED);
         this.aliens.put(as.hashCode, alien);
 
         // alien is added with isNew == true, this leads to update() adding it to the visuals
@@ -339,15 +340,15 @@ public class Scene3D {
         this.updateQueue.add(alien);
     }
 
-    double xFromX(int x) { //[Q]
+    public static double xFromX(double x) { //[Q]
         return (x) * spacing;
     }
 
-    double yFromIndex(int i) { //[Q]
+    public static double yFromIndex(int i) { //[Q]
         return -i;
     }
 
-    double zFromY(int y) { //[Q]
+    public static double zFromY(double y) { //[Q]
         return (y) * spacing;
     }
 
@@ -365,9 +366,9 @@ public class Scene3D {
 
         for (Alien3D a : updateQueue) {
             if (a.killMe) {
-                this.aliens.remove(a.as.hashCode);
-                this.gameShell.fieldGrid.getCell(a.x, a.y).removeAlien(a);
-                this.root.getChildren().remove(a.alien);
+                aliens.remove(a.as.hashCode);
+                gameShell.fieldGrid.getCell(a.x, a.y).removeAlien(a);
+                root.getChildren().remove(a);
             } else {
                 a.updatePosition();
 

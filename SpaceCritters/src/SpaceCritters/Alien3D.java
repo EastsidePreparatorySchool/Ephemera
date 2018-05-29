@@ -19,7 +19,7 @@ import javafx.scene.transform.Translate;
  *
  * @author gmein
  */
-public class Alien3D {
+public class Alien3D extends OrbitGroup{
 
     int x;
     int y;
@@ -33,7 +33,7 @@ public class Alien3D {
     final int id;
     final AlienSpec as;
     final SpaceCritters gameShell;
-    Shape3D alien;
+    private Shape3D alien;
     private LinkedList<Transform> intrinsicTransforms;
 
     public Alien3D(SpaceCritters gameShellInstance, AlienSpec as, int id, int x, int y, AlienShapeFactory asf) { //[Q]
@@ -65,7 +65,9 @@ public class Alien3D {
 
         alien.setMaterial(new PhongMaterial(gameShell.fieldGrid.speciesSet.getColor(as.speciesName, as.speciesID)));
         alien.setDrawMode(DrawMode.FILL);
-    }
+        
+        getChildren().add(alien);
+    } 
 
     void updatePosition() { //[Q]
         Cell cell;
@@ -84,7 +86,7 @@ public class Alien3D {
                 cell.addAlien(this);
 
                 if (isNew) {
-                    gameShell.mainScene.root.getChildren().add(this.alien);
+                    gameShell.mainScene.root.getChildren().add(this);
                     isNew = false;
                 }
             } else {// we are only changing height
@@ -92,9 +94,9 @@ public class Alien3D {
             }
             alien.getTransforms().clear();
             alien.getTransforms().add(new Translate(
-                    gameShell.mainScene.xFromX(x),
-                    gameShell.mainScene.yFromIndex(zPos),
-                    gameShell.mainScene.zFromY(y)));
+                    Scene3D.xFromX(x),
+                    Scene3D.yFromIndex(zPos),
+                    Scene3D.zFromY(y)));
             alien.getTransforms().addAll(intrinsicTransforms);
         }
     }

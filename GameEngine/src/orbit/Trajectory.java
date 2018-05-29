@@ -10,6 +10,7 @@ import alieninterfaces.Vector2;
 import gamelogic.InternalSpaceObject;
 import gamelogic.SpaceGrid;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  *
@@ -34,20 +35,6 @@ public class Trajectory {
         
         currentFocus = focus;
         
-        
-        
-        //useless code for drawing conics
-        //unneccessary as of yet
-        double dTheta = Math.PI / 200;
-        double topBound;
-        double bottomBound;
-        if (conics.get(0) instanceof Hyperbola) {
-            topBound = Math.acos(-1f / e) + conics.get(0).rotation;
-            bottomBound = conics.get(0).rotation - Math.acos(-1f / e);
-        } else {
-            topBound = Math.PI;
-            bottomBound = dTheta - Math.PI;
-        }
     }
     
     public double partialHillRadius() {
@@ -81,6 +68,40 @@ public class Trajectory {
         Trajectory trajectory = new Trajectory();
         for (int i = 0; i < conics.size(); i++) trajectory.conics.add(conics.get(i).clone());
         
+        trajectory.currentFocus = currentFocus;
         return trajectory;
+    }   
+    
+    
+    
+    
+    
+    
+    public Iterator toDraw(int segments) {
+        double dTheta = 2 * Math.PI / segments;
+        double topBound;
+        double bottomBound;
+        
+        Conic conic = conics.get(0);
+        if (conic instanceof Hyperbola) {
+            topBound = Math.acos(-1f / conic.e) + conic.rotation;
+            bottomBound = conic.rotation - Math.acos(-1f / conic.e);
+        } else {
+            topBound = Math.PI;
+            bottomBound = dTheta - Math.PI;
+        }
+        
+        ArrayList<Vector2> points = new ArrayList<>();
+        for (double theta = bottomBound; theta < topBound; theta += dTheta) {
+            points.add(conic.positionAtAngle(theta));
+        }
+        if (conic.e < 1) points.add(conics.get(0).positionAtAngle(dTheta - Math.PI));
+        
+        
+        return points.iterator();
+    }
+    
+    public Vector2 positionOfFocus() {
+        return currentFocus.position(sg.getTime());
     }
 }

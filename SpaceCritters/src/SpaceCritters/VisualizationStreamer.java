@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 import com.google.gson.Gson;
 import alieninterfaces.StarSpec;
+import orbit.Trajectory;
 
 /**
  *
@@ -56,7 +57,7 @@ public class VisualizationStreamer implements GameVisualizer {
     }
 
     @Override
-    public void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass) { //[Q]
+    public void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass, Trajectory t) { //[Q]
         String s = makeRecord("REGPLANET", new PlanetSpec(x, y, name, index, energy, tech, mass));
         println(stateLog, s);
         println(progressLog, s);
@@ -87,7 +88,7 @@ public class VisualizationStreamer implements GameVisualizer {
     }
 
     @Override
-    public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition) { //[Q]
+    public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition, boolean update, Trajectory t) { //[Q]
     }
 
     @Override
@@ -95,7 +96,7 @@ public class VisualizationStreamer implements GameVisualizer {
     }
 
     @Override
-    public void showSpawn(AlienSpec as, double energyAtPos) {
+    public void showSpawn(AlienSpec as, double energyAtPos, Trajectory t) {
     }
 
     @Override

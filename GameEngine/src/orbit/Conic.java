@@ -63,15 +63,15 @@ public abstract class Conic {
         double p = hm*hm/mu;
         double rotation = Math.atan2(e.y, e.x);//Math.asin( v.dot(r.unit()) * hm / (mu*em) ) - theta;
         double theta = r.angle() - rotation;//Math.acos((p/rm - 1) / em);//Math.acos(e.dot(r) / (em*rm));
-        double tNaught = 0; //M at time = 0
+        double tNaught = 0; //I don't knw what I wanted this to be
         
-        
+        /*
         System.out.println("some values:");
         System.out.println("e: " + em);
         System.out.println("p: " + p/Constants.deltaX);
         System.out.println("theta: " + theta);
         System.out.println("rotation of conic: " + rotation);
-        
+        */
         
         return newConic(focus, p/Constants.deltaX, em, theta, tNaught, rotation, sg);
     }
@@ -106,6 +106,7 @@ public abstract class Conic {
         
         
         this.M0 = MAtAngle(theta);
+        
         this.tNaught = tNaught; //thetaNaught?
 
         //p = h^2 / mu              semi-latus rectum
@@ -158,6 +159,6 @@ public abstract class Conic {
     }
     
     public double partialHillRadius() {
-        return p  * (1-e)/ ( (1-e*e) * Math.pow(3*focus.mass(), 1f/3) );
+        return p  * (1-e)/ ( (1-e*e) * Math.pow(3*focus.mass(), 1f/3) ) / Constants.deltaX;
     }
 }

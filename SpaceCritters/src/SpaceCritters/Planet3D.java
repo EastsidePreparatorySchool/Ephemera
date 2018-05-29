@@ -4,18 +4,28 @@
  */
 package SpaceCritters;
 
+import alieninterfaces.Vector2;
+import java.util.ArrayList;
+import java.util.Iterator;
 import javafx.geometry.Point3D;
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Box;
 import javafx.scene.shape.DrawMode;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Sphere;
+import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Translate;
+import orbit.Trajectory;
 
 /**
  *
  * @author gunnar
  */
-public class Planet3D {
+public class Planet3D extends OrbitGroup {
 
     final private SpaceCritters gameShell;
     public int x;
@@ -28,7 +38,7 @@ public class Planet3D {
     int nextY;
     double rotation = 0;
 
-    public Planet3D(SpaceCritters gameShellInstance, int x, int y, String name, int index, double energy) { //[Q]
+    public Planet3D(SpaceCritters gameShellInstance, int x, int y, String name, int index, double energy, Trajectory t) { //[Q]
         this.gameShell = gameShellInstance;
         this.x = x;
         this.y = y;
@@ -38,14 +48,17 @@ public class Planet3D {
         this.nextX = x;
         this.nextY = y;
 
-        this.s = new Sphere(0.7);
+        s = new Sphere(0.7);
         s.setMaterial(new PhongMaterial(Color.GREEN));
         s.setDrawMode(DrawMode.FILL);
         s.setTranslateX(gameShell.mainScene.xFromX(x));
         s.setTranslateY(gameShell.mainScene.objectElevation);
         s.setTranslateZ(gameShell.mainScene.zFromY(y));
-        this.s.setRotationAxis(new Point3D(0, -1, 0));
-
+        s.setRotationAxis(new Point3D(0, -1, 0));
+        
+        getChildren().add(s);
+        
+        if (t != null) buildTrajectory(t, Color.WHITE);
         if (name.equalsIgnoreCase("Earth")) {
             decorateEarth(s);
         } else if (name.equalsIgnoreCase("RMack")) {
@@ -53,6 +66,7 @@ public class Planet3D {
         }
 
     }
+    
 
     public void recordMoveTo(int x, int y) { //[Q]
         this.nextX = x;
