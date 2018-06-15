@@ -37,7 +37,7 @@ public class ContextImplementation implements Context {
 
     @Override
     public Position getPosition() {
-        return ac.p;
+        return new Position(ac.p);
     }
 
     @Override

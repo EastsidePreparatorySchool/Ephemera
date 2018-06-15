@@ -4,15 +4,12 @@
  */
 package SpaceCritters;
 
-import alieninterfaces.Vector2;
-import alieninterfaces.Vector3;
 import gameengineV1.GameEngineV1;
 import gameengineinterfaces.GameCommand;
 import gameengineinterfaces.GameCommandCode;
 import gameengineinterfaces.GameElementSpec;
 import gameengineinterfaces.GameVisualizer;
 import gamelogic.Constants;
-import gamelogic.SpaceGrid;
 import java.io.IOException;
 import java.util.Iterator;
 import javafx.application.Platform;
@@ -24,9 +21,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import static javafx.application.Application.launch;
-import orbit.DummyMass;
-import orbit.Orbitable;
-import orbit.Trajectory;
 
 /**
  *
