@@ -56,8 +56,15 @@ public class Hyperbola extends Conic {
             dF = e * Math.sinh(F) - F - M;
             F -= dF / (e * Math.cosh(F) - 1);
         } while (dF > Constants.accuracy);
-
-        return trueAtF(F);
+        
+        
+        
+        double theta = trueAtF(F);
+        if (t == sg.getTime()) {
+            theta0 = theta1;
+            theta1 = theta;
+        }
+        return theta;
     }
     
     @Override

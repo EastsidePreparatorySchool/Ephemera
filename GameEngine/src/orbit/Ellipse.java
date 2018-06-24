@@ -61,7 +61,12 @@ public class Ellipse extends Conic {
     }
     @Override
     public double angleAtTime(double t) {
-        return trueAtE(EAtTime(t));
+        double theta = trueAtE(EAtTime(t));
+        if (t == sg.getTime()) {
+            theta0 = theta1;
+            theta1 = theta;
+        }
+        return theta;
     }
     
     @Override

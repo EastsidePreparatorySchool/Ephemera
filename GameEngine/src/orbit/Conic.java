@@ -16,7 +16,6 @@ import gamelogic.SpaceGrid;
  * @author qbowers
  */
 class OrbitException extends RuntimeException {
-
     OrbitException(String s) {
         super(s);
     }
@@ -41,6 +40,10 @@ public abstract class Conic {
     double tNaught;
 
     SpaceGrid sg;
+    
+    
+    double theta0;
+    double theta1;
     
     
     public static Conic newConic(Orbitable focus, Vector2 r, Vector2 v, double t, SpaceGrid sg) {
@@ -121,23 +124,26 @@ public abstract class Conic {
         //||r|| + ||r||||e||cos theta = h^2 / mu
         //r_p (radius at periapse) = (h^2 / mu) / (1 + ||e|| cos theta)
     }
-
+    
     public abstract double angleAtTime(double t);
-
+    
     public abstract double timeAtAngle(double theta);
-
+    
     public abstract double nextTimeAtAngle(double theta, double t);
     
     public abstract double MAtAngle(double theta);
-
+    
+    public double radiusAtAngle(double theta) { return p / (1 + e * Math.cos(theta)); }
+    public double angleAtRadius(double r) { return Math.acos((r - p) / (-r*e)); }
+    
     public Position positionAtAngle(double theta) {
-        double r = p / (1 + e * Math.cos(theta));
+        double r = radiusAtAngle(theta);
         if (r < 0 && Math.abs(theta) < Math.PI) {
             System.out.println("Radius was negative at angle " + theta);
         }
         return new Position(r * Math.cos(theta + rotation), r * Math.sin(theta + rotation)).scale(1f / Constants.deltaX);
     }
-
+    
     public Position positionAtTime(double t) {
         double theta = angleAtTime(t);
         return positionAtAngle(theta).add(focus.position(t));
@@ -160,5 +166,11 @@ public abstract class Conic {
     
     public double partialHillRadius() {
         return p  * (1-e)/ ( (1-e*e) * Math.pow(3*focus.mass(), 1f/3) ) / Constants.deltaX;
+    }
+    
+    public double periapse() { return radiusAtAngle(0); }
+    public double apoapse() { 
+        if (this instanceof Parabola || this instanceof Hyperbola) return Double.POSITIVE_INFINITY;
+        return radiusAtAngle(Math.PI);
     }
 }

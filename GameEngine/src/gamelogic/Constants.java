@@ -37,6 +37,11 @@ public class Constants {
         return (c < 0) ? 0:c;
     }
     
+    //the minimum safe distance from a star, decided arbitrarily
+    public static final double starDeathRadius = 5e2;
+    
+    
+    
     public static final double standardMoveCost = 0.1;
     
     
