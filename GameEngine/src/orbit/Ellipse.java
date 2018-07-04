@@ -51,9 +51,14 @@ public class Ellipse extends Conic {
         //find eccentric anomaly
         double E = (t == sg.getTime()) ? prevE : M;
         double dE;
+        int count = 0;
         do { //some calculouse black magic to find E (to within a certain accuracy)
             dE = E - e * Math.sin(E) - M;
             E -= dE / (1 - e * Math.cos(E));
+            if (++ count > 1000) {
+                System.err.println("Stuck in loop in Ellipse EAtTime");
+                break;
+            }
         } while (Math.abs(dE) >= Constants.accuracy);
 
         if (t == sg.getTime()) prevE = E;

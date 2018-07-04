@@ -52,9 +52,14 @@ public class Hyperbola extends Conic {
         }*/
         double F = (t == sg.getTime()) ? prevF : M;
         double dF;
+        int count = 0;
         do {
             dF = e * Math.sinh(F) - F - M;
             F -= dF / (e * Math.cosh(F) - 1);
+             if (++ count > 1000) {
+                System.err.println("Stuck in loop in Hyperbola angleAtTime");
+                break;
+            }
         } while (dF > Constants.accuracy);
 
         return trueAtF(F);
