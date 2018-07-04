@@ -48,7 +48,6 @@
     {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockaliens","className":"Alf","state":"","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0, "mass": 0.0, "mass": 0.0},
     {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockaliens","className":"Tribbles","state":"","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0, "mass": 0.0},
     {"kind":"RESIDENT","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"Elbubbians","state":"","parent":"ephemera.eastsideprep.org:stockelements:Kukaro","x":0,"y":0,"energy":255.0,"tech":5.0, "mass": 0.0},
-    {"kind":"RESIDENT","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"Elbubbians","state":"","parent":"ephemera.eastsideprep.org:stockelements:Liloso","x":0,"y":0,"energy":255.0,"tech":5.0, "mass": 0.0},
     {"kind":"RESIDENT","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"Ezkar","state":"","parent":"ephemera.eastsideprep.org:stockelements:Leyec","x":0,"y":0,"energy":8.0,"tech":255.0, "mass": 0.0},
     {"kind":"RESIDENT","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"SysAds","state":"","parent":"ephemera.eastsideprep.org:stockelements:RMack","x":0,"y":0,"energy":8.0,"tech":8.0, "mass": 0.0}
   ]

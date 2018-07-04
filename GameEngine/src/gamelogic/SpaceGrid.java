@@ -232,7 +232,6 @@ public class SpaceGrid {
                 ac.kill("Death for unhandled exception in getMove()/getAccelerate(): " + ex.toString());
                 ex.printStackTrace();
             }
-
         }
     }
 

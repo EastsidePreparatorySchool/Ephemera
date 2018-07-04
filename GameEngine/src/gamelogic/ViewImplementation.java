@@ -152,10 +152,12 @@ public class ViewImplementation implements View {
             AlienCell acs = ag.getAliensAt(p);
             if (acs != null) {
 
-                LinkedList<AlienSpecies> bunch = acs.getAllSpeciesWithPredicateAndPosition((species) -> species != specific, p);
+
+                LinkedList<AlienSpecies> bunch = acs.getAllSpeciesWithPredicateAndPosition((species) -> species == specific, p);
                 if (bunch != null) {
                     if (as == null) {
                         as = new LinkedList();
+
                     }
                     as.addAll(bunch);
                 }
