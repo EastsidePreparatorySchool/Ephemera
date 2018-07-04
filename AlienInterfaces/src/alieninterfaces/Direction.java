@@ -8,39 +8,37 @@ package alieninterfaces;
  *
  * @author gmein
  */
-public class Direction {
+public class Direction extends Vector2 {
 
-    public int x;
-    public int y;
+    public Direction(Vector2 v) {
+        super(v);
+    }
 
-    public Direction(int xChange, int yChange) {
-        this.x = xChange;
-        this.y = yChange;
+    public Direction(double x, double y) {
+        super(x, y);
     }
 
     public Direction(Position p1, Position p2) {
         this.x = p2.x - p1.x;
         this.y = p2.y - p1.y;
     }
-    
+
     public Direction add(Direction d1) {
-        return new Direction(x+d1.x, y+d1.y);
+        return new Direction(x + d1.x, y + d1.y);
     }
 
-    public int getLength() {
-        return Math.abs(x) + Math.abs(y);
+    public double getLength() {
+        return magnitude();
     }
 
-    public Direction scaleToLength(int l) {
-        int currentLength = getLength();
-        int newX = (int) (this.x * (double) l / (double) currentLength);
-        int newY = (int) (this.y * (double) l / (double) currentLength);
-
-        return new Direction(newX, newY);
+    @Override
+    public Direction scaleToLength(double scale) {
+        return new Direction(super.scaleToLength(scale));
     }
 
-    public String toString() {
-        return "(" + x + "," + y + ")";
+    @Override
+    public IntegerDirection round() {
+        return new IntegerDirection(this);
     }
 
 }

@@ -10,11 +10,11 @@ import gameengineinterfaces.*;
  *
  * @author gunnar
  */
-public class ResidentContextImplementation implements ResidentContext{
-    
+public class ResidentContextImplementation implements ResidentContext {
+
     AlienContainer ac;
-    
-    ResidentContextImplementation (AlienContainer ac) {
+
+    ResidentContextImplementation(AlienContainer ac) {
         this.ac = ac;
     }
 
@@ -27,6 +27,5 @@ public class ResidentContextImplementation implements ResidentContext{
     public void setTech(int tech) {
         this.ac.tech = tech;
     }
-    
-    
+
 }

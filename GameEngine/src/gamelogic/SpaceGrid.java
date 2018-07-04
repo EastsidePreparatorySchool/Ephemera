@@ -19,6 +19,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import orbit.DummyTrajectory;
+import orbit.Trajectory;
 
 /**
  *
@@ -40,10 +42,14 @@ public class SpaceGrid {
     double avgTech;
 
     int currentTurn = 1;
+    private static double time = 0;
     int speciesCounter = 1; // starting with ID 1
 
     // this is the only approved random generator for the game. Leave it alone!
     public Random rand;
+
+    public SpaceGrid() {
+    }
 
     public SpaceGrid(GameEngineV1 eng, GameVisualizer vis, int width, int height, Achievement[] achievements) {
         this.vis = vis;
@@ -61,12 +67,16 @@ public class SpaceGrid {
         return alienCount;
     }
 
-   public double getTech() {
+    public double getTech() {
         return avgTech;
     }
 
+    public double getTime() {
+        return time;
+    }
+
     public void ready() {
-        // this is also a good spot to 
+        // this is also a good spot to
         // prepare the random generator seed number
         // if not set from config file
         if (Constants.randSeed == 0) {
@@ -83,7 +93,7 @@ public class SpaceGrid {
         // send the whole energyMap to the display
         for (int x = -aliens.centerX; x < aliens.centerX; x++) {
             for (int y = -(aliens.centerY); y < (aliens.centerY); y++) {
-                vis.mapEnergy(x, y, aliens.getEnergyAt(new Position(x, y)));
+                vis.mapEnergy(x, y, aliens.getEnergyAt(new IntegerPosition(x, y)));
             }
         }
 
@@ -91,6 +101,8 @@ public class SpaceGrid {
     }
 
     public boolean executeGameTurn() {
+        time += Constants.deltaT;
+
         performCommunications();
         removeDeadAliens();
         performReceives();
@@ -155,7 +167,7 @@ public class SpaceGrid {
         vis.debugOut("");
     }
 
-    public void performCommunications() {
+    public void performCommunications() { //[Q]
         // phase 1: take outgoing messages and store in ac
         for (AlienContainer ac : aliens) {
             // get rid of stale views from prior phases
@@ -190,7 +202,7 @@ public class SpaceGrid {
                 ac.ctx.view = null;
 
                 // call the alien to receive messages
-                AlienCell acell = aliens.getAliensAt(ac.x, ac.y);
+                AlienCell acell = aliens.getAliensAt(ac.p);
                 if (acell.currentMessages != null) {
                     String[] messages = new String[acell.currentMessages.size()];
                     try {
@@ -204,14 +216,11 @@ public class SpaceGrid {
         }
     }
 
-    public void requestAlienMoves() {
+    public void requestAlienMoves() { //[Q]
         //vis.debugOut("Requesting moves for " + (aliens.size()) + " aliens");
         for (AlienContainer ac : aliens) {
             // get rid of stale views from prior moves
             ac.ctx.view = null;
-
-            int oldX = ac.x;
-            int oldY = ac.y;
 
             // call the alien to move
             try {
@@ -220,13 +229,8 @@ public class SpaceGrid {
                 // we'll let that go
             } catch (Exception ex) {
                 displayException("Unhandled exception in getMove(): ", ex);
-                ac.kill("Death for unhandled exception in getMove(): " + ex.toString());
-            }
-
-            // charge only for moves > 1 in either direction
-            int moveLength = GridCircle.distance(ac.x, ac.y, oldX, oldY);
-            if (Math.abs(ac.x - oldX) > 1 || Math.abs(ac.y - oldY) > 1) {
-                ac.energy -= moveLength;
+                ac.kill("Death for unhandled exception in getMove()/getAccelerate(): " + ex.toString());
+                ex.printStackTrace();
             }
         }
     }
@@ -235,7 +239,47 @@ public class SpaceGrid {
         for (InternalSpaceObject so : this.objects) {
             if (so.isPlanet) {
                 Planet p = (Planet) so;
+
+                // unplug planet from grid
+                aliens.unplugPlanet(p);
+
+                Position pOld = p.position;
                 p.move();
+                Position pNew = p.position;
+
+                // plug planet back into grid
+                aliens.plugPlanet(p);
+
+                // now worry about the aliens at the old and new positions
+                AlienCell acsFrom = aliens.getAliensAt(pOld.round());
+                AlienCell acsTo = aliens.getAliensAt(pNew.round());
+
+                // if aliens are where the planet is moving to, and not landed, they die.
+                if (acsTo != null) {
+                    // we have a cell, let's look at aliens
+                    for (AlienContainer ac : acsTo) {
+                        // if not landed, and not freshly moved here, you die.
+                        if (ac.planet != p && ac.nextP.equals(ac.p)) {
+                            ac.kill("Death by being in path of planet " + p.className);
+                        }
+                    }
+                }
+
+                // aliens that were on the planet, move with the planet
+                // do this on a cloned list to avoid comodification
+                LinkedList<AlienContainer> acsClone = (LinkedList<AlienContainer>) acsFrom.clone();
+                for (AlienContainer ac : acsClone) {
+                    if (ac.planet == p) {
+                        // they didn't intend to move away, move with planet
+                        ac.nextP = p.position;
+                    }
+                }
+
+                // visualize
+                IntegerPosition pOldInt = pOld.round();
+                IntegerPosition pNewInt = pNew.round();
+
+                vis.showPlanetMove(pOldInt.x, pOldInt.y, pNewInt.x, pNewInt.y, p.className, p.index, p.energy, (int) p.tech);
             }
         }
     }
@@ -252,24 +296,23 @@ public class SpaceGrid {
 
     // now that moving is done and views don't matter anymore,
     // record the moves in AlienContainers and the grid
-    public void recordAlienMoves() {
+    public void recordAlienMoves() { //[Q]
         //vis.debugOut("Recording moves for " + (aliens.size()) + " aliens");
 
         // now for all the aliens
         for (AlienContainer ac : aliens) {
             if (ac.energy > 0) {// not accidentally killed by moving planet in this phase
-                int oldX = ac.x;
-                int oldY = ac.y;
+                int oldX = ac.p.round().x; //[kludge]
+                int oldY = ac.p.round().y;
 
-                if (oldX != ac.nextX || oldY != ac.nextY) {
-                    ac.x = ac.nextX;
-                    ac.y = ac.nextY;
-                    aliens.move(ac, oldX, oldY, ac.x, ac.y);
+                if (oldX != ac.nextP.x || oldY != ac.nextP.y) {
+                    ac.p.set(ac.nextP);
+                    aliens.move(ac, oldX, oldY, ac.p.round().x, ac.p.round().y);
                 }
 
-                // need to go through all the rest to mark cell fresh for display, 
+                // need to go through all the rest to mark cell fresh for display,
                 // TODO: Fix this in visualizer instead, go away from fillRect and to painting individual cells.
-                AlienCell acs = aliens.getAliensAt(ac.x, ac.y);
+                AlienCell acs = aliens.getAliensAt(ac.p);
 
                 // call shell visualizer
                 // just make sure we don't blow up the alien beacuse of an exception in the shell
@@ -278,7 +321,9 @@ public class SpaceGrid {
                             oldX,
                             oldY,
                             0,
-                            0);
+                            0,
+                            ac.updated,
+                            ac.trajectory);
                 } catch (Exception e) {
                     displayException("Unhandled exception in showMove(): ", e);
                 }
@@ -290,8 +335,8 @@ public class SpaceGrid {
         }
     }
 
-    public boolean isInSafeZone(AlienContainer ac) {
-        return GridCircle.distance(0, 0, ac.x, ac.y) <= Constants.safeZoneRadius;
+    public boolean isInSafeZone(AlienContainer ac) { //[Q]
+        return ac.p.magnitude() <= Constants.safeZoneRadius;
     }
 
     public void removeDeadAliens() {
@@ -321,7 +366,7 @@ public class SpaceGrid {
             alien.outgoingMessage = null;
             alien.listening = false;
 
-            AlienCell acell = alien.grid.aliens.getAliensAt(alien.x, alien.y);
+            AlienCell acell = alien.grid.aliens.getAliensAt(alien.p);
             acell.listening = false;
             acell.currentMessages = null;
             acell.energyPerAlien = 0;
@@ -329,7 +374,7 @@ public class SpaceGrid {
     }
 
     public void processResults() {
-        for (AlienContainer ac:aliens) {
+        for (AlienContainer ac : aliens) {
             //for (AlienContainer ac : aliens) {
             // get rid of stale views from prior moves
             ac.ctx.view = null;
@@ -349,14 +394,13 @@ public class SpaceGrid {
     public void requestAlienActions() {
 
         this.avgTech = 0;
-        
+
         // first request all the actions from the aliens
-        for (AlienContainer thisAlien:aliens) {
+        for (AlienContainer thisAlien : aliens) {
             // get rid of stale views from prior phases
             thisAlien.ctx.view = null;
-            
+
             // assess avg tech
-            
             avgTech += thisAlien.tech;
 
             try {
@@ -368,7 +412,7 @@ public class SpaceGrid {
                 thisAlien.currentActionCode = Action.ActionCode.None;
                 thisAlien.currentActionPower = 0;
             } catch (Exception ex) {
-                // for all other exceptions, we'll kill it. 
+                // for all other exceptions, we'll kill it.
                 thisAlien.currentActionCode = Action.ActionCode.None;
                 thisAlien.currentActionPower = 0;
                 thisAlien.kill("Death for unhandled exception in getAction(): " + ex.toString());
@@ -385,9 +429,9 @@ public class SpaceGrid {
         }
     }
 
-    public void performAlienActions() {
+    public void performAlienActions() { //[Q]
         LinkedList<AlienSpec> newAliens = new LinkedList<>();
-
+        HashMap<AlienSpec, Trajectory> trajectories = new HashMap<>();
         // now process all actions
         for (AlienContainer thisAlien : aliens) {
             //thisAlien.debugOut(thisAlien.currentActionCode.toString());
@@ -399,7 +443,7 @@ public class SpaceGrid {
 
             switch (thisAlien.currentActionCode) {
                 case Land:
-                    Planet p = aliens.getAliensAt(thisAlien.x, thisAlien.y).planet;
+                    Planet p = aliens.getAliensAt(thisAlien.p).planet;
                     if (p != null) {
                         thisAlien.planet = p;
                     } else {
@@ -433,7 +477,7 @@ public class SpaceGrid {
                     List<AlienSpec> fightSpecs = new ArrayList<>();
                     HashMap<String, Double> fightSpecies = new HashMap<>();
 
-                    LinkedList<AlienContainer> fightingAliens = aliens.getAliensAt(thisAlien.x, thisAlien.y);
+                    LinkedList<AlienContainer> fightingAliens = aliens.getAliensAt(thisAlien.p);
 
                     for (AlienContainer fightingAlien : fightingAliens) {
 
@@ -470,7 +514,7 @@ public class SpaceGrid {
                         }
                     }
 
-                    vis.showFight(thisAlien.x, thisAlien.y);
+                    vis.showFight(thisAlien.p.round().x, thisAlien.p.round().y);
 
                     // Determine the winning power in the fight
                     double winningPower = 0; // The fight powers might tie
@@ -540,7 +584,7 @@ public class SpaceGrid {
                     // As long as we don't mutilate the aliens, we can mutilate
                     // the list as much as we want
                     List<AlienContainer> aliensAtPos;
-                    aliensAtPos = (List<AlienContainer>) aliens.getAliensAt(thisAlien.x, thisAlien.y).clone();
+                    aliensAtPos = (List<AlienContainer>) aliens.getAliensAt(thisAlien.p).clone();
                     for (AlienContainer ac : aliensAtPos) {
                         if (ac.currentActionCode == Action.ActionCode.Fight) {
                             break; // No trades can take place if there is war
@@ -599,7 +643,7 @@ public class SpaceGrid {
                 case Gain:
                     // todo: share power only among those gaining
                     if (thisAlien.energy < Constants.energyCap) {
-                        AlienCell acs = aliens.getAliensAt(thisAlien.x, thisAlien.y);
+                        AlienCell acs = aliens.getAliensAt(thisAlien.p);
                         // if this cell was not initialized in this turn, initialize it
                         // todo: how does this get reset? should it?
                         if (acs.energyPerAlien == 0) {
@@ -653,15 +697,15 @@ public class SpaceGrid {
                         thisAlien.kill("Death by spawning exhaustion - died in childbirth.");
                     }
 
-                    Direction dir = new Direction(x, y);
-                    dir = thisAlien.containMove(thisAlien.x, thisAlien.y, dir);
+                    Vector2 dir = new IntegerVector2(x, y).v2();
+                    dir = thisAlien.containMove(thisAlien.p.x, thisAlien.p.y, dir);
 
-                    x = thisAlien.x + dir.x;
-                    y = thisAlien.y + dir.y;
+                    x = thisAlien.p.round().x + dir.round().x; //[kludge]
+                    y = thisAlien.p.round().y + dir.round().y;
 
                     // Add in the alien spec to a new arraylist
                     // to be processed later so the master list is not disrupted
-                    newAliens.add(new AlienSpec(
+                    AlienSpec spec = new AlienSpec(
                             thisAlien.domainName,
                             thisAlien.packageName,
                             thisAlien.className,
@@ -673,8 +717,11 @@ public class SpaceGrid {
                             thisAlien.tech, // tech inherited undiminished from parent, TODO: This is questionable
                             null,
                             null,
-                            thisAlien.currentActionMessage
-                    ));
+                            thisAlien.currentActionMessage,
+                            thisAlien
+                    );
+                    newAliens.add(spec);
+                    trajectories.put(spec, thisAlien.trajectory);
 
                     break;
             }
@@ -684,53 +731,63 @@ public class SpaceGrid {
         // add all new aliens
         for (AlienSpec as : newAliens) {
             addAlienWithParams(as.x, as.y, as.domainName, as.packageName, as.className,
-                    as.hashCode, as.tech, as.energy, as.msg);
+                    as.hashCode, as.tech, as.energy, as.msg, trajectories.get(as));
         }
     }
 
-    void addSpecies(GameElementSpec element) {
+    InternalAlienSpecies addSpecies(GameElementSpec element) {
         String speciesName = element.domainName + ":" + element.packageName + ":" + element.className;
+        int oldCounter = speciesCounter;
+        InternalAlienSpecies result = null;
 
-        // add species if necessary
-        InternalAlienSpecies as = speciesMap.get(speciesName);
-        if (as == null) {
+        try {
+            // add species if necessary
+            InternalAlienSpecies as = speciesMap.get(speciesName);
+            if (as == null) {
 
-            as = new InternalAlienSpecies(element.domainName, element.packageName, element.className, speciesCounter, speciesMap.getAchievementCount());
-            speciesMap.put(speciesName, as);
-            speciesCounter++;
+                as = new InternalAlienSpecies(element.domainName, element.packageName, element.className, speciesCounter, speciesMap.getAchievementCount());
+                speciesMap.put(speciesName, as);
+                speciesCounter++;
 
-            if (as.cns == null) {
-                try {
-                    as.cns = loadConstructor(engine, element.domainName, element.packageName, element.className);
-                } catch (Exception e) {
-                    gridDebugErr("sg.addSpecies: Error loading contructor for " + speciesName);
-                    //throw (e);
-                }
-                as.shapeFactory = null;
-                try {
-                    Alien a = (Alien) as.cns.newInstance();
-                    if (a instanceof AlienShapeFactory) {
-                        as.shapeFactory = (AlienShapeFactory) a;
+                if (as.cns == null) {
+                    try {
+                        as.cns = loadConstructor(engine, element.domainName, element.packageName, element.className);
+                    } catch (Exception e) {
+                        gridDebugErr("sg.addSpecies: Error loading contructor for " + speciesName);
+//                        e.printStackTrace(System.out);
                     }
-                } catch (Exception e) {
-                    gridDebugErr("sg.addSpecies: Error constructing class reference alien for " + speciesName);
-                    //throw (e);
+                    as.shapeFactory = null;
+                    try {
+                        Alien a = (Alien) as.cns.newInstance();
+                        if (a instanceof AlienShapeFactory) {
+                            as.shapeFactory = (AlienShapeFactory) a;
+                        }
+                    } catch (Exception e) {
+                        gridDebugErr("sg.addSpecies: Error constructing class reference alien for " + speciesName);
+                        throw (e);
+                    }
+
                 }
 
+                if (!element.packageName.equalsIgnoreCase("stockelements")) {
+                    vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
+                }
+                result = as;
             }
-
-            if (!element.packageName.equalsIgnoreCase("stockelements")) {
-                vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
-            }
+        } catch (Exception e) {
+            gridDebugErr("sg.addSpecies: Could not register alien species " + speciesName);
+            speciesMap.remove(speciesName);
+            speciesCounter = oldCounter;
+//            e.printStackTrace(System.out);
         }
+        return result;
     }
 
-    void addAlien(int x, int y, String domainName, String alienPackageName, String alienClassName) {
-        addAlienWithParams(x, y, domainName, alienPackageName, alienClassName, 0, 1, 1, null);
-    }
-
-    AlienContainer addAlienWithParams(int x, int y, String domainName, String alienPackageName, String alienClassName,
-            int parent, double tech, double power, String spawnMsg) {
+    AlienContainer addAlienWithParams(int x, int y, String domainName,
+            String alienPackageName, String alienClassName,
+            int parent, double tech, double power, String spawnMsg,
+            Trajectory trajectory
+    ) {
         AlienContainer ac = null;
 
         String speciesName = domainName + ":" + alienPackageName + ":" + alienClassName;
@@ -746,24 +803,26 @@ public class SpaceGrid {
             }
         }
 
-        if (as.counter < Constants.perSpeciesCap
-                && as.spawns < Constants.perSpeciesSpawnCap) {
+        if (as.counter < Constants.perSpeciesCap && as.spawns < Constants.perSpeciesSpawnCap) {
             try {
                 ac = new AlienContainer(this, this.vis, x, y,
                         domainName, alienPackageName, alienClassName, as.cns, as,
                         tech, power, // tech and power
                         parent, // no parent
-                        spawnMsg); // no spawn state
+                        spawnMsg, // no spawn state
+                        trajectory); //no trajectory
 
                 aliens.addAlienAndPlug(ac);
                 if (!ac.packageName.equalsIgnoreCase("stockelements")) {
-                    vis.showSpawn(ac.getFullAlienSpec(), 0);
+                    vis.showSpawn(ac.getFullAlienSpec(), 0, ac.trajectory);
                 }
                 as.counter++;
                 as.spawns++;
                 this.alienCount++;
             } catch (InstantiationException e) {
                 gridDebugErr("sg: could not instantiate new " + speciesName);
+                gridDebugErr("sg: " + e.getMessage());
+                e.printStackTrace(System.out);
             }
         }
 
@@ -773,10 +832,10 @@ public class SpaceGrid {
     // Note: Having a seperate method for each InternalSpaceObject seems a little gross,
     // as there is already a large if statement in addElement and the code in
     // addPlanet and addStar is nearly identical
-    void addPlanet(GameElementSpec element) {
+    void addPlanet(GameElementSpec element
+    ) { //[Q]
         InternalSpaceObject soParent = null;
         PlanetBehavior pb = null;
-
         for (InternalSpaceObject o : this.objects) {
             if (element.parent.equalsIgnoreCase(o.getFullName())) {
                 soParent = o;
@@ -791,23 +850,23 @@ public class SpaceGrid {
                 vis.debugOut("sg.addPlanet: behavior not found: " + element.className);
             }
 
-            Planet p = new Planet(this, soParent.position.x, soParent.position.y,
-                    GridCircle.distance(element.x, element.y, 0, 0),
+            Planet p = new Planet(this, soParent,
+                    new Vector2(element.x, element.y).magnitude(),
                     planetCount++,
                     element.domainName, element.packageName, element.className,
-                    element.energy, element.tech, element.parent, pb);
+                    element.energy, element.tech, element.parent, pb, element.mass);
             p.init();
             objects.add(p);
             this.aliens.plugPlanet(p);
-            vis.registerPlanet(p.position.x, p.position.y, element.className, p.index, element.energy, (int) element.tech);
+            vis.registerPlanet(p.position.round().x, p.position.round().y, element.className, p.index, element.energy, (int) element.tech, element.mass, p.trajectory);
         }
     }
 
-    void addStar(GameElementSpec element) {
-        Star st = new Star(this, element.x, element.y, starCount++, element.domainName, element.packageName, element.className, element.energy, element.tech);
+    void addStar(GameElementSpec element) { //[Q]
+        Star st = new Star(this, element.x, element.y, starCount++, element.domainName, element.packageName, element.className, element.energy, element.tech, element.mass);
         objects.add(st);
         this.aliens.plugStar(st);
-        vis.registerStar(element.x, element.y, element.className, objects.indexOf(st), element.energy);
+        vis.registerStar(element.x, element.y, element.className, objects.indexOf(st), element.energy, element.mass);
         aliens.distributeStarEnergy(element.x, element.y, element.energy);
     }
 
@@ -827,10 +886,14 @@ public class SpaceGrid {
             return;
         }
 
-        addSpecies(element);
+        InternalAlienSpecies as = addSpecies(element);
+        if (as == null) {
+            return;
+        }
 
-        ac = addAlienWithParams(p.position.x, p.position.y, element.domainName, element.packageName, element.className,
-                0, 1, 1, element.state);
+        ac = addAlienWithParams(p.position.round().x, p.position.round().y,
+                element.domainName, element.packageName, element.className,
+                0, 1, 1, element.state, null);
 
         if (ac == null) {
             return;
@@ -854,7 +917,17 @@ public class SpaceGrid {
             switch (element.kind) {
                 case ALIEN:
                     // position (0,0) leads to random assignment
-                    addAlien(0, 0, element.domainName, element.packageName, element.className);
+                    InternalSpaceObject soParent = null;
+                    element.parent = "ephemera.eastsideprep.org:stockelements:Sol"; // BIG FAT KLUDGE
+                    for (InternalSpaceObject o : this.objects) {
+                        if (element.parent != null && element.parent.equalsIgnoreCase(o.getFullName())) {
+                            soParent = o;
+                            break;
+                        }
+                    }
+
+                    addAlienWithParams(0, 0, element.domainName, element.packageName, element.className, 0, 1, 1, null,
+                            (soParent != null) ? new DummyTrajectory(soParent) : null);
                     break;
                 case SPECIES:
                     addSpecies(element);
@@ -899,22 +972,14 @@ public class SpaceGrid {
 
         try {
             file = new File(fullName);
-            url = file.toURI().toURL();
-            parameters = new Object[1];
-            parameters[0] = url;
 
-            URLClassLoader classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-            Method method = URLClassLoader.class
-                    .getDeclaredMethod("addURL", URL.class
-                    );
-            method.setAccessible(true);
-            Object result = method.invoke(classLoader, parameters);
+            URLClassLoader classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()}, this.getClass().getClassLoader());
 
             String fullClassName = packageName.equals("") ? className : (packageName + "." + className);
 
             cs = ClassLoader.getSystemClassLoader().loadClass(fullClassName).getConstructor();
         } catch (Exception e) {
-            //e.printStackTrace();
+//            e.printStackTrace(System.out);
             vis.debugErr("sg: Could not get constructor: " + className);
             throw e;
         }

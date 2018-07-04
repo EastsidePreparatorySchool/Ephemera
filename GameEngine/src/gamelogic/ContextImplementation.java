@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class ContextImplementation implements Context {
 
-    private AlienContainer ac;
+    private final AlienContainer ac;
     public GameVisualizer vis;
     public ViewImplementation view;
 
@@ -37,7 +37,17 @@ public class ContextImplementation implements Context {
 
     @Override
     public Position getPosition() {
-        return new Position(ac.x, ac.y);
+        return new Position(ac.p);
+    }
+
+    @Override
+    public double getMass() {
+        return ac.getMass();
+    }
+
+    @Override
+    public double getTime() {
+        return ac.grid.getTime();
     }
 
     @Override
@@ -46,23 +56,22 @@ public class ContextImplementation implements Context {
         if (size > 2 && size > (int) ac.tech) {
             throw new NotEnoughTechException();
         }
-        
+
         //if (!Constants.gameMode.equalsIgnoreCase("sc_play.json")) {
         //    // views are only free in play mode
         //    ac.energy -= size;
         //}
-        
         // Make size at least 2 so people can see where they can move for free
         size = Math.max(size, 2);
 
         // if we don't have one or they want a bigger one
-        this.view = new ViewImplementation(ac.grid.aliens, ac, ac.x, ac.y, size);
+        this.view = new ViewImplementation(ac.grid.aliens, ac, ac.p.round().x, ac.p.round().y, size); //[kludge]
         return this.view;
     }
 
     @Override
     public double getPresentEnergy() {
-        return ac.grid.aliens.getEnergyAt(ac.x, ac.y);
+        return ac.grid.aliens.getEnergyAt(ac.p.round().x, ac.p.round().y); //[kludge]
     }
 
     @Override
@@ -79,11 +88,12 @@ public class ContextImplementation implements Context {
     public HashMap getSecrets() {
         return new HashMap<>(ac.secrets);
     }
-    
+
     @Override
     public int getSecret(String key) {
         return ac.secrets.get(key);
     }
+
     // alien chatter is prefixed with full info, and only talks when chatter is on
     @Override
     public void debugOut(String s) {
@@ -100,7 +110,7 @@ public class ContextImplementation implements Context {
     // messsaging API: record that this alien wants to send, and whether to receive
     @Override
     public void broadcastAndListen(String message, int power, boolean listen)
-            throws NotEnoughTechException, NotEnoughEnergyException {
+            throws NotEnoughTechException, NotEnoughEnergyException { //[Q]
 
         if (power > ac.tech) {
             throw new NotEnoughTechException();
@@ -116,29 +126,24 @@ public class ContextImplementation implements Context {
         ac.outgoingPower = power;
 
         if (listen) {
-            AlienCell acell = this.ac.grid.aliens.getAliensAt(ac.x, ac.y);
+            AlienCell acell = this.ac.grid.aliens.getAliensAt(ac.p.round().x, ac.p.round().y); //[kludge]
             ac.listening = true;
             acell.listening = true;
         }
     }
 
     // communicate phase 2: deliver messages to gridpoints
-    public void routeMessages() {
+    public void routeMessages() { //[Q]
         // poke around our current position,
         // tracing an imaginary square of increasing size,
         // in 8 line segments, hopefully without overlap
-        for (int d = 1; d <= ac.outgoingPower; d++) {
-            GridCircle c = new GridCircle(ac.x, ac.y, d);
-            for (Position point : c) {
-                if (point != null) {
-                    depositMessageAt(point, ac.outgoingMessage);
-                }
-            }
+        for (IntegerPosition p:new GridDisk(ac.p, (int) ac.outgoingPower)) {
+            depositMessageAt(p, ac.outgoingMessage);
         }
     }
 
     // put a message at one grid point ONLY if someone is listening
-    public void depositMessageAt(Position p, String message) {
+    public void depositMessageAt(IntegerPosition p, String message) { //[Q]
         int x = p.x;
         int y = p.y;
 
@@ -170,13 +175,13 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public Position getMinPosition() {
-        return new Position(-ac.grid.width / 2, -ac.grid.height / 2);
+    public IntegerPosition getMinPosition() {
+        return new IntegerPosition(-ac.grid.width / 2, -ac.grid.height / 2);
     }
 
     @Override
-    public Position getMaxPosition() {
-        return new Position(ac.grid.width / 2 - 1, ac.grid.height / 2 - 1);
+    public IntegerPosition getMaxPosition() {
+        return new IntegerPosition(ac.grid.width / 2 - 1, ac.grid.height / 2 - 1);
     }
 
     @Override
@@ -188,25 +193,25 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public int getDistance(Position p1, Position p2) {
-        return GridCircle.distance(p1, p2);
+    public double getDistance(Vector2 p1, Vector2 p2) {
+        return p1.subtract(p2).magnitude();
     }
 
     @Override
-    public List<Position> computeOrbit(Position center, int radius) {
-        GridCircle gc = new GridCircle(center.x, center.y, radius);
-        ArrayList<Position> orbit = new ArrayList<>();
-        
-        for (Position p:gc) {
+    public List<IntegerPosition> computeOrbit(IntegerPosition center, int radius) { //Note: DISABLED. No one uses it and it needs to be rewtirren with conics anyway
+        //GridCircle gc = new GridCircle(center.x, center.y, radius);
+        ArrayList<IntegerPosition> orbit = new ArrayList<>();
+
+        /*for (IntegerPosition p : gc) {
             orbit.add(p);
-        }
-        
+        }*/
+
         return orbit;
     }
 
     @Override
     public AlienSpecies getMyAlienSpecies() {
-        return new AlienSpecies(ac.domainName, ac.packageName, ac.className, ac.speciesID, ac.x, ac.y);
+        return new AlienSpecies(ac.domainName, ac.packageName, ac.className, ac.speciesID, ac.p.round().x, ac.p.round().y); //[kludge]
     }
 
 }

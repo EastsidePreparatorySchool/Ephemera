@@ -78,12 +78,12 @@ public class GameEngineThread extends Thread {
                     }
                 } catch (Exception e) {
                     engine.vis.debugErr("GameEngineThread: Unhandled exception during turn: " + e.getMessage());
-                    //e.printStackTrace();
+                    e.printStackTrace();
                 }
                 totalTurns++;
                 engine.vis.showCompletedTurn(totalTurns, engine.grid.getNumAliens(), System.nanoTime() - startTurnTime, engine.grid.getTech());
             } catch (Exception e) {
-                //e.printStackTrace();
+                e.printStackTrace();
                 engine.vis.debugErr("GameThread: Unknown exception: " + e.getMessage());
                 break;
             }

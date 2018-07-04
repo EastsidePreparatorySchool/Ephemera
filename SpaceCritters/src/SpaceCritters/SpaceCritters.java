@@ -10,31 +10,16 @@ import gameengineinterfaces.GameCommandCode;
 import gameengineinterfaces.GameElementSpec;
 import gameengineinterfaces.GameVisualizer;
 import gamelogic.Constants;
-import java.io.File;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.util.Iterator;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.stage.Screen;
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.geometry.Pos;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Modality;
-import javafx.stage.StageStyle;
 import static javafx.application.Application.launch;
 
 /**
@@ -61,7 +46,25 @@ public class SpaceCritters extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-
+        
+        /*Orbitable center = new DummyMass();
+        double p = 10;
+        double e = 0.8;
+        double rotation = 1;
+        double theta = 0.6;
+        Trajectory trajectory = new Trajectory(center, p, e, theta, rotation, new SpaceGrid());
+        Vector2 r = trajectory.positionAtTime(0);
+        Vector2 v = trajectory.velocityAtTime(0);
+        System.out.println("Position: " + r);
+        System.out.println("Velocity: " + v);
+        System.out.println("a: " + r.angle());
+        
+        
+        trajectory.accelerate(new Vector2(0,0), 0);*/
+        
+        
+        //if (true) throw new java.lang.RuntimeException();
+        
         GameElementSpec[] elements;
 
         try {
@@ -142,7 +145,6 @@ public class SpaceCritters extends Application {
             engine.init(field, gamePath, alienPath);
             elements = engine.readConfigFile("sc_config.json");
             engine.processGameElements(elements);
-
             // load a game and process it
             elements = engine.readConfigFile(Constants.gameMode);
             engine.processGameElements(elements);
@@ -151,7 +153,7 @@ public class SpaceCritters extends Application {
             mainScene = new Scene3D(this, (int) screenBounds.getWidth() - 220, (int) screenBounds.getHeight() - 20);
 
             // set a hook to shut down engine on game exit
-            stage.setOnCloseRequest(e -> handleExit());
+            stage.setOnCloseRequest(ex -> handleExit());
 
             // load fancy planets
             Planet3D.preLoadPlanetImages();
@@ -159,20 +161,126 @@ public class SpaceCritters extends Application {
             // set scene and stage
             border.setCenter(mainScene.outer);
             Scene scene = new Scene(border);
-            scene.setOnKeyPressed((e) -> mainScene.controlCamera(e));
+            //scene.setOnKeyPressed((ex) -> mainScene.controlCamera(ex));
+            scene.setOnKeyPressed((ex) -> mainScene.handleKeyPress(ex));
+            scene.setOnMouseDragged((ex) -> mainScene.handleDrag(ex));
+            scene.setOnMousePressed((ex) -> mainScene.handleClick(ex));
+            scene.setOnScroll((ex) -> mainScene.handleScroll(ex));
             mainScene.outer.requestFocus();
+            
 
             stage.setScene(scene);
             //stage.show(); // happens in showReady()
 
             // and tell the engine that we are done adding elements
             engine.queueCommand(new GameCommand(GameCommandCode.Ready));
-        } catch (Exception e) {
-            System.out.println(e.toString());
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
             System.in.read();
         }
     }
+//    public void logFocus() {
+//        return 
+//    }
 
+    // handle shutdown gracefully
+    public void handleExit() {
+        engine.queueCommand(new GameCommand(GameCommandCode.End));
+        field.showGameOver(); // closes logfile
+        this.streamer.showGameOver();
+        this.streamer.shutdown();
+
+        Platform.exit();
+        System.exit(0);
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    //
+    // Visual helpers
+    //
+    private void setSize(Stage stage, javafx.geometry.Rectangle2D bounds) {
+        stage.setX(bounds.getMinX());
+        stage.setY(bounds.getMinY());
+        stage.setWidth(bounds.getWidth());
+        stage.setHeight(bounds.getHeight());
+
+    }
+
+
+    /*
+     * Creates an HBox with two buttons for the top region
+     */
+    ListView<AlienSpeciesForDisplay> addAlienSpeciesList() {
+        ListView<AlienSpeciesForDisplay> speciesView = new ListView<>(species.getObservableList());
+
+        speciesView.setCellFactory((ListView<AlienSpeciesForDisplay> list) -> new SpeciesListCell());
+        speciesView.setStyle("-fx-background-color: black;");
+
+        return speciesView;
+    }
+
+    void startGame() {
+        // first start
+        Iterator<AlienSpeciesForDisplay> iter = species.speciesList.iterator();
+        while (iter.hasNext()) {
+            AlienSpeciesForDisplay as = iter.next();
+            if (as.isOn()) {
+                GameElementSpec element = new GameElementSpec("ALIEN", as.domainName, as.packageName, as.className,
+                        null); // state
+                engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
+            } else {
+                //iter.remove();
+            }
+        }
+
+        engine.queueCommand(new GameCommand(GameCommandCode.Resume));
+        controlPane.buttonPause.setText("Pause");
+        controlPane.speciesView.setDisable(true);
+
+    }
+
+    void startOrPauseGame(ActionEvent e) {
+        if (controlPane.buttonPause.getText().equals("Pause")) {
+            // pause
+            engine.queueCommand(new GameCommand(GameCommandCode.Pause));
+            controlPane.buttonPause.setText("Resume");
+            controlPane.speciesView.setDisable(false);
+        } else if (controlPane.buttonPause.getText().equals("Start")) {
+            // first start
+            startGame();
+            controlPane.speciesView.setDisable(true);
+
+        } else {
+            // regular resume
+            engine.queueCommand(new GameCommand(GameCommandCode.Resume));
+            controlPane.buttonPause.setText("Pause");
+            controlPane.speciesView.setDisable(true);
+        }
+    }
+
+    // doesn't really work
+    /*
+    private void restart() {
+        engine.queueCommand(new GameCommand(GameCommandCode.End));
+        stage.close();
+        try {
+            StringBuilder cmd = new StringBuilder();
+            cmd.append(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java ");
+            for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
+                cmd.append(jvmArg + " ");
+            }
+            cmd.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
+            cmd.append(SpaceCritters.class.getName()).append(" ");
+            Runtime.getRuntime().exec(cmd.toString());
+            System.exit(0);
+        } catch (Exception e) {
+        }
+    }
+     */
+ /*
     private Stage createSplashScreen() {
         Stage dialog = new Stage();
         dialog.setTitle("About SpaceCritters");
@@ -267,100 +375,5 @@ public class SpaceCritters extends Application {
         //dialog.setFullScreen(true);
         return dialog;
     }
-
-    // handle shutdown gracefully
-    public void handleExit() {
-        engine.queueCommand(new GameCommand(GameCommandCode.End));
-        field.showGameOver(); // closes logfile
-        this.streamer.showGameOver();
-        this.streamer.shutdown();
-
-        Platform.exit();
-        System.exit(0);
-    }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-    //
-    // Visual helpers
-    //
-    private void setSize(Stage stage, javafx.geometry.Rectangle2D bounds) {
-        stage.setX(bounds.getMinX());
-        stage.setY(bounds.getMinY());
-        stage.setWidth(bounds.getWidth());
-        stage.setHeight(bounds.getHeight());
-
-    }
-
-
-    /*
-     * Creates an HBox with two buttons for the top region
      */
-    ListView<AlienSpeciesForDisplay> addAlienSpeciesList() {
-        ListView<AlienSpeciesForDisplay> speciesView = new ListView<>(species.getObservableList());
-
-        speciesView.setCellFactory((ListView<AlienSpeciesForDisplay> list) -> new SpeciesListCell());
-        speciesView.setStyle("-fx-background-color: black;");
-
-        return speciesView;
-    }
-
-    void startGame() {
-        // first start
-        Iterator<AlienSpeciesForDisplay> iter = species.speciesList.iterator();
-        while (iter.hasNext()) {
-            AlienSpeciesForDisplay as = iter.next();
-            if (as.isOn()) {
-                GameElementSpec element = new GameElementSpec("ALIEN", as.domainName, as.packageName, as.className,
-                        null); // state
-                engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
-            } else {
-                //iter.remove();
-            }
-        }
-
-        engine.queueCommand(new GameCommand(GameCommandCode.Resume));
-        controlPane.buttonPause.setText("Pause");
-        controlPane.speciesView.setDisable(true);
-
-    }
-
-    void startOrPauseGame(ActionEvent e) {
-        if (controlPane.buttonPause.getText().equals("Pause")) {
-            // pause
-            engine.queueCommand(new GameCommand(GameCommandCode.Pause));
-            controlPane.buttonPause.setText("Resume");
-            controlPane.speciesView.setDisable(false);
-        } else if (controlPane.buttonPause.getText().equals("Start")) {
-            // first start
-            startGame();
-            controlPane.speciesView.setDisable(true);
-
-        } else {
-            // regular resume
-            engine.queueCommand(new GameCommand(GameCommandCode.Resume));
-            controlPane.buttonPause.setText("Pause");
-            controlPane.speciesView.setDisable(true);
-        }
-    }
-
-    // doesn't really work
-    private void restart() {
-        engine.queueCommand(new GameCommand(GameCommandCode.End));
-        stage.close();
-        try {
-            StringBuilder cmd = new StringBuilder();
-            cmd.append(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java ");
-            for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
-                cmd.append(jvmArg + " ");
-            }
-            cmd.append("-cp ").append(ManagementFactory.getRuntimeMXBean().getClassPath()).append(" ");
-            cmd.append(SpaceCritters.class.getName()).append(" ");
-            Runtime.getRuntime().exec(cmd.toString());
-            System.exit(0);
-        } catch (Exception e) {
-        }
-    }
 }

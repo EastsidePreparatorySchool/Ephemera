@@ -20,6 +20,7 @@ public class Venusian implements Alien {
     public Venusian() {
     }
 
+    @Override
     public void init(Context game_ctx, int id, int parent, String message) {
         ctx = game_ctx;
         ctx.debugOut("Initialized at "
@@ -27,6 +28,7 @@ public class Venusian implements Alien {
 
     }
 
+    @Override
     public Direction getMove() {
 
         //ctx.debugOut("Move requested,"
@@ -39,7 +41,7 @@ public class Venusian implements Alien {
             List<AlienSpecies> nearestAliens = ctx.getView((int) ctx.getTech()).getClosestXenos(
                     new AlienSpecies("eastsideprep.org", "stockaliens", "Alf", 0));
             if (nearestAliens != null) {
-                Position nearest = nearestAliens.get(0).position;
+                IntegerPosition nearest = nearestAliens.get(0).position;
 
                 if (nearest.x > ctx.getPosition().x) {
                     x = -1;
@@ -65,7 +67,6 @@ public class Venusian implements Alien {
         }
         //ctx.debugOut("Moving (" + Integer.toString(x) + "," + Integer.toString(y) + ")");
 
-        
         // move at least 1 
         if (x == 0 && y == 0) {
             x = ctx.getRandomInt(3) - 1;
@@ -73,8 +74,8 @@ public class Venusian implements Alien {
         }
         //but don't move into star
         try {
-            if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new Direction((int) x, (int) y))) != null) {
-                y -= y > 0? 1:-1;
+            if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new IntegerDirection((int) x, (int) y))) != null) {
+                y -= y > 0 ? 1 : -1;
             }
         } catch (NotEnoughEnergyException | NotEnoughTechException | View.CantSeeSquareException ex) {
         }

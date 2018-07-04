@@ -9,6 +9,8 @@ package gameengineinterfaces;
  * @author gunnar
  */
 public interface ResidentContext {
+
     void setEnergy(double energy);
-    void setTech (int tech);
+
+    void setTech(int tech);
 }

@@ -22,9 +22,8 @@ public class Star3D {
     final public double energy;
     final public int index; // index in ArrayList of stars in both engine and visualizer
     final public Sphere s;
- 
 
-    public Star3D(SpaceCritters gameShellInstance, int x, int y, String name, int index, double energy) {
+    public Star3D(SpaceCritters gameShellInstance, int x, int y, String name, int index, double energy) { //[Q]
         this.gameShell = gameShellInstance;
         this.x = x;
         this.y = y;
@@ -35,20 +34,16 @@ public class Star3D {
         this.s = new Sphere(1.0);
         s.setMaterial(new PhongMaterial(Color.rgb(255, 255, 255, 0.9)));
         s.setDrawMode(DrawMode.FILL);
-        s.setTranslateX(gameShell.mainScene.xFromX(x));
+        s.setTranslateX(Scene3D.xFromX(x));
         s.setTranslateY(gameShell.mainScene.objectElevation);
-        s.setTranslateZ(gameShell.mainScene.zFromY(y));
-
-    
+        s.setTranslateZ(Scene3D.zFromY(y));
 
     }
 
     public void forceUpdatePosition() {
-        s.setTranslateX(gameShell.mainScene.xFromX(x));
+        s.setTranslateX(Scene3D.xFromX(x));
         s.setTranslateY(gameShell.mainScene.objectElevation);
-        s.setTranslateZ(gameShell.mainScene.zFromY(y));
-
-      
+        s.setTranslateZ(Scene3D.zFromY(y));
 
     }
 

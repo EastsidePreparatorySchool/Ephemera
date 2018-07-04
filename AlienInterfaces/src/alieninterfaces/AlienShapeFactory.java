@@ -10,7 +10,7 @@ import javafx.scene.shape.Shape3D;
  *
  * @author gunnar
  */
-public interface AlienShapeFactory{
+public interface AlienShapeFactory {
 
     Shape3D getShape(int complexityLimit);
 

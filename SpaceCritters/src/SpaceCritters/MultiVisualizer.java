@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import orbit.Trajectory;
 
 /**
  *
@@ -36,27 +37,27 @@ public class MultiVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void registerStar(int x, int y, String name, int index, double luminosity) {
+    public void registerStar(int x, int y, String name, int index, double luminosity, double mass) { //[Q]
         cgv.forEach(e -> {
             try {
-                e.registerStar(x, y, name, index, luminosity);
+                e.registerStar(x, y, name, index, luminosity, mass);
             } catch (UnsupportedOperationException ex) {
             }
         });
     }
 
     @Override
-    public void registerPlanet(int x, int y, String name, int index, double energy, int tech) {
+    public void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass, Trajectory t) { //[Q]
         cgv.forEach(e -> {
             try {
-                e.registerPlanet(x, y, name, index, energy, tech);
+                e.registerPlanet(x, y, name, index, energy, tech, mass, t);
             } catch (UnsupportedOperationException ex) {
             }
         });
     }
 
     @Override
-    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) {
+    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) { //[Q]
         cgv.forEach(e -> {
             try {
                 e.showPlanetMove(oldx, oldy, x, y, name, index, energy, tech);
@@ -116,10 +117,10 @@ public class MultiVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition) {
+    public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition, boolean update, Trajectory t) { //[Q]
         cgv.forEach(e -> {
             try {
-                e.showMove(as, oldX, oldY, energyAtNewPosition, energyAtOldPosition);
+                e.showMove(as, oldX, oldY, energyAtNewPosition, energyAtOldPosition, update, t);
             } catch (UnsupportedOperationException ex) {
             }
         });
@@ -136,10 +137,10 @@ public class MultiVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showSpawn(AlienSpec as, double energyAtPos) {
+    public void showSpawn(AlienSpec as, double energyAtPos, Trajectory t) {
         cgv.forEach(e -> {
             try {
-                e.showSpawn(as, energyAtPos);
+                e.showSpawn(as, energyAtPos, t);
             } catch (UnsupportedOperationException ex) {
             }
         });

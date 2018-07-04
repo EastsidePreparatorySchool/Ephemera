@@ -68,8 +68,8 @@ public final class ControlPane extends VBox {
         buttonConsole = new Button("Console");
         buttonHelp = new Button("Help");
         turnCounter = new Text("Turns:        0");
-        alienNumber =         new Text("Aliens:       0");
-        timeForTurn =         new Text("s/turn:     0ms");
+        alienNumber = new Text("Aliens:       0");
+        timeForTurn = new Text("s/turn:     0ms");
         timeForTurnAndAlien = new Text("s/turn/#:   0ms");
         alienView = new RadioButton("Aliens");
         energyView = new RadioButton("Energy");
@@ -145,7 +145,7 @@ public final class ControlPane extends VBox {
         alienNumber.setFont(Font.font("Consolas", FontWeight.NORMAL, 14));
         alienNumber.setStyle("-fx-background-color: black;");
         alienNumber.setFill(Color.WHITE);
-        
+
         timeForTurn.setFont(Font.font("Consolas", FontWeight.NORMAL, 14));
         timeForTurn.setStyle("-fx-background-color: black;");
         timeForTurn.setFill(Color.WHITE);

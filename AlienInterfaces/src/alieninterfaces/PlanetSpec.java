@@ -17,13 +17,16 @@ public class PlanetSpec {
     double energy;
     int tech;
 
-    public PlanetSpec(int x, int y, String name, int index, double energy, int tech) {
+    double mass;
+
+    public PlanetSpec(int x, int y, String name, int index, double energy, int tech, double mass) { //[Q]
         this.x = x;
         this.y = y;
         this.name = name;
         this.index = index;
         this.energy = energy;
         this.tech = tech;
+        this.mass = mass;
     }
 
 }

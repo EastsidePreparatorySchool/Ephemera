@@ -55,7 +55,7 @@ public class Martian implements Alien {
         }
 
         //gets the coordinates of the closest alien.
-        Position ClosestAlien = new Position(5, 5);
+        IntegerPosition ClosestAlien = new IntegerPosition(5, 5);
 
         try {
             List<AlienSpecies> l = ctx.getView((int) ctx.getTech()).getClosestXenos(
@@ -64,19 +64,19 @@ public class Martian implements Alien {
                 ClosestAlien = l.get(0).position;
             }
         } catch (Exception e) {
-            ClosestAlien = new Position(5, 5);
+            ClosestAlien = new IntegerPosition(5, 5);
         }
 
         if (ClosestAlien == null) {
-            ClosestAlien = new Position(5, 5);
+            ClosestAlien = new IntegerPosition(5, 5);
 
         }
 
         //Checks to see if the closest alien is withen moving capability.
-        if (ctx.getDistance(ClosestAlien, ctx.getPosition()) <= (long) ctx.getTech()) {
+        if (ctx.getDistance(ClosestAlien.v2(), ctx.getPosition()) <= (long) ctx.getTech()) {
 
-            HorizontalMove = ClosestAlien.x - ctx.getPosition().x;
-            VerticalMove = ClosestAlien.y - ctx.getPosition().y;
+            HorizontalMove = ClosestAlien.x - ctx.getPosition().round().x;
+            VerticalMove = ClosestAlien.y - ctx.getPosition().round().y;
         }
 
         //sets the amount of energy to fight with by how much energy, and how muc technology
@@ -95,7 +95,7 @@ public class Martian implements Alien {
         }
         //but don't move into star
         try {
-            if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new Direction((int) HorizontalMove, (int) VerticalMove))) != null) {
+            if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new IntegerDirection((int) HorizontalMove, (int) VerticalMove))) != null) {
                 VerticalMove -= VerticalMove > 0 ? 1 : -1;
             }
         } catch (NotEnoughEnergyException | NotEnoughTechException | View.CantSeeSquareException ex) {

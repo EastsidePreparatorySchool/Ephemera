@@ -50,7 +50,7 @@ public class Alf implements Alien {
             List<AlienSpecies> nearestAliens = ctx.getView((int) ctx.getTech()).getClosestXenos(
                     new AlienSpecies("ephemera.eastsideprep.org", "stockaliens", "Alf", 0));
             if (nearestAliens != null) {
-                Position nearest = nearestAliens.get(0).position;
+                IntegerPosition nearest = nearestAliens.get(0).position;
 
                 //always moves away from other aliens
                 if (nearest.x > ctx.getPosition().x) {
@@ -79,7 +79,7 @@ public class Alf implements Alien {
         }
         //but don't move into star
         try {
-            if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new Direction((int) x, (int) y))) != null) {
+            if (ctx.getView(2).getSpaceObjectAtPos(ctx.getPosition().add(new IntegerDirection((int) x, (int) y))) != null) {
                 y -= y > 0 ? 1 : -1;
             }
         } catch (NotEnoughEnergyException | NotEnoughTechException | View.CantSeeSquareException ex) {

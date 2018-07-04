@@ -11,7 +11,7 @@ import alieninterfaces.*;
  * @author thaeger
  */
 public class Tribbles implements Alien {
-    
+
     int myID = 0;
     Context ctx;
     int alienCount = 0;
@@ -24,7 +24,7 @@ public class Tribbles implements Alien {
     public void init(Context ctx, int id, int parent, String message) {
         this.myID = id;
         this.ctx = ctx;
-     }
+    }
 
     @Override
     public void communicate() {
@@ -40,44 +40,44 @@ public class Tribbles implements Alien {
     public Direction getMove() {
         //find distance between here and corner
         //find nearest star/planet for avoidance
-        
-        if(alienCount < 5000) {
-        distance = ctx.getDistance(ctx.getPosition(),ctx.getMinPosition());
-        if(distance > r) {
-            distance = ctx.getDistance(ctx.getPosition(),ctx.getMinPosition());
-            ctx.debugOut(Integer.toString(distance));
-            return new Direction(-1,-1);
-        }
-        if(distance <= r) {
-            distance = ctx.getDistance(ctx.getPosition(),ctx.getMinPosition());
-            x = ctx.getRandomInt(3) - 1;
-            y = ctx.getRandomInt(3) - 1;
-            return new Direction(x,y);
-        }
-        return new Direction(0,0);
+
+        if (alienCount < 5000) {
+            distance = (int) ctx.getDistance(ctx.getPosition(), ctx.getMinPosition().v2());
+            if (distance > r) {
+                distance = (int) ctx.getDistance(ctx.getPosition(), ctx.getMinPosition().v2());
+                ctx.debugOut(Integer.toString(distance));
+                return new Direction(-1, -1);
+            }
+            if (distance <= r) {
+                distance = (int) ctx.getDistance(ctx.getPosition(), ctx.getMinPosition().v2());
+                x = ctx.getRandomInt(3) - 1;
+                y = ctx.getRandomInt(3) - 1;
+                return new Direction(x, y);
+            }
+            return new Direction(0, 0);
         } else {
             x = ctx.getRandomInt(3) - 1;
             y = ctx.getRandomInt(3) - 1;
-            return new Direction(x,y);
+            return new Direction(x, y);
         }
     }
 
     @Override
     public Action getAction() {
-        if(distance < r + 5 && ctx.getEnergy() > ctx.getSpawningCost() + 11){
+        if (distance < r + 5 && ctx.getEnergy() > ctx.getSpawningCost() + 11) {
             alienCount++;
             ctx.debugOut(Double.toString(ctx.getEnergy()));
-            return new Action(Action.ActionCode.Spawn,10);
-        } else  {
-            if(ctx.getEnergy() < ctx.getTech() + 5)
+            return new Action(Action.ActionCode.Spawn, 10);
+        } else {
+            if (ctx.getEnergy() < ctx.getTech() + 5) {
                 return new Action(Action.ActionCode.Gain);
-            else {
+            } else {
                 return new Action(Action.ActionCode.Research);
             }
         }
     }
 
     @Override
-    public void processResults(){
+    public void processResults() {
     }
 }

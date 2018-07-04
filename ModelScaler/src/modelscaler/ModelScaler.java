@@ -29,16 +29,15 @@ public class ModelScaler extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        
+
         display = createDisplay();
 
         HBox hb = new HBox();
         hb.getChildren().addAll(display, controls);
 
         root.getChildren().add(hb);
-        
+
         Scene scene = prepareScene();
-        
 
         primaryStage.setTitle("SpaceCritters Model Scaler 1.0");
         primaryStage.setScene(scene);
@@ -71,10 +70,6 @@ public class ModelScaler extends Application {
         return scene;
     }
 
-    
-    
-    
-    
     /**
      * @param args the command line arguments
      */

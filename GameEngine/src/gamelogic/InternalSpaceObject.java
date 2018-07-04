@@ -4,14 +4,18 @@
  */
 package gamelogic;
 
+import alieninterfaces.IntegerPosition;
 import alieninterfaces.Position;
+import alieninterfaces.Vector2;
 import gameengineinterfaces.PlanetBehavior;
+import orbit.Orbitable;
+import orbit.Trajectory;
 
 /**
  *
  * @author guberti
  */
-public abstract class InternalSpaceObject {
+public abstract class InternalSpaceObject implements Orbitable {
 
     public Position position;
     public final String domainName;
@@ -20,14 +24,19 @@ public abstract class InternalSpaceObject {
     private String fullName;
     public SpaceGrid grid;
     public boolean isPlanet = false;
-    public int index; 
+    public int index;
     public PlanetBehavior pb;
+    
+    public double hillRadius = 0;
+
+    double mass;
+    Trajectory trajectory;
 
     public double energy; // Energy that aliens gain every turn from the planet
     public double tech; // Tech boost for the planet
 
-    public InternalSpaceObject(SpaceGrid grid, int x, int y, int index, String domainName, String packageName, String className, double energy, double tech) {
-        this.position = new Position (x,y);
+    public InternalSpaceObject(SpaceGrid grid, Position p, int index, String domainName, String packageName, String className, double energy, double tech, double mass) { //[Q]
+        this.position = new Position(p);
         this.energy = energy;
         this.tech = tech;
         this.domainName = domainName;
@@ -36,6 +45,7 @@ public abstract class InternalSpaceObject {
         this.grid = grid;
         this.index = index;
         this.pb = null;
+        this.mass = mass;
     }
 
     public String getFullName() {
@@ -45,5 +55,22 @@ public abstract class InternalSpaceObject {
 
         return fullName;
 
+    }
+    
+    @Override
+    public double mass() { return mass; }
+    @Override
+    public Position position(double t) { 
+        if (trajectory != null) return trajectory.positionAtTime(t);
+        return new Position(position);
+    }
+    @Override
+    public Vector2 velocity(double t) {
+        if (trajectory == null) return new Vector2(0,0);
+        return trajectory.velocityAtTime(t);
+    }
+    
+    public double hillRadius() {
+        return hillRadius;
     }
 }

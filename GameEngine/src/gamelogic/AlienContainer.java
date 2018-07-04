@@ -8,8 +8,10 @@ import gameengineinterfaces.AlienSpec;
 import alieninterfaces.*;
 import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
-import static gamelogic.GridCircle.distance;
 import java.util.HashMap;
+import orbit.DummyTrajectory;
+import orbit.Orbitable;
+import orbit.Trajectory;
 
 /**
  *
@@ -27,6 +29,7 @@ public class AlienContainer {
     public AlienSpecies species;
     public final Constructor<?> constructor;
     public Alien alien;
+    public AlienComplex calien;
     public final ContextImplementation ctx;
     public final SpaceGrid grid;
     public int alienHashCode;
@@ -45,13 +48,16 @@ public class AlienContainer {
     public HashMap<String, Integer> secrets;
 
     boolean participatedInAction;
-    public int x;
-    public int y;
-    public int nextX;
-    public int nextY;
+    public Position p = new Position(0, 0);
+    public Position nextP;
     public String outgoingMessage;
     public double outgoingPower;
     int turnsInSafeZone;
+    
+    boolean isComplex;
+    Trajectory trajectory;
+    
+    public boolean updated = true;
 
     // Declare stats here
     //
@@ -59,7 +65,7 @@ public class AlienContainer {
     //
     public AlienContainer(SpaceGrid sg, GameVisualizer vis, int x, int y,
             String alienDomainName, String alienPackageName, String alienClassName, Constructor<?> cns, AlienSpecies as,
-            double energy, double tech, int parent, String message) throws InstantiationException {
+            double energy, double tech, int parent, String message, Trajectory trajectory) throws InstantiationException { //[Q]
 
         this.domainName = alienDomainName;
         this.packageName = alienPackageName;
@@ -79,13 +85,13 @@ public class AlienContainer {
 
         // if position = (0,0) assign random position in safe zone
         if (x == 0 && y == 0) {
-            this.x = ctx.getRandomInt(Constants.safeZoneRadius + 1);
-            this.x *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
-            this.y = ctx.getRandomInt(Constants.safeZoneRadius + 1);
-            this.y *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
+            this.p.x = ctx.getRandomInt(Constants.safeZoneRadius + 1);
+            this.p.x *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
+            this.p.y = ctx.getRandomInt(Constants.safeZoneRadius + 1);
+            this.p.y *= (ctx.getRandomInt(2) == 0 ? 1 : -1);
         } else {
-            this.x = x;
-            this.y = y;
+            this.p.x = x;
+            this.p.y = y;
         }
 
         this.alienHashCode = 0;
@@ -94,10 +100,14 @@ public class AlienContainer {
         try {
             a = (Alien) cns.newInstance();
             this.alien = a;
+            if (a instanceof AlienComplex) {
+                initComplex(a, trajectory);
+            }
             this.alienHashCode = ++currentID;
         } catch (Throwable t) {
             this.alien = null;
             grid.gridDebugErr("ac: Error constructing Alien");
+            t.printStackTrace(System.out);
             throw new InstantiationException();
         }
 
@@ -112,6 +122,40 @@ public class AlienContainer {
 
     }
     // class-related helpers
+    
+    public void initComplex(Alien a, Trajectory trajectory) throws InstantiationException {
+        calien = (AlienComplex) a;
+        isComplex = true;
+        
+        
+        if (trajectory == null) {
+            grid.gridDebugErr("ac: No trajectory or focus given");
+            throw new InstantiationException();
+        }
+        
+        
+        
+        if (trajectory instanceof DummyTrajectory){
+            this.trajectory = new Trajectory(
+                    trajectory.currentFocus, //focus from the dummy trajectory
+                    grid.rand.nextDouble()*3 + 5, //semi-latus rectum
+                    Math.pow(grid.rand.nextDouble(),2), //Eccentricity
+                    grid.rand.nextDouble()*2*Math.PI, //mNaught
+                    grid.rand.nextDouble()*2*Math.PI, //rotation
+                    grid);
+        } else this.trajectory = trajectory.clone();
+        
+        
+        p = this.trajectory.positionAtTime(0);
+    }
+    
+    
+    
+    
+    
+    public double getMass() {
+        return Constants.alienMass;
+    }
 
     public String getFullSpeciesName() {
         if (speciesName == null) {
@@ -128,18 +172,18 @@ public class AlienContainer {
     }
 
     public AlienSpec getFullAlienSpec() {
-        return new AlienSpec(this.domainName, this.packageName, this.className, this.species.speciesID, this.alienHashCode, this.x, this.y,
+        return new AlienSpec(this.domainName, this.packageName, this.className, this.species.speciesID, this.alienHashCode, this.p.round().x, this.p.round().y,
                 this.tech, this.energy, this.fullName, this.speciesName, this.currentActionPower);
     }
 
-    public AlienSpec getSimpleAlienSpec() {
+    /*public AlienSpec getSimpleAlienSpec() {
         return new AlienSpec(this.domainName, this.packageName, this.className, this.species.speciesID, this.fullName, this.speciesName);
-    }
+    }*/
 
     public AlienSpecies getAlienSpecies() {
         if (this.species == null) {
             assert false;
-            species = new AlienSpecies(this.domainName, this.packageName, this.className, species.speciesID, this.x, this.y);
+            species = new AlienSpecies(this.domainName, this.packageName, this.className, species.speciesID, this.p.round().x, this.p.round().y);
         }
         return species;
 
@@ -147,11 +191,11 @@ public class AlienContainer {
 
     public String toStringExpensive() {
         return getFullName() + ": "
-                + "X:" + (x)
-                + " Y:" + (y)
+                + "X:" + (p.x)
+                + " Y:" + (p.y)
                 + " E:" + (energy)
                 + " T:" + (tech)
-                + " r:" + ((int) Math.floor(Math.hypot((double) x, (double) y)));
+                + " r:" + ((int) Math.floor(Math.hypot(p.x, p.y)));
     }
 
     public void processResults() {
@@ -163,9 +207,122 @@ public class AlienContainer {
     }
 
     public void move() throws NotEnoughTechException {
+        // if on planet, ignore move
+        if (this.planet != null) return;
+        
+        if (isComplex) movecomplex();
+        else movestandard();
+    }
+    
+    
+    
+    public void movecomplex() throws NotEnoughTechException {
+        /* FIND DELTAV */
+        updated = true;
+        Vector2 deltaV;
+        try {
+            deltaV = calien.getAccelerate().scale(1f/getMass());
+        } catch (UnsupportedOperationException e) { deltaV = null; }
+        
+        if (deltaV.x == 0 && deltaV.y == 0) deltaV = null; //if there is no acceleration, don't do anything
+        
+        nextP = trajectory.positionAtTime(grid.getTime());
+        
+        
+        
+        
+        /* CHARGE ALIEN FOR DELTAV */
+        
+        //aliens cannot change their trajectory if they ar enot in the game limits
+        if (GridDisk.isValidPoint(nextP.round())) {
+            if (deltaV != null) {
+                double m = deltaV.magnitude();
+                if (m < Constants.maxDeltaV(tech)) {
+                    this.energy -= Constants.accelerationCost(m);
+                } else deltaV = null;
+            }
+        } else if (!trajectory.isBound()) {
+            System.out.println("Murderd for nonexistance");
+            kill("Floated into the abyss");
+            return;
+        }
+        
+        
+        
+        
+        
+        
+        
+        /* DETERMINE CURRENT FOCUS */
+        Orbitable focus = findFocus();
+        
+        
+        /* FINALLY, COMPUTE NEW TRAJECTORY */
+        
+        if (focus != trajectory.currentFocus) { //make a new trajectory if the focus has changed
+            System.out.println("WHO?? ");
+            if (focus instanceof Planet) {
+                System.out.println("TWAS A PLANET");
+                System.out.println(((Planet) focus).className);
+            }
+            if (focus instanceof Star) System.out.println("TWAS A STAR");
+            Vector2 v = trajectory.velocityAtTime(grid.getTime());
+            if (deltaV != null) v = v.add(deltaV);
+            trajectory = new Trajectory(focus, nextP, v, grid);
+            return;
+        } else if (deltaV != null) { //if not, alter the old one
+            trajectory.accelerate(deltaV, grid.getTime());
+            return;
+        }
+        updated = false;
+    }
+    
+    public Orbitable findFocus() {
+        Orbitable focus = trajectory.currentFocus;
+        boolean altered = false;
+        
+        //if orbiting a planet and within that planet's hill sphere, you're staying there
+        //if not, enter the parent star's orbit
+        if (focus instanceof Planet) {
+            System.out.println(focus.hillRadius());
+            if (focus.position(grid.getTime()).subtract(nextP).magnitude() <= focus.hillRadius()) return focus;
+            else {
+                focus = ((Planet) focus).trajectory.currentFocus;
+            }
+        }
+        
+        //parent must be a star if code gets here
+        
+        double F = focus.mass() / focus.position(grid.getTime()).subtract(nextP).magnitude();
+        
+        //for each star
+        //if it exerts more force on you than your parent star, it becomes your new parent
+        for(InternalSpaceObject iso: grid.objects) if (iso instanceof Star && iso != focus) {
+            if (iso.mass() / iso.position(grid.getTime()).subtract(nextP).magnitude() > F) {
+                focus = iso;
+                altered = true;
+                F = focus.mass() / focus.position(grid.getTime()).subtract(nextP).magnitude();
+            }
+        }
+        
+        //for each planet orbiting your parent star
+        //if you're in their hill sphere, they are your new parent
+        //TODO: does not account for overlapping hill spheres
+        for(InternalSpaceObject iso: grid.objects) if (iso instanceof Planet && iso.trajectory.currentFocus == focus) {
+            if (iso.position(grid.getTime()).subtract(nextP).magnitude() <= iso.hillRadius()) {
+                focus = iso;
+                altered = true;
+            }
+        }
+        
+        return focus;
+    }
+    
+    
+    public void movestandard() throws NotEnoughTechException { //[Q]
 
         // Whether the move goes off the board will be determined by the grid
-        Direction direction = null;
+        Vector2 direction = null;
         try {
             direction = alien.getMove();
         } catch (UnsupportedOperationException e) {
@@ -173,31 +330,21 @@ public class AlienContainer {
             direction = new Direction(0, 0);
         }
 
-        // if on planet, ignore move
-        if (this.planet != null) {
-            return;
-        }
+        
 
-        this.checkMove(direction); // Throws an exception if illegal
+        checkMove(direction); // Throws an exception if illegal
 
         // we want to contain aliens in the 250 sphere, so apply the "cosmic drift"
-        direction = this.containMove(x, y, direction);
-
-        int oldx = x;
-        int oldy = y;
-        nextX = x + direction.x;
-        nextY = y + direction.y;
-
-        int width = Constants.width;
-        int height = Constants.height;
-        if (nextX > (width / 2) || nextX < (0 - width / 2) || nextY > (height / 2) || nextY < (0 - height / 2)) {
-            debugErr("ac.move: Out of bounds: (" + x + ":" + y + ")");
-        }
+        direction = this.containMove(p.x, p.y, direction);
+        
+        nextP = new Position(p.add(direction));
+        
+        this.energy -= direction.magnitude() * Constants.standardMoveCost;
     }
 
     // this does the actual checking
-    private void checkMove(Direction direction) throws NotEnoughTechException {
-        int moveLength = distance(0, 0, direction.x, direction.y);
+    private void checkMove(Vector2 direction) throws NotEnoughTechException { //[Q]
+        int moveLength = (int) direction.magnitude();
 
         // let one x one moves go
         if (Math.abs(direction.x) <= 1 && Math.abs(direction.y) <= 1) {
@@ -217,8 +364,8 @@ public class AlienContainer {
         }
     }
 
-    public Direction containMove(int x, int y, Direction dir) {
-        int dxi, dyi;
+    public Direction containMove(double x, double y, Vector2 dir) { //[Q]
+        double dxi, dyi;
 
         dxi = dir.x;
         dyi = dir.y;

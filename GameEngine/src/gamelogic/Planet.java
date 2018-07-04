@@ -4,10 +4,11 @@
  */
 package gamelogic;
 
+import alieninterfaces.IntegerPosition;
 import alieninterfaces.Position;
 import gameengineinterfaces.PlanetBehavior;
-import java.util.Iterator;
 import java.util.LinkedList;
+import orbit.Trajectory;
 
 /**
  *
@@ -15,120 +16,46 @@ import java.util.LinkedList;
  */
 public class Planet extends InternalSpaceObject {
 
-    public final String parent;
-    public int radius;
-    private GridCircle gc;
-    Iterator<Position> gcIterator;
-    int orbitalVelocityCounter;
+    public final String parentString;
+    private final InternalSpaceObject parent;
     public Position parentPosition;
+    
+    private double radius;
 
-    public Planet(SpaceGrid grid, int parentx, int parenty, int radius, int index, String domainName, String packageName, String className,
-            double energy, double tech, String parent, PlanetBehavior pb) {
-        super(grid, parentx, parenty, index, domainName, packageName, className, energy, tech);
-        this.parent = parent;
-        this.parentPosition = new Position(parentx, parenty);
-        this.radius = radius;
+    public Planet(SpaceGrid grid, InternalSpaceObject parent, double radius, int index, String domainName, String packageName, String className,
+            double energy, double tech, String parentString, PlanetBehavior pb, double mass) {
+        super(grid, parent.position, index, domainName, packageName, className, energy, tech, mass);
+        this.parentString = parentString;
+        this.parentPosition = parent.position;
+        this.radius = radius * Constants.deltaX;
         this.isPlanet = true;
         this.pb = pb;
+        
+        this.parent = parent;
+        this.radius = radius;
     }
 
     public void init() {
         // slight random eccentricity
-        position.x += grid.rand.nextInt(3) - 1;
-        position.y += grid.rand.nextInt(3) - 1;
-
-        // make the orbit
-        gc = new GridCircle(position.x, position.y, radius);
-        gcIterator = gc.iterator();
-        this.orbitalVelocityCounter = radius;
-
-        this.position = gcIterator.next();
-
-        // randomize position in orbit
-        for (int randomShift = grid.rand.nextInt(4 * radius); randomShift > 0; randomShift--) {
-            this.position = gcIterator.next();
-        }
-
-        // if we somehow exhausted the circle (shouldn't happen, but you know)
-        // create another iterator
-        if (!gcIterator.hasNext()) {
-            gcIterator = gc.iterator();
-        }
-
+        this.trajectory = new Trajectory(parent,radius,grid.rand.nextDouble()* 0.5,grid.rand.nextDouble()*Math.PI,grid.rand.nextDouble()*Math.PI,grid);
+        position = trajectory.positionAtTime(grid.getTime());
+        
+        hillRadius = trajectory.partialHillRadius() * Math.pow(mass, 1f/3);
+        
         // initialize planet behavior
-        if (pb != null) {
-            pb.init(this);
-        }
-
+        if (pb != null) pb.init(this);
     }
 
-    public Position move() {
-
-        Position pOld = this.position;
-        Position pNew = this.position;
-
-        --orbitalVelocityCounter;
-        if (orbitalVelocityCounter == 0) {
-            orbitalVelocityCounter = radius;
-
-            if (!gcIterator.hasNext()) {
-                gcIterator = gc.iterator();
-            }
-
-            pNew = gcIterator.next();
-        }
-
-        // unplug planet from grid
-        this.grid.aliens.unplugPlanet(this);
-
-        // now worry about the aliens at the old and new positions
-        AlienCell acsFrom = this.grid.aliens.getAliensAt(pOld);
-        AlienCell acsTo = this.grid.aliens.getAliensAt(pNew);
-
-        // if aliens are where the planet is moving to, and not landed, they die.
-        if (acsTo != null) {
-            // we have a cell, let's look at aliens
-            for (AlienContainer ac : acsTo) {
-                // if not landed, and not freshly moved here, you die.
-                if (ac.planet != this
-                        && ac.nextX == ac.x
-                        && ac.nextY == ac.y) {
-                    ac.kill("Death by being in path of planet " + this.className);
-                }
-            }
-        }
-
-        // aliens that were on the planet, move with the planet
-        // do this on a cloned list to avoid comodification
-        LinkedList<AlienContainer> acsClone = (LinkedList<AlienContainer>) acsFrom.clone();
-        for (AlienContainer ac : acsClone) {
-            if (ac.planet == this) {
-                // they didn't intend to move away, move with planet
-                ac.nextX = this.position.x;
-                ac.nextY = this.position.y;
-            }
-        }
-
-        // update our position
-        this.position = pNew;
-
-        // plug planet back into grid
-        this.grid.aliens.plugPlanet(this);
-
-        // visualize
-        this.grid.vis.showPlanetMove(pOld.x, pOld.y, pNew.x, pNew.y, className, this.index, energy, (int) tech);
-
-        return this.position;
+    public void move() {
+        this.position = trajectory.positionAtTime(grid.getTime());
     }
 
     public void reviewInhabitants() {
-        if (pb == null) {
-            return;
-        }
+        if (pb == null) return;
 
         try {
             // todo: need to make a new list with only the landed aliens
-            pb.reviewInhabitants(grid.aliens.getAliensAt(position));
+            pb.reviewInhabitants(grid.aliens.getAliensAt(position.round()));
         } catch (UnsupportedOperationException e) {
             // that's ok.
         }
@@ -136,13 +63,11 @@ public class Planet extends InternalSpaceObject {
     }
 
     public void reviewInhabitantActions() {
-        if (pb == null) {
-            return;
-        }
+        if (pb == null) return;
 
         try {
             // todo: make a new list with only the landed aliens
-            pb.reviewInhabitantActions(grid.aliens.getAliensAt(position));
+            pb.reviewInhabitantActions(grid.aliens.getAliensAt(position.round()));
         } catch (UnsupportedOperationException e) {
             // that's ok.
         }

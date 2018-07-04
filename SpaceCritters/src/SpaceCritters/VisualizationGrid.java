@@ -13,8 +13,10 @@ import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
+import orbit.Trajectory;
 
 /**
  *
@@ -84,8 +86,8 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     // translation of (x,y) to array element
-    Cell getCell(int x, int y) {
-        return grid[x + (width / 2)][y + (height / 2)];
+    Cell getCell(int x, int y) { //[Q]
+         return grid[x + (width / 2)][y + (height / 2)];
     }
 
     @Override
@@ -117,7 +119,7 @@ public class VisualizationGrid implements GameVisualizer {
             text = "t(turn):        " + paddedTimeString(time);
             this.gameShell.controlPane.timeForTurn.setText(text);
 
-            text = "1000*t/#/tech^2:" + paddedTimeString((long)(1000*time/(numAliens == 0?numAliens:1)/(tech*tech)));
+            text = "1000*t/#/tech^2:" + paddedTimeString((long) (1000 * time / (numAliens != 0 ? numAliens : 1) / (tech != 0.0?tech * tech:1)));
             this.gameShell.controlPane.timeForTurnAndAlien.setText(text);
 
             speciesSet.notifyListeners();
@@ -126,7 +128,7 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showMove(AlienSpec as, int oldx, int oldy, double energyAtNew, double energyAtOld) {
+    public void showMove(AlienSpec as, int oldx, int oldy, double energyAtNew, double energyAtOld, boolean update, Trajectory t) { //[Q]
         int x = as.x;
         int y = as.y;
 
@@ -134,6 +136,10 @@ public class VisualizationGrid implements GameVisualizer {
         if (alien != null) {
             // not done for residents
             alien.recordMoveTo(x, y);
+            if (update && t != null) {
+                Platform.runLater( () -> { alien.buildTrajectory(t, gameShell.fieldGrid.speciesSet.getColor(as.speciesName, as.speciesID)); });
+            }
+            
         }
     }
 
@@ -143,10 +149,10 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showSpawn(AlienSpec as, double energyAtPos) {
+    public void showSpawn(AlienSpec as, double energyAtPos, Trajectory t) {
         debugOut("Engine reporting Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
         AlienShapeFactory asf = speciesSet.addAlien(as.getFullSpeciesName(), as.speciesID);
-        gameShell.mainScene.createAlien(as, as.hashCode, as.x, as.y, asf);
+        gameShell.mainScene.createAlien(as, as.hashCode, as.x, as.y, asf, t);
     }
 
     @Override
@@ -269,14 +275,14 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void registerStar(int x, int y, String name, int index, double luminosity) {
+    public void registerStar(int x, int y, String name, int index, double luminosity, double mass) { //[Q]
         Utilities.runAndWait(() -> gameShell.mainScene.createStar(x, y, name, index, luminosity));
 
     }
 
     @Override
-    public void registerPlanet(int x, int y, String name, int index, double energy, int tech) {
-        Utilities.runAndWait(() -> gameShell.mainScene.createPlanet(x, y, name, index, energy, tech));
+    public void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass, Trajectory t) { //[Q]
+        Utilities.runAndWait(() -> gameShell.mainScene.createPlanet(x, y, name, index, energy, tech, t));
 
     }
 
@@ -321,7 +327,7 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) {
+    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) { //[Q]
         gameShell.mainScene.planets.get(index).recordMoveTo(x, y);
     }
 

@@ -5,6 +5,9 @@
 package gameengineinterfaces;
 
 import alieninterfaces.AlienSpecies;
+import gamelogic.AlienContainer;
+import orbit.Conic;
+import orbit.Trajectory;
 
 /**
  *
@@ -25,10 +28,10 @@ public class AlienSpec {
     public String fullName;
     public String speciesName;
     public String msg;
-
+    
     public AlienSpec(String domainName, String packageName, String className,
             int speciesID, int hashCode, int x, int y, double tech, double energy,
-            String fullName, String speciesName, String msg) {
+            String fullName, String speciesName, String msg) { //[Q]
         this.domainName = domainName;
         this.packageName = packageName;
         this.className = className;
@@ -42,10 +45,28 @@ public class AlienSpec {
         this.speciesID = speciesID;
         this.msg = msg;
     }
+    
+    public AlienSpec(String domainName, String packageName, String className,
+            int speciesID, int hashCode, int x, int y, double tech, double energy,
+            String fullName, String speciesName, String msg, AlienContainer parent) { //[Q]
+        this.domainName = domainName;
+        this.packageName = packageName;
+        this.className = className;
+        this.hashCode = hashCode;
+        this.x = x;
+        this.y = y;
+        this.tech = tech;
+        this.energy = energy;
+        this.fullName = fullName;
+        this.speciesName = speciesName;
+        this.speciesID = speciesID;
+        this.msg = msg;
+        //this.parent = parent;
+    }
 
     public AlienSpec(String domainName, String packageName, String className,
             int speciesID, int hashCode, int x, int y, double tech, double energy,
-            String fullName, String speciesName, double actionPower) {
+            String fullName, String speciesName, double actionPower) { //[Q]
         this.domainName = domainName;
         this.packageName = packageName;
         this.className = className;
@@ -58,15 +79,14 @@ public class AlienSpec {
         this.speciesName = speciesName;
         this.speciesID = speciesID;
         this.actionPower = actionPower;
-
     }
-    
+
     public AlienSpec(AlienSpecies as) {
         this.domainName = as.domainName;
         this.packageName = as.packageName;
         this.className = as.className;
         this.speciesID = as.speciesID;
-        
+
     }
 
     // for purposes of describing a species of alien
@@ -95,11 +115,11 @@ public class AlienSpec {
         return fullName;
     }
 
-    public String getXYString() {
+    public String getXYString() { //[Q]
         return "(" + x + "," + y + ")";
     }
 
     public String getTechEnergyString() {
-        return "(" + Math.round(tech*10)/10 + "," + Math.round(energy*10)/10 + ")";
+        return "(" + Math.round(tech * 10) / 10 + "," + Math.round(energy * 10) / 10 + ")";
     }
 }

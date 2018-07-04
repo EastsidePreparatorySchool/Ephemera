@@ -14,29 +14,45 @@ import java.util.List;
 public interface Context {
 
     double getEnergy();
+
     int getTech();
 
     Position getPosition();
+
     View getView(int size) throws NotEnoughEnergyException, NotEnoughTechException;
-    Position getMinPosition();
-    Position getMaxPosition();
-    int getDistance(Position p1, Position p2);
+
+    IntegerPosition getMinPosition();
+
+    IntegerPosition getMaxPosition();
+
+    double getDistance(Vector2 p1, Vector2 p2); //[Q]
+
     double getPresentEnergy();
 
     int getSpawningCost();
+
     int getFightingCost();
 
     int getRandomInt(int ceiling);
+
     int getGameTurn();
-    List<Position> computeOrbit (Position center, int radius);
+
+    double getTime();
+
+    List<IntegerPosition> computeOrbit(IntegerPosition center, int radius);
 
     HashMap getSecrets();
+
     int getSecret(String key);
-    
+
     void broadcastAndListen(String message, int power, boolean listen)
             throws NotEnoughTechException, NotEnoughEnergyException;
 
     void debugOut(String s);
-    String getStateString ();
+
+    String getStateString();
+
     AlienSpecies getMyAlienSpecies();
+
+    double getMass();
 }
