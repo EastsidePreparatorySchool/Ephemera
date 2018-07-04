@@ -5,6 +5,6 @@
     {"kind":"CONSTANT","className":"perSpeciesSpawnCap","state":"10000"},
     {"kind":"CONSTANT","className":"safeZoneRadius","state":"10"},
     {"kind":"CONSTANT","className":"iSaidNoFighting","state":"false"},
-    {"kind":"CONSTANT","className":"maxTurns","state":"20000"},
+    {"kind":"CONSTANT","className":"maxTurns","state":"100000"},
     {"kind":"CONSTANT","className":"emptySpaceEnergy","state":"1"}
 ]
