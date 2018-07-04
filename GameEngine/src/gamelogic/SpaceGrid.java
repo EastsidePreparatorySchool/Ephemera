@@ -930,7 +930,9 @@ public class SpaceGrid {
                             (soParent != null) ? new DummyTrajectory(soParent) : null);
                     break;
                 case SPECIES:
-                    addSpecies(element);
+                    if (element.state.equalsIgnoreCase("true")) {
+                        addSpecies(element);
+                    }
                     break;
                 case PLANET:
                     addPlanet(element);
