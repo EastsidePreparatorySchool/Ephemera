@@ -33,8 +33,7 @@ public class BigBoyAlien implements Alien {
     public void communicate() {
         try {
             cntxt.broadcastAndListen("TO ALL MY FELLOW ALIENS, from " + id, 0, true);
-        } catch (NotEnoughTechException ex) {
-        } catch (NotEnoughEnergyException ex) {
+        } catch (NotEnoughTechException | NotEnoughEnergyException ex) {
         }
     }
 
@@ -59,8 +58,8 @@ public class BigBoyAlien implements Alien {
             cntxt.debugOut("i caught an exception, whee!");
         }
 
-        Position ClosestAlien = new Position(5, 5);
-        Position NextClosestAlien = new Position(5, 5);
+        IntegerPosition ClosestAlien = new IntegerPosition(5, 5);
+        IntegerPosition NextClosestAlien = new IntegerPosition(5, 5);
         try {
             List<AlienSpecies> l = cntxt.getView((int) cntxt.getTech()).getClosestSpecificAliens(null); // changed to "null", I know I told you otherwise, but this is more efficient
             if (l != null && l.size() > 1) {
@@ -78,7 +77,7 @@ public class BigBoyAlien implements Alien {
         }
 
         if (ClosestAlien == null) {
-            ClosestAlien = new Position (5, 5);
+            ClosestAlien = new IntegerPosition (5, 5);
 
         }
         cntxt.debugOut("the nearest boy is " + ClosestAlien + " and the second nearest boy is" + NextClosestAlien);
@@ -90,11 +89,11 @@ public class BigBoyAlien implements Alien {
                 int Tech = cntxt.getTech();
                 cntxt.debugOut("necessary tech is:" + ((Math.abs(ClosestAlien.y - cntxt.getPosition().y) + Math.abs(ClosestAlien.x - cntxt.getPosition().x)) + 7));
                 
-                if (cntxt.getDistance(cntxt.getPosition(), ClosestAlien) < 3) {
+                if (cntxt.getDistance(cntxt.getIntegerPosition(), ClosestAlien) < 3) {
                     cntxt.debugOut("moving away");
                     return new Direction(ClosestAlien.y - cntxt.getPosition().y - 3, ClosestAlien.x - cntxt.getPosition().x - 3);
                 }
-                if (cntxt.getDistance(cntxt.getPosition(), NextClosestAlien) > 3) {
+                if (cntxt.getDistance(cntxt.getIntegerPosition(), NextClosestAlien) > 3) {
                     cntxt.debugOut("moving closer!!");
                     return new Direction(NextClosestAlien.y - cntxt.getPosition().y - 3, NextClosestAlien.x - cntxt.getPosition().x - 3);
                 }

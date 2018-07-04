@@ -41,6 +41,11 @@ public class ContextImplementation implements Context {
     }
 
     @Override
+    public IntegerPosition getIntegerPosition() {
+        return new IntegerPosition(ac.p);
+    }
+
+    @Override
     public double getMass() {
         return ac.getMass();
     }
@@ -137,7 +142,7 @@ public class ContextImplementation implements Context {
         // poke around our current position,
         // tracing an imaginary square of increasing size,
         // in 8 line segments, hopefully without overlap
-        for (IntegerPosition p:new GridDisk(ac.p, (int) ac.outgoingPower)) {
+        for (IntegerPosition p : new GridDisk(ac.p, (int) ac.outgoingPower)) {
             depositMessageAt(p, ac.outgoingMessage);
         }
     }
@@ -196,7 +201,12 @@ public class ContextImplementation implements Context {
     public double getDistance(Vector2 p1, Vector2 p2) {
         return p1.subtract(p2).magnitude();
     }
-
+    
+    @Override
+    public int getDistance(IntegerPosition p1, IntegerPosition p2) {
+        return (int) p1.subtract(p2).magnitude();
+    }
+    
     @Override
     public List<IntegerPosition> computeOrbit(IntegerPosition center, int radius) { //Note: DISABLED. No one uses it and it needs to be rewtirren with conics anyway
         //GridCircle gc = new GridCircle(center.x, center.y, radius);
@@ -205,7 +215,6 @@ public class ContextImplementation implements Context {
         /*for (IntegerPosition p : gc) {
             orbit.add(p);
         }*/
-
         return orbit;
     }
 

@@ -4,7 +4,7 @@ package gamelogic;
 import alieninterfaces.IntegerPosition;
 import alieninterfaces.Position;
 import static gamelogic.GridDisk.disk;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
 /**
@@ -83,8 +83,8 @@ public class SortedGridDisk extends GridDisk {
     }
     
     static void sortDisk(int radius) {
-        java.util.Arrays.sort(disk.get((double)radius), (IntegerPosition a, IntegerPosition b) -> {
-            return (a.magnitude() > b.magnitude()) ? 1:-1;
+        Arrays.sort(disk.get((double)radius), (IntegerPosition a, IntegerPosition b) -> {
+            return (int) (a.magnitude() - b.magnitude());
         });
         sortedDisks.add(radius);
     }
