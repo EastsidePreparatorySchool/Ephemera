@@ -107,6 +107,7 @@ public class AlienContainer {
         } catch (Throwable t) {
             this.alien = null;
             grid.gridDebugErr("ac: Error constructing Alien");
+            t.printStackTrace(System.out);
             throw new InstantiationException();
         }
 
