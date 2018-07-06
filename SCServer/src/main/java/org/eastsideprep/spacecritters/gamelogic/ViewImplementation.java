@@ -47,7 +47,7 @@ public class ViewImplementation implements View {
     public List<AlienSpecies> getAliensAtPos(IntegerPosition p) throws CantSeeSquareException { //[Q]
         checkPos(p);
 
-        LinkedList<AlienSpecies> as = new LinkedList();
+        LinkedList<AlienSpecies> as = new LinkedList<>();
         AlienCell acs = ag.getAliensAt(p);
         if (acs != null) {
             for (AlienContainer ac : acs) {
@@ -59,7 +59,7 @@ public class ViewImplementation implements View {
 
     @Override
     public List<AlienSpecies> getAliensInView() { //[Q]
-        LinkedList<AlienSpecies> as = new LinkedList();
+        LinkedList<AlienSpecies> as = new LinkedList<>();
 
         for (IntegerPosition p: new GridDisk(centerX, centerY, size)) {
             AlienCell acs = ag.getAliensAt(p);
@@ -96,7 +96,7 @@ public class ViewImplementation implements View {
 
     @Override
     public List<SpaceObject> getSpaceObjectsInView() { //[Q]
-        LinkedList<SpaceObject> sos = new LinkedList();
+        LinkedList<SpaceObject> sos = new LinkedList<>();
         SpaceObject so = null;
         
         for (IntegerPosition p: new GridDisk(centerX, centerY, size, true)) {
@@ -156,7 +156,7 @@ public class ViewImplementation implements View {
                 LinkedList<AlienSpecies> bunch = acs.getAllSpeciesWithPredicateAndPosition((species) -> species == specific, p);
                 if (bunch != null) {
                     if (as == null) {
-                        as = new LinkedList();
+                        as = new LinkedList<>();
 
                     }
                     as.addAll(bunch);

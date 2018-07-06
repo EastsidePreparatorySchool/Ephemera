@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author guberti
  */
-public class ContextImplementation implements Context {
+public  class ContextImplementation implements Context {
 
     private final AlienContainer ac;
     public GameVisualizer vis;
@@ -166,7 +166,7 @@ public class ContextImplementation implements Context {
                 if (acell.listening) {
                     // leave a message
                     if (acell.currentMessages == null) {
-                        acell.currentMessages = new ArrayList();
+                        acell.currentMessages = new ArrayList<String>();
                     }
                     acell.currentMessages.add(message);
                 }

@@ -266,7 +266,7 @@ public class SpaceGrid {
 
                 // aliens that were on the planet, move with the planet
                 // do this on a cloned list to avoid comodification
-                LinkedList<AlienContainer> acsClone = (LinkedList<AlienContainer>) acsFrom.clone();
+                LinkedList<AlienContainer> acsClone = new LinkedList<>(acsFrom);
                 for (AlienContainer ac : acsClone) {
                     if (ac.planet == p) {
                         // they didn't intend to move away, move with planet
@@ -582,8 +582,8 @@ public class SpaceGrid {
                     // Make a SHALLOW copy of the aliens at the given position
                     // As long as we don't mutilate the aliens, we can mutilate
                     // the list as much as we want
-                    List<AlienContainer> aliensAtPos;
-                    aliensAtPos = (List<AlienContainer>) aliens.getAliensAt(thisAlien.p).clone();
+                    LinkedList<AlienContainer> aliensAtPos = new LinkedList<>(aliens.getAliensAt(thisAlien.p));
+
                     for (AlienContainer ac : aliensAtPos) {
                         if (ac.currentActionCode == Action.ActionCode.Fight) {
                             break; // No trades can take place if there is war
@@ -596,13 +596,8 @@ public class SpaceGrid {
                     }
                     // Trading will now commence
                     // First sort aliens by tech
-                    Comparator c = new Comparator<AlienContainer>() {
-                        @Override
-                        public int compare(AlienContainer ac1, AlienContainer ac2) {
-                            return (int) (ac1.tech - ac2.tech);
-                        }
-                    };
-                    Collections.sort(aliensAtPos, c);
+
+                    Collections.sort(aliensAtPos, (ac1, ac2) -> (int) (ac1.tech - ac2.tech));
                     // aliensAtPos is now sorted by tech
                     while (aliensAtPos.size() > 0) {
                         AlienContainer buyingAlien = aliensAtPos.get(0);
@@ -769,7 +764,7 @@ public class SpaceGrid {
                 }
 
                 if (!element.className.toLowerCase().endsWith("resident")) {
-                    System.out.println("2 "+element.className);
+                    System.out.println("2 " + element.className);
                     vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
                 }
                 result = as;
@@ -799,7 +794,7 @@ public class SpaceGrid {
             speciesMap.put(speciesName, as);
             speciesCounter++;
             if (!alienClassName.toLowerCase().endsWith("resident")) {
-                System.out.println("1 "+alienClassName);
+                System.out.println("1 " + alienClassName);
                 vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
             }
         }

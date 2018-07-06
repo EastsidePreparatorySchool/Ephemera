@@ -15,7 +15,7 @@ import java.util.Iterator;
  */
 public class GridDisk extends AbstractCollection<IntegerPosition> {
 
-    static final HashMap<Double, IntegerPosition[]> disk = new HashMap();
+    static final HashMap<Double, IntegerPosition[]> disk = new HashMap<>();
     IntegerPosition[] specificDisk;
     double radius;
     Position center;
@@ -67,8 +67,8 @@ public class GridDisk extends AbstractCollection<IntegerPosition> {
     }
 
     @Override
-    public Iterator iterator() {
-        return new PositionIterator();
+    public Iterator<IntegerPosition> iterator() {
+        return (Iterator<IntegerPosition>)new PositionIterator();
     }
 
     @Override
@@ -76,7 +76,7 @@ public class GridDisk extends AbstractCollection<IntegerPosition> {
         return specificDisk.length;
     }
 
-    class PositionIterator implements Iterator {
+    class PositionIterator implements Iterator<IntegerPosition> {
         int index = 0;
         @Override
         public boolean hasNext() {

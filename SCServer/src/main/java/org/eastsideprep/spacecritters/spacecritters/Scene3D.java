@@ -73,10 +73,10 @@ public class Scene3D {
 
     public Scene3D(SpaceCritters gameShellInstance, int widthPX, int heightPX) {
         this.gameShell = gameShellInstance;
-        this.stars = new HashMap(50);
-        this.planets = new HashMap(50);
-        this.aliens = new HashMap(100000);
-        this.updateQueue = new ConcurrentLinkedQueue();
+        this.stars = new HashMap<>(50);
+        this.planets = new HashMap<>(50);
+        this.aliens = new HashMap<>(100000);
+        this.updateQueue = new ConcurrentLinkedQueue<>();
 
         // initial camera values
         this.xRot = -20;

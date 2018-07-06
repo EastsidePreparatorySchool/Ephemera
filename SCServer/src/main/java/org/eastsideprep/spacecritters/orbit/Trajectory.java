@@ -17,7 +17,7 @@ import java.util.Iterator;
  */
 public class Trajectory {
 
-    ArrayList<Conic> conics = new ArrayList();
+    ArrayList<Conic> conics = new ArrayList<>();
     public Orbitable currentFocus;
     public SpaceGrid sg;
     
@@ -76,7 +76,7 @@ public class Trajectory {
     
     
     
-    public Iterator toDraw(int segments) {
+    public Iterator<Vector2> toDraw(int segments) {
         double dTheta = 2 * Math.PI / segments;
         double topBound;
         double bottomBound;

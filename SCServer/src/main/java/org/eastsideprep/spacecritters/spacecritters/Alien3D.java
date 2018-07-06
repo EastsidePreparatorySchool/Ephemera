@@ -58,7 +58,7 @@ public class Alien3D extends OrbitGroup{
             alien = new Box(0.5, 0.5, 0.5);
         }
 
-        this.intrinsicTransforms = new LinkedList();
+        this.intrinsicTransforms = new LinkedList<>();
         for (Transform t : alien.getTransforms()) {
             this.intrinsicTransforms.add(t);
         }
