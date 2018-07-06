@@ -30,66 +30,72 @@ public class GameEngineThread extends Thread {
         GameCommand gc;
         int totalTurns = 0;
         boolean endGame = false;
+        try {
+            //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+            Achievement[] achievements = new Achievement[1];
+            achievements[0] = new Achievement(1);
+            AchievementReq req = new AchievementReq(AchievementFlag.AlienKilledByFighting);
+            achievements[0].addReq(req, 0);
 
-        //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-        Achievement[] achievements = new Achievement[1];
-        achievements[0] = new Achievement(1);
-        AchievementReq req = new AchievementReq(AchievementFlag.AlienKilledByFighting);
-        achievements[0].addReq(req, 0);
+            engine.grid = new SpaceGrid(engine, engine.vis, Constants.width, Constants.height, achievements);
 
-        engine.grid = new SpaceGrid(engine, engine.vis, Constants.width, Constants.height, achievements);
-
-        engine.vis.debugOut("GameEngineThread: Started");
-        do {
-            try {
-                do {
-                    // do we have work requests? Only peek, don't wait
-                    while (!engine.queue.isEmpty()) {
-                        gc = (GameCommand) engine.queue.remove();
-                        // Process the work item, true means exit
-
-                        endGame = processCommand(gc);
-                        if (endGame) {
-                            break;
-                        }
-                    }
-
-                    if (engine.gameState == GameState.Paused) {
-                        // show idle updates
-                        if (pastReady) {
-                            engine.vis.showIdleUpdate(engine.grid.getNumAliens());
-                        }
-                        try {
-                            synchronized (engine.queue) {
-                                engine.queue.wait();
-                            }
-                        } catch (InterruptedException e) {
-                        }
-                    }
-                } while (engine.gameState == GameState.Paused);
-
-                // Execute game turn
-                long startTurnTime = System.nanoTime();
+            engine.vis.debugOut("GameEngineThread: Started");
+            do {
                 try {
-                    if (engine.grid.executeGameTurn()) {
-                        // return true: game over because at most one species left
-                        engine.gameState = GameState.Paused;
-                        engine.vis.showGameOver();
-                    }
-                } catch (Exception e) {
-                    engine.vis.debugErr("GameEngineThread: Unhandled exception during turn: " + e.getMessage());
-                    e.printStackTrace();
-                }
-                totalTurns++;
-                engine.vis.showCompletedTurn(totalTurns, engine.grid.getNumAliens(), System.nanoTime() - startTurnTime, engine.grid.getTech());
-            } catch (Exception e) {
-                e.printStackTrace();
-                engine.vis.debugErr("GameThread: Unknown exception: " + e.getMessage());
-                break;
-            }
+                    do {
+                        // do we have work requests? Only peek, don't wait
+                        while (!engine.queue.isEmpty()) {
+                            gc = (GameCommand) engine.queue.remove();
+                            // Process the work item, true means exit
 
-        } while (!endGame);
-        engine.vis.debugOut("GameThread: Exit");
+                            endGame = processCommand(gc);
+                            if (endGame) {
+                                break;
+                            }
+                        }
+
+                        if (engine.gameState == GameState.Paused) {
+                            // show idle updates
+                            if (pastReady) {
+                                engine.vis.showIdleUpdate(engine.grid.getNumAliens());
+                            }
+                            try {
+                                synchronized (engine.queue) {
+                                    engine.queue.wait();
+                                }
+                            } catch (InterruptedException e) {
+                                System.err.println("GEThread interrupted: " + e.getMessage());
+                                e.printStackTrace(System.err);
+                            }
+                        }
+                    } while (engine.gameState == GameState.Paused);
+
+                    // Execute game turn
+                    long startTurnTime = System.nanoTime();
+                    try {
+                        if (engine.grid.executeGameTurn()) {
+                            // return true: game over because at most one species left
+                            engine.gameState = GameState.Paused;
+                            engine.vis.showGameOver();
+                        }
+                    } catch (Exception e) {
+                        engine.vis.debugErr("GameEngineThread: Unhandled exception during turn: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                    totalTurns++;
+                    engine.vis.showCompletedTurn(totalTurns, engine.grid.getNumAliens(), System.nanoTime() - startTurnTime, engine.grid.getTech());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    engine.vis.debugErr("GameThread: Unknown exception: " + e.getMessage());
+                    break;
+                }
+
+            } while (!endGame);
+            engine.vis.debugOut("GameThread: Exit");
+        } catch (Exception e) {
+            System.err.println("scserver init: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
     }
 
     private boolean processCommand(GameCommand gc) throws Exception {

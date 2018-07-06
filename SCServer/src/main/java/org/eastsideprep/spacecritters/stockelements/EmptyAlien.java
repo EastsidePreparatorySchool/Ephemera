@@ -5,25 +5,16 @@
 package org.eastsideprep.spacecritters.stockelements;
 
 import org.eastsideprep.spacecritters.alieninterfaces.*;
-import org.eastsideprep.spacecritters.gameengineinterfaces.*;
-import java.util.HashMap;
 
 /**
  *
  * @author gunnar
  */
-public class SysAds implements Alien, ResidentAlien {
-
-    Context ctx;
-    ResidentContext rc;
-    int id;
-    HashMap<String, Integer> secrets;
+public class EmptyAlien implements Alien {
 
     @Override
     public void init(Context ctx, int id, int parent, String message) {
-        this.ctx = ctx;
-        this.id = id;
-        ctx.debugOut("SysAds initialized");
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -51,14 +42,4 @@ public class SysAds implements Alien, ResidentAlien {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    // resident interface implementation starts here
-    @Override
-    public void init(ResidentContext rc) {
-        this.rc = rc;
-
-        // SysAds are not to be trifled with ...
-        rc.setEnergy(1000);
-        rc.setTech(255);
-        ctx.debugOut("SysAds resident alien interface initialized");
-    }
 }

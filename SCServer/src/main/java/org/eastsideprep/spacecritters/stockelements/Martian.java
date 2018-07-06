@@ -2,7 +2,7 @@
  * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
  * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
-package org.eastsideprep.spacecritters.stockaliens;
+package org.eastsideprep.spacecritters.stockelements;
 
 import org.eastsideprep.spacecritters.alieninterfaces.*;
 import java.util.List;
@@ -59,7 +59,7 @@ public class Martian implements Alien {
 
         try {
             List<AlienSpecies> l = ctx.getView((int) ctx.getTech()).getClosestXenos(
-                    new AlienSpecies("eastsideprep.org", "stockaliens", "Martian", 0));
+                    new AlienSpecies("eastsideprep.org", "stockelements", "Martian", 0));
             if (l.size() > 1) {
                 ClosestAlien = l.get(0).position;
             }

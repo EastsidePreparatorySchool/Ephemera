@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package org.eastsideprep.spacecritters.stockaliens;
+package org.eastsideprep.spacecritters.stockelements;
 
 import org.eastsideprep.spacecritters.alieninterfaces.*;
 import java.util.ArrayList;

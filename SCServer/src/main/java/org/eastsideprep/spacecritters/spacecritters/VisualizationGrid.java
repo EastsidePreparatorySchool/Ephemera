@@ -87,7 +87,7 @@ public class VisualizationGrid implements GameVisualizer {
 
     // translation of (x,y) to array element
     Cell getCell(int x, int y) { //[Q]
-         return grid[x + (width / 2)][y + (height / 2)];
+        return grid[x + (width / 2)][y + (height / 2)];
     }
 
     @Override
@@ -119,7 +119,7 @@ public class VisualizationGrid implements GameVisualizer {
             text = "t(turn):        " + paddedTimeString(time);
             this.gameShell.controlPane.timeForTurn.setText(text);
 
-            text = "1000*t/#/tech^2:" + paddedTimeString((long) (1000 * time / (numAliens != 0 ? numAliens : 1) / (tech != 0.0?tech * tech:1)));
+            text = "1000*t/#/tech^2:" + paddedTimeString((long) (1000 * time / (numAliens != 0 ? numAliens : 1) / (tech != 0.0 ? tech * tech : 1)));
             this.gameShell.controlPane.timeForTurnAndAlien.setText(text);
 
             speciesSet.notifyListeners();
@@ -137,9 +137,11 @@ public class VisualizationGrid implements GameVisualizer {
             // not done for residents
             alien.recordMoveTo(x, y);
             if (update && t != null) {
-                Platform.runLater( () -> { alien.buildTrajectory(t, gameShell.fieldGrid.speciesSet.getColor(as.speciesName, as.speciesID)); });
+                Platform.runLater(() -> {
+                    alien.buildTrajectory(t, gameShell.fieldGrid.speciesSet.getColor(as.speciesName, as.speciesID));
+                });
             }
-            
+
         }
     }
 
@@ -169,6 +171,9 @@ public class VisualizationGrid implements GameVisualizer {
         try {
             logFile.close();
         } catch (Exception e) {
+            System.err.println("showGameOver: " + e.getMessage());
+            e.printStackTrace(System.err);
+
         }
         debugOut("Game Over");
         Utilities.runAndWait(() -> this.gameShell.startOrPauseGame(new ActionEvent()));
@@ -221,6 +226,9 @@ public class VisualizationGrid implements GameVisualizer {
             logFile.write(s);
             logFile.flush();
         } catch (Exception e) {
+            System.err.println("print: " + e.getMessage());
+            e.printStackTrace(System.err);
+
         }
     }
 
@@ -231,6 +239,9 @@ public class VisualizationGrid implements GameVisualizer {
             logFile.newLine();
             logFile.flush();
         } catch (Exception e) {
+            System.err.println("println: " + e.getMessage());
+            e.printStackTrace(System.err);
+
         }
     }
 
@@ -240,6 +251,9 @@ public class VisualizationGrid implements GameVisualizer {
             logFile.newLine();
             logFile.flush();
         } catch (Exception e) {
+            System.err.println("printinlogonly: " + e.getMessage());
+            e.printStackTrace(System.err);
+
         }
     }
 

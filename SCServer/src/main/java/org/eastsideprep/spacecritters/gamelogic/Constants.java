@@ -22,24 +22,26 @@ public class Constants {
     //selected randomly
     public static final double alienMass = 1e4;
     public static final double deltaT = 0.001;
-    public static final double G = 0.8e-6; 
+    public static final double G = 0.8e-6;
     public static final double deltaX = 5e4;
     public static final double accuracy = 1e-2;
-    
+
     public static final double minAllowedDeltaV = 5;
+
     public static double maxDeltaV(double tech) {
         double dv = tech * 5;
-        return (dv < minAllowedDeltaV) ? minAllowedDeltaV:dv;
+        return (dv < minAllowedDeltaV) ? minAllowedDeltaV : dv;
     }
+
     public static double accelerationCost(double deltaV) {
         double c = deltaV * 0.1 - 5;
-        if (c > 0) System.out.println("some one is getting charged. Moved " + deltaV);
-        return (c < 0) ? 0:c;
+        if (c > 0) {
+            System.out.println("some one is getting charged. Moved " + deltaV);
+        }
+        return (c < 0) ? 0 : c;
     }
-    
+
     public static final double standardMoveCost = 0.1;
-    
-    
 
     public static String gameMode = "sc_play.json"; // Brawl, Play, or a specific mission file
     public static int maxTurns = 100000; // 
@@ -81,6 +83,8 @@ public class Constants {
                 }
             }
         } catch (Exception e) {
+            System.err.println("Constants.getValue: " + e.getMessage());
+            e.printStackTrace(System.err);
         }
         return null;
     }

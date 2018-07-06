@@ -2,63 +2,68 @@
  * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
  * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
-package org.eastsideprep.spacecritters.stockaliens;
+package org.eastsideprep.spacecritters.stockelements;
 
 import org.eastsideprep.spacecritters.alieninterfaces.*;
 import java.util.List;
 
 /**
  *
- * @author Marnie Manning
+ * @author jbriggs
  */
-public class Venusian implements Alien {
+public class Alf implements Alien {
 
     Context ctx;
+    static int totalCount = 0;
+    int myAlienNumber;
 
     final boolean debug = true;
 
-    public Venusian() {
+    public Alf() {
     }
 
-    @Override
     public void init(Context game_ctx, int id, int parent, String message) {
-        ctx = game_ctx;
-        ctx.debugOut("Initialized at "
-                + ctx.getStateString());
+        totalCount += 1;
+        myAlienNumber = totalCount;
 
+        ctx = game_ctx;
+        /*ctx.debugOut("Initialized at "
+                + "(" + Integer.toString(ctx.getX())
+                + "," + Integer.toString(ctx.getY()) + ")"
+                + " E: " + Double.toString(ctx.getEnergy())
+                + " T: " + Double.toString(ctx.getTech()));
+         */
     }
 
-    @Override
     public Direction getMove() {
 
         //ctx.debugOut("Move requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
+        // Venusians run away from the nearest alien
+        double techLevel = ctx.getTech();
+
         int x = 0;
         int y = 0;
 
         try {
             List<AlienSpecies> nearestAliens = ctx.getView((int) ctx.getTech()).getClosestXenos(
-                    new AlienSpecies("eastsideprep.org", "stockaliens", "Alf", 0));
+                    new AlienSpecies("ephemera.eastsideprep.org", "stockelements", "Alf", 0));
             if (nearestAliens != null) {
                 IntegerPosition nearest = nearestAliens.get(0).position;
 
+                //always moves away from other aliens
                 if (nearest.x > ctx.getPosition().x) {
-                    x = -1;
+                    x = (int) (-techLevel / 2);
                 } else if (nearest.x < ctx.getPosition().x) {
-                    x = 1;
+                    x = (int) (techLevel / 2);
                 }
 
-                if (nearest.y > ctx.getPosition().x) {
-                    y = -1;
+                if (nearest.y > ctx.getPosition().y) {
+                    y = (int) (-techLevel / 2);
                 } else if (nearest.y < ctx.getPosition().y) {
-                    y = 1;
+                    y = (int) (techLevel / 2);
                 }
-
-                // guard against tech fail
-                //if (ctx.getTech() < 2.0) {
-                //    y = 0;
-                //}
             }
         } catch (Exception e) {
             x = ctx.getRandomInt(3) - 1;
@@ -83,14 +88,12 @@ public class Venusian implements Alien {
         return new Direction(x, y);
     }
 
-    @Override
     public Action getAction() {
 
         //ctx.debugOut("Action requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
         //        + " T:" + Integer.toString(ctx.getTech()));
         View view = null;
-
         try {
             view = ctx.getView((int) ctx.getTech());
         } catch (Exception e) {
@@ -101,6 +104,7 @@ public class Venusian implements Alien {
         try {
             // is there another alien on our position?
             if (view.getAliensAtPos(ctx.getPosition()).size() > 1) {
+                ctx.debugOut("Others are here");
                 // if so, do we have any energy?
                 if (ctx.getEnergy() < 10) {
                     // no, keep moving.
@@ -120,7 +124,6 @@ public class Venusian implements Alien {
         //tech is not a priority
         if (ctx.getEnergy() > (ctx.getTech() + 5)) {
 
-            // TODO: Assumption: spawning cost will never be greater than 20
             if (ctx.getEnergy() > ctx.getSpawningCost() + 10) {
                 //should spawn fast at the beggining,
                 ctx.debugOut("Spawning");

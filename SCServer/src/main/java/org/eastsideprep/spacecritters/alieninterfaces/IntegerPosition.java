@@ -33,10 +33,10 @@ public class IntegerPosition extends IntegerVector2 {
     public IntegerPosition add(IntegerVector2 dir) {
         return new IntegerPosition(super.add(dir));
     }
-    
+
     @Override
     public Position v2() {
-        return new Position(x,y);
+        return new Position(x, y);
     }
 
     public static IntegerPosition fromString(String s) { //[Q] (parsing!)
@@ -58,6 +58,8 @@ public class IntegerPosition extends IntegerVector2 {
             return new IntegerPosition(x, y);
 
         } catch (Exception e) {
+            System.err.println("IntegerPosition: " + e.getMessage());
+            e.printStackTrace(System.err);
         }
 
         return null;

@@ -2,7 +2,7 @@
  * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
  * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
-package org.eastsideprep.spacecritters.stockaliens;
+package org.eastsideprep.spacecritters.stockelements;
 
 /**
  *
@@ -17,7 +17,7 @@ import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
-import static org.eastsideprep.spacecritters.stockaliens.AggressiveAlien.dalekMesh;
+import static org.eastsideprep.spacecritters.stockelements.AggressiveAlien.dalekMesh;
 
 public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
 

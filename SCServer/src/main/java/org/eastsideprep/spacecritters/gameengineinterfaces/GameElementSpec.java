@@ -1,4 +1,4 @@
- /*
+/*
  * This work is licensed under a Creative Commons Attribution-NonCommercial 3.0 United States License.
  * For more information go to http://creativecommons.org/licenses/by-nc/3.0/us/
  */
@@ -27,6 +27,8 @@ public class GameElementSpec {
             this.kind = GameElementKind.valueOf(kindString.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
             this.kind = GameElementKind.INVALID;
+            System.err.println("GameElementSpec: " + e.getMessage());
+            e.printStackTrace(System.err);
         }
     }
 
@@ -39,6 +41,8 @@ public class GameElementSpec {
             this.state = state;
         } catch (IllegalArgumentException e) {
             this.kind = GameElementKind.INVALID;
+            System.err.println("GameElementSpec: " + e.getMessage());
+            e.printStackTrace(System.err);
         }
     }
 }

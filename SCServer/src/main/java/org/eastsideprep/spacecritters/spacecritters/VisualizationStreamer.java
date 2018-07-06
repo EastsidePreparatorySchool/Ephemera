@@ -165,6 +165,9 @@ public class VisualizationStreamer implements GameVisualizer {
             stateLog.close();
             progressLog.close();
         } catch (Exception e) {
+            System.err.println("closefiles: " + e.getMessage());
+            e.printStackTrace(System.err);
+
         }
     }
 
@@ -173,6 +176,9 @@ public class VisualizationStreamer implements GameVisualizer {
             file.write(s);
             file.flush();
         } catch (Exception e) {
+            System.err.println("visstream print: " + e.getMessage());
+            e.printStackTrace(System.err);
+
         }
     }
 
@@ -182,6 +188,8 @@ public class VisualizationStreamer implements GameVisualizer {
             file.newLine();
             file.flush();
         } catch (Exception e) {
+            System.err.println("visstream print: " + e.getMessage());
+            e.printStackTrace(System.err);
         }
     }
 

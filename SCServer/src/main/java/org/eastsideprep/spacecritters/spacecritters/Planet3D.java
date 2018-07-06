@@ -55,10 +55,12 @@ public class Planet3D extends OrbitGroup {
         s.setTranslateY(gameShell.mainScene.objectElevation);
         s.setTranslateZ(gameShell.mainScene.zFromY(y));
         s.setRotationAxis(new Point3D(0, -1, 0));
-        
+
         getChildren().add(s);
-        
-        if (t != null) buildTrajectory(t, Color.WHITE);
+
+        if (t != null) {
+            buildTrajectory(t, Color.WHITE);
+        }
         if (name.equalsIgnoreCase("Earth")) {
             decorateEarth(s);
         } else if (name.equalsIgnoreCase("RMack")) {
@@ -66,7 +68,6 @@ public class Planet3D extends OrbitGroup {
         }
 
     }
-    
 
     public void recordMoveTo(int x, int y) { //[Q]
         this.nextX = x;
@@ -98,10 +99,16 @@ public class Planet3D extends OrbitGroup {
     private static Image dMapMack;
 
     public static void preLoadPlanetImages() {
-        dMap = new Image(SpaceCritters.class.getResourceAsStream("dMap_earth.jpg"));
-        bMap = new Image(SpaceCritters.class.getResourceAsStream("bMap_earth.jpg"));
-        sMap = new Image(SpaceCritters.class.getResourceAsStream("sMap_earth.jpg"));
-        dMapMack = new Image(SpaceCritters.class.getResourceAsStream("dmap_rmack.jpg"));
+        try {
+            dMap = new Image(SpaceCritters.class.getResourceAsStream("/dMap_earth.jpg"));
+            bMap = new Image(SpaceCritters.class.getResourceAsStream("/bMap_earth.jpg"));
+            sMap = new Image(SpaceCritters.class.getResourceAsStream("/sMap_earth.jpg"));
+            dMapMack = new Image(SpaceCritters.class.getResourceAsStream("/dmap_rmack.jpg"));
+        } catch (Exception e) {
+            System.err.println("preload planet images" + e.getMessage());
+            e.printStackTrace(System.err);
+
+        }
     }
 
     private void decorateEarth(Sphere s) {

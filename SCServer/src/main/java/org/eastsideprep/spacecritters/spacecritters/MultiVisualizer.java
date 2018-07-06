@@ -32,6 +32,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.registerSpecies(as, asf);
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -42,6 +44,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.registerStar(x, y, name, index, luminosity, mass);
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -52,6 +56,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.registerPlanet(x, y, name, index, energy, tech, mass, t);
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -62,6 +68,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.showPlanetMove(oldx, oldy, x, y, name, index, energy, tech);
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -72,6 +80,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.mapEnergy(x, y, energy);
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -82,6 +92,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.showReady();
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -92,6 +104,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.showCompletedTurn(totalTurns, numAliens, time, tech);
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -102,6 +116,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.showIdleUpdate(numAliens);
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -112,6 +128,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.showAliens(aliens);
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -122,7 +140,9 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.showMove(as, oldX, oldY, energyAtNewPosition, energyAtOldPosition, update, t);
             } catch (UnsupportedOperationException ex) {
-            }
+                 System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
+           }
         });
     }
 
@@ -132,6 +152,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.showFight(x, y);
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -142,6 +164,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.showSpawn(as, energyAtPos, t);
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -152,6 +176,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.showDeath(as, energyAtPos);
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -180,6 +206,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.showEngineStateChange(gs);
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -190,6 +218,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.showUpdateAfterRequestedActions();
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -200,6 +230,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.showGameOver();
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -210,6 +242,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.debugOut(s);
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -220,6 +254,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.debugErr(s);
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -230,7 +266,9 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.setFilter(s);
             } catch (UnsupportedOperationException ex) {
-            }
+                 System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
+           }
         });
     }
 
@@ -240,7 +278,9 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.setChatter(f);
             } catch (UnsupportedOperationException ex) {
-            }
+                 System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
+           }
         });
     }
 
@@ -250,6 +290,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.init();
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }
@@ -260,6 +302,8 @@ public class MultiVisualizer implements GameVisualizer {
             try {
                 e.shutdown();
             } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
             }
         });
     }

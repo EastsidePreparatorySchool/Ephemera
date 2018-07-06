@@ -342,7 +342,7 @@ public class SpaceGrid {
         for (Iterator<AlienContainer> iterator = aliens.iterator(); iterator.hasNext();) {
             AlienContainer ac = iterator.next();
             if (ac.energy <= 0) {
-                if (!ac.packageName.equalsIgnoreCase("stockelements")) {
+                if (!ac.className.toLowerCase().endsWith("resident")) {
                     vis.showDeath(ac.getFullAlienSpec(), 0);
                 }
                 aliens.unplug(ac);
@@ -768,7 +768,8 @@ public class SpaceGrid {
 
                 }
 
-                if (!element.packageName.equalsIgnoreCase("stockelements")) {
+                if (!element.className.toLowerCase().endsWith("resident")) {
+                    System.out.println("2 "+element.className);
                     vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
                 }
                 result = as;
@@ -797,7 +798,8 @@ public class SpaceGrid {
             as = new InternalAlienSpecies(domainName, alienPackageName, alienClassName, speciesCounter, speciesMap.getAchievementCount());
             speciesMap.put(speciesName, as);
             speciesCounter++;
-            if (!alienPackageName.equalsIgnoreCase("stockelements")) {
+            if (!alienClassName.toLowerCase().endsWith("resident")) {
+                System.out.println("1 "+alienClassName);
                 vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
             }
         }
@@ -812,7 +814,7 @@ public class SpaceGrid {
                         trajectory); //no trajectory
 
                 aliens.addAlienAndPlug(ac);
-                if (!ac.packageName.equalsIgnoreCase("stockelements")) {
+                if (!ac.className.toLowerCase().endsWith("resident")) {
                     vis.showSpawn(ac.getFullAlienSpec(), 0, ac.trajectory);
                 }
                 as.counter++;
@@ -959,14 +961,17 @@ public class SpaceGrid {
         URL url;
         Object[] parameters;
 
-        if (packageName.equalsIgnoreCase("stockaliens")
+        if (packageName.equalsIgnoreCase("stockelements")
                 || packageName.equalsIgnoreCase("alieninterfaces")) {
             fullName = engine.gamePath
                     + packageName
                     + System.getProperty("file.separator")
-                    + "dist"
+                    + "scserver"
                     + System.getProperty("file.separator")
-                    + packageName + ".jar";
+                    + "target"
+                    + System.getProperty("file.separator")
+                    + "SCServer-1.0-SNAPSHOT.jar";
+            packageName = "org.eastsideprep.spacecritters.stockelements";
         } else {
             fullName = engine.alienPath + domainName;
         }
@@ -1044,47 +1049,45 @@ public class SpaceGrid {
 
         File folderFile = new File(folder);
 
-        if (folderFile != null) {
-            File[] files = folderFile.listFiles();
+        File[] files = folderFile.listFiles();
 
-            if (files != null) {
-                for (File f : files) {
-                    if (f.isDirectory()) {
-                        // recurse
-                        addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), domain + f.getName() + System.getProperty("file.separator"));
-                    } else if ((f.getName().toLowerCase().endsWith(".jar"))
-                            && (!f.getName().toLowerCase().equals("stockaliens.jar"))
-                            && (!f.getName().toLowerCase().equals("stockelements.jar"))
-                            && (!f.getName().toLowerCase().equals("alieninterfaces.jar"))) {
-                        try {
-                            // look for jar files and process
-                            List<String> classNames = new ArrayList<String>();
-                            ZipInputStream zip = new ZipInputStream(new FileInputStream(f));
-                            for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
-                                if (!entry.isDirectory() && (entry.getName().toLowerCase().endsWith("alien.class")
-                                        || entry.getName().toLowerCase().endsWith("spacecritter.class"))) {
+        if (files != null) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    // recurse
+                    addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), domain + f.getName() + System.getProperty("file.separator"));
+                } else if ((f.getName().toLowerCase().endsWith(".jar"))
+                        && (!f.getName().toLowerCase().equals("SCServer-1.0-SNAPSHOT.jar"))) {
+                    try {
+                        // look for jar files and process
+                        List<String> classNames = new ArrayList<>();
+                        ZipInputStream zip = new ZipInputStream(new FileInputStream(f));
+                        for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                            if (!entry.isDirectory() && (entry.getName().toLowerCase().endsWith("alien.class")
+                                    || entry.getName().toLowerCase().endsWith("spacecritter.class"))) {
 
-                                    // handle classes in the default package differently
-                                    if (entry.getName().lastIndexOf('/') != -1) {
-                                        // named package
-                                        packageName = entry.getName().substring(0, entry.getName().lastIndexOf('/'));
-                                        className = entry.getName().substring(entry.getName().lastIndexOf('/') + 1).replace(".class", "");
-                                    } else {
-                                        //default package
-                                        packageName = "";
-                                        className = entry.getName().replace(".class", "");
-                                    }
-
-                                    addSpecies(new GameElementSpec("SPECIES",
-                                            domain + f.getName(),
-                                            packageName,
-                                            className,
-                                            "")
-                                    );
+                                // handle classes in the default package differently
+                                if (entry.getName().lastIndexOf('/') != -1) {
+                                    // named package
+                                    packageName = entry.getName().substring(0, entry.getName().lastIndexOf('/'));
+                                    className = entry.getName().substring(entry.getName().lastIndexOf('/') + 1).replace(".class", "");
+                                } else {
+                                    //default package
+                                    packageName = "";
+                                    className = entry.getName().replace(".class", "");
                                 }
+
+                                addSpecies(new GameElementSpec("SPECIES",
+                                        domain + f.getName(),
+                                        packageName,
+                                        className,
+                                        "")
+                                );
                             }
-                        } catch (Exception e) {
                         }
+                    } catch (Exception e) {
+                        System.err.println("addCustomAliens: " + e.getMessage());
+                        e.printStackTrace(System.err);
                     }
                 }
             }

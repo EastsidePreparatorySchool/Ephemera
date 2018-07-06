@@ -46,7 +46,7 @@ public class SpaceCritters extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        
+
         /*Orbitable center = new DummyMass();
         double p = 10;
         double e = 0.8;
@@ -61,10 +61,7 @@ public class SpaceCritters extends Application {
         
         
         trajectory.accelerate(new Vector2(0,0), 0);*/
-        
-        
         //if (true) throw new java.lang.RuntimeException();
-        
         GameElementSpec[] elements;
 
         try {
@@ -98,9 +95,9 @@ public class SpaceCritters extends Application {
             String gamePath = System.getProperty("user.dir");
             gamePath = gamePath.toLowerCase();
 
-            if (gamePath.contains("ephemera" + System.getProperty("file.separator") + "spacecritters")) {
+            if (gamePath.contains("ephemera" + System.getProperty("file.separator") + "scserver")) {
                 // probably started from netbeans
-                gamePath = gamePath.substring(0, gamePath.toLowerCase().indexOf("spacecritters"));
+                gamePath = gamePath.substring(0, gamePath.toLowerCase().indexOf("scserver"));
                 //TODO: Can't rely on constants before reading config file
                 // read config files earlier.Read constants first, then game constants, then init, then read stock elements, game elements
                 Constants.searchParentForAliens = false;
@@ -167,7 +164,6 @@ public class SpaceCritters extends Application {
             scene.setOnMousePressed((ex) -> mainScene.handleClick(ex));
             scene.setOnScroll((ex) -> mainScene.handleScroll(ex));
             mainScene.outer.requestFocus();
-            
 
             stage.setScene(scene);
             //stage.show(); // happens in showReady()
@@ -175,8 +171,10 @@ public class SpaceCritters extends Application {
             // and tell the engine that we are done adding elements
             engine.queueCommand(new GameCommand(GameCommandCode.Ready));
         } catch (Exception ex) {
-            System.out.println(ex.toString());
-            System.in.read();
+            System.err.println("start: " + ex.getMessage());
+            ex.printStackTrace(System.err);
+
+//            System.in.read();
         }
     }
 //    public void logFocus() {

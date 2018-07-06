@@ -1,4 +1,4 @@
-package org.eastsideprep.spacecritters.stockaliens;
+package org.eastsideprep.spacecritters.stockelements;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -68,7 +68,7 @@ public class TrajanAlien implements Alien, AlienComplex {
 
         /*try {
             List<AlienSpecies> inRangeAliens = ctx.getView((int) ctx.getTech()).getClosestXenos(
-                    new AlienSpecies("ephemera.eastsideprep.org", "stockaliens", "Alf", 0));
+                    new AlienSpecies("ephemera.eastsideprep.org", "stockelements", "Alf", 0));
 
             Position nearest = inRangeAliens.get(0).position;
             int nearestDistX = Math.abs((nearest.x - ctx.getPosition().x));
