@@ -5,6 +5,7 @@
 package gamelog;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -22,7 +23,7 @@ public class GameLog {
 
     private final GameLogState state;
     private ArrayList<GameLogEntry> log = new ArrayList<>();
-    private final ArrayList<GameLogObserver> observers = new ArrayList<>();
+    private final HashMap<Object, GameLogObserver> observers = new HashMap<>();
 
     private int start = 0;
     private int end = 0;
@@ -44,9 +45,19 @@ public class GameLog {
         }
     }
 
-    GameLogObserver addObserver() {
-        GameLogObserver obs = new GameLogObserver(this);
+    GameLogObserver addObserver(Object client) {
+        GameLogObserver obs;
+        synchronized (observers) {
+            obs = new GameLogObserver(this);
+            observers.put(client, obs);
+        }
         return obs;
+    }
+
+    void removeObserver(Object client) {
+        synchronized (observers) {
+            observers.remove(client);
+        }
     }
 
     void collapseRead() {
@@ -85,7 +96,7 @@ public class GameLog {
                 if (obs.maxRead == minRead && end > minRead) {
                     int currentMin = end;
 
-                    for (GameLogObserver o : observers) {
+                    for (GameLogObserver o : observers.values()) {
                         if (o.maxRead < currentMin) {
                             currentMin = o.maxRead;
                         }
