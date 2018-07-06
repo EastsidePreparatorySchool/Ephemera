@@ -11,5 +11,6 @@ import gamelog.GameLogEntry;
  * @author gmein
  */
 public class SCGameLogEntry extends GameLogEntry {
+    // to record: moves, acceleration, state change (t,e, orbital, secrets), comm, trade, 
     
 }
