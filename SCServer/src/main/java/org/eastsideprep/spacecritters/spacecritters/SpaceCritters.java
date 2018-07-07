@@ -259,6 +259,29 @@ public class SpaceCritters extends Application {
         }
     }
 
+    public void startOrResumeGame() {
+     if (controlPane.buttonPause.getText().equals("Start")) {
+            // first start
+            startGame();
+            controlPane.speciesView.setDisable(true);
+
+        } else if (controlPane.buttonPause.getText().equals("Resume")){
+            // regular resume
+            engine.queueCommand(new GameCommand(GameCommandCode.Resume));
+            controlPane.buttonPause.setText("Pause");
+            controlPane.speciesView.setDisable(true);
+        }
+    }
+
+    public void pauseGame() {
+        if (controlPane.buttonPause.getText().equals("Pause")) {
+            // pause
+            engine.queueCommand(new GameCommand(GameCommandCode.Pause));
+            controlPane.buttonPause.setText("Resume");
+            controlPane.speciesView.setDisable(false);
+        } 
+    }
+
     // doesn't really work
     /*
     private void restart() {

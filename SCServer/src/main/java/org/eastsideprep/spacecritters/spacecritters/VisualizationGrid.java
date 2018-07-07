@@ -17,6 +17,8 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import org.eastsideprep.spacecritters.orbit.Trajectory;
+import org.eastsideprep.spacecritters.scgamelog.SCGameLogEntry;
+import org.eastsideprep.spacecritters.scserver.MainApp;
 
 /**
  *
@@ -94,6 +96,9 @@ public class VisualizationGrid implements GameVisualizer {
     public void showIdleUpdate(int numAliens) {
         this.numAliens = numAliens;
 
+      
+        MainApp.log.collapseRead();
+
         Utilities.runAndWait(() -> {
             String text = "Aliens: " + paddedString(numAliens, 7);
             this.gameShell.controlPane.alienNumber.setText(text);
@@ -106,6 +111,9 @@ public class VisualizationGrid implements GameVisualizer {
     @Override
     public void showCompletedTurn(int totalTurns, int numAliens, long time, double tech) {
         ++totalTurnCounter;
+
+        MainApp.log.addLogEntry(new SCGameLogEntry(totalTurnCounter));
+
         this.numAliens = numAliens;
         debugOut("Turn #" + totalTurnCounter + " complete.");
         Utilities.runAndWait(() -> {
@@ -168,6 +176,7 @@ public class VisualizationGrid implements GameVisualizer {
     @Override
     public void showGameOver() {
         gameShell.gameOver = true;
+        debugOut("Game Over");
         try {
             logFile.close();
         } catch (Exception e) {
@@ -175,7 +184,6 @@ public class VisualizationGrid implements GameVisualizer {
             e.printStackTrace(System.err);
 
         }
-        debugOut("Game Over");
         Utilities.runAndWait(() -> this.gameShell.startOrPauseGame(new ActionEvent()));
     }
 

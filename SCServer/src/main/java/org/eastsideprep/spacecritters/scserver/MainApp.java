@@ -1,18 +1,28 @@
 package org.eastsideprep.spacecritters.scserver;
 
+import java.util.ArrayList;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+import javafx.application.Platform;
 import javafx.stage.Stage;
+import org.eastsideprep.spacecritters.gamelog.GameLog;
+import org.eastsideprep.spacecritters.gamelog.GameLogEntry;
+import org.eastsideprep.spacecritters.scgamelog.SCGameLogEntry;
+import org.eastsideprep.spacecritters.scgamelog.SCGameState;
 import org.eastsideprep.spacecritters.spacecritters.SpaceCritters;
+import spark.Request;
+import static spark.Spark.*;
 
 public class MainApp extends Application {
-    
-    SpaceCritters sc;
-    
+
+    static SpaceCritters sc;
+    public static SCGameState scState;
+    public static GameLog log;
+
     @Override
     public void start(Stage stage) throws Exception {
         sc = new SpaceCritters();
-        
+
         try {
             sc.start(stage);
         } catch (Exception e) {
@@ -32,7 +42,93 @@ public class MainApp extends Application {
     public static void main(String[] args) {
         System.setProperty("javafx.preloader", "org.eastsideprep.spacecritters.spacecritters.SplashScreenLoader");
 
+        initSpark();
+        initLog();
+
         launch(args);
     }
+
+    /// initialization
+    private static void initSpark() {
+        staticFiles.location("/static");
+        get("/start", "application/json", (req, res) -> doStart(), new JSONRT());
+        get("/pause", "application/json", (req, res) -> doPause(), new JSONRT());
+        get("/shutdown", "application/json", (req, res) -> shutdown(), new JSONRT());
+        get("/updates", "application/json", (req, res) -> getUpdates(req), new JSONRT());
+    }
+
+    private static void initLog() {
+        scState = new SCGameState(0, 0);
+        log = new GameLog(scState);
+    }
+
+    // ROUTES
     
+    private static String doStart() {
+        Platform.runLater(()->sc.startOrResumeGame());
+        return "SC: Start/resume request queued";
+    }
+    
+    private static String doPause() {
+        Platform.runLater(()->sc.pauseGame());
+        return "SC: Pause request queued";
+    }
+    
+        private static String shutdown() {
+        Platform.runLater(()->sc.handleExit());
+        return "SC: shutdown initiated";
+    }
+    
+ 
+    
+    private static int[] getInitialState(Request req) {
+        try {
+            ServerContext ctx = getCtx(req);
+            if (ctx.observer == null) {
+                ctx.observer = log.addObserver(log);
+            }
+            SCGameState state = SCGameState.safeGetNewState(ctx.observer);
+            return new int[]{ctx.observer.hashCode(), state.entries, state.totalTurns};
+
+        } catch (Exception e) {
+            System.out.println("exception in GIS");
+        }
+        return null;
+    }
+
+    private static int[] getUpdates(Request req) {
+        try {
+            ServerContext ctx = getCtx(req);
+            if (ctx.observer == null) {
+                return getInitialState(req);
+            }
+
+            ArrayList<GameLogEntry> list = ctx.observer.getNewItems();
+            // Convert list into something GSOn can convert;
+            int[] a = new int[list.size()];
+            for (int i = 0; i < a.length; i++) {
+                SCGameLogEntry item = (SCGameLogEntry) list.get(i);
+                a[i] = item.turn;
+            }
+            return a;
+
+        } catch (Exception e) {
+            System.out.println("exception in GU");
+            System.out.println(e.getMessage());
+            e.printStackTrace(System.out);
+        }
+        return null;
+    }
+
+    // context helper
+    private static ServerContext getCtx(Request req) {
+        ServerContext ctx = req.session().attribute("ServerContext");
+        if (req.session().isNew()) {
+            ctx = new ServerContext();
+            req.session().attribute("ServerContext", ctx);
+        }
+
+        return ctx;
+    }
+
 }

@@ -10,7 +10,7 @@ package org.eastsideprep.spacecritters.gamelog;
  */
 
 public interface GameLogState {
-    GameLogState clone ();
+    GameLogState copy ();
     void addEntry(GameLogEntry ge);
     int getEntryCount();
 }

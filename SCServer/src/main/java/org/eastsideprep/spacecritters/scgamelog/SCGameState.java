@@ -4,7 +4,9 @@
  */
 package org.eastsideprep.spacecritters.scgamelog;
 
+import org.eastsideprep.spacecritters.gamelog.GameLog;
 import org.eastsideprep.spacecritters.gamelog.GameLogEntry;
+import org.eastsideprep.spacecritters.gamelog.GameLogObserver;
 import org.eastsideprep.spacecritters.gamelog.GameLogState;
 
 /**
@@ -13,19 +15,49 @@ import org.eastsideprep.spacecritters.gamelog.GameLogState;
  */
 public class SCGameState implements GameLogState {
 
-    @Override
-    public GameLogState clone() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int totalTurns;
+    public int entries;
+
+    // what the console uses initially, 
+    // and what "copy" uses internally
+    public SCGameState(int total, int entries) {
+        this.totalTurns = total;
+        this.entries = entries;
     }
 
+    // this is used by the log to hand a new copy to a client
+    @Override
+    public GameLogState copy() {
+        return new SCGameState(totalTurns, entries);
+    }
+
+    // the log uses this to compact itself into the state
     @Override
     public void addEntry(GameLogEntry ge) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        SCGameLogEntry sge = null;
+        try {
+            sge = (SCGameLogEntry) ge;
+        } catch (Exception e) {
+            System.err.println("GameState: Invalid log entry added to state");
+            return;
+        }
+        totalTurns = Math.max(totalTurns,sge.turn);
+        entries++;
     }
 
+    // log needs this
     @Override
     public int getEntryCount() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return entries;
     }
     
+    public static SCGameState safeGetNewState(GameLogObserver obs) {
+        try {
+            return (SCGameState) obs.getInitialState();
+        } catch (Exception e) {
+            System.err.println("invalid game state at safegetnewgamestate");
+        }
+        return null;
+    }
+
 }

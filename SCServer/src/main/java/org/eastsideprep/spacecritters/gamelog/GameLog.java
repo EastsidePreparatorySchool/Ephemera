@@ -28,14 +28,26 @@ public class GameLog {
     private int start = 0;
     private int end = 0;
     private int minRead = 0;
+    private final int COLLAPSE_THRESHOLD = 1000;
 
-    GameLog(GameLogState state) {
+    public GameLog(GameLogState state) {
         rlock = rwl.readLock();
         wlock = rwl.writeLock();
         this.state = state;
     }
 
-    void addLogEntries(List<GameLogEntry> list) {
+    public void addLogEntry(GameLogEntry item) {
+        wlock.lock();
+        try {
+            log.add(item);
+            end++;
+        } finally {
+            wlock.unlock();
+        }
+//        printLogInfo("AE");
+    }
+
+    public void addLogEntries(List<GameLogEntry> list) {
         wlock.lock();
         try {
             log.addAll(list);
@@ -43,26 +55,31 @@ public class GameLog {
         } finally {
             wlock.unlock();
         }
+//        printLogInfo("AES");
     }
 
-    GameLogObserver addObserver(Object client) {
+    public GameLogObserver addObserver(Object client) {
         GameLogObserver obs;
         synchronized (observers) {
             obs = new GameLogObserver(this);
             observers.put(client, obs);
         }
+//        printLogInfo("AO");
         return obs;
     }
 
-    void removeObserver(Object client) {
+    public void removeObserver(Object client) {
         synchronized (observers) {
             observers.remove(client);
         }
+//        printLogInfo("RO");
     }
 
-    void collapseRead() {
+    public void collapseRead() {
         wlock.lock();
         try {
+            printLogInfo("CR1");
+            System.out.println("Log: compacting, state entries:" + state.getEntryCount());
             // process all read items into state log, 
             for (int i = 0; i < minRead - start; i++) {
                 state.addEntry(log.get(i));
@@ -74,55 +91,82 @@ public class GameLog {
             log = newLog;
 
             // and adjust the "start" offset
-            start -= end - minRead;
+            start = minRead;
+            printLogInfo("CR2");
+            System.out.println("Log: compacted, state entries:" + state.getEntryCount());
         } finally {
             wlock.unlock();
         }
     }
 
     // needs rewrite with concept of observers
-    ArrayList<GameLogEntry> getNewItems(GameLogObserver obs) {
+    public ArrayList<GameLogEntry> getNewItems(GameLogObserver obs) {
         ArrayList<GameLogEntry> result = new ArrayList<>();
 
         rlock.lock();
+        int oldMinRead = minRead;
         try {
-            // copy the new items to the result
-            result.addAll(log.subList(obs.maxRead - start, end - start));
+            printLogInfo("GNI1", obs);
+            int items = end - obs.maxRead;
+            if (items > 0) {
+                // copy the new items to the result
+                result.addAll(log.subList(obs.maxRead - start, end - start));
 
-            // update maxRead, and possibly minRead
-            // need to lock this, multiple threads might want to do it
-            synchronized (observers) {
-                // if we were at minRead and have new items, we might need to move it
-                if (obs.maxRead == minRead && end > minRead) {
-                    int currentMin = end;
+                // update maxRead, and possibly minRead
+                // need to lock this, multiple threads might want to do it
+                synchronized (observers) {
+                    obs.maxRead = end;
+                    // if we were at minRead and have new items, we might need to move it
+                    if (obs.maxRead == minRead && end > minRead) {
+                        int currentMin = end;
 
-                    for (GameLogObserver o : observers.values()) {
-                        if (o.maxRead < currentMin) {
-                            currentMin = o.maxRead;
+                        for (GameLogObserver o : observers.values()) {
+                            if (o.maxRead < currentMin) {
+                                currentMin = o.maxRead;
+                            }
                         }
+                        // record new minimum
+                        minRead = currentMin;
                     }
-                    // record new minimum
-                    minRead = currentMin;
                 }
-                // set our new maxRead
-                obs.maxRead = end;
+                printLogInfo("GNI2", obs);
+
             }
 
         } finally {
             rlock.unlock();
         }
 
+        if (minRead - oldMinRead > COLLAPSE_THRESHOLD) {
+            collapseRead();
+        }
+
         return result;
     }
 
-    GameLogState getNewGameLogState() {
+    public GameLogState getNewGameLogState() {
         GameLogState result = null;
         wlock.lock();
         try {
-            result = state.clone();
+            result = state.copy();
         } finally {
             wlock.unlock();
         }
         return result;
+    }
+
+    private void printLogInfo(String op) {
+        if (end < start || minRead < start || minRead > end) {
+            System.out.println("---- log corrupt");
+        }
+        System.out.println("Log" + op + ": " + log.size() + ", start:" + start + ", end:" + end + ", minRead:" + minRead + ", state:" + state.getEntryCount());
+    }
+
+    private void printLogInfo(String op, GameLogObserver obs) {
+        printLogInfo(op);
+        if (obs.maxRead < start || obs.maxRead > end) {
+            System.out.println("---- obs data corrupt");
+        }
+        System.out.println("  obs:" + obs.hashCode() + ", info:" + obs.maxRead);
     }
 }
