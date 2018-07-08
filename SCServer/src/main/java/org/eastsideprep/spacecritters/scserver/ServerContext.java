@@ -5,6 +5,8 @@
  */
 package org.eastsideprep.spacecritters.scserver;
 
+import org.eastsideprep.spacecritters.gameengineimplementation.GameEngineV2;
+import org.eastsideprep.spacecritters.gameengineinterfaces.GameEngine;
 import org.eastsideprep.spacecritters.gamelog.GameLogObserver;
 
 /**
@@ -13,4 +15,9 @@ import org.eastsideprep.spacecritters.gamelog.GameLogObserver;
  */
 public class ServerContext {
     GameLogObserver observer;
+    GameEngineV2 engine;
+    
+    public ServerContext() {
+    }
+    
 }

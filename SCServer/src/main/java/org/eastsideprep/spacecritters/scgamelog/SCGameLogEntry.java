@@ -13,8 +13,10 @@ import org.eastsideprep.spacecritters.gamelog.GameLogEntry;
 public class SCGameLogEntry extends GameLogEntry {
     // to record: moves, acceleration, state change (t,e, orbital, secrets), comm, trade, 
     public int turn;
+    public int numAliens;
     
-    public SCGameLogEntry(int turn) {
+    public SCGameLogEntry(int turn, int numAliens) {
         this.turn = turn;
+        this.numAliens = numAliens;
     }
 }

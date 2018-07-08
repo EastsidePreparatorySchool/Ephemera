@@ -96,9 +96,6 @@ public class VisualizationGrid implements GameVisualizer {
     public void showIdleUpdate(int numAliens) {
         this.numAliens = numAliens;
 
-      
-        MainApp.log.collapseRead();
-
         Utilities.runAndWait(() -> {
             String text = "Aliens: " + paddedString(numAliens, 7);
             this.gameShell.controlPane.alienNumber.setText(text);
@@ -111,8 +108,6 @@ public class VisualizationGrid implements GameVisualizer {
     @Override
     public void showCompletedTurn(int totalTurns, int numAliens, long time, double tech) {
         ++totalTurnCounter;
-
-        MainApp.log.addLogEntry(new SCGameLogEntry(totalTurnCounter));
 
         this.numAliens = numAliens;
         debugOut("Turn #" + totalTurnCounter + " complete.");

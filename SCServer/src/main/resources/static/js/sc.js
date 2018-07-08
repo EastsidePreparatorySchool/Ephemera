@@ -33,13 +33,33 @@ function request(obj) {
 
 
 
+
+function attach() {
+    request({url: "attach"})   
+        .then(data => {
+            data = JSON.parse(data);
+            //println("Initial state: " + data);
+            println("Observer id: " + data[0]);
+            println("Total game turns: "+ data[1]);
+            println("Number of aliens: "+data[2]);
+            clearInterval(updateTimer);
+            updateTimer = setInterval(getMoreUpdates, 1000);
+        })
+        .catch(error => {
+            println("Error: " + error);
+            clearInterval(updateTimer);
+        });;
+}
+
+
 function updates () {
     request({url: "updates"})
         .then(data => {
             if (data !== null) {
+                //println("Raw: "+data.substr(0,100));
                 data = JSON.parse(data);
                 if (data !== null && data.length > 0) {
-                    println("Updates: " + data.length + " items");
+                    println("Updates: " + data.length + " game turns have completed. #Aliens"+data[data.length-1].numAliens);
                 }
             }
         })
@@ -48,18 +68,6 @@ function updates () {
         });
 }
 
-function attach() {
-    request({url: "attach"})   
-        .then(data => {
-            data = JSON.parse(data);
-            println("Initial state: " + data);
-            clearInterval(updateTimer);
-            updateTimer = setInterval(getMoreUpdates, 1000);
-        })
-        .catch(error => {
-            println("Error: " + error);
-        });;
-}
 
 
 function detach() {
@@ -80,6 +88,7 @@ function pause() {
 
 
 function shutdown() {
+    clearInterval(updateTimer);
     request({url: "shutdown"});
 }
 

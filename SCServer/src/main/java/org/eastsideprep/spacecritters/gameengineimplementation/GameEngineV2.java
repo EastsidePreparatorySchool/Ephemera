@@ -12,6 +12,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import org.eastsideprep.spacecritters.gamelog.GameLog;
+import org.eastsideprep.spacecritters.scgamelog.SCGameState;
 
 /**
  *
@@ -27,11 +29,17 @@ public class GameEngineV2 implements GameEngine {
     public String gamePath;
     public String alienPath;
     Gson gson;
+    public SCGameState state;
+    public GameLog log;
 
     public GameEngineV2() {
         this.gson = new Gson();
         this.queue = new ConcurrentLinkedQueue<>();
+        this.state = new SCGameState(0, 0);
+        this.log = new GameLog(state);
     }
+    
+  
 
     @Override
     public boolean isAlive() {

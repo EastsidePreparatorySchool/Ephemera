@@ -4,6 +4,7 @@
  */
 package org.eastsideprep.spacecritters.spacecritters;
 
+import org.eastsideprep.spacecritters.scserver.LoggingVisualizer;
 import org.eastsideprep.spacecritters.gameengineimplementation.GameEngineV2;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameCommand;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameCommandCode;
@@ -29,7 +30,7 @@ import static javafx.application.Application.launch;
 public class SpaceCritters extends Application {
 
     boolean gameOver = false;
-    GameEngineV2 engine;
+    public GameEngineV2 engine;
 //    VisualizationGrid field;
     GameVisualizer field;
     VisualizationGrid fieldGrid;
@@ -131,7 +132,7 @@ public class SpaceCritters extends Application {
             //
             // test: viz streamer for web version
             //
-            this.streamer = new VisualizationStreamer(logPath);
+            this.streamer = new LoggingVisualizer(engine.log);
 
             // make multiviz with both
             this.field = new MultiVisualizer(

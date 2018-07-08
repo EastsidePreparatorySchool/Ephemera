@@ -17,6 +17,7 @@ public class SCGameState implements GameLogState {
 
     public int totalTurns;
     public int entries;
+    public int numAliens;
 
     // what the console uses initially, 
     // and what "copy" uses internally
