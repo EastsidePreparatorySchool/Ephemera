@@ -27,21 +27,24 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void registerSpecies(AlienSpec as, AlienShapeFactory asf) {
-
+        log.addLogEntry(new SCGameLogEntry("ADDSPECIES", 0, 0, 0, 0, as.getFullSpeciesName(), 0, 0.0, 0.0));
     }
 
     @Override
     public void registerStar(int x, int y, String name, int index, double luminosity, double mass) { //[Q]
+        log.addLogEntry(new SCGameLogEntry("ADDSTAR", x, y, 0, 0, name, index, 0.0, 0.0));
 
     }
 
     @Override
     public void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass, Trajectory t) { //[Q]
+        log.addLogEntry(new SCGameLogEntry("ADDPLANET", x, y, 0, 0, name, index, 0.0, 0.0));
 
     }
 
     @Override
     public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) { //[Q]
+        log.addLogEntry(new SCGameLogEntry("MOVEPLANET", x, y, 0, 0, name, index, 0.0, 0.0));
     }
 
     @Override

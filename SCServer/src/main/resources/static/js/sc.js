@@ -12,7 +12,9 @@ var alienSpan = document.getElementById("numaliens");
 var centerDiv = document.getElementById("center");
 
 var aliens = {};
-var speciesMap;
+var planets = {};
+var stars = [];
+var speciesMap = null; // see init()
 
 
 //initialize three.js and set all initial values
@@ -21,6 +23,8 @@ var scene;
 var camera;
 var renderer;
 var cubeGeo;
+var startGeo;
+var planetGeo;
 var gridHelper;
 var light;
 
@@ -107,9 +111,12 @@ function updates () {
             }
         })
         .catch(error => {
-            clearInterval(updateTimer);
-            updateTimer = null;
-            println("Error: " + error);
+            if (updateTimer !== null) {
+                clearInterval(updateTimer);
+                updateTimer = null;
+                println("Server not responding, updates suspended.");
+            }
+            //println("Error: " + error);
         });
 }
 
@@ -123,10 +130,26 @@ function processUpdates(data){
                     turnSpan.innerText = o.param1;
                     alienSpan.innerText = o.param2;
                     break;
+
+                case "ADDSTAR":
+                    addStar(o);
+                    break;
+
+                case "ADDPLANET":
+                    addPlanet(o);
+                    break;
+                case "MOVEPLANET":
+                    movePlanet(o);
+                    break;
+
+                case "ADDSPECIES":
+                    addSpecies(o);
+                    break;
+
                 case "ADD":
                     //println ("Adding alien id: "+o.id+", species: "+o.name);
                     addAlien(o);
-                    break;
+                    break; 
                 case "MOVE":
                     //println("Move: id: "+o.id+" ("+o.param1 +","+o.param2+") -> ("+o.newX +","+o.newY+")");
                     moveAlien(o);
@@ -135,6 +158,7 @@ function processUpdates(data){
                     //println("Alien id: "+o.id+" died.");
                     killAlien(o);
                     break;
+
                 default:
                     println ("unknown record");
                     break;
@@ -209,13 +233,13 @@ class Alien {
     this.mesh = new THREE.Mesh(cubeGeo,this.mat);
     scene.add(this.mesh);
     this.mesh.position.x = x;
-    this.mesh.position.z = z;
-    this.mesh.position.y = 0.5;
+    this.mesh.position.z = -z;
+    this.mesh.position.y = 1;
     this.id = id;
   }
   move(x,z){
     this.mesh.position.x = x;
-    this.mesh.position.z = z;
+    this.mesh.position.z = -z;
   }
   kill(){
     scene.remove(this.mesh);
@@ -223,6 +247,52 @@ class Alien {
   }
 };
 
+
+// star class, use this to make aliens
+class Star {
+  constructor(x,z){
+    this.mat = new THREE.MeshBasicMaterial({color:"white", wireframe:false});
+    this.mesh = new THREE.Mesh(starGeo,this.mat);
+    scene.add(this.mesh);
+    this.mesh.position.x = x;
+    this.mesh.position.z = -z;
+    this.mesh.position.y = 1;
+  }
+ 
+};
+
+// planet class, use this to make aliens
+class Planet {
+    constructor(x,z, id){
+        this.mat = new THREE.MeshBasicMaterial({color:"green", wireframe:false});
+        this.mesh = new THREE.Mesh(planetGeo,this.mat);
+        scene.add(this.mesh);
+        this.mesh.position.x = x;
+        this.mesh.position.z = -z;
+        this.mesh.position.y = 1;
+        this.id = id;
+    }
+    move(x,z){
+        this.mesh.position.x = x;
+        this.mesh.position.z = -z;
+    }
+};
+
+function addStar(content) {
+    stars.push(new Star(content.newX,content.newY));
+}
+
+
+function addPlanet(content) {
+    planets[content.id] = new Planet(content.newX,content.newY, content.id);
+}
+
+function movePlanet(content) {
+    var planet = planets[content.id];
+    if (planet !== undefined) {
+        planet.move(content.newX,content.newY);
+    }
+}
 
 
 
@@ -244,12 +314,16 @@ function killAlien(content) {
     }
 }
 
+function addSpecies(content) {
+    speciesMap.getColor(content.name);
+}
+
 
 class SpeciesMap {
     constructor() {
         this.map = {};
         this.count = 0;
-        this.colors = ["red", "blue", "yellow", "green", "orange", "purple"];
+        this.colors = ["lightblue", "yellow", "lightpink", "lightgreen", "orange", "white"];
     }
 
     getColor(name) {
@@ -257,9 +331,9 @@ class SpeciesMap {
         console.log(this.map);
         var color = this.map[name];
         if (color === undefined) {
-            this.count++;
             color = this.colors[this.count%this.colors.length];
             this.map[name] = color;
+            this.count++;
         }
         return color;
     }
@@ -303,9 +377,11 @@ function init() {
     centerDiv.appendChild(renderer.domElement);
 
     cubeGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
+    starGeo = new THREE.SphereGeometry(2.0, 32, 32);
+    planetGeo = new THREE.SphereGeometry(1.0, 32, 32);
 
 
-    gridHelper = new THREE.GridHelper(size, divisions);
+    gridHelper = new THREE.GridHelper(size, divisions, "darkred", "darkred");
     scene.add(gridHelper);
 
     camera.position.z = 100;
