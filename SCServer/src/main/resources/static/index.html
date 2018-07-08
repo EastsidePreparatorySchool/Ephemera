@@ -1,31 +1,52 @@
 <!DOCTYPE html>
+<html style="height:100%; margin:0; padding:0; ">
 
-<html>
     <head>
-        <title>SpaceCritters Online (test)</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Space Critters Online V0.2</title>
     </head>
-    <body onload="init()">
-
-        <h2>SpaceCritters Online V0.1</h2>
-        <div> 
-            Controls:<br>
-            <button onclick="start()">Start</button>
-            <button onclick="pause()">Pause</button>
-            <br>
-            <button onclick="attach()">Attach</button>
-            <button onclick="updates()">Get updates</button>
-            <button onclick="detach()">Detach</button>
-            <br>
-            <button onclick="shutdown()">Shutdown</button>
+    
+    <body style="margin: 0; padding: 0; height:100%" onload="init()">
+        <div style="width:100%;background-color: #344343;height:20%;text-align: center; ">
+            <span style="font-family: Brush Script MT; font-size: 400%;">
+                Space Critters Online V0.2
+            </span>
+            <p>
+                Top pane
+            </p>
         </div>
-        <br>
-        <br>
-        <br>
-        <textarea style="width:500px; height:200px; overflow-y:scroll; resize:none;" id="output"></textarea>
+
+        <div style="float:left;width:20%; height:60%;background-color: #8B9B73">
+            Controls<br><br>
+            <button style="width:130px" onclick="start()">Start</button><br>
+            <button style="width:130px" onclick="pause()">Pause</button><br><br>
+            <button style="width:130px" onclick="attach()">Attach</button><br>
+            <button style="width:130px" onclick="detach()">Detach</button><br><br>
+            <button style="width:130px" onclick="shutdown()">Shutdown</button><br>
+        </div>
+
+        <div style="float:left;width:60%; height:60%; text-align: center; background-color: #2E2224; color:#8B9B73;" id="center">
+        </div>
+
+        <div style="float:left;width:20%; height:60%; text-align: center;background-color: #63816F; font-family: monospace">
+            Status
+            <p>Turns  : <span id="turns">0</span></p>
+            <p>#aliens: <span id="numaliens">0</span></p>
 
 
+
+        </div>
+
+        <div style="width:100%;height:20%;background-color: #60725E; clear:both;">
+            <textarea style="width:100%; height:100%; overflow-y:scroll; resize:none;" id="output"></textarea>
+        </div>
+
+        <br>
+
+        <script src="/js/jquery-3.3.1.min.js"></script>
+        <script src="/js/three.min.js"></script>
         <script src="/js/sc.js"></script>
     </body>
+
+
+
 </html>

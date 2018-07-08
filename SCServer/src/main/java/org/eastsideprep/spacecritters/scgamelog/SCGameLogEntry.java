@@ -18,11 +18,12 @@ public class SCGameLogEntry extends GameLogEntry {
     public int param1;
     public int param2;
     public String name;
+    public int id;
     public double energy;
     public double tech;
     
     
-    public SCGameLogEntry(String type, int newX, int newY, int param1, int param2, String name, double energy, double tech) {
+    public SCGameLogEntry(String type, int newX, int newY, int param1, int param2, String name, int id, double energy, double tech) {
         this.type = type;
         this.newX = newX;
         this.newY = newY;
@@ -31,5 +32,6 @@ public class SCGameLogEntry extends GameLogEntry {
         this.energy = energy;
         this.tech = tech;
         this.name = name;
+        this.id = id;
     }
 }

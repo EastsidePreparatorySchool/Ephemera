@@ -126,17 +126,14 @@ public class SpaceCritters extends Application {
             this.engine = new GameEngineV2();
             this.fieldGrid = new VisualizationGrid();
 
-            // now initialize visualization field
+            // now initialize visualization field  
             this.fieldGrid.initField(this, engine, consolePane, species, logPath, width, height);
 
-            //
-            // test: viz streamer for web version
-            //
+            // make logging vis (for web clients)
             this.streamer = new LoggingVisualizer(engine.log);
 
             // make multiviz with both
-            this.field = new MultiVisualizer(
-                    new GameVisualizer[]{this.fieldGrid, this.streamer});
+            this.field = new MultiVisualizer(new GameVisualizer[]{this.fieldGrid, this.streamer});
             this.field.init(); // calls init on all
 
             // and engine
@@ -261,12 +258,12 @@ public class SpaceCritters extends Application {
     }
 
     public void startOrResumeGame() {
-     if (controlPane.buttonPause.getText().equals("Start")) {
+        if (controlPane.buttonPause.getText().equals("Start")) {
             // first start
             startGame();
             controlPane.speciesView.setDisable(true);
 
-        } else if (controlPane.buttonPause.getText().equals("Resume")){
+        } else if (controlPane.buttonPause.getText().equals("Resume")) {
             // regular resume
             engine.queueCommand(new GameCommand(GameCommandCode.Resume));
             controlPane.buttonPause.setText("Pause");
@@ -280,7 +277,7 @@ public class SpaceCritters extends Application {
             engine.queueCommand(new GameCommand(GameCommandCode.Pause));
             controlPane.buttonPause.setText("Resume");
             controlPane.speciesView.setDisable(false);
-        } 
+        }
     }
 
     // doesn't really work

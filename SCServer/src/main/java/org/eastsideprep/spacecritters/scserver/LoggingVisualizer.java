@@ -54,7 +54,7 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void showCompletedTurn(int totalTurns, int numAliens, long timeTaken, double avgTech) {
-        log.addLogEntry(new SCGameLogEntry("TURN", 0, 0, totalTurns, numAliens, null, 0.0, 0.0));
+        log.addLogEntry(new SCGameLogEntry("TURN", 0, 0, totalTurns, numAliens, null, -1, 0.0, 0.0));
     }
 
     @Override
@@ -67,7 +67,7 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition, boolean update, Trajectory t) { //[Q]
-        log.addLogEntry(new SCGameLogEntry("MOVE", as.x, as.y, oldX, oldY, as.getFullSpeciesName(), 0.0, 0.0));
+        log.addLogEntry(new SCGameLogEntry("MOVE", as.x, as.y, oldX, oldY, null, as.hashCode, 0.0, 0.0));
     }
 
     @Override
@@ -76,10 +76,12 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void showSpawn(AlienSpec as, double energyAtPos, Trajectory t) {
+        log.addLogEntry(new SCGameLogEntry("ADD", as.x, as.y, 0, 0, as.getFullSpeciesName(), as.hashCode, 0.0, 0.0));
     }
 
     @Override
     public void showDeath(AlienSpec as, double energyAtPos) {
+        log.addLogEntry(new SCGameLogEntry("KILL", as.x, as.y, 0, 0, null, as.hashCode, 0.0, 0.0));
     }
 
     @Override

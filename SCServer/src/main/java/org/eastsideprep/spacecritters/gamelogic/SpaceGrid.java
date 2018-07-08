@@ -764,7 +764,7 @@ public class SpaceGrid {
                 }
 
                 if (!element.className.toLowerCase().endsWith("resident")) {
-                    System.out.println("2 " + element.className);
+//                    System.out.println("2 " + element.className);
                     vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
                 }
                 result = as;
@@ -794,7 +794,6 @@ public class SpaceGrid {
             speciesMap.put(speciesName, as);
             speciesCounter++;
             if (!alienClassName.toLowerCase().endsWith("resident")) {
-                System.out.println("1 " + alienClassName);
                 vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
             }
         }
@@ -811,10 +810,10 @@ public class SpaceGrid {
                 aliens.addAlienAndPlug(ac);
                 if (!ac.className.toLowerCase().endsWith("resident")) {
                     vis.showSpawn(ac.getFullAlienSpec(), 0, ac.trajectory);
+                    this.alienCount++;
                 }
                 as.counter++;
                 as.spawns++;
-                this.alienCount++;
             } catch (InstantiationException e) {
                 gridDebugErr("sg: could not instantiate new " + speciesName);
                 gridDebugErr("sg: " + e.getMessage());
@@ -894,8 +893,6 @@ public class SpaceGrid {
         if (ac == null) {
             return;
         }
-
-        this.alienCount--; // don't count this one, it's a resident
 
         if (ac.alien instanceof ResidentAlien) {
             ResidentContextImplementation rc = new ResidentContextImplementation(ac);
