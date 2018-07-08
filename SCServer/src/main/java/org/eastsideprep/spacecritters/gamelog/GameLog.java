@@ -59,23 +59,30 @@ public class GameLog {
     }
 
     public GameLogObserver addObserver(Object client) {
+        collapseRead();
         GameLogObserver obs;
         synchronized (observers) {
             obs = new GameLogObserver(this);
             observers.put(client, obs);
         }
-//        printLogInfo("AO");
+        printLogInfo("AO");
         return obs;
     }
 
     public void removeObserver(Object client) {
         synchronized (observers) {
             observers.remove(client);
+            updateMinRead();
         }
-//        printLogInfo("RO");
+        printLogInfo("RO");
+        collapseRead();
     }
 
     public void collapseRead() {
+        if (minRead - start <= COLLAPSE_THRESHOLD) {
+            return;
+        }
+
         wlock.lock();
         try {
             printLogInfo("CR1");
@@ -115,18 +122,12 @@ public class GameLog {
                 // update maxRead, and possibly minRead
                 // need to lock this, multiple threads might want to do it
                 synchronized (observers) {
+                    int oldMax = obs.maxRead;
                     obs.maxRead = end;
-                    // if we were at minRead and have new items, we might need to move it
-                    if (obs.maxRead == minRead && end > minRead) {
-                        int currentMin = end;
 
-                        for (GameLogObserver o : observers.values()) {
-                            if (o.maxRead < currentMin) {
-                                currentMin = o.maxRead;
-                            }
-                        }
-                        // record new minimum
-                        minRead = currentMin;
+                    // if we were at minRead we might need to move it
+                    if (oldMax == minRead) {
+                        updateMinRead();
                     }
                 }
                 printLogInfo("GNI2", obs);
@@ -137,9 +138,7 @@ public class GameLog {
             rlock.unlock();
         }
 
-        if (minRead - oldMinRead > COLLAPSE_THRESHOLD) {
-            collapseRead();
-        }
+        collapseRead();
 
         return result;
     }
@@ -155,11 +154,24 @@ public class GameLog {
         return result;
     }
 
+    // only call this when already synchronized on observers
+    private void updateMinRead() {
+        int currentMin = end;
+
+        for (GameLogObserver o : observers.values()) {
+            if (o.maxRead < currentMin) {
+                currentMin = o.maxRead;
+            }
+        }
+        // record new minimum
+        minRead = currentMin;
+    }
+
     private void printLogInfo(String op) {
         if (end < start || minRead < start || minRead > end) {
             System.out.println("---- log corrupt");
         }
-        System.out.println("Log" + op + ": " + log.size() + ", start:" + start + ", end:" + end + ", minRead:" + minRead + ", state:" + state.getEntryCount());
+        System.out.println("Log" + op + ": array size:" + log.size() + ", start:" + start + ", end:" + end + ", minRead:" + minRead + ", state:" + state.getEntryCount());
     }
 
     private void printLogInfo(String op, GameLogObserver obs) {
@@ -167,6 +179,6 @@ public class GameLog {
         if (obs.maxRead < start || obs.maxRead > end) {
             System.out.println("---- obs data corrupt");
         }
-        System.out.println("  obs:" + obs.hashCode() + ", info:" + obs.maxRead);
+        System.out.println("  obs:" + Integer.toHexString(obs.hashCode()) + ", maxRead:" + obs.maxRead);
     }
 }

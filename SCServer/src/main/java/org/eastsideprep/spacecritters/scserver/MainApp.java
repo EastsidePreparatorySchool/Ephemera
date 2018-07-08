@@ -54,7 +54,9 @@ public class MainApp extends Application {
         get("/start", "application/json", (req, res) -> doStart(), new JSONRT());
         get("/pause", "application/json", (req, res) -> doPause(), new JSONRT());
         get("/shutdown", "application/json", (req, res) -> shutdown(), new JSONRT());
-        get("/updates", "application/json", (req, res) -> getUpdates(req), new JSONRT());
+        get("/attach", "application/json", (req, res) -> attach(req), new JSONRT());
+        get("/detach", "application/json", (req, res) -> detach(req), new JSONRT());
+        get("/updates", "application/json", (req, res) -> updates(req), new JSONRT());
     }
 
     private static void initLog() {
@@ -63,29 +65,26 @@ public class MainApp extends Application {
     }
 
     // ROUTES
-    
     private static String doStart() {
-        Platform.runLater(()->sc.startOrResumeGame());
+        Platform.runLater(() -> sc.startOrResumeGame());
         return "SC: Start/resume request queued";
     }
-    
+
     private static String doPause() {
-        Platform.runLater(()->sc.pauseGame());
+        Platform.runLater(() -> sc.pauseGame());
         return "SC: Pause request queued";
     }
-    
-        private static String shutdown() {
-        Platform.runLater(()->sc.handleExit());
+
+    private static String shutdown() {
+        Platform.runLater(() -> sc.handleExit());
         return "SC: shutdown initiated";
     }
-    
- 
-    
-    private static int[] getInitialState(Request req) {
+
+    private static int[] attach(Request req) {
         try {
             ServerContext ctx = getCtx(req);
             if (ctx.observer == null) {
-                ctx.observer = log.addObserver(log);
+                ctx.observer = log.addObserver(ctx);
             }
             SCGameState state = SCGameState.safeGetNewState(ctx.observer);
             return new int[]{ctx.observer.hashCode(), state.entries, state.totalTurns};
@@ -95,12 +94,26 @@ public class MainApp extends Application {
         }
         return null;
     }
+   private static String detach(Request req) {
+        try {
+            ServerContext ctx = getCtx(req);
+            if (ctx.observer != null) {
+                 log.removeObserver(ctx);
+                 ctx.observer = null;
+            }
+        } catch (Exception e) {
+            System.out.println("detach exception");
+            return "detach: exception in RO";
+        }
+        return "detach success";
+    }
 
-    private static int[] getUpdates(Request req) {
+ 
+    private static int[] updates(Request req) {
         try {
             ServerContext ctx = getCtx(req);
             if (ctx.observer == null) {
-                return getInitialState(req);
+                return null;
             }
 
             ArrayList<GameLogEntry> list = ctx.observer.getNewItems();
