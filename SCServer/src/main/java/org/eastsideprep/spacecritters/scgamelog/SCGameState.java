@@ -42,7 +42,9 @@ public class SCGameState implements GameLogState {
             System.err.println("GameState: Invalid log entry added to state");
             return;
         }
-        totalTurns = Math.max(totalTurns,sge.turn);
+        if (sge.type.equals("TURN")) {
+            totalTurns++;
+        }
         entries++;
     }
 
@@ -51,7 +53,7 @@ public class SCGameState implements GameLogState {
     public int getEntryCount() {
         return entries;
     }
-    
+
     public static SCGameState safeGetNewState(GameLogObserver obs) {
         try {
             return (SCGameState) obs.getInitialState();

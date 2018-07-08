@@ -58,14 +58,31 @@ function updates () {
             if (data !== null) {
                 //println("Raw: "+data.substr(0,100));
                 data = JSON.parse(data);
-                if (data !== null && data.length > 0) {
-                    println("Updates: " + data.length + " game turns have completed. #Aliens"+data[data.length-1].numAliens);
-                }
+                processUpdates(data);
             }
         })
         .catch(error => {
             println("Error: " + error);
         });
+}
+
+function processUpdates(data){
+    if (data !== null && data.length > 0) {
+        for (var i = 0; i< data.length; i++) {
+            var o = data[i];
+            switch (o.type) {
+                case "TURN":
+                    println("Turn "+o.param1+" complete. #Aliens:"+o.param2);
+                    break;
+                case "MOVE":
+                    println("Move: ("+o.param1 +","+o.param2+") -> ("+o.newX +","+o.newY+")");
+                    break;
+                default:
+                    println ("uknown record");
+                    break;
+            }
+        }
+    }
 }
 
 

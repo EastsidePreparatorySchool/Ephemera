@@ -27,17 +27,17 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void registerSpecies(AlienSpec as, AlienShapeFactory asf) {
-    
+
     }
 
     @Override
     public void registerStar(int x, int y, String name, int index, double luminosity, double mass) { //[Q]
-     
+
     }
 
     @Override
     public void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass, Trajectory t) { //[Q]
-    
+
     }
 
     @Override
@@ -54,7 +54,7 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void showCompletedTurn(int totalTurns, int numAliens, long timeTaken, double avgTech) {
-        log.addLogEntry(new SCGameLogEntry(totalTurns, numAliens));
+        log.addLogEntry(new SCGameLogEntry("TURN", 0, 0, totalTurns, numAliens, null, 0.0, 0.0));
     }
 
     @Override
@@ -67,6 +67,7 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition, boolean update, Trajectory t) { //[Q]
+        log.addLogEntry(new SCGameLogEntry("MOVE", as.x, as.y, oldX, oldY, as.getFullSpeciesName(), 0.0, 0.0));
     }
 
     @Override
@@ -121,6 +122,5 @@ public class LoggingVisualizer implements GameVisualizer {
     @Override
     public void shutdown() {
     }
-
 
 }
