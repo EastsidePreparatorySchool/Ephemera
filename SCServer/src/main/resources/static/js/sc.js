@@ -225,16 +225,65 @@ function detach() {
 
 
 function create() {
-    request({url: "create?name="+engineName.value});
+    request({url: "create?name="+engineName.value})
+        .then(data => {
+              if (data !== null) {
+                  println("  Response: "+data);
+              }
+          })
+          .catch(error => {
+              if (error !== null && error.length > 0) {
+                  println("  Error: '" + error+"'");
+              }
+          });
 }
 
 function start() {
-    request({url: "start"});
+    request({url: "start"})
+        .then(data => {
+              if (data !== null) {
+                  println("  Response: "+data);
+              }
+          })
+          .catch(error => {
+              if (error !== null && error.length > 0) {
+                  println("  Error: '" + error+"'");
+              }
+          });
+}
+
+function listEngines() {
+    request({url: "listengines"})
+        .then(data => {
+              if (data !== null) {
+                println ("Raw: "+data);
+                data = JSON.parse(data);
+                for (var s in data) {
+                    println("Engine: '"+data[s]+"'");
+                }
+              }
+          })
+          .catch(error => {
+              if (error !== null && error.length > 0) {
+                  println("  Error: '" + error+"'");
+              }
+          });
 }
 
 
+
 function pause() {
-    request({url: "pause"});
+    request({url: "pause"})
+        .then(data => {
+               if (data !== null) {
+                   println("  Response: "+data);
+               }
+           })
+           .catch(error => {
+               if (error !== null && error.length > 0) {
+                   println("  Error: '" + error+"'");
+               }
+           });
 }
 
 
@@ -545,6 +594,8 @@ function init() {
     //grid.addToCell("hah2", -250,250);
     //grid.addToCell("hah3", 250,-250);
     //grid.addToCell("hah4", 250,250);
+
+    listEngines();
 
     println ("initialized");
 }

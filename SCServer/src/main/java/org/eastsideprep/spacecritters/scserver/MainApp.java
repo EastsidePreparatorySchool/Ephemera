@@ -64,6 +64,7 @@ public class MainApp extends Application {
         staticFiles.location("/static");
         get("/start", "application/json", (req, res) -> doStart(req), new JSONRT());
         get("/pause", "application/json", (req, res) -> doPause(req), new JSONRT());
+        get("/listengines", "application/json", (req, res) -> doListEngines(req), new JSONRT());
         get("/create", "application/json", (req, res) -> doCreateEngine(req), new JSONRT());
         get("/attach", "application/json", (req, res) -> doAttach(req), new JSONRT());
         get("/detach", "application/json", (req, res) -> doDetach(req), new JSONRT());
@@ -90,6 +91,14 @@ public class MainApp extends Application {
         ctx.engine.queueCommand(new GameCommand(GameCommandCode.Pause));
 //        Platform.runLater(() -> sc.pauseGame());
         return "SC: Pause request queued";
+    }
+
+    private static String[] doListEngines(Request req) {
+        String[] result = new String [engines.size()];
+        for (String s : engines.keySet()) {
+            System.out.println("Listing engine: '"+s+"'");
+        }
+        return engines.keySet().toArray(result);
     }
 
     private static String doCreateEngine(Request req) {
@@ -200,7 +209,6 @@ public class MainApp extends Application {
         }
         System.out.println("createDesktopEngine: created and initialized, processing");
 
- 
         return sc.engine;
     }
 
