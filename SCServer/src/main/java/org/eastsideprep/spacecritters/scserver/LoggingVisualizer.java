@@ -38,13 +38,13 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass, Trajectory t) { //[Q]
-        log.addLogEntry(new SCGameLogEntry("ADDPLANET", x, y, 0, 0, name, index, 0.0, 0.0));
+        log.addLogEntry(new SCGameLogEntry("ADDPLANET", x, y, 0, 0, name, -index, 0.0, 0.0));
 
     }
 
     @Override
     public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) { //[Q]
-        log.addLogEntry(new SCGameLogEntry("MOVEPLANET", x, y, 0, 0, name, index, 0.0, 0.0));
+        log.addLogEntry(new SCGameLogEntry("MOVEPLANET", x, y, 0, 0, name, -index, 0.0, 0.0));
     }
 
     @Override
@@ -70,7 +70,10 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition, boolean update, Trajectory t) { //[Q]
-        log.addLogEntry(new SCGameLogEntry("MOVE", as.x, as.y, oldX, oldY, null, as.hashCode, 0.0, 0.0));
+        System.out.println("LOGDEBUG: MOVE" + as.hashCode);
+        if (!as.isResident) {
+            log.addLogEntry(new SCGameLogEntry("MOVE", as.x, as.y, oldX, oldY, null, as.hashCode, 0.0, 0.0));
+        }
     }
 
     @Override
@@ -79,11 +82,13 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void showSpawn(AlienSpec as, double energyAtPos, Trajectory t) {
+        System.out.println("LOGDEBUG: ADD" + as.hashCode);
         log.addLogEntry(new SCGameLogEntry("ADD", as.x, as.y, 0, 0, as.getFullSpeciesName(), as.hashCode, 0.0, 0.0));
     }
 
     @Override
     public void showDeath(AlienSpec as, double energyAtPos) {
+        System.out.println("LOGDEBUG: KILL" + as.hashCode);
         log.addLogEntry(new SCGameLogEntry("KILL", as.x, as.y, 0, 0, null, as.hashCode, 0.0, 0.0));
     }
 

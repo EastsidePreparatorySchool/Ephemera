@@ -354,7 +354,7 @@ public class SpaceGrid {
         for (Iterator<AlienContainer> iterator = aliens.iterator(); iterator.hasNext();) {
             AlienContainer ac = iterator.next();
             if (ac.energy <= 0) {
-                if (!ac.className.toLowerCase().endsWith("resident")) {
+                if (!ac.species.isResident) {
                     vis.showDeath(ac.getFullAlienSpec(), 0);
                 }
                 aliens.unplug(ac);
@@ -365,7 +365,6 @@ public class SpaceGrid {
                 if (as != null) {
                     as.counter--;
                 }
-
             }
         }
     }
@@ -820,7 +819,7 @@ public class SpaceGrid {
                         trajectory); //no trajectory
 
                 aliens.addAlienAndPlug(ac);
-                if (!ac.className.toLowerCase().endsWith("resident")) {
+                if (!ac.species.isResident) {
                     vis.showSpawn(ac.getFullAlienSpec(), 0, ac.trajectory);
                     this.alienCount++;
                 }

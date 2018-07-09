@@ -101,6 +101,7 @@ public class SCGameState implements GameLogState {
                 break;
             case "KILL":
                 aliens.remove(sge.id);
+                break;
             default:
                 break;
         }

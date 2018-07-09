@@ -39,7 +39,7 @@
     {"kind":"PLANET","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"Leyec","state":"","parent":"ephemera.eastsideprep.org:stockelements:Sirius","x":8,"y":8,"energy":16.0,"tech":16.0, "mass": 6.0},
     {"kind":"PLANET","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"Petigi","state":"","parent":"ephemera.eastsideprep.org:stockelements:Ross248","x":3,"y":5,"energy":16.0,"tech":8.0, "mass": 6.0},
     {"kind":"PLANET","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"RMack","state":"","parent":"ephemera.eastsideprep.org:stockelements:EpsilonEridani","x":6,"y":2,"energy":16.0,"tech":8.0, "mass": 6.0},
-    {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"AggressiveAlien","state":"true","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0, "mass": 0.0},
+    {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"AggressiveAlien","state":"false","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0, "mass": 0.0},
     {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"Martian","state":"true","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0, "mass": 0.0},
     {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"Venusian","state":"true","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0, "mass": 0.0},
     {"kind":"SPECIES","domainName":"ephemera.eastsideprep.org","packageName":"stockelements","className":"WeepingAngel","state":"true","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0, "mass": 0.0},

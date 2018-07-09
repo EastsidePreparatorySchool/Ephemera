@@ -28,7 +28,8 @@ public class AlienSpec {
     public String fullName;
     public String speciesName;
     public String msg;
-    
+    public boolean isResident;
+
     public AlienSpec(String domainName, String packageName, String className,
             int speciesID, int hashCode, int x, int y, double tech, double energy,
             String fullName, String speciesName, String msg) { //[Q]
@@ -44,8 +45,9 @@ public class AlienSpec {
         this.speciesName = speciesName;
         this.speciesID = speciesID;
         this.msg = msg;
+        this.isResident = this.className.toLowerCase().endsWith("resident");
     }
-    
+
     public AlienSpec(String domainName, String packageName, String className,
             int speciesID, int hashCode, int x, int y, double tech, double energy,
             String fullName, String speciesName, String msg, AlienContainer parent) { //[Q]
@@ -61,6 +63,7 @@ public class AlienSpec {
         this.speciesName = speciesName;
         this.speciesID = speciesID;
         this.msg = msg;
+        this.isResident = this.className.toLowerCase().endsWith("resident");
         //this.parent = parent;
     }
 
@@ -79,6 +82,7 @@ public class AlienSpec {
         this.speciesName = speciesName;
         this.speciesID = speciesID;
         this.actionPower = actionPower;
+        this.isResident = this.className.toLowerCase().endsWith("resident");
     }
 
     public AlienSpec(AlienSpecies as) {
@@ -86,7 +90,7 @@ public class AlienSpec {
         this.packageName = as.packageName;
         this.className = as.className;
         this.speciesID = as.speciesID;
-
+        this.isResident = as.isResident;
     }
 
     // for purposes of describing a species of alien

@@ -16,12 +16,14 @@ public class AlienSpecies {
     private String speciesName;
     public int speciesID;
     public IntegerPosition position; // for view purposes
+    public boolean isResident;
 
     public AlienSpecies(String domainName, String packageName, String className, int id) {
         this.domainName = domainName;
         this.packageName = packageName;
         this.className = className;
         this.speciesID = id;
+        this.isResident = className.toLowerCase().endsWith("resident");
     }
 
     public AlienSpecies(String domainName, String packageName, String className, int id, int x, int y) { //[Q]
@@ -30,6 +32,7 @@ public class AlienSpecies {
         this.className = className;
         this.speciesID = id;
         this.position = new IntegerPosition(x, y);
+        this.isResident = className.toLowerCase().endsWith("resident");
     }
 
     public String getFullSpeciesName() {
