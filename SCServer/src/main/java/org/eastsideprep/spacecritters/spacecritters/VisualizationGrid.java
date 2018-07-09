@@ -17,8 +17,6 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import org.eastsideprep.spacecritters.orbit.Trajectory;
-import org.eastsideprep.spacecritters.scgamelog.SCGameLogEntry;
-import org.eastsideprep.spacecritters.scserver.MainApp;
 
 /**
  *
@@ -173,7 +171,10 @@ public class VisualizationGrid implements GameVisualizer {
         gameShell.gameOver = true;
         debugOut("Game Over");
         try {
-            logFile.close();
+            if (logFile != null) {
+                logFile.close();
+                logFile = null;
+            }
         } catch (Exception e) {
             System.err.println("showGameOver: " + e.getMessage());
             e.printStackTrace(System.err);
@@ -226,8 +227,10 @@ public class VisualizationGrid implements GameVisualizer {
     private void print(String s) {
         console.print(s);
         try {
-            logFile.write(s);
-            logFile.flush();
+            if (logFile != null) {
+                logFile.write(s);
+                logFile.flush();
+            }
         } catch (Exception e) {
             System.err.println("print: " + e.getMessage());
             e.printStackTrace(System.err);
@@ -238,9 +241,11 @@ public class VisualizationGrid implements GameVisualizer {
     private void println(String s) {
         console.println(s);
         try {
-            logFile.write(s);
-            logFile.newLine();
-            logFile.flush();
+            if (logFile != null) {
+                logFile.write(s);
+                logFile.newLine();
+                logFile.flush();
+            }
         } catch (Exception e) {
             System.err.println("println: " + e.getMessage());
             e.printStackTrace(System.err);
@@ -250,9 +255,11 @@ public class VisualizationGrid implements GameVisualizer {
 
     private void printlnLogOnly(String s) {
         try {
-            logFile.write(s);
-            logFile.newLine();
-            logFile.flush();
+            if (logFile != null) {
+                logFile.write(s);
+                logFile.newLine();
+                logFile.flush();
+            }
         } catch (Exception e) {
             System.err.println("printinlogonly: " + e.getMessage());
             e.printStackTrace(System.err);
