@@ -266,8 +266,8 @@ function println (message) {
 
 // alien class, use this to make aliens
 class Alien {
-  constructor(c,x,z,id){
-    this.mat = new THREE.MeshBasicMaterial({color:c, wireframe:false});
+  constructor(material,x,z,id){
+    this.mat = material; //new THREE.MeshBasicMaterial({color:c, wireframe:false});
     this.mesh = new THREE.Mesh(cubeGeo,this.mat);
     scene.add(this.mesh);
     this.mesh.position.x = x;
@@ -335,7 +335,7 @@ function movePlanet(content) {
 
 
 function addAlien(content) {
-    aliens[content.id] = new Alien(speciesMap.getColor(content.name),content.newX,content.newY);
+    aliens[content.id] = new Alien(speciesMap.getMat(content.name),content.newX,content.newY);
 }
 
 function moveAlien(content) {
