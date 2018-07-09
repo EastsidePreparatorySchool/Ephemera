@@ -100,7 +100,7 @@ public class GameLog {
             // and adjust the "start" offset
             start = minRead;
 //            printLogInfo("CR2");
-            System.out.println("Log: compacted");
+            //System.out.println("Log: compacted");
         } finally {
             wlock.unlock();
         }

@@ -384,7 +384,7 @@ class Alien {
     }
 
     setHeight(height) {
-        this.mesh.y = height;
+        this.mesh.position.y = height;
     }
 };
 
@@ -591,7 +591,8 @@ function init() {
     //grid.addToCell("hah1", -250,-250);
     //grid.addToCell("hah2", -250,250);
     //grid.addToCell("hah3", 250,-250);
-    //grid.addToCell("hah4", 250,250);
+    //println(""+grid.addToCell("hah4", 250,250));
+    //println(""+grid.addToCell("hah5", 250,250));
 
     listEngines();
 
