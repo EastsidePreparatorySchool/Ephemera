@@ -257,7 +257,9 @@ public class MainApp extends Application {
         engine.processGameElements(elements);
         System.out.println("createServerEngine: processing configuration files");
 
- 
+        engine.queueCommand(new GameCommand(GameCommandCode.Ready));
+        System.out.println("createServerEngine: queued ready");
+
         return engine;
     }
 

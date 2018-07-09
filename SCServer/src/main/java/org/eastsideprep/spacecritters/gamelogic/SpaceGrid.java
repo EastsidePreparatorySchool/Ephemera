@@ -104,7 +104,7 @@ public class SpaceGrid {
             try {
                 this.addElement(element);
             } catch (IOException ex) {
-                vis.debugOut("SpaceGrid.Ready.addElement: " + ex.getMessage());
+                System.out.println("SpaceGrid.Ready.addElement: " + ex.getMessage());
             }
         }
 
