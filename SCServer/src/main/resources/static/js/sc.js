@@ -18,6 +18,7 @@ var aliens = {};
 var planets = {};
 var stars = [];
 var speciesMap = null; // see init()
+var grid = [];
 
 
 //initialize three.js and set all initial values
@@ -117,7 +118,7 @@ function updates () {
             }
         })
         .catch(error => {
-            //println("Error: " + error);
+            println("Error: " + error);
             if (updateTimer !== null) {
                 detach();
                 println("Server not responding, console detached.");
@@ -259,30 +260,77 @@ function println (message) {
    print(message+"\n");
 }
 
-//
-// PM alien code follows
+
+
+// grid to keep track of stacked aliens
+
+class Grid {
+    constructor (width, height) {
+        this.grid = [];
+        this.width = width;
+        this.height = height;
+        this.halfWidth = Math.floor(width/2);
+        this.halfHeight = Math.floor(height/2);
+        
+        for (var x = 0; x< width; x++) {
+            var col = []
+            for (var y = 0; y< height; y++) {
+                col.push([]);
+            }
+            this.grid.push(col);
+       }
+    }
+
+    addToCell(alien, x, y) {
+        console.log(x+", "+y+", "+alien);
+
+        x = Math.floor(x);
+        y = Math.floor(y);
+        var cell = this.grid[x+this.halfWidth][y+this.halfHeight];
+        cell.push(alien);
+        return cell.length;
+    }
+
+    removeFromCell(alien, x, y) {
+        console.log(x+", "+y+", "+alien);
+
+        x = Math.floor(x);
+        y = Math.floor(y);
+        var cell = this.grid[x+this.halfWidth][y+this.halfHeight];
+        var index = cell.indexOf(alien);
+        if (index !== undefined) {
+            cell.splice(index, 1);
+        }
+    }
+}
 
 
 
 // alien class, use this to make aliens
 class Alien {
-  constructor(material,x,z,id){
-    this.mat = material; //new THREE.MeshBasicMaterial({color:c, wireframe:false});
-    this.mesh = new THREE.Mesh(cubeGeo,this.mat);
-    scene.add(this.mesh);
-    this.mesh.position.x = x;
-    this.mesh.position.z = -z;
-    this.mesh.position.y = 1;
-    this.id = id;
-  }
-  move(x,z){
-    this.mesh.position.x = x;
-    this.mesh.position.z = -z;
-  }
-  kill(){
-    scene.remove(this.mesh);
-    delete aliens[this.id];
-  }
+    constructor(material,x,z,id){
+        this.mat = material; 
+        this.mesh = new THREE.Mesh(cubeGeo,this.mat);
+        scene.add(this.mesh);
+        this.mesh.position.x = x;
+        this.mesh.position.z = -z;
+        this.mesh.position.y = 1;
+        this.id = id;
+    }
+
+    move(x,z){
+        this.mesh.position.x = x;
+        this.mesh.position.z = -z;
+    }
+
+    kill(){
+        scene.remove(this.mesh);
+        delete aliens[this.id];
+    }
+
+    setHeight(height) {
+        this.mesh.y = height;
+    }
 };
 
 
@@ -335,14 +383,21 @@ function movePlanet(content) {
 
 
 function addAlien(content) {
-    aliens[content.id] = new Alien(speciesMap.getMat(content.name),content.newX,content.newY);
+    var alien = new Alien(speciesMap.getMat(content.name),content.newX,content.newY)
+    aliens[content.id] = alien;
+    grid.addToCell(alien, content.newX, content.newY);
 }
 
 function moveAlien(content) {
     var alien = aliens[content.id];
-    if (alien !== undefined) {
-        alien.move(content.newX,content.newY);
+    if (alien === undefined) {
+        return;
     }
+
+    alien.move(content.newX,content.newY);
+    grid.removeFromCell(alien, content.param1, content.param2);
+    var height = grid.addToCell(alien, content.newX, content.newY);
+    alien.setHeight(height);
 }
         
 function killAlien(content) {
@@ -473,12 +528,17 @@ function init() {
 
     // 
     speciesMap = new SpeciesMap();
+    grid = new Grid(501,501);
 
-    println ("initialized");
 
     //addSpecies({name:"ephemera.eastsideprep.org:stockelements:test1"});
     //addSpecies({name:"someschool.org:someschmuck:test2"});
+    //grid.addToCell("hah1", -250,-250);
+    //grid.addToCell("hah2", -250,250);
+    //grid.addToCell("hah3", 250,-250);
+    //grid.addToCell("hah4", 250,250);
 
+    println ("initialized");
 }
 
 println ("parsed");
