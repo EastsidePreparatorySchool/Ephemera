@@ -4,7 +4,6 @@ SpaceCritters online - GM, QB, PM
 
 
 var updateInterval = 200;
-var updateTimer = null;
 
 var textarea = document.getElementById("output");
 var turnSpan = document.getElementById("turns");
@@ -98,13 +97,10 @@ function attach() {
             alienSpan.innerText = 0;
             countsP.style.display = "inline";
             statusP.innerHTML = "Attached to<br>&nbsp;Engine:   "+data.engine+"<br>&nbsp;Observer: "+data.observer;
-            clearInterval(updateTimer);
-            updateTimer = setInterval(getMoreUpdates, updateInterval);
-            getMoreUpdates();
+            updates();
+            println ("Requested updates in attach");
         })
         .catch(error => {
-            clearInterval(updateTimer);
-            updateTimer = null;
             println("Error: " + error);
         });;
 }
@@ -123,16 +119,22 @@ function updates () {
             if (error !== null && error.length > 0) {
                 println("Error: '" + error+"'");
             }
-            if (updateTimer !== null) {
-                detach();
-                println("Server not responding, console detached.");
-            }
+
+            detach();
+            println("Server not responding, console detached.");
         });
 }
 
 function processUpdates(data){
+    var requested = false;
     if (data !== null && data.length > 0) {
         for (var i = 0; i< data.length; i++) {
+            // if 90% processed, file another request for updates
+            if (i > (data.length*0.9) && !requested) {
+                updates();
+                requested = true;
+                println ("Requested updates in processUpdates");
+            }
             var o = data[i];
             switch (o.type) {
                 case "TURN":
@@ -176,13 +178,17 @@ function processUpdates(data){
         }
         renderer.render(scene,camera);
     }
+    if (!requested) {
+         setTimeout(updates, updateInterval);
+         requested = true;
+         println ("Requested delayed updates at the end of processUpdates");
+     }
+
 }
 
 
 
 function detach() {
-    clearInterval(updateTimer);
-    updateTimer = null;
     countsP.style.display = "none";
     statusP.innerHTML = "";
     species.innerHTML = "";
@@ -244,6 +250,8 @@ function start() {
               if (data !== null) {
                   println("  Response: "+data);
               }
+              updates();
+              println ("Requested updates in start");
           })
           .catch(error => {
               if (error !== null && error.length > 0) {
@@ -289,16 +297,6 @@ function pause() {
 
 
 
-
-
-//
-// timer refresh
-//
-
-
-function getMoreUpdates() {
-    updates();
-}
 
 
 
