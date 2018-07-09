@@ -33,12 +33,14 @@ public class GameLogObserver {
         ArrayList<GameLogEntry> result;
         if (stateServed) {
             result = log.getNewItems(this);
-            System.out.println("Obs "+this.hashCode()+": Serving incremental state: "+result.size() + " items");
+            if (result.size() > 0) {
+                System.out.println("Obs " + this.hashCode() + ": Serving incremental state: " + result.size() + " items");
+            }
         } else {
             stateServed = true;
-            result =  myState.getCompactedEntries();
-             System.out.println("Obs "+this.hashCode()+": Serving initial state: "+result.size() + " items");
-       }
+            result = myState.getCompactedEntries();
+            System.out.println("Obs " + this.hashCode() + ": Serving initial state: " + result.size() + " items");
+        }
         return result;
     }
 }

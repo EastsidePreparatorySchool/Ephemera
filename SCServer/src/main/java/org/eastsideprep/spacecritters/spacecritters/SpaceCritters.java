@@ -123,7 +123,7 @@ public class SpaceCritters extends Application {
             // initialize Ephemera game engine and visualizer
             //
             //get some objects created (not initialized, nothing important happens here)
-            this.engine = new GameEngineV2();
+            this.engine = new GameEngineV2("main");
             this.fieldGrid = new VisualizationGrid();
 
             // now initialize visualization field  
@@ -220,17 +220,17 @@ public class SpaceCritters extends Application {
 
     void startGame() {
         // first start
-        Iterator<AlienSpeciesForDisplay> iter = species.speciesList.iterator();
-        while (iter.hasNext()) {
-            AlienSpeciesForDisplay as = iter.next();
-            if (as.isOn()) {
-                GameElementSpec element = new GameElementSpec("ALIEN", as.domainName, as.packageName, as.className,
-                        null); // state
-                engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
-            } else {
-                //iter.remove();
-            }
-        }
+//        Iterator<AlienSpeciesForDisplay> iter = species.speciesList.iterator();
+//        while (iter.hasNext()) {
+//            AlienSpeciesForDisplay as = iter.next();
+//            if (as.isOn()) {
+//                GameElementSpec element = new GameElementSpec("ALIEN", as.domainName, as.packageName, as.className,
+//                        null); // state
+//                engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
+//            } else {
+//                //iter.remove();
+//            }
+//        }
 
         engine.queueCommand(new GameCommand(GameCommandCode.Resume));
         controlPane.buttonPause.setText("Pause");

@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.eastsideprep.spacecritters.orbit.DummyTrajectory;
@@ -93,6 +95,16 @@ public class SpaceGrid {
         for (int x = -aliens.centerX; x < aliens.centerX; x++) {
             for (int y = -(aliens.centerY); y < (aliens.centerY); y++) {
                 vis.mapEnergy(x, y, aliens.getEnergyAt(new IntegerPosition(x, y)));
+            }
+        }
+
+        System.out.println("SpaceGrid.ready: Processing initial aliens: " + this.speciesMap.values().size());
+        for (InternalAlienSpecies ias : this.speciesMap.values()) {
+            GameElementSpec element = new GameElementSpec("ALIEN", ias.domainName, ias.packageName, ias.className, null); // state
+            try {
+                this.addElement(element);
+            } catch (IOException ex) {
+                vis.debugOut("SpaceGrid.Ready.addElement: " + ex.getMessage());
             }
         }
 

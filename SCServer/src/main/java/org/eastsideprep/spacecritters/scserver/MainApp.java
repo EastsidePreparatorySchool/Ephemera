@@ -1,13 +1,15 @@
 package org.eastsideprep.spacecritters.scserver;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import org.eastsideprep.spacecritters.gameengineimplementation.GameEngineV2;
+import org.eastsideprep.spacecritters.gameengineinterfaces.GameCommand;
+import org.eastsideprep.spacecritters.gameengineinterfaces.GameCommandCode;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameElementSpec;
-import org.eastsideprep.spacecritters.gameengineinterfaces.GameEngine;
 import org.eastsideprep.spacecritters.gamelog.GameLogEntry;
 import org.eastsideprep.spacecritters.gamelogic.Constants;
 import org.eastsideprep.spacecritters.scgamelog.SCGameLogEntry;
@@ -20,11 +22,14 @@ import static spark.Spark.*;
 public class MainApp extends Application {
 
     static SpaceCritters sc;
-    static GameEngine ge;
+    static GameEngineV2 ge;
+    static HashMap<String, GameEngineV2> engines;
 
     @Override
     public void start(Stage stage) throws Exception {
-        this.ge = createDesktopGameEngine(stage);
+        MainApp.engines = new HashMap<>();
+        MainApp.ge = createDesktopGameEngine(stage);
+        engines.put("main", MainApp.ge);
     }
 
     /**
@@ -57,60 +62,102 @@ public class MainApp extends Application {
     /// initialization
     private static void initSpark() {
         staticFiles.location("/static");
-        get("/start", "application/json", (req, res) -> doStart(), new JSONRT());
-        get("/pause", "application/json", (req, res) -> doPause(), new JSONRT());
-        get("/shutdown", "application/json", (req, res) -> shutdown(), new JSONRT());
-        get("/attach", "application/json", (req, res) -> attach(req), new JSONRT());
-        get("/detach", "application/json", (req, res) -> detach(req), new JSONRT());
-        get("/updates", "application/json", (req, res) -> updates(req), new JSONRT());
+        get("/start", "application/json", (req, res) -> doStart(req), new JSONRT());
+        get("/pause", "application/json", (req, res) -> doPause(req), new JSONRT());
+        get("/create", "application/json", (req, res) -> doCreateEngine(req), new JSONRT());
+        get("/attach", "application/json", (req, res) -> doAttach(req), new JSONRT());
+        get("/detach", "application/json", (req, res) -> doDetach(req), new JSONRT());
+        get("/updates", "application/json", (req, res) -> doUpdates(req), new JSONRT());
     }
 
     // ROUTES
-    private static String doStart() {
-        Platform.runLater(() -> sc.startOrResumeGame());
+    private static String doStart(Request req) {
+        ServerContext ctx = getCtx(req);
+        if (ctx.observer == null) {
+            return "SC: doStart: not attached";
+        }
+        ctx.engine.queueCommand(new GameCommand(GameCommandCode.Resume));
+
+//        Platform.runLater(() -> sc.startOrResumeGame());
         return "SC: Start/resume request queued";
     }
 
-    private static String doPause() {
-        Platform.runLater(() -> sc.pauseGame());
+    private static String doPause(Request req) {
+        ServerContext ctx = getCtx(req);
+        if (ctx.observer == null) {
+            return "SC: doStart: not attached";
+        }
+        ctx.engine.queueCommand(new GameCommand(GameCommandCode.Pause));
+//        Platform.runLater(() -> sc.pauseGame());
         return "SC: Pause request queued";
     }
 
-    private static String shutdown() {
-        Platform.runLater(() -> sc.handleExit());
-        return "SC: shutdown initiated";
+    private static String doCreateEngine(Request req) {
+        String name = req.queryParams("name");
+
+        // cannot create main engine after the fact todo: rethink that.
+        if (name.equalsIgnoreCase("main")) {
+            System.err.println("Exception in doCreateEngine: can't create main engine from web interface");
+            return null;
+        }
+
+        GameEngineV2 eng = MainApp.engines.get(name);
+        if (eng != null) {
+            System.err.println("Exception in doCreateEngine: engine '" + name + "'exists already");
+            return null;
+        }
+
+        try {
+            eng = createServerGameEngine(name);
+        } catch (Exception e) {
+            System.err.println("Exception in doCreateEngine: " + e.getMessage());
+        }
+        engines.put(name, eng);
+        return name;
     }
-    
-    public static class AttachRecord{
-        int engine;
+
+    public static class AttachRecord {
+
+        String engine;
         int observer;
         int turns;
-        
-        AttachRecord(int e, int o, int t) {
-            engine = e;
+
+        AttachRecord(String n, int o, int t) {
+            engine = n;
             observer = o;
             turns = t;
         }
     }
 
-    private static AttachRecord attach(Request req) {
+    private static AttachRecord doAttach(Request req) {
+        String engineRequest;
         try {
             ServerContext ctx = getCtx(req);
             if (ctx.observer == null) {
-                // todo: let the user submit an engine to attach to, in the request
-                ctx.engine = sc.engine;
+
+                engineRequest = req.queryParams("engine");
+                if (engineRequest == null || engineRequest.equals("")) {
+                    engineRequest = "main";
+                }
+
+                ctx.engine = MainApp.engines.get(engineRequest);
+                if (ctx.engine == null) {
+                    System.out.println("doAttach: Engine '" + engineRequest + "'not found");
+                    return null;
+                }
                 ctx.observer = ctx.engine.log.addObserver(ctx);
             }
             SCGameState state = SCGameState.safeGetNewState(ctx.observer);
-            return new AttachRecord (ctx.engine.hashCode(), ctx.observer.hashCode(), state.totalTurns);
+            return new AttachRecord(ctx.engine.name, ctx.observer.hashCode(), state.totalTurns);
 
         } catch (Exception e) {
-            System.out.println("exception in GIS");
+            System.out.println("exception in doAttach");
+            e.printStackTrace(System.out);
         }
         return null;
     }
 
-    private static String detach(Request req) {
+    private static String doDetach(Request req) {
         try {
             ServerContext ctx = getCtx(req);
             if (ctx.observer != null) {
@@ -124,7 +171,7 @@ public class MainApp extends Application {
         return "detach success";
     }
 
-    private static SCGameLogEntry[] updates(Request req) {
+    private static SCGameLogEntry[] doUpdates(Request req) {
         try {
             ServerContext ctx = getCtx(req);
             if (ctx.observer == null) {
@@ -132,14 +179,7 @@ public class MainApp extends Application {
             }
 
             ArrayList<GameLogEntry> list = ctx.observer.getNewItems();
-            // Convert list into something GSOn can convert;
-//            int[] a = new int[list.size()];
-//            for (int i = 0; i < a.length; i++) {
-//                SCGameLogEntry item = (SCGameLogEntry) list.get(i);
-//                a[i] = item.turn;
-//            }
-//            return a;
-            SCGameLogEntry[] array = new SCGameLogEntry[list.size()]; 
+            SCGameLogEntry[] array = new SCGameLogEntry[list.size()];
             return list.toArray(array);
 
         } catch (Exception e) {
@@ -150,19 +190,21 @@ public class MainApp extends Application {
         return null;
     }
 
-    private GameEngine createDesktopGameEngine(Stage stage) {
-        this.sc = new SpaceCritters();
+    static private GameEngineV2 createDesktopGameEngine(Stage stage) {
+        MainApp.sc = new SpaceCritters();
         try {
-            sc.start(stage);
+            MainApp.sc.start(stage);
         } catch (Exception e) {
             System.err.println("scserver init: " + e.getMessage());
             e.printStackTrace(System.err);
         }
+        System.out.println("createDesktopEngine: created and initialized, processing");
 
+ 
         return sc.engine;
     }
 
-    private GameEngine createServerGameEngine() {
+    static private GameEngineV2 createServerGameEngine(String name) {
         // construct path to important game folders
         String gamePath = System.getProperty("user.dir");
         gamePath = gamePath.toLowerCase();
@@ -188,20 +230,24 @@ public class MainApp extends Application {
         Utilities.createFolder(alienPath);
 
         alienPath += System.getProperty("file.separator");
+        System.out.println("createServerEngine: created folders and paths");
 
         //
         // initialize Ephemera game engine and visualizer
         //
         //get some objects created (not initialized, nothing important happens here)
-        GameEngineV2 engine = new GameEngineV2();
+        GameEngineV2 engine = new GameEngineV2(name);
+        System.out.println("createServerEngine: created game engine");
         //
         // test: viz streamer for web version
         //
         LoggingVisualizer streamer = new LoggingVisualizer(engine.log);
         streamer.init();
+        System.out.println("createServerEngine: initialized streamer log");
 
         // and engine
         engine.init(streamer, gamePath, alienPath);
+        System.out.println("createServerEngine: initialized game engine");
 
         // read config
         GameElementSpec[] elements = engine.readConfigFile("sc_config.json");
@@ -209,7 +255,9 @@ public class MainApp extends Application {
         // load a game and process it
         elements = engine.readConfigFile(Constants.gameMode);
         engine.processGameElements(elements);
+        System.out.println("createServerEngine: processing configuration files");
 
+ 
         return engine;
     }
 

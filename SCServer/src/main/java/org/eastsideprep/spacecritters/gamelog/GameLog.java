@@ -85,8 +85,8 @@ public class GameLog {
 
         wlock.lock();
         try {
-            printLogInfo("CR1");
-            System.out.println("Log: compacting");
+//            printLogInfo("CR1");
+//            System.out.println("Log: compacting");
             // process all read items into state log, 
             for (int i = 0; i < minRead - start; i++) {
                 state.addEntry(log.get(i));
@@ -99,7 +99,7 @@ public class GameLog {
 
             // and adjust the "start" offset
             start = minRead;
-            printLogInfo("CR2");
+//            printLogInfo("CR2");
             System.out.println("Log: compacted");
         } finally {
             wlock.unlock();
@@ -113,7 +113,7 @@ public class GameLog {
         rlock.lock();
         int oldMinRead = minRead;
         try {
-            printLogInfo("GNI1", obs);
+//            printLogInfo("GNI1", obs);
             int items = end - obs.maxRead;
             if (items > 0) {
                 // copy the new items to the result
@@ -130,7 +130,7 @@ public class GameLog {
                         updateMinRead();
                     }
                 }
-                printLogInfo("GNI2", obs);
+//                printLogInfo("GNI2", obs);
 
             }
 

@@ -13,12 +13,14 @@ var centerDiv = document.getElementById("center");
 var species = document.getElementById("species");
 var statusP = document.getElementById("status");
 var countsP = document.getElementById("counts");
+var engineName = document.getElementById("enginename");
 
 var aliens = {};
 var planets = {};
 var stars = [];
 var speciesMap = null; // see init()
 var grid = [];
+
 
 
 //initialize three.js and set all initial values
@@ -85,7 +87,7 @@ function request(obj) {
 // main functionality accessible from buttons
 
 function attach() {
-    request({url: "attach"})   
+    request({url: "attach?engine="+engineName.value})   
         .then(data => {
             data = JSON.parse(data);
             //println("Initial state: " + data);
@@ -94,8 +96,8 @@ function attach() {
             println("Total game turns: "+ data.turns);
             turnSpan.innerText = data.turns;
             alienSpan.innerText = 0;
-            countsP.style.color = "gold";
-            statusP.innerHTML = "Attached to<br>&nbsp;Engine: "+data.engine+"<br>&nbsp;Observer: "+data.observer;
+            countsP.style.display = "inline";
+            statusP.innerHTML = "Attached to<br>&nbsp;Engine:   "+data.engine+"<br>&nbsp;Observer: "+data.observer;
             clearInterval(updateTimer);
             updateTimer = setInterval(getMoreUpdates, updateInterval);
             getMoreUpdates();
@@ -118,7 +120,9 @@ function updates () {
             }
         })
         .catch(error => {
-            println("Error: " + error);
+            if (error !== null && error.length > 0) {
+                println("Error: '" + error+"'");
+            }
             if (updateTimer !== null) {
                 detach();
                 println("Server not responding, console detached.");
@@ -179,7 +183,7 @@ function processUpdates(data){
 function detach() {
     clearInterval(updateTimer);
     updateTimer = null;
-    countsP.style.color = "black";
+    countsP.style.display = "none";
     statusP.innerHTML = "";
     species.innerHTML = "";
 
@@ -219,6 +223,10 @@ function detach() {
     request({url: "detach"});
 }
 
+
+function create() {
+    request({url: "create?name="+engineName.value});
+}
 
 function start() {
     request({url: "start"});
@@ -282,7 +290,7 @@ class Grid {
     }
 
     addToCell(alien, x, y) {
-        console.log(x+", "+y+", "+alien);
+        //console.log(x+", "+y+", "+alien);
 
         x = Math.floor(x);
         y = Math.floor(y);
@@ -292,7 +300,7 @@ class Grid {
     }
 
     removeFromCell(alien, x, y) {
-        console.log(x+", "+y+", "+alien);
+        //console.log(x+", "+y+", "+alien);
 
         x = Math.floor(x);
         y = Math.floor(y);
@@ -409,7 +417,7 @@ function killAlien(content) {
 
 function addSpecies(content) {
     // this first line adds the species to the hashmap as well
-    var color = speciesMap.getColor(content.name);
+    speciesMap.getColor(content.name);
 
 }
 
@@ -425,8 +433,8 @@ class SpeciesMap {
     getMat(name) {
         var mat = this.mat[name];
         if (mat === undefined) {
-            mat = new THREE.MeshBasicMaterial({color:color, wireframe:false});
-            this.mat[name] = mat;
+            getColor(name);
+            mat = this.mat[name];
         }
         return mat;
     }

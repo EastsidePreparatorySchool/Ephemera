@@ -12,8 +12,10 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import java.util.Iterator;
 import org.eastsideprep.spacecritters.gamelog.GameLog;
 import org.eastsideprep.spacecritters.scgamelog.SCGameState;
+import org.eastsideprep.spacecritters.spacecritters.AlienSpeciesForDisplay;
 
 /**
  *
@@ -31,15 +33,15 @@ public class GameEngineV2 implements GameEngine {
     Gson gson;
     public SCGameState state;
     public GameLog log;
+    public String name;
 
-    public GameEngineV2() {
+    public GameEngineV2(String name) {
         this.gson = new Gson();
         this.queue = new ConcurrentLinkedQueue<>();
-        this.state = new SCGameState(0,0);
+        this.state = new SCGameState(0, 0);
         this.log = new GameLog(state);
+        this.name = name;
     }
-    
-  
 
     @Override
     public boolean isAlive() {
@@ -48,13 +50,12 @@ public class GameEngineV2 implements GameEngine {
 
     @Override
     public void init(GameVisualizer vis, String gamePath, String alienPath) {
-        
+
         // 
         // save the visualizer (how we report status)
         // create a new Spacegrid (the game board)
         // set up a transfer queue that we will use to post commands to the game thread
         //
-
         this.vis = vis;
         gameState = GameState.Paused;
         this.gamePath = gamePath;
@@ -97,6 +98,7 @@ public class GameEngineV2 implements GameEngine {
         return elements;
     }
 
+ 
     @Override
     public void processGameElements(GameElementSpec[] elements) {
         //
@@ -105,7 +107,7 @@ public class GameEngineV2 implements GameEngine {
             //if (element.className.equals("Caelusite")) System.out.println("HELLLO!: " + element.parent);
             GameCommand gc = new GameCommand(GameCommandCode.AddElement);
             gc.parameters = new GameElementSpec[]{element};
-            
+
             //vis.debugOut("GameEngine: Queueing new game element");
             queueCommand(gc);
 
@@ -126,7 +128,7 @@ public class GameEngineV2 implements GameEngine {
         //
         // queue alien info to synchronized queue
         //
-        
+
         /*if (gc.parameters != null && gc.parameters.length > 0 && gc.parameters[0] != null && gc.parameters[0] instanceof GameElementSpec) {
             GameElementSpec m = (GameElementSpec) gc.parameters[0];
             //System.out.println("found a guy");
@@ -135,7 +137,6 @@ public class GameEngineV2 implements GameEngine {
             }
         
         }*/
-        
         vis.debugOut("GameEngineV1: Queueing command " + gc.code.toString());
 
         synchronized (this.queue) {

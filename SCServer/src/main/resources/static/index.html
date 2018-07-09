@@ -25,13 +25,19 @@
             <div style="margin:5%">
                 Eastside Preparatory School<br>
                 SpaceCritters Console V0.3<br><br>
-                <button style="width:130px" onclick="start()">Start</button><br>
-                <button style="width:130px" onclick="pause()">Pause</button><br><br>
-                <button style="width:130px" onclick="attach()">Attach</button><br>
-                <button style="width:130px" onclick="detach()">Detach</button><br><br>
+                Engine name:<br>
+                <input type="text" id="enginename" value="main" style="width:200px;"><br>
                 <br>
-                <p id="status"></p>
+                <button style="width:130px" onclick="create()">Create</button><br>
+                <button style="width:130px" onclick="attach()">Attach</button><br>
+                <button style="width:130px" onclick="detach()">Detach</button><br>
+                <br>
                 <p id="counts" style="color:black;">
+                    <button style="width:130px" onclick="start()">Start</button><br>
+                    <button style="width:130px" onclick="pause()">Pause</button><br><br>
+                    <br>
+                    <span id="status"></span><br>
+                    <br>
                     Turns  : <span id="turns">0</span><br>
                     Aliens : <span id="numaliens">0</span>
                 </p>
