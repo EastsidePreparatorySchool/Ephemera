@@ -98,7 +98,7 @@ function attach() {
             countsP.style.display = "inline";
             statusP.innerHTML = "Attached to<br>&nbsp;Engine:   "+data.engine+"<br>&nbsp;Observer: "+data.observer;
             updates();
-            println ("Requested updates in attach");
+            //println ("Requested updates in attach");
         })
         .catch(error => {
             println("Error: " + error);
@@ -133,7 +133,7 @@ function processUpdates(data){
             if (i > (data.length*0.9) && !requested) {
                 updates();
                 requested = true;
-                println ("Requested updates in processUpdates");
+                //println ("Requested updates in processUpdates");
             }
             var o = data[i];
             switch (o.type) {
@@ -181,7 +181,7 @@ function processUpdates(data){
     if (!requested) {
          setTimeout(updates, updateInterval);
          requested = true;
-         println ("Requested delayed updates at the end of processUpdates");
+         //println ("Requested delayed updates at the end of processUpdates");
      }
 
 }
@@ -251,7 +251,7 @@ function start() {
                   println("  Response: "+data);
               }
               updates();
-              println ("Requested updates in start");
+              //println ("Requested updates in start");
           })
           .catch(error => {
               if (error !== null && error.length > 0) {
