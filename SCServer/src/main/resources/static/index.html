@@ -4,46 +4,51 @@
     <head>
         <title>Space Critters Online V0.2</title>
     </head>
-    
+
     <body style="margin: 0; padding: 0; height:100%" onload="init()">
-        <div style="width:100%;background-color: #14213d;color: #fca311;height:10%;text-align: center; ">
-            <br>
-            <span style="font-family: Brush Script MT; font-size: 400%;">
-                Space Critters Online V0.2
-            </span>
+        <!--        <div style="width:100%;background-color: #14213d;color: #fca311;height:10%;text-align: center; ">
+                    <br>
+                    <span style="font-family: Brush Script MT; font-size: 400%;">
+                        Space Critters Online V0.2
+                    </span>
+                
+          
         
+                <div style="float:left;width:10%; height:80%;background-color: #14213d;color:#fca311;">
+          
+                </div>
+              </div>-->
+        <div style="float:left;width:75%; height:80%; text-align: center; background-color: #000000; color:#ffffff;" id="center">
         </div>
 
-        <div style="float:left;width:10%; height:80%;background-color: #14213d;color:#fca311;">
-            Controls<br><br>
-            <button style="width:130px" onclick="start()">Start</button><br>
-            <button style="width:130px" onclick="pause()">Pause</button><br><br>
-            <button style="width:130px" onclick="attach()">Attach</button><br>
-            <button style="width:130px" onclick="detach()">Detach</button><br><br>
-            <button style="width:130px" onclick="shutdown()">Shutdown</button><br>
+        <div style="float:left;width:25%; height:80%;  text-align: left;background-color: #000000; ;color:#fca311; font-family: monospace">
+            <div style="margin:5%">
+                Eastside Preparatory School<br>
+                SpaceCritters Console V0.3<br><br>
+                <button style="width:130px" onclick="start()">Start</button><br>
+                <button style="width:130px" onclick="pause()">Pause</button><br><br>
+                <button style="width:130px" onclick="attach()">Attach</button><br>
+                <button style="width:130px" onclick="detach()">Detach</button><br><br>
+                <br>
+                <p id="status"></p>
+                <p id="counts" style="color:black;">
+                    Turns  : <span id="turns">0</span><br>
+                    Aliens : <span id="numaliens">0</span>
+                </p>
+                <br>
+                <p id="species"></p>
+            </div>
         </div>
 
-        <div style="float:left;width:80%; height:80%; text-align: center; background-color: #000000; color:#ffffff;" id="center">
-        </div>
-
-        <div style="float:left;width:10%; height:80%; text-align: center;background-color: #14213d; ;color:#fca311; font-family: monospace">
-            Status
-            <p>Turns  : <span id="turns">0</span></p>
-            <p>#aliens: <span id="numaliens">0</span></p>
-
-
-
-        </div>
-
-        <div style="width:100%;height:10%;background-color: #d0d0d0; clear:both;">
-            <textarea style="width:100%; height:100%; overflow-y:scroll; resize:none;" id="output"></textarea>
+        <div style="width:100%;height:20%;background-color: #808080; clear:both;">
+            <textarea style="width:100%; height:100%; background-color: #808080;overflow-y:scroll; resize:none;" id="output"></textarea>
         </div>
 
         <br>
 
-        <script src="/js/jquery-3.3.1.min.js"></script>
-        <script src="/js/three.min.js"></script>
-        <script src="/js/sc.js"></script>
+        <script src="js/jquery-3.3.1.min.js"></script>
+        <script src="js/three.min.js"></script>
+        <script src="js/sc.js"></script>
     </body>
 
 

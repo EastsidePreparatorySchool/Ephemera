@@ -35,7 +35,7 @@ public class GameEngineV2 implements GameEngine {
     public GameEngineV2() {
         this.gson = new Gson();
         this.queue = new ConcurrentLinkedQueue<>();
-        this.state = new SCGameState(0, 0);
+        this.state = new SCGameState(0,0);
         this.log = new GameLog(state);
     }
     

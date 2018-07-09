@@ -86,7 +86,7 @@ public class GameLog {
         wlock.lock();
         try {
             printLogInfo("CR1");
-            System.out.println("Log: compacting, state entries:" + state.getEntryCount());
+            System.out.println("Log: compacting");
             // process all read items into state log, 
             for (int i = 0; i < minRead - start; i++) {
                 state.addEntry(log.get(i));
@@ -100,7 +100,7 @@ public class GameLog {
             // and adjust the "start" offset
             start = minRead;
             printLogInfo("CR2");
-            System.out.println("Log: compacted, state entries:" + state.getEntryCount());
+            System.out.println("Log: compacted");
         } finally {
             wlock.unlock();
         }
@@ -171,7 +171,7 @@ public class GameLog {
         if (end < start || minRead < start || minRead > end) {
             System.out.println("---- log corrupt");
         }
-        System.out.println("Log" + op + ": array size:" + log.size() + ", start:" + start + ", end:" + end + ", minRead:" + minRead + ", state:" + state.getEntryCount());
+        System.out.println("Log" + op + ": array size:" + log.size() + ", start:" + start + ", end:" + end + ", minRead:" + minRead);
     }
 
     private void printLogInfo(String op, GameLogObserver obs) {

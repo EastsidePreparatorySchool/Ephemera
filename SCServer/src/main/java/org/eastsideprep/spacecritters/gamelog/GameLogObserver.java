@@ -11,24 +11,34 @@ import java.util.ArrayList;
  * @author gmein
  */
 public class GameLogObserver {
+
     private final GameLog log;
     private GameLogState myState;
     int maxRead;
-    
+    boolean stateServed = false;
+
     GameLogObserver(GameLog l) {
         log = l;
         maxRead = -1;
-        
+
     }
-    
-    public GameLogState getInitialState () {
-        myState  = log.getNewGameLogState();
+
+    public GameLogState getInitialState() {
+        myState = log.getNewGameLogState();
         maxRead = myState.getEntryCount();
         return myState;
     }
-    
+
     public ArrayList<GameLogEntry> getNewItems() {
-        ArrayList<GameLogEntry> result = log.getNewItems(this);
+        ArrayList<GameLogEntry> result;
+        if (stateServed) {
+            result = log.getNewItems(this);
+            System.out.println("Obs "+this.hashCode()+": Serving incremental state: "+result.size() + " items");
+        } else {
+            stateServed = true;
+            result =  myState.getCompactedEntries();
+             System.out.println("Obs "+this.hashCode()+": Serving initial state: "+result.size() + " items");
+       }
         return result;
     }
 }

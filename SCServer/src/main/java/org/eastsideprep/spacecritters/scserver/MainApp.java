@@ -80,8 +80,20 @@ public class MainApp extends Application {
         Platform.runLater(() -> sc.handleExit());
         return "SC: shutdown initiated";
     }
+    
+    public static class AttachRecord{
+        int engine;
+        int observer;
+        int turns;
+        
+        AttachRecord(int e, int o, int t) {
+            engine = e;
+            observer = o;
+            turns = t;
+        }
+    }
 
-    private static int[] attach(Request req) {
+    private static AttachRecord attach(Request req) {
         try {
             ServerContext ctx = getCtx(req);
             if (ctx.observer == null) {
@@ -90,7 +102,7 @@ public class MainApp extends Application {
                 ctx.observer = ctx.engine.log.addObserver(ctx);
             }
             SCGameState state = SCGameState.safeGetNewState(ctx.observer);
-            return new int[]{ctx.observer.hashCode(), state.totalTurns, state.numAliens};
+            return new AttachRecord (ctx.engine.hashCode(), ctx.observer.hashCode(), state.totalTurns);
 
         } catch (Exception e) {
             System.out.println("exception in GIS");

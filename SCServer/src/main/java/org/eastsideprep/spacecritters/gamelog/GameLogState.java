@@ -4,6 +4,8 @@
  */
 package org.eastsideprep.spacecritters.gamelog;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author gmein
@@ -13,4 +15,5 @@ public interface GameLogState {
     GameLogState copy ();
     void addEntry(GameLogEntry ge);
     int getEntryCount();
+    ArrayList<GameLogEntry> getCompactedEntries();
 }

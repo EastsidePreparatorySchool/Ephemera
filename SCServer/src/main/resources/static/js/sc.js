@@ -10,6 +10,9 @@ var textarea = document.getElementById("output");
 var turnSpan = document.getElementById("turns");
 var alienSpan = document.getElementById("numaliens");
 var centerDiv = document.getElementById("center");
+var species = document.getElementById("species");
+var statusP = document.getElementById("status");
+var countsP = document.getElementById("counts");
 
 var aliens = {};
 var planets = {};
@@ -85,13 +88,16 @@ function attach() {
         .then(data => {
             data = JSON.parse(data);
             //println("Initial state: " + data);
-            println("Observer id: " + data[0]);
-            println("Total game turns: "+ data[1]);
-            println("Number of aliens: "+data[2]);
-            turnSpan.innerText = data[1];
-            alienSpan.innerText = data[2];
+            println("Engine id: " + data.engine);
+            println("Observer id: " + data.observer);
+            println("Total game turns: "+ data.turns);
+            turnSpan.innerText = data.turns;
+            alienSpan.innerText = 0;
+            countsP.style.color = "gold";
+            statusP.innerHTML = "Attached to<br>&nbsp;Engine: "+data.engine+"<br>&nbsp;Observer: "+data.observer;
             clearInterval(updateTimer);
             updateTimer = setInterval(getMoreUpdates, updateInterval);
+            getMoreUpdates();
         })
         .catch(error => {
             clearInterval(updateTimer);
@@ -111,12 +117,11 @@ function updates () {
             }
         })
         .catch(error => {
-            if (updateTimer !== null) {
-                clearInterval(updateTimer);
-                updateTimer = null;
-                println("Server not responding, updates suspended.");
-            }
             //println("Error: " + error);
+            if (updateTimer !== null) {
+                detach();
+                println("Server not responding, console detached.");
+            }
         });
 }
 
@@ -173,6 +178,43 @@ function processUpdates(data){
 function detach() {
     clearInterval(updateTimer);
     updateTimer = null;
+    countsP.style.color = "black";
+    statusP.innerHTML = "";
+    species.innerHTML = "";
+
+    speciesMap = new SpeciesMap();
+
+    //println("starting purge ...");
+
+    var a;
+    var count = 0;
+    for (a in aliens) {
+        scene.remove(aliens[a].mesh);
+        count++;
+    }
+    aliens = {};
+    //println(" ... killed "+count+" aliens");
+
+    var p;
+    count = 0;
+    for (p in planets) {
+        scene.remove(planets[p].mesh);
+        count++;
+    }
+    planets = {};
+    //println(" ... destroyed "+count+" planets");
+
+    var s;
+    for (count = 0;count < stars.length; count++) {
+        scene.remove(stars[count].mesh);
+    }
+    stars = [];
+    //println(" ... extinguished "+count+" stars");
+
+    renderer.render(scene,camera);
+    //println("purge complete.");
+
+
     request({url: "detach"});
 }
 
@@ -187,10 +229,6 @@ function pause() {
 }
 
 
-function shutdown() {
-    clearInterval(updateTimer);
-    request({url: "shutdown"});
-}
 
 
 
@@ -315,25 +353,58 @@ function killAlien(content) {
 }
 
 function addSpecies(content) {
-    speciesMap.getColor(content.name);
+    // this first line adds the species to the hashmap as well
+    var color = speciesMap.getColor(content.name);
+
 }
 
 
 class SpeciesMap {
     constructor() {
         this.map = {};
+        this.mat = {};
         this.count = 0;
         this.colors = ["lightblue", "yellow", "lightpink", "lightgreen", "orange", "white"];
     }
 
+    getMat(name) {
+        var mat = this.mat[name];
+        if (mat === undefined) {
+            mat = new THREE.MeshBasicMaterial({color:color, wireframe:false});
+            this.mat[name] = mat;
+        }
+        return mat;
+    }
+
     getColor(name) {
-        console.log (this);
-        console.log(this.map);
+//        console.log (this);
+//        console.log(this.map);
         var color = this.map[name];
         if (color === undefined) {
             color = this.colors[this.count%this.colors.length];
             this.map[name] = color;
+            this.mat[name] = new THREE.MeshBasicMaterial({color:color, wireframe:false});
             this.count++;
+
+            var displayName = name.substr(name.lastIndexOf(":")+1);
+            var displayQualifier = name.substr(0,name.lastIndexOf(":"));
+            if (displayQualifier === "ephemera.eastsideprep.org:stockelements"){
+                displayQualifier = "System";
+            }
+            displayName += " ("+displayQualifier+")";
+            
+            var chk = document.createElement("input");
+            chk.type = "checkbox";
+            chk.checked = true;
+            species.appendChild(chk);
+
+            var text = document.createElement("span");
+            text.style.color = color;
+            text.innerText = " "+displayName;
+            species.appendChild(text);
+
+            var br = document.createElement("br");
+            species.appendChild(br);
         }
         return color;
     }
@@ -381,12 +452,14 @@ function init() {
     planetGeo = new THREE.SphereGeometry(1.0, 32, 32);
 
 
-    gridHelper = new THREE.GridHelper(size, divisions, "darkred", "darkred");
+    gridHelper = new THREE.GridHelper(size, divisions, "#500000", "#500000");
     scene.add(gridHelper);
 
-    camera.position.z = 100;
-    camera.position.y = 100;
+    camera.position.z = 310;
+    camera.position.y = 220;
+    camera.position.x = 20;
     camera.rotation.x = -Math.PI/4;
+    //camera.rotation.y = 0.2;
 
     light = new THREE.AmbientLight(0x404040);
     scene.add(light);
@@ -402,6 +475,10 @@ function init() {
     speciesMap = new SpeciesMap();
 
     println ("initialized");
+
+    //addSpecies({name:"ephemera.eastsideprep.org:stockelements:test1"});
+    //addSpecies({name:"someschool.org:someschmuck:test2"});
+
 }
 
 println ("parsed");
