@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
-import javafx.application.Platform;
 import javafx.stage.Stage;
 import org.eastsideprep.spacecritters.gameengineimplementation.GameEngineV2;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameCommand;
@@ -154,7 +153,7 @@ public class MainApp extends Application {
                     System.out.println("doAttach: Engine '" + engineRequest + "'not found");
                     return null;
                 }
-                ctx.observer = ctx.engine.log.addObserver(ctx);
+                ctx.observer = ctx.engine.log.addObserver();
             }
             SCGameState state = (SCGameState) ctx.observer.getInitialState();
             return new AttachRecord(ctx.engine.name, ctx.observer.hashCode(), state.totalTurns);
@@ -170,7 +169,7 @@ public class MainApp extends Application {
         try {
             ServerContext ctx = getCtx(req);
             if (ctx.observer != null) {
-                ctx.engine.log.removeObserver(ctx);
+                ctx.engine.log.removeObserver(ctx.observer);
                 ctx.observer = null;
             }
         } catch (Exception e) {

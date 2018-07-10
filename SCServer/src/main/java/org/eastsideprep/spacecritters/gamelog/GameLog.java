@@ -5,7 +5,7 @@
 package org.eastsideprep.spacecritters.gamelog;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -23,7 +23,7 @@ public class GameLog {
 
     private final GameLogState state;
     private ArrayList<GameLogEntry> log = new ArrayList<>();
-    private final HashMap<Object, GameLogObserver> observers = new HashMap<>();
+    private final LinkedList<GameLogObserver> observers = new LinkedList<>();
 
     private int start = 0;
     private int end = 0;
@@ -58,20 +58,20 @@ public class GameLog {
 //        printLogInfo("AES");
     }
 
-    public GameLogObserver addObserver(Object client) {
+    public GameLogObserver addObserver() {
         collapseRead();
         GameLogObserver obs;
         synchronized (observers) {
             obs = new GameLogObserver(this);
-            observers.put(client, obs);
+            observers.add(obs);
         }
         printLogInfo("AO");
         return obs;
     }
 
-    public void removeObserver(Object client) {
+    public void removeObserver(GameLogObserver obs) {
         synchronized (observers) {
-            observers.remove(client);
+            observers.remove(obs);
             updateMinRead();
         }
         printLogInfo("RO");
@@ -158,7 +158,7 @@ public class GameLog {
     private void updateMinRead() {
         int currentMin = end;
 
-        for (GameLogObserver o : observers.values()) {
+        for (GameLogObserver o : observers) {
             if (o.maxRead < currentMin) {
                 currentMin = o.maxRead;
             }

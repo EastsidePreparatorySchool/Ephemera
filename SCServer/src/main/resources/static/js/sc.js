@@ -96,7 +96,8 @@ function attach() {
             turnSpan.innerText = data.turns;
             alienSpan.innerText = 0;
             countsP.style.display = "inline";
-            statusP.innerHTML = "Attached to<br>&nbsp;Engine:   "+data.engine+"<br>&nbsp;Observer: "+data.observer;
+            statusP.innerHTML = "Attached to<br>&nbsp;Engine:&nbsp&nbsp&nbsp"+data.engine
+                                +"<br>&nbsp;Observer:&nbsp"+data.observer;
             updates();
             //println ("Requested updates in attach");
         })
@@ -384,7 +385,7 @@ class Alien {
     }
 
     setHeight(height) {
-        this.mesh.position.y = height;
+        this.mesh.position.y = 2*height;
     }
 };
 
@@ -567,7 +568,7 @@ function init() {
 
     camera.position.z = 310;
     camera.position.y = 220;
-    camera.position.x = 20;
+    camera.position.x = 0;
     camera.rotation.x = -Math.PI/4;
     //camera.rotation.y = 0.2;
 
