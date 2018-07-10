@@ -47,7 +47,11 @@ public class AlienCell extends LinkedList<AlienContainer> {
     public void remove(AlienContainer ac) {
         Integer count;
         count = speciesMap.getOrDefault(ac.getAlienSpecies(), 0) - 1;
-        speciesMap.put(ac.getAlienSpecies(), count);
+        if (count == 0) {
+            speciesMap.remove(ac.getAlienSpecies());
+        } else {
+            speciesMap.put(ac.getAlienSpecies(), count);
+        }
         super.remove(ac);
     }
 

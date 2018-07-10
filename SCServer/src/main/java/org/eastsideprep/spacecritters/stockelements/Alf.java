@@ -47,9 +47,9 @@ public class Alf implements Alien {
         int y = 0;
 
         try {
-            List<AlienSpecies> nearestAliens = ctx.getView((int) ctx.getTech()).getClosestXenos(
-                    new AlienSpecies("ephemera.eastsideprep.org", "stockelements", "Alf", 0));
-            if (nearestAliens != null) {
+            List<AlienSpecies> nearestAliens = ctx.getView((int) ctx.getTech()).getClosestXenos(null);
+            if (nearestAliens != null && nearestAliens.size() > 0) {
+                System.out.println("ALf: seeing "+nearestAliens.size()+", "+ctx.getStateString());
                 IntegerPosition nearest = nearestAliens.get(0).position;
 
                 //always moves away from other aliens
@@ -64,6 +64,8 @@ public class Alf implements Alien {
                 } else if (nearest.y < ctx.getPosition().y) {
                     y = (int) (techLevel / 2);
                 }
+            } else {
+                System.out.println("Alf: not seeing anyone");
             }
         } catch (Exception e) {
             x = ctx.getRandomInt(3) - 1;
