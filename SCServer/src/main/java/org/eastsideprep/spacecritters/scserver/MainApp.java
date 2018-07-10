@@ -94,9 +94,9 @@ public class MainApp extends Application {
     }
 
     private static String[] doListEngines(Request req) {
-        String[] result = new String [engines.size()];
+        String[] result = new String[engines.size()];
         for (String s : engines.keySet()) {
-            System.out.println("Listing engine: '"+s+"'");
+            System.out.println("Listing engine: '" + s + "'");
         }
         return engines.keySet().toArray(result);
     }
@@ -156,7 +156,7 @@ public class MainApp extends Application {
                 }
                 ctx.observer = ctx.engine.log.addObserver(ctx);
             }
-            SCGameState state = SCGameState.safeGetNewState(ctx.observer);
+            SCGameState state = (SCGameState) ctx.observer.getInitialState();
             return new AttachRecord(ctx.engine.name, ctx.observer.hashCode(), state.totalTurns);
 
         } catch (Exception e) {
@@ -188,6 +188,18 @@ public class MainApp extends Application {
             }
 
             ArrayList<GameLogEntry> list = ctx.observer.getNewItems();
+
+            if (req.queryParams("compact").equals("yes")) {
+                // if the client requests it, make a new game state, 
+                // we will use it to compact the entries
+                
+                SCGameState compactor = new SCGameState();
+                for (GameLogEntry item : list) {
+                    compactor.addEntry(item);
+                }
+                list = compactor.getCompactedEntries();
+            }
+            // now convert into array to JSON knows what to do
             SCGameLogEntry[] array = new SCGameLogEntry[list.size()];
             return list.toArray(array);
 

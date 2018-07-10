@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import org.eastsideprep.spacecritters.gamelog.GameLogEntry;
-import org.eastsideprep.spacecritters.gamelog.GameLogObserver;
 import org.eastsideprep.spacecritters.gamelog.GameLogState;
 
 /**
@@ -19,6 +18,8 @@ public class SCGameState implements GameLogState {
 
     public int entries;
     public int totalTurns;
+    public SCGameLogEntry lastTurn;
+
     private HashMap<Integer, SCGameLogEntry> aliens = new HashMap<>();
     private HashMap<Integer, SCGameLogEntry> planets = new HashMap<>();
     private ArrayList<SCGameLogEntry> stars = new ArrayList<>();
@@ -29,6 +30,12 @@ public class SCGameState implements GameLogState {
     public SCGameState(int total, int entries) {
         this.totalTurns = total;
         this.entries = entries;
+    }
+
+    // this is for clients who want to compact a set of log entries after getting them
+    public SCGameState() {
+        this.totalTurns = 0;
+        this.entries = 0;
     }
 
     // this is used by the log to hand a new copy to a client
@@ -54,6 +61,10 @@ public class SCGameState implements GameLogState {
             sc.species.add(new SCGameLogEntry(e));
         }
 
+        if (lastTurn != null) {
+            sc.lastTurn = new SCGameLogEntry(lastTurn);
+        }
+
         return sc;
     }
 
@@ -62,6 +73,7 @@ public class SCGameState implements GameLogState {
     public void addEntry(GameLogEntry ge) {
         SCGameLogEntry sge = null;
         try {
+            // cast and make copy
             sge = (SCGameLogEntry) ge;
         } catch (Exception e) {
             System.err.println("GameState: Invalid log entry added to state");
@@ -70,23 +82,25 @@ public class SCGameState implements GameLogState {
         switch (sge.type) {
             case "TURN":
                 totalTurns = sge.param1;
+                lastTurn = new SCGameLogEntry(sge);
+
                 break;
             case "ADD":
-                aliens.put(sge.id, sge);
+                aliens.put(sge.id, new SCGameLogEntry(sge));
                 break;
             case "ADDSTAR":
-                stars.add(sge);
+                stars.add(new SCGameLogEntry(sge));
                 break;
             case "ADDSPECIES":
                 species.add(sge);
                 break;
             case "ADDPLANET":
-                planets.put(sge.id, sge);
+                planets.put(sge.id, new SCGameLogEntry(sge));
                 break;
             case "MOVE":
                 SCGameLogEntry sgeAdd = aliens.get(sge.id);
                 if (sgeAdd == null) {
-                    System.err.println(" LOG compact: alien not found for move, id:"+sge.id);
+                    aliens.put(sge.id, new SCGameLogEntry(sge));
                     break;
                 }
                 sgeAdd.newX = sge.newX;
@@ -96,6 +110,10 @@ public class SCGameState implements GameLogState {
                 break;
             case "MOVEPLANET":
                 SCGameLogEntry sgePlanet = planets.get(sge.id);
+                if (sgePlanet == null) {
+                    aliens.put(sge.id, new SCGameLogEntry(sge));
+                    break;
+                }
                 sgePlanet.newX = sge.newX;
                 sgePlanet.newY = sge.newY;
                 break;
@@ -114,15 +132,14 @@ public class SCGameState implements GameLogState {
         return entries;
     }
 
-    public static SCGameState safeGetNewState(GameLogObserver obs) {
-        try {
-            return (SCGameState) obs.getInitialState();
-        } catch (Exception e) {
-            System.err.println("invalid game state at safegetnewgamestate");
-        }
-        return null;
-    }
-
+//    public static SCGameState safeGetNewState(GameLogObserver obs) {
+//        try {
+//            return (SCGameState) obs.getInitialState();
+//        } catch (Exception e) {
+//            System.err.println("invalid game state at safegetnewgamestate");
+//        }
+//        return null;
+//    }
     // this is what the server will use to get entries to feed to the client. 
     @Override
     public ArrayList<GameLogEntry> getCompactedEntries() {
@@ -132,7 +149,9 @@ public class SCGameState implements GameLogState {
         result.addAll(planets.values());
         result.addAll(species);
         result.addAll(aliens.values());
-
+        if (lastTurn != null) {
+            result.add(lastTurn);
+        }
         return result;
     }
 

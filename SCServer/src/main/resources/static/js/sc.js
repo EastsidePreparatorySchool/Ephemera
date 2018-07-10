@@ -107,7 +107,7 @@ function attach() {
 
 
 function updates () {
-    request({url: "updates"})
+    request({url: "updates?compact=yes"})
         .then(data => {
             if (data !== null) {
                 //println("Raw: "+data.substr(0,100));

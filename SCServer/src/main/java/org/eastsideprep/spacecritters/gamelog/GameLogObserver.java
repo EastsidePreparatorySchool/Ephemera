@@ -17,7 +17,7 @@ public class GameLogObserver {
     int maxRead;
     boolean stateServed = false;
 
-    GameLogObserver(GameLog l) {
+    public GameLogObserver(GameLog l) {
         log = l;
         maxRead = -1;
 
