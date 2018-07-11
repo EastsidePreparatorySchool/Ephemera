@@ -26,25 +26,26 @@ public class LoggingVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void registerSpecies(AlienSpec as, AlienShapeFactory asf) {
-        log.addLogEntry(new SCGameLogEntry("ADDSPECIES", 0, 0, 0, 0, as.getFullSpeciesName(), 0, 0.0, 0.0));
+    public void registerSpecies(AlienSpec as, AlienShapeFactory asf, boolean instantiate) {
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ADDSPECIES, 
+                0, 0, instantiate?1:0, 0, as.getFullSpeciesName(), 0, 0.0, 0.0));
     }
 
     @Override
     public void registerStar(int x, int y, String name, int index, double luminosity, double mass) { //[Q]
-        log.addLogEntry(new SCGameLogEntry("ADDSTAR", x, y, 0, 0, name, index, 0.0, 0.0));
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ADDSTAR, x, y, 0, 0, name, index, 0.0, 0.0));
 
     }
 
     @Override
     public void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass, Trajectory t) { //[Q]
-        log.addLogEntry(new SCGameLogEntry("ADDPLANET", x, y, 0, 0, name, -index, 0.0, 0.0));
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ADDPLANET, x, y, 0, 0, name, -index, 0.0, 0.0));
 
     }
 
     @Override
     public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) { //[Q]
-        log.addLogEntry(new SCGameLogEntry("MOVEPLANET", x, y, 0, 0, name, -index, 0.0, 0.0));
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.MOVEPLANET, x, y, 0, 0, name, -index, 0.0, 0.0));
     }
 
     @Override
@@ -57,7 +58,7 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void showCompletedTurn(int totalTurns, int numAliens, long timeTaken, double avgTech) {
-        log.addLogEntry(new SCGameLogEntry("TURN", 0, 0, totalTurns, numAliens, null, -1, 0.0, 0.0));
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.TURN, 0, 0, totalTurns, numAliens, null, -1, 0.0, 0.0));
     }
 
     @Override
@@ -72,7 +73,7 @@ public class LoggingVisualizer implements GameVisualizer {
     public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition, boolean update, Trajectory t) { //[Q]
         //System.out.println("LOGDEBUG: MOVE" + as.hashCode);
         if (!as.isResident) {
-            log.addLogEntry(new SCGameLogEntry("MOVE", as.x, as.y, oldX, oldY, null, as.hashCode, 0.0, 0.0));
+            log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.MOVE, as.x, as.y, oldX, oldY, null, as.hashCode, 0.0, 0.0));
         }
     }
 
@@ -83,13 +84,13 @@ public class LoggingVisualizer implements GameVisualizer {
     @Override
     public void showSpawn(AlienSpec as, double energyAtPos, Trajectory t) {
         //System.out.println("LOGDEBUG: ADD" + as.hashCode);
-        log.addLogEntry(new SCGameLogEntry("ADD", as.x, as.y, 0, 0, as.getFullSpeciesName(), as.hashCode, 0.0, 0.0));
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ADD, as.x, as.y, 0, 0, as.getFullSpeciesName(), as.hashCode, 0.0, 0.0));
     }
 
     @Override
     public void showDeath(AlienSpec as, double energyAtPos) {
         //System.out.println("LOGDEBUG: KILL" + as.hashCode);
-        log.addLogEntry(new SCGameLogEntry("KILL", as.x, as.y, 0, 0, null, as.hashCode, 0.0, 0.0));
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.KILL, as.x, as.y, 0, 0, null, as.hashCode, 0.0, 0.0));
     }
 
     @Override

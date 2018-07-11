@@ -19,12 +19,14 @@ public class InternalAlienSpecies extends AlienSpecies {
     public long counter;
     public long spawns;
     public boolean[] achievements;
+    public boolean instantiate;
 
-    public InternalAlienSpecies(String domainName, String packageName, String className, int id, int achievementCount) {
+    public InternalAlienSpecies(String domainName, String packageName, String className, int id, int achievementCount, boolean instantiate) {
         super(domainName, packageName, className, id);
         counter = 0;
         spawns = 0;
         achievements = new boolean[achievementCount];
+        this.instantiate = instantiate;
         resetAchievements();
     }
 

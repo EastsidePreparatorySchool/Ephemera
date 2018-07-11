@@ -13,12 +13,24 @@ var species = document.getElementById("species");
 var statusP = document.getElementById("status");
 var countsP = document.getElementById("counts");
 var engineName = document.getElementById("enginename");
+var engines = document.getElementById("engines");
 
 var aliens = {};
 var planets = {};
 var stars = [];
-var speciesMap = null; // see init()
+var speciesMap = null; 
 var grid = [];
+
+const ADDSPECIES = 1;
+const ADDSTAR=2;
+const ADDPLANET=3;
+const MOVEPLANET=4;
+const TURN=5;
+const ADD=6;
+const MOVE=7;
+const KILL=8;
+
+
 
 
 
@@ -90,7 +102,7 @@ function request(obj) {
 // main functionality accessible from buttons
 
 function attach() {
-    request({url: "attach?engine="+engineName.value})   
+    request({url: "attach?engine="+engines.value})   
         .then(data => {
             data = JSON.parse(data);
             //println("Initial state: " + data);
@@ -136,48 +148,49 @@ function processUpdates(data){
         for (var i = 0; i< data.length; i++) {
             // if 90% processed, file another request for updates
             if (i > (data.length*0.9) && !requested) {
-                updates();
+                setTimeout(updates, updateInterval);
                 requested = true;
                 //println ("Requested updates in processUpdates");
             }
             var o = data[i];
+            //console.log(o);
             switch (o.type) {
-                case "TURN":
+                case TURN:
                     //println("Turn "+o.param1+" complete. #Aliens:"+o.param2);
                     turnSpan.innerText = o.param1;
                     alienSpan.innerText = o.param2;
                     break;
 
-                case "ADDSTAR":
+                case ADDSTAR:
                     addStar(o);
                     break;
 
-                case "ADDPLANET":
+                case ADDPLANET:
                     addPlanet(o);
                     break;
-                case "MOVEPLANET":
+                case MOVEPLANET:
                     movePlanet(o);
                     break;
 
-                case "ADDSPECIES":
+                case ADDSPECIES:
                     addSpecies(o);
                     break;
 
-                case "ADD":
+                case ADD:
                     //println ("Adding alien id: "+o.id+", species: "+o.name);
                     addAlien(o);
                     break; 
-                case "MOVE":
+                case MOVE:
                     //println("Move: id: "+o.id+" ("+o.param1 +","+o.param2+") -> ("+o.newX +","+o.newY+")");
                     moveAlien(o);
                     break;
-                case "KILL":
+                case KILL:
                     //println("Alien id: "+o.id+" died.");
                     killAlien(o);
                     break;
 
                 default:
-                    println ("unknown record");
+                    println ("unknown record type"+o.type);
                     break;
             }
         }
@@ -240,6 +253,7 @@ function create() {
         .then(data => {
               if (data !== null) {
                   println("  Response: "+data);
+                  listEngines();
               }
           })
           .catch(error => {
@@ -269,10 +283,18 @@ function listEngines() {
     request({url: "listengines"})
         .then(data => {
               if (data !== null) {
-                println ("Raw: "+data);
+                //println ("Raw: "+data);
                 data = JSON.parse(data);
+
+                engines.innerHTML = "";
                 for (var s in data) {
-                    println("Engine: '"+data[s]+"'");
+                    //println("Engine: '"+data[s]+"'");
+                            
+                    var option = document.createElement("option");
+                    option.value = data[s];
+                    var optionText = document.createTextNode(data[s]);
+                    option.appendChild(optionText);
+                    engines.appendChild(option);
                 }
               }
           })
@@ -636,7 +658,6 @@ function animate() {
     controls.update();
 
     renderer.render(scene, camera);
-    console.log("animate called");
 }
 
 

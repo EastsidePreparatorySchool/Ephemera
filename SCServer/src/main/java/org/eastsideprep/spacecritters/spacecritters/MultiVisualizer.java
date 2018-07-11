@@ -27,10 +27,10 @@ public class MultiVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void registerSpecies(AlienSpec as, AlienShapeFactory asf) {
+    public void registerSpecies(AlienSpec as, AlienShapeFactory asf, boolean instantiate) {
         cgv.forEach(e -> {
             try {
-                e.registerSpecies(as, asf);
+                e.registerSpecies(as, asf, instantiate);
             } catch (UnsupportedOperationException ex) {
                 System.err.println("multivis: " + ex.getMessage());
                 ex.printStackTrace(System.err);

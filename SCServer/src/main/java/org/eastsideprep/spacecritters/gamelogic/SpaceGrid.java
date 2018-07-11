@@ -100,11 +100,13 @@ public class SpaceGrid {
 
         System.out.println("SpaceGrid.ready: Processing initial aliens: " + this.speciesMap.values().size());
         for (InternalAlienSpecies ias : this.speciesMap.values()) {
-            GameElementSpec element = new GameElementSpec("ALIEN", ias.domainName, ias.packageName, ias.className, null); // state
-            try {
-                this.addElement(element);
-            } catch (IOException ex) {
-                System.out.println("SpaceGrid.Ready.addElement: " + ex.getMessage());
+            if (ias.instantiate) {
+                GameElementSpec element = new GameElementSpec("ALIEN", ias.domainName, ias.packageName, ias.className, null); // state
+                try {
+                    this.addElement(element);
+                } catch (IOException ex) {
+                    System.out.println("SpaceGrid.Ready.addElement: " + ex.getMessage());
+                }
             }
         }
 
@@ -750,7 +752,7 @@ public class SpaceGrid {
             InternalAlienSpecies as = speciesMap.get(speciesName);
             if (as == null) {
 
-                as = new InternalAlienSpecies(element.domainName, element.packageName, element.className, speciesCounter, speciesMap.getAchievementCount());
+                as = new InternalAlienSpecies(element.domainName, element.packageName, element.className, speciesCounter, speciesMap.getAchievementCount(), element.state.equals("true"));
                 speciesMap.put(speciesName, as);
                 speciesCounter++;
 
@@ -776,7 +778,7 @@ public class SpaceGrid {
 
                 if (!element.className.toLowerCase().endsWith("resident")) {
 //                    System.out.println("2 " + element.className);
-                    vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
+                    vis.registerSpecies(new AlienSpec(as), as.shapeFactory, as.instantiate);
                 }
                 result = as;
             }
@@ -801,11 +803,11 @@ public class SpaceGrid {
         // add species if necessary
         InternalAlienSpecies as = speciesMap.get(speciesName);
         if (as == null) {
-            as = new InternalAlienSpecies(domainName, alienPackageName, alienClassName, speciesCounter, speciesMap.getAchievementCount());
+            as = new InternalAlienSpecies(domainName, alienPackageName, alienClassName, speciesCounter, speciesMap.getAchievementCount(), false);
             speciesMap.put(speciesName, as);
             speciesCounter++;
             if (!alienClassName.toLowerCase().endsWith("resident")) {
-                vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
+                vis.registerSpecies(new AlienSpec(as), as.shapeFactory, as.instantiate);
             }
         }
 
@@ -934,9 +936,7 @@ public class SpaceGrid {
                             (soParent != null) ? new DummyTrajectory(soParent) : null);
                     break;
                 case SPECIES:
-                    if (element.state.equalsIgnoreCase("true")) {
-                        addSpecies(element);
-                    }
+                    addSpecies(element);
                     break;
                 case PLANET:
                     addPlanet(element);

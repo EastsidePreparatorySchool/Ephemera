@@ -49,17 +49,17 @@ public class SpeciesSet {
         }
 
         // if we got here, no matching species found
-        AlienSpeciesForDisplay as = new AlienSpeciesForDisplay(gameShell, speciesName, id);
+        AlienSpeciesForDisplay as = new AlienSpeciesForDisplay(gameShell, speciesName, id, false);
         Utilities.runSafe(() -> speciesList.add(as));
         as.setOn(true);
         return null;
 
     }
 
-    public void addAlienSpecies(AlienSpec as, AlienShapeFactory asf) {
-        AlienSpeciesForDisplay asfd = new AlienSpeciesForDisplay(gameShell, as, asf);
+    public void addAlienSpecies(AlienSpec as, AlienShapeFactory asf, boolean instantiate) {
+        AlienSpeciesForDisplay asfd = new AlienSpeciesForDisplay(gameShell, as, asf, instantiate);
         Utilities.runSafe(() -> speciesList.add(asfd));
-        asfd.setOn(true);
+        asfd.setOn(instantiate);
     }
 
     public void removeAlien(String speciesName, int speciesId) {

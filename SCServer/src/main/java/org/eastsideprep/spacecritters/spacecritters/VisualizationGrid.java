@@ -294,8 +294,8 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void registerSpecies(AlienSpec as, AlienShapeFactory asf) {
-        speciesSet.addAlienSpecies(as, asf);
+    public void registerSpecies(AlienSpec as, AlienShapeFactory asf, boolean instantiate) {
+        speciesSet.addAlienSpecies(as, asf, instantiate);
     }
 
     @Override

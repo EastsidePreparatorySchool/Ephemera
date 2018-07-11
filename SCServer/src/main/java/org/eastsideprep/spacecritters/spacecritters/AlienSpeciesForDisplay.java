@@ -25,6 +25,7 @@ public class AlienSpeciesForDisplay {
     String className;
     int id;
     AlienShapeFactory asf;
+    boolean instantiate;
 
     int count;
     Color color;
@@ -36,7 +37,7 @@ public class AlienSpeciesForDisplay {
     static String[] alienStyles = {"lightblue", "yellow", "lightpink", "lightgreen", "orange", "white"};
     static int colorCount = 0;
 
-    AlienSpeciesForDisplay(SpaceCritters gameShellInstance, String speciesName, int id) {
+    AlienSpeciesForDisplay(SpaceCritters gameShellInstance, String speciesName, int id, boolean instantiate) {
         this.gameShell = gameShellInstance;
         this.speciesName = speciesName;
         this.count = 0;
@@ -45,12 +46,13 @@ public class AlienSpeciesForDisplay {
         this.style = alienStyles[colorCount % alienColors.length];
         colorCount++;
         this.asf = null;
+        this.instantiate = instantiate;
 
-        on.setValue(true);
+        on.setValue(instantiate);
 
     }
 
-    AlienSpeciesForDisplay(SpaceCritters gameShellInstance, AlienSpec as, AlienShapeFactory asf) {
+    AlienSpeciesForDisplay(SpaceCritters gameShellInstance, AlienSpec as, AlienShapeFactory asf, boolean instantiate) {
         this.gameShell = gameShellInstance;
         this.domainName = as.domainName;
         this.packageName = as.packageName;
@@ -63,7 +65,7 @@ public class AlienSpeciesForDisplay {
         colorCount++;
         this.asf = asf;
 
-        //on.setValue(true);
+        on.setValue(instantiate);
     }
 
     public final StringProperty nameProperty() {

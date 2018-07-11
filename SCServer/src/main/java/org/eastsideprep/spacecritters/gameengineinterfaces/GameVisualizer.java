@@ -18,7 +18,7 @@ public interface GameVisualizer {
 
     void shutdown();
 
-    void registerSpecies(AlienSpec as, AlienShapeFactory asf);
+    void registerSpecies(AlienSpec as, AlienShapeFactory asf, boolean instantiate);
 
     void registerStar(int x, int y, String name, int index, double luminosity, double mass); //[Q]
 

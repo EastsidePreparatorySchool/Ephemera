@@ -13,7 +13,7 @@ import org.eastsideprep.spacecritters.gamelog.GameLogEntry;
 public class SCGameLogEntry extends GameLogEntry {
 
     // to record: moves, acceleration, state change (t,e, orbital, secrets), comm, trade, 
-    public String type;
+    public int type;
     public int newX;
     public int newY;
     public int param1;
@@ -23,7 +23,7 @@ public class SCGameLogEntry extends GameLogEntry {
     public double energy;
     public double tech;
 
-    public SCGameLogEntry(String type, int newX, int newY, int param1, int param2, String name, int id, double energy, double tech) {
+    public SCGameLogEntry(int type, int newX, int newY, int param1, int param2, String name, int id, double energy, double tech) {
         this.type = type;
         this.newX = newX;
         this.newY = newY;
@@ -45,5 +45,16 @@ public class SCGameLogEntry extends GameLogEntry {
         this.tech = sge.tech;
         this.name = sge.name;
         this.id = sge.id;
+    }
+    
+    public static class Type {
+        public static final int ADDSPECIES = 1; 
+        public static final int ADDSTAR = 2;
+        public static final int ADDPLANET=3;
+        public static final int MOVEPLANET=4;
+        public static final int TURN=5;
+        public static final int ADD=6;
+        public static final int MOVE=7;
+        public static final int KILL=8;
     }
 }

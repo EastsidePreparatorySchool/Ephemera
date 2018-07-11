@@ -80,24 +80,24 @@ public class SCGameState implements GameLogState {
             return;
         }
         switch (sge.type) {
-            case "TURN":
+            case SCGameLogEntry.Type.TURN:
                 totalTurns = sge.param1;
                 lastTurn = new SCGameLogEntry(sge);
 
                 break;
-            case "ADD":
+            case SCGameLogEntry.Type.ADD:
                 aliens.put(sge.id, new SCGameLogEntry(sge));
                 break;
-            case "ADDSTAR":
+            case SCGameLogEntry.Type.ADDSTAR:
                 stars.add(new SCGameLogEntry(sge));
                 break;
-            case "ADDSPECIES":
+            case SCGameLogEntry.Type.ADDSPECIES:
                 species.add(sge);
                 break;
-            case "ADDPLANET":
+            case SCGameLogEntry.Type.ADDPLANET:
                 planets.put(sge.id, new SCGameLogEntry(sge));
                 break;
-            case "MOVE":
+            case SCGameLogEntry.Type.MOVE:
                 SCGameLogEntry sgeAdd = aliens.get(sge.id);
                 if (sgeAdd == null) {
                     aliens.put(sge.id, new SCGameLogEntry(sge));
@@ -108,7 +108,7 @@ public class SCGameState implements GameLogState {
                 sgeAdd.energy = sge.energy;
                 sgeAdd.tech = sge.tech;
                 break;
-            case "MOVEPLANET":
+            case SCGameLogEntry.Type.MOVEPLANET:
                 SCGameLogEntry sgePlanet = planets.get(sge.id);
                 if (sgePlanet == null) {
                     aliens.put(sge.id, new SCGameLogEntry(sge));
@@ -117,7 +117,7 @@ public class SCGameState implements GameLogState {
                 sgePlanet.newX = sge.newX;
                 sgePlanet.newY = sge.newY;
                 break;
-            case "KILL":
+            case SCGameLogEntry.Type.KILL:
                 aliens.remove(sge.id);
                 break;
             default:
