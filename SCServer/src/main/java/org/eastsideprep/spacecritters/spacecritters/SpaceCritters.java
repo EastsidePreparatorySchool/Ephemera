@@ -233,27 +233,50 @@ public class SpaceCritters extends Application {
 //        }
 
         engine.queueCommand(new GameCommand(GameCommandCode.Resume));
+//        showRunning();
+
+    }
+
+    void showReady() {
+        controlPane.buttonPause.setText("Start");
+        controlPane.speciesView.setDisable(false);
+    }
+
+    void showRunning() {
         controlPane.buttonPause.setText("Pause");
         controlPane.speciesView.setDisable(true);
+    }
 
+    void showPaused() {
+        controlPane.buttonPause.setText("Resume");
+        controlPane.speciesView.setDisable(false);
+    }
+
+    void showGameOver() {
+        gameOver = true;
+        
+        controlPane.buttonPause.setText("Game Over");
+        controlPane.buttonPause.setDisable(true);
+
+        controlPane.speciesView.setDisable(true);
     }
 
     void startOrPauseGame(ActionEvent e) {
         if (controlPane.buttonPause.getText().equals("Pause")) {
             // pause
             engine.queueCommand(new GameCommand(GameCommandCode.Pause));
-            controlPane.buttonPause.setText("Resume");
-            controlPane.speciesView.setDisable(false);
+//            controlPane.buttonPause.setText("Resume");
+//            controlPane.speciesView.setDisable(false);
         } else if (controlPane.buttonPause.getText().equals("Start")) {
             // first start
             startGame();
-            controlPane.speciesView.setDisable(true);
+//            controlPane.speciesView.setDisable(true);
 
         } else {
             // regular resume
             engine.queueCommand(new GameCommand(GameCommandCode.Resume));
-            controlPane.buttonPause.setText("Pause");
-            controlPane.speciesView.setDisable(true);
+//            controlPane.buttonPause.setText("Pause");
+//            controlPane.speciesView.setDisable(true);
         }
     }
 
@@ -261,13 +284,13 @@ public class SpaceCritters extends Application {
         if (controlPane.buttonPause.getText().equals("Start")) {
             // first start
             startGame();
-            controlPane.speciesView.setDisable(true);
+//            controlPane.speciesView.setDisable(true);
 
         } else if (controlPane.buttonPause.getText().equals("Resume")) {
             // regular resume
             engine.queueCommand(new GameCommand(GameCommandCode.Resume));
-            controlPane.buttonPause.setText("Pause");
-            controlPane.speciesView.setDisable(true);
+//            controlPane.buttonPause.setText("Pause");
+//            controlPane.speciesView.setDisable(true);
         }
     }
 
@@ -275,8 +298,8 @@ public class SpaceCritters extends Application {
         if (controlPane.buttonPause.getText().equals("Pause")) {
             // pause
             engine.queueCommand(new GameCommand(GameCommandCode.Pause));
-            controlPane.buttonPause.setText("Resume");
-            controlPane.speciesView.setDisable(false);
+//            controlPane.buttonPause.setText("Resume");
+//            controlPane.speciesView.setDisable(false);
         }
     }
 

@@ -168,7 +168,7 @@ public class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void showGameOver() {
-        gameShell.gameOver = true;
+        gameShell.showGameOver();
         debugOut("Game Over");
         try {
             if (logFile != null) {
@@ -217,6 +217,16 @@ public class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void showEngineStateChange(GameState gs) {
+        switch (gs) {
+            case Paused:
+                Platform.runLater(() -> gameShell.showPaused());
+                break;
+            case Running:
+                Platform.runLater(() -> gameShell.showRunning());
+                break;
+            default:
+                break;
+        }
         Thread.yield();
     }
 
@@ -325,6 +335,7 @@ public class VisualizationGrid implements GameVisualizer {
             gameShell.mainScene.update();
             gameShell.stage.show();
 
+            gameShell.showReady();
             if ((boolean) Constants.getValue("autoStart")) {
                 this.gameShell.startGame();
             }

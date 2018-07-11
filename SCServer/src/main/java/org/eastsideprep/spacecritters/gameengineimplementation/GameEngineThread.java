@@ -185,12 +185,14 @@ public class GameEngineThread extends Thread {
             case Pause:
                 engine.vis.debugOut("GameEngineThread: Pausing");
                 engine.gameState = GameState.Paused;
+                engine.vis.showEngineStateChange(GameState.Paused);
                 break;
 
             case Resume:
                 engine.vis.debugOut("GameEngineThread: Resuming");
                 engine.vis.debugOut("---------------------------------- Game segment starts here:");
                 engine.gameState = GameState.Running;
+                engine.vis.showEngineStateChange(GameState.Running);
                 break;
 
             case List:
@@ -199,13 +201,14 @@ public class GameEngineThread extends Thread {
 
             case Ready:
                 engine.grid.addAllCustomAliens();
-                engine.grid.ready();
+                engine.grid.ready(); // will cause vis.showReady
                 pastReady = true;
                 break;
 
             case End:
                 engine.vis.debugOut("GameEngineThread: End request, thread closing");
                 gameOver = true;
+                engine.vis.showGameOver();
                 break;
 
             default:
