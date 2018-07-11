@@ -1,4 +1,0 @@
-GameEngineV1: read config file: sc_initial_setup.csv
-GameEngineV1:init:File-related error
-GameEngineV1:init:     c:\users\gmein\documents\github\ephemera\spacecritters\sc_initial_setup.csv (The system cannot find the file specified)
-GameEngineV1: Queueing command Ready

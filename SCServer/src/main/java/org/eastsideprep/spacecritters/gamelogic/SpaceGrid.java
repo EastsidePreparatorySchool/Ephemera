@@ -14,10 +14,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.security.CodeSource;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.eastsideprep.spacecritters.orbit.DummyTrajectory;
@@ -924,9 +924,9 @@ public class SpaceGrid {
                 case ALIEN:
                     // position (0,0) leads to random assignment
                     InternalSpaceObject soParent = null;
-                    element.parent = "ephemera.eastsideprep.org:stockelements:Sol"; // BIG FAT KLUDGE
+                    element.parent = "Sol"; // BIG FAT KLUDGE
                     for (InternalSpaceObject o : this.objects) {
-                        if (element.parent != null && element.parent.equalsIgnoreCase(o.getFullName())) {
+                        if (element.parent != null && element.parent.equalsIgnoreCase(o.className)) {
                             soParent = o;
                             break;
                         }
@@ -959,34 +959,40 @@ public class SpaceGrid {
     //
     public Constructor<?> loadConstructor(GameEngineV2 engine, String domainName, String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Constructor<?> cs = null;
-        String fullName;
+        String fullName = "";
         File file;
-        URL url;
-        Object[] parameters;
 
         if (packageName.equalsIgnoreCase("stockelements")
                 || packageName.equalsIgnoreCase("alieninterfaces")) {
-            fullName = engine.gamePath
-                    + packageName
-                    + System.getProperty("file.separator")
-                    + "scserver"
-                    + System.getProperty("file.separator")
-                    + "target"
-                    + System.getProperty("file.separator")
-                    + "SCServer-1.0-SNAPSHOT.jar";
-            packageName = "org.eastsideprep.spacecritters.stockelements";
+//            fullName = engine.gamePath
+////                    + packageName
+////                    + System.getProperty("file.separator")
+//                    + "scserver"
+//                    + System.getProperty("file.separator")
+//                    + "target"
+//                    + System.getProperty("file.separator")
+//                    + "SCServer-1.0-SNAPSHOT.jar";
+//            packageName = "org.eastsideprep.spacecritters.stockelements";
+            CodeSource src = SpaceGrid.class.getProtectionDomain().getCodeSource();
+            fullName = src.getLocation().getFile();
         } else {
             fullName = engine.alienPath + domainName;
         }
         String fullClassName = null;
         try {
             file = new File(fullName);
+            URLClassLoader classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+            Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+            method.setAccessible(true);
+            System.out.println("Adding path " + file.toURI().toURL());
+            method.invoke(classLoader, file.toURI().toURL());
 
-            URLClassLoader classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()}, this.getClass().getClassLoader());
-
+//            URLClassLoader classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()}, this.getClass().getClassLoader());
             fullClassName = packageName.equals("") ? className : (packageName + "." + className);
 
             cs = ClassLoader.getSystemClassLoader().loadClass(fullClassName).getConstructor();
+            System.out.println("sg: Successfully loaded constructor for " + fullClassName);
+
         } catch (Exception e) {
 //            e.printStackTrace(System.out);
             vis.debugOut("sg: Could not get constructor: " + fullClassName);
