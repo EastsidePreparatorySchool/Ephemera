@@ -27,6 +27,10 @@ var grid = [];
 var scene;
 var camera;
 var renderer;
+var controls;
+var width; 
+var height;
+
 var cubeGeo;
 var startGeo;
 var planetGeo;
@@ -550,11 +554,19 @@ class SpeciesMap {
 
 function init() {
     scene = new THREE.Scene();
-    var width = $('#center').width();
-    var height = $('#center').height();
+    width = $('#center').width();
+    height = $('#center').height();
+
+    if (!Detector.webgl) {
+        Detector.addGetWebGLMessage();
+    }
 
     camera = new THREE.PerspectiveCamera(75, width/ height, 0.1, 1000 );
+    camera.position.set(310, 220, 0);
+    camera.rotation.x = -Math.PI/4;
+
     renderer = new THREE.WebGLRenderer();
+    renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize(width, height);
     centerDiv.appendChild(renderer.domElement);
 
@@ -566,11 +578,14 @@ function init() {
     gridHelper = new THREE.GridHelper(size, divisions, "#500000", "#500000");
     scene.add(gridHelper);
 
-    camera.position.z = 310;
-    camera.position.y = 220;
-    camera.position.x = 0;
-    camera.rotation.x = -Math.PI/4;
-    //camera.rotation.y = 0.2;
+
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+    controls.dampingFactor = 0.25;
+    controls.screenSpacePanning = false;
+    controls.minDistance = 100;
+    controls.maxDistance = 500
+    controls.maxPolarAngle = Math.PI / 2;
 
     light = new THREE.AmbientLight(0x404040);
     scene.add(light);
@@ -579,8 +594,11 @@ function init() {
 
 
     //listeners for keypresses
-    document.addEventListener('keyup', keyUp, false);
-    document.addEventListener('keydown', keyDown, false);
+    //document.addEventListener('keyup', keyUp, false);
+    //document.addEventListener('keydown', keyDown, false);
+    window.addEventListener( 'resize', onWindowResize, false );
+
+    animate();
 
     // 
     speciesMap = new SpeciesMap();
@@ -599,6 +617,28 @@ function init() {
 
     println ("initialized");
 }
+
+function onWindowResize() {
+    width = $('#center').width();
+    height = $('#center').height();
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+}
+
+
+
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    // required if controls.enableDamping or controls.autoRotate are set to true
+    controls.update();
+
+    renderer.render(scene, camera);
+    console.log("animate called");
+}
+
 
 println ("parsed");
 
