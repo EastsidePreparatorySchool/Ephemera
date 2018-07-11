@@ -491,7 +491,7 @@ function killAlien(content) {
 
 function addSpecies(content) {
     // this first line adds the species to the hashmap as well
-    speciesMap.getColor(content.name);
+    speciesMap.getColor(content.name, content.param1);
 
 }
 
@@ -513,7 +513,7 @@ class SpeciesMap {
         return mat;
     }
 
-    getColor(name) {
+    getColor(name, instantiate) {
 //        console.log (this);
 //        console.log(this.map);
         var color = this.map[name];
@@ -532,7 +532,7 @@ class SpeciesMap {
             
             var chk = document.createElement("input");
             chk.type = "checkbox";
-            chk.checked = true;
+            chk.checked = instantiate;
             species.appendChild(chk);
 
             var text = document.createElement("span");

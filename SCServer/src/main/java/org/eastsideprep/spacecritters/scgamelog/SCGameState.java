@@ -18,6 +18,7 @@ public class SCGameState implements GameLogState {
 
     public int entries;
     public int totalTurns;
+    public boolean forUpdates;
     public SCGameLogEntry lastTurn;
 
     private HashMap<Integer, SCGameLogEntry> aliens = new HashMap<>();
@@ -33,9 +34,10 @@ public class SCGameState implements GameLogState {
     }
 
     // this is for clients who want to compact a set of log entries after getting them
-    public SCGameState() {
+    public SCGameState(boolean forUpdates) {
         this.totalTurns = 0;
         this.entries = 0;
+        this.forUpdates = forUpdates; //purpose of the state, whether to record kills or just drop the alien
     }
 
     // this is used by the log to hand a new copy to a client
@@ -118,7 +120,20 @@ public class SCGameState implements GameLogState {
                 sgePlanet.newY = sge.newY;
                 break;
             case SCGameLogEntry.Type.KILL:
-                aliens.remove(sge.id);
+                if (forUpdates) {
+                    SCGameLogEntry sgeDead = aliens.get(sge.id);
+                    if (sgeDead == null) {
+                        aliens.put(sge.id, new SCGameLogEntry(sge));
+                        break;
+                    }
+                    if (sgeDead.type == SCGameLogEntry.Type.ADD) {
+                        aliens.remove(sge.id);
+                    } else {
+                        sgeDead.type = SCGameLogEntry.Type.KILL;
+                    }
+                } else {
+                    aliens.remove(sge.id);
+                }
                 break;
             default:
                 break;

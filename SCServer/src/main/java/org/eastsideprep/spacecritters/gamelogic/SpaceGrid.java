@@ -761,7 +761,7 @@ public class SpaceGrid {
                         as.cns = loadConstructor(engine, element.domainName, element.packageName, element.className);
                     } catch (Exception e) {
                         gridDebugErr("sg.addSpecies: Error loading contructor for " + speciesName);
-//                        e.printStackTrace(System.out);
+                        e.printStackTrace(System.out);
                     }
                     as.shapeFactory = null;
                     try {
@@ -978,18 +978,18 @@ public class SpaceGrid {
         } else {
             fullName = engine.alienPath + domainName;
         }
-
+        String fullClassName = null;
         try {
             file = new File(fullName);
 
             URLClassLoader classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()}, this.getClass().getClassLoader());
 
-            String fullClassName = packageName.equals("") ? className : (packageName + "." + className);
+            fullClassName = packageName.equals("") ? className : (packageName + "." + className);
 
             cs = ClassLoader.getSystemClassLoader().loadClass(fullClassName).getConstructor();
         } catch (Exception e) {
 //            e.printStackTrace(System.out);
-            vis.debugErr("sg: Could not get constructor: " + className);
+            vis.debugOut("sg: Could not get constructor: " + fullClassName);
             throw e;
         }
         return cs;

@@ -192,7 +192,7 @@ public class MainApp extends Application {
                 // if the client requests it, make a new game state, 
                 // we will use it to compact the entries
                 
-                SCGameState compactor = new SCGameState();
+                SCGameState compactor = new SCGameState(true);
                 for (GameLogEntry item : list) {
                     compactor.addEntry(item);
                 }
