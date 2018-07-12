@@ -4,7 +4,6 @@
 
 
 var updateInterval = 200;
-
 var textarea = document.getElementById("output");
 var turnSpan = document.getElementById("turns");
 var alienSpan = document.getElementById("numaliens");
@@ -14,13 +13,11 @@ var statusP = document.getElementById("status");
 var countsP = document.getElementById("counts");
 var engineName = document.getElementById("enginename");
 var engines = document.getElementById("engines");
-
 var aliens = {};
 var planets = {};
 var stars = [];
 var speciesMap = null;
 var grid = [];
-
 const ADDSPECIES = 1;
 const ADDSTAR = 2;
 const ADDPLANET = 3;
@@ -29,11 +26,6 @@ const TURN = 5;
 const ADD = 6;
 const MOVE = 7;
 const KILL = 8;
-
-
-
-
-
 //initialize three.js and set all initial values
 
 var scene;
@@ -42,20 +34,14 @@ var renderer;
 var controls;
 var width;
 var height;
-
 var cubeGeo;
 var startGeo;
 var planetGeo;
 var gridHelper;
 var light;
-
 var size = 501;
 var divisions = 501;
 var rotation = 0;
-
-
-
-
 // key handlers
 
 function keyUp(event) {
@@ -72,7 +58,7 @@ function keyDown(event) {
 
 var key = {
     check: () => {
-        //put things that happen while keys are pushed here
+//put things that happen while keys are pushed here
     }
 }
 
@@ -84,7 +70,6 @@ function request(obj) {
     return new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
         xhr.open(obj.method || "GET", obj.url);
-
         xhr.onload = () => {
             if (xhr.status >= 200 && xhr.status < 300) {
                 resolve(xhr.response);
@@ -93,13 +78,10 @@ function request(obj) {
             }
         };
         xhr.onerror = () => reject(xhr.statusText);
-
         xhr.send(obj.body);
     });
 }
 ;
-
-
 // main functionality accessible from buttons
 
 function attach() {
@@ -148,7 +130,7 @@ function processUpdates(data) {
     var requested = false;
     if (data !== null && data.length > 0) {
         for (var i = 0; i < data.length; i++) {
-            // if 90% processed, file another request for updates
+// if 90% processed, file another request for updates
             if (i > (data.length * 0.9) && !requested) {
                 setTimeout(updates, updateInterval);
                 requested = true;
@@ -162,22 +144,18 @@ function processUpdates(data) {
                     turnSpan.innerText = o.param1;
                     alienSpan.innerText = o.param2;
                     break;
-
                 case ADDSTAR:
                     addStar(o);
                     break;
-
                 case ADDPLANET:
                     addPlanet(o);
                     break;
                 case MOVEPLANET:
                     movePlanet(o);
                     break;
-
                 case ADDSPECIES:
                     addSpecies(o);
                     break;
-
                 case ADD:
                     //println ("Adding alien id: "+o.id+", species: "+o.name);
                     addAlien(o);
@@ -190,7 +168,6 @@ function processUpdates(data) {
                     //println("Alien id: "+o.id+" died.");
                     killAlien(o);
                     break;
-
                 default:
                     println("unknown record type" + o.type);
                     break;
@@ -212,9 +189,7 @@ function detach() {
     countsP.style.display = "none";
     statusP.innerHTML = "";
     species.innerHTML = "";
-
     speciesMap = new SpeciesMap();
-
     //println("starting purge ...");
 
     var a;
@@ -287,7 +262,6 @@ function listEngines() {
                 if (data !== null) {
                     //println ("Raw: "+data);
                     data = JSON.parse(data);
-
                     engines.innerHTML = "";
                     for (var s in data) {
                         //println("Engine: '"+data[s]+"'");
@@ -355,7 +329,6 @@ class Grid {
         this.height = height;
         this.halfWidth = Math.floor(width / 2);
         this.halfHeight = Math.floor(height / 2);
-
         for (var x = 0; x < width; x++) {
             var col = []
             for (var y = 0; y < height; y++) {
@@ -366,7 +339,7 @@ class Grid {
     }
 
     addToCell(alien, x, y) {
-        //console.log(x+", "+y+", "+alien);
+//console.log(x+", "+y+", "+alien);
 
         x = Math.floor(x);
         y = Math.floor(y);
@@ -376,7 +349,7 @@ class Grid {
     }
 
     removeFromCell(alien, x, y) {
-        //console.log(x+", "+y+", "+alien);
+//console.log(x+", "+y+", "+alien);
 
         x = Math.floor(x);
         y = Math.floor(y);
@@ -417,8 +390,6 @@ class Alien {
     }
 }
 ;
-
-
 // star class, use this to make aliens
 class Star {
     constructor(x, z) {
@@ -432,7 +403,6 @@ class Star {
 
 }
 ;
-
 // planet class, use this to make aliens
 class Planet {
     constructor(x, z, id) {
@@ -450,7 +420,6 @@ class Planet {
     }
 }
 ;
-
 function addStar(content) {
     stars.push(new Star(content.newX, content.newY));
 }
@@ -495,9 +464,8 @@ function killAlien(content) {
 }
 
 function addSpecies(content) {
-    // this first line adds the species to the hashmap as well
+// this first line adds the species to the hashmap as well
     speciesMap.getColor(content.name, content.param1);
-
 }
 
 
@@ -527,24 +495,20 @@ class SpeciesMap {
             this.map[name] = color;
             this.mat[name] = new THREE.MeshBasicMaterial({color: color, wireframe: false});
             this.count++;
-
             var displayName = name.substr(name.lastIndexOf(":") + 1);
             var displayQualifier = name.substr(0, name.lastIndexOf(":"));
             if (displayQualifier === "org.eastsideprep.spacecritters:org.eastsideprep.spacecritters.stockelements") {
                 displayQualifier = "System";
             }
             displayName += " (" + displayQualifier + ")";
-
             var chk = document.createElement("input");
             chk.type = "checkbox";
             chk.checked = instantiate;
             species.appendChild(chk);
-
             var text = document.createElement("span");
             text.style.color = color;
             text.innerText = " " + displayName;
             species.appendChild(text);
-
             var br = document.createElement("br");
             species.appendChild(br);
         }
@@ -554,28 +518,7 @@ class SpeciesMap {
 
 
 
-//
-// PM:
-// welcome to code purgatory, where all my code that i think might be useful in the future but does not work right now goes
-// 
 
-/*
- 
- // THE CAMERA CURRENTLY DOES NOT WORK
- camera.rotation.y = 0;
- camera.position.z = 5*Math.cos((rotation*Math.PI)/180);
- camera.position.x = 5*Math.sin((rotation*Math.PI)/180);
- camera.rotation.x = 0;
- camera.rotation.y = (rotation*Math.PI)/180;
- camera.rotation.x = -Math.PI/4;
- camera.rotation.x = (rotation*Math.PI)/180;
- camera.rotation.z = -(rotation*Math.PI)/180;
- 
- */
-
-//
-// end purgatory
-//
 
 
 
@@ -583,7 +526,6 @@ function init() {
     scene = new THREE.Scene();
     width = $('#center').width();
     height = $('#center').height();
-
     if (!Detector.webgl) {
         Detector.addGetWebGLMessage();
     }
@@ -591,21 +533,15 @@ function init() {
     camera = new THREE.PerspectiveCamera(100, width / height, 0.1, 1000);
     camera.position.set(350, 120, 0);
     camera.rotation.x = -Math.PI / 4;
-
     renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
     centerDiv.appendChild(renderer.domElement);
-
     cubeGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
     starGeo = new THREE.SphereGeometry(2.0, 32, 32);
     planetGeo = new THREE.SphereGeometry(1.0, 32, 32);
-
-
     gridHelper = new THREE.GridHelper(size, divisions, "#500000", "#500000");
     scene.add(gridHelper);
-
-
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
     controls.dampingFactor = 0.25;
@@ -613,25 +549,17 @@ function init() {
     controls.minDistance = 100;
     controls.maxDistance = 500
     controls.maxPolarAngle = Math.PI / 2;
-
     light = new THREE.AmbientLight(0x404040);
     scene.add(light);
-
     renderer.render(scene, camera);
-
-
     //listeners for keypresses
     //document.addEventListener('keyup', keyUp, false);
     //document.addEventListener('keydown', keyDown, false);
     window.addEventListener('resize', onWindowResize, false);
-
     animate();
-
     // 
     speciesMap = new SpeciesMap();
     grid = new Grid(501, 501);
-
-
     //addSpecies({name:"ephemera.eastsideprep.org:stockelements:test1"});
     //addSpecies({name:"someschool.org:someschmuck:test2"});
     //grid.addToCell("hah1", -250,-250);
@@ -641,7 +569,6 @@ function init() {
     //println(""+grid.addToCell("hah5", 250,250));
 
     listEngines();
-
     println("initialized");
 }
 
@@ -658,12 +585,32 @@ function onWindowResize() {
 
 function animate() {
     requestAnimationFrame(animate);
-
     // required if controls.enableDamping or controls.autoRotate are set to true
     controls.update();
-
     renderer.render(scene, camera);
 }
+
+
+
+
+function submitForm(form) {
+    var body = new FormData(form);
+
+    request({method: "POST", url: "upload", body:body})
+            .then(data => {
+                println("JAR upload successful");
+            })
+            .catch(error => {
+                if (error !== null && error.length > 0) {
+                    println("Error: '" + error + "'");
+                }
+
+                detach();
+                println("Server not responding, console detached.");
+            });
+     return false;
+}
+
 
 
 println("parsed");

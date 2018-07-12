@@ -1,10 +1,16 @@
 package org.eastsideprep.spacecritters.scserver;
 
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.stage.Stage;
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.http.Part;
 import org.eastsideprep.spacecritters.gameengineimplementation.GameEngineV2;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameCommand;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameCommandCode;
@@ -68,6 +74,7 @@ public class MainApp extends Application {
         get("/attach", "application/json", (req, res) -> doAttach(req), new JSONRT());
         get("/detach", "application/json", (req, res) -> doDetach(req), new JSONRT());
         get("/updates", "application/json", (req, res) -> doUpdates(req), new JSONRT());
+        post("/upload", (req, res) -> uploadFile(req, res));
     }
 
     // ROUTES
@@ -191,7 +198,7 @@ public class MainApp extends Application {
             if (req.queryParams("compact").equals("yes")) {
                 // if the client requests it, make a new game state, 
                 // we will use it to compact the entries
-                
+
                 SCGameState compactor = new SCGameState(true);
                 for (GameLogEntry item : list) {
                     compactor.addEntry(item);
@@ -280,6 +287,33 @@ public class MainApp extends Application {
         System.out.println("createServerEngine: queued ready");
 
         return engine;
+    }
+
+    public static long uploadFile(spark.Request request, spark.Response response) {
+        System.out.println("upload ...");
+        MultipartConfigElement multipartConfigElement
+                = new MultipartConfigElement(System.getProperty("java.io.tmpdir"));
+        request.raw().setAttribute("org.eclipse.jetty.multipartConfig", multipartConfigElement);
+
+        long size = 0;
+        try {
+            Part file = request.raw().getPart("jarfile");
+            size = file.getSize();
+            final Path path = Paths.get(
+                    sc.engine.getAlienPath()
+                    + System.getProperty("file.separator")
+                    + file.getSubmittedFileName()
+            );
+            final InputStream in = file.getInputStream();
+            Files.copy(in, path);
+            System.out.println("successfully uploaded alien jar " + file.getSubmittedFileName());
+
+        } catch (Exception e) {
+            System.out.println(e.toString());
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+        return size;
     }
 
 }

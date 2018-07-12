@@ -98,7 +98,6 @@ public class GameEngineV2 implements GameEngine {
         return elements;
     }
 
- 
     @Override
     public void processGameElements(GameElementSpec[] elements) {
         //
@@ -144,4 +143,10 @@ public class GameEngineV2 implements GameEngine {
             this.queue.notifyAll();
         }
     }
+
+    @Override
+    public String getAlienPath() {
+        return this.alienPath;
+    }
+
 }
