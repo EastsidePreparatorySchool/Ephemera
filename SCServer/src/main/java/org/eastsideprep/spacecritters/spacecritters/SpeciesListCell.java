@@ -51,9 +51,9 @@ public class SpeciesListCell extends CheckBoxListCell<AlienSpeciesForDisplay> {
         if (item != null && !empty) {
             this.setStyle(item.getStyle());
             String s = item.toString();
-            if (s.startsWith("ephemera.eastsideprep.org:stockelements:")) {
-                s = s.replace("ephemera.eastsideprep.org:stockelements:", "System:");
-            }
+            //if (s.startsWith("org.eastsideprep.spacecritters:org.eastsideprep.spacecritters.stockelements:")) {
+                s = s.replace("org.eastsideprep.spacecritters:org.eastsideprep.spacecritters.stockelements:", "System:");
+            //}
             setText(s);
         } else {
             this.setStyle("-fx-background-color: black; -fx-text-fill:black;");

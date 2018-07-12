@@ -394,15 +394,15 @@ class Alien {
         this.mat = material; 
         this.mesh = new THREE.Mesh(cubeGeo,this.mat);
         scene.add(this.mesh);
-        this.mesh.position.x = x;
-        this.mesh.position.z = -z;
+        this.mesh.position.x = -z;
+        this.mesh.position.z = -x;
         this.mesh.position.y = 1;
         this.id = id;
     }
 
     move(x,z){
-        this.mesh.position.x = x;
-        this.mesh.position.z = -z;
+        this.mesh.position.x = -z;
+        this.mesh.position.z = -x;
     }
 
     kill(){
@@ -422,8 +422,8 @@ class Star {
     this.mat = new THREE.MeshBasicMaterial({color:"white", wireframe:false});
     this.mesh = new THREE.Mesh(starGeo,this.mat);
     scene.add(this.mesh);
-    this.mesh.position.x = x;
-    this.mesh.position.z = -z;
+    this.mesh.position.x = -z;
+    this.mesh.position.z = -x;
     this.mesh.position.y = 1;
   }
  
@@ -435,14 +435,14 @@ class Planet {
         this.mat = new THREE.MeshBasicMaterial({color:"green", wireframe:false});
         this.mesh = new THREE.Mesh(planetGeo,this.mat);
         scene.add(this.mesh);
-        this.mesh.position.x = x;
-        this.mesh.position.z = -z;
+        this.mesh.position.x = -z;
+        this.mesh.position.z = -x;
         this.mesh.position.y = 1;
         this.id = id;
     }
     move(x,z){
-        this.mesh.position.x = x;
-        this.mesh.position.z = -z;
+        this.mesh.position.x = -z;
+        this.mesh.position.z = -x;
     }
 };
 
@@ -525,7 +525,7 @@ class SpeciesMap {
 
             var displayName = name.substr(name.lastIndexOf(":")+1);
             var displayQualifier = name.substr(0,name.lastIndexOf(":"));
-            if (displayQualifier === "ephemera.eastsideprep.org:stockelements"){
+            if (displayQualifier === "org.eastsideprep.spacecritters:org.eastsideprep.spacecritters.stockelements"){
                 displayQualifier = "System";
             }
             displayName += " ("+displayQualifier+")";

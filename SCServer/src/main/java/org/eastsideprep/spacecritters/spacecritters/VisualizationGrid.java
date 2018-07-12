@@ -168,7 +168,7 @@ public class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void showGameOver() {
-        gameShell.showGameOver();
+        Utilities.runAndWait(()->gameShell.showGameOver());
         debugOut("Game Over");
         try {
             if (logFile != null) {
@@ -180,7 +180,7 @@ public class VisualizationGrid implements GameVisualizer {
             e.printStackTrace(System.err);
 
         }
-        Utilities.runAndWait(() -> this.gameShell.startOrPauseGame(new ActionEvent()));
+        //Utilities.runAndWait(() -> this.gameShell.startOrPauseGame(new ActionEvent()));
     }
 
     @Override

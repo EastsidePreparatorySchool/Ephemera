@@ -760,8 +760,8 @@ public class SpaceGrid {
                     try {
                         as.cns = loadConstructor(engine, element.domainName, element.packageName, element.className);
                     } catch (Exception e) {
-                        gridDebugErr("sg.addSpecies: Error loading contructor for " + speciesName);
-                        e.printStackTrace(System.out);
+                        gridDebugOut("sg.addSpecies: Error loading contructor for " + speciesName);
+                        //e.printStackTrace(System.out);
                     }
                     as.shapeFactory = null;
                     try {
