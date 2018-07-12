@@ -290,6 +290,11 @@ public class MainApp extends Application {
     }
 
     public static long uploadFile(spark.Request request, spark.Response response) {
+        ServerContext ctx = getCtx(request);
+        if (ctx.observer == null) {
+            return 0;
+        }
+
         System.out.println("upload ...");
         MultipartConfigElement multipartConfigElement
                 = new MultipartConfigElement(System.getProperty("java.io.tmpdir"));
@@ -298,9 +303,18 @@ public class MainApp extends Application {
         long size = 0;
         try {
             Part file = request.raw().getPart("jarfile");
+            String domain = "uploadedaliens";
+//            String domain = request.raw().getPart("domain") or such; 
+            // make sure domain folder exists
+            String domainFolder = sc.engine.getAlienPath()
+                    + System.getProperty("file.separator")
+                    + "uploadedaliens";
+            Utilities.createFolder(domainFolder);
+
+            //
             size = file.getSize();
             final Path path = Paths.get(
-                    sc.engine.getAlienPath()
+                    domainFolder
                     + System.getProperty("file.separator")
                     + file.getSubmittedFileName()
             );
@@ -308,6 +322,13 @@ public class MainApp extends Application {
             Files.copy(in, path);
             System.out.println("successfully uploaded alien jar " + file.getSubmittedFileName());
 
+            GameElementSpec element = new GameElementSpec(
+                    "SPECIES", 
+                    domain+ System.getProperty("file.separator")+file.getSubmittedFileName(),
+                    "",
+                    "*", 
+                    null);
+            ctx.engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
         } catch (Exception e) {
             System.out.println(e.toString());
             System.out.println(e.getMessage());
