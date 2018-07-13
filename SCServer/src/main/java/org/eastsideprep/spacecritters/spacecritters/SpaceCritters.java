@@ -30,7 +30,7 @@ import static javafx.application.Application.launch;
 public class SpaceCritters extends Application {
 
     boolean gameOver = false;
-    public GameEngineV2 engine;
+    public static GameEngineV2 engine;
 //    VisualizationGrid field;
     GameVisualizer field;
     VisualizationGrid fieldGrid;

@@ -6,9 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javafx.application.Application;
-import static javafx.application.Application.launch;
-import javafx.stage.Stage;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 import org.eastsideprep.spacecritters.gameengineimplementation.GameEngineV2;
@@ -23,34 +20,48 @@ import org.eastsideprep.spacecritters.spacecritters.SpaceCritters;
 import org.eastsideprep.spacecritters.spacecritters.Utilities;
 import spark.Request;
 import static spark.Spark.*;
+import spark.servlet.SparkApplication;
 
-public class MainApp extends Application {
+public class MainApp implements SparkApplication {
 
     static SpaceCritters sc;
     static GameEngineV2 ge;
     static HashMap<String, GameEngineV2> engines;
+    static MainApp app;
 
-    @Override
-    public void start(Stage stage) throws Exception {
+    public static void main(String[] args) {
+        //System.setProperty("javafx.preloader", "org.eastsideprep.spacecritters.spacecritters.SplashScreenLoader");
+
+        app = new MainApp();
+        app.init();
+
         MainApp.engines = new HashMap<>();
-        MainApp.ge = createDesktopGameEngine(stage);
-        engines.put("main", MainApp.ge);
+        MainApp.engines.put("main", null); // desktop engine
+
+        MainApp.ge = createDesktopGameEngine();
+        if (ge == null) {
+            ge = MainApp.createServerGameEngine("main");
+            if (ge == null) {
+                System.out.println("Could not create initial game engine");
+                return;
+            }
+        }
+        MainApp.engines.put("main", MainApp.ge); // if we get here, desktop engine won't run and our new server engine is the main
     }
 
-    /**
-     * The main() method is ignored in correctly deployed JavaFX application.
-     * main() serves only as fallback in case the application can not be
-     * launched through deployment artifacts, e.g., in IDEs with limited FX
-     * support. NetBeans ignores main().
-     *
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        System.setProperty("javafx.preloader", "org.eastsideprep.spacecritters.spacecritters.SplashScreenLoader");
-
-        initSpark();
-
-        launch(args);
+    /// initialization
+    @Override
+    public void init() {
+        staticFiles.location("/static");
+        get("/start", "application/json", (req, res) -> doStart(req), new JSONRT());
+        get("/pause", "application/json", (req, res) -> doPause(req), new JSONRT());
+        get("/listengines", "application/json", (req, res) -> doListEngines(req), new JSONRT());
+        get("/create", "application/json", (req, res) -> doCreateEngine(req), new JSONRT());
+        get("/attach", "application/json", (req, res) -> doAttach(req), new JSONRT());
+        get("/detach", "application/json", (req, res) -> doDetach(req), new JSONRT());
+        get("/updates", "application/json", (req, res) -> doUpdates(req), new JSONRT());
+        get("/check", "application/json", (req, res) -> doCheck(req), new JSONRT());
+        post("/upload", (req, res) -> uploadFile(req, res));
     }
 
     // context helper
@@ -64,20 +75,6 @@ public class MainApp extends Application {
         return ctx;
     }
 
-    /// initialization
-    private static void initSpark() {
-        staticFiles.location("/static");
-        get("/start", "application/json", (req, res) -> doStart(req), new JSONRT());
-        get("/pause", "application/json", (req, res) -> doPause(req), new JSONRT());
-        get("/listengines", "application/json", (req, res) -> doListEngines(req), new JSONRT());
-        get("/create", "application/json", (req, res) -> doCreateEngine(req), new JSONRT());
-        get("/attach", "application/json", (req, res) -> doAttach(req), new JSONRT());
-        get("/detach", "application/json", (req, res) -> doDetach(req), new JSONRT());
-        get("/updates", "application/json", (req, res) -> doUpdates(req), new JSONRT());
-        get("/check", "application/json", (req, res) -> doCheck(req), new JSONRT());
-        post("/upload", (req, res) -> uploadFile(req, res));
-    }
-
     // ROUTES
     private static String doStart(Request req) {
         ServerContext ctx = getCtx(req);
@@ -86,7 +83,6 @@ public class MainApp extends Application {
         }
         ctx.engine.queueCommand(new GameCommand(GameCommandCode.Resume));
 
-//        Platform.runLater(() -> sc.startOrResumeGame());
         return "SC: Start/resume request queued";
     }
 
@@ -96,7 +92,6 @@ public class MainApp extends Application {
             return "SC: doStart: not attached";
         }
         ctx.engine.queueCommand(new GameCommand(GameCommandCode.Pause));
-//        Platform.runLater(() -> sc.pauseGame());
         return "SC: Pause request queued";
     }
 
@@ -158,6 +153,10 @@ public class MainApp extends Application {
 
                 ctx.engine = MainApp.engines.get(engineRequest);
                 if (ctx.engine == null) {
+                    ctx.engine = MainApp.sc.engine;
+                }
+                
+                if (ctx.engine == null) {
                     System.out.println("doAttach: Engine '" + engineRequest + "'not found");
                     return null;
                 }
@@ -218,15 +217,15 @@ public class MainApp extends Application {
         return null;
     }
 
-    static private GameEngineV2 createDesktopGameEngine(Stage stage) {
+    static private GameEngineV2 createDesktopGameEngine() {
         MainApp.sc = new SpaceCritters();
         try {
-            MainApp.sc.start(stage);
+            MainApp.sc.main(new String[]{});
+            System.out.println("createDesktopEngine: created and initialized, processing");
         } catch (Exception e) {
             System.err.println("scserver init: " + e.getMessage());
             e.printStackTrace(System.err);
         }
-        System.out.println("createDesktopEngine: created and initialized, processing");
 
         return sc.engine;
     }
@@ -343,14 +342,13 @@ public class MainApp extends Application {
         if (ctx.observer == null) {
             return "not attached";
         }
-        
-        
+
         String id = req.queryParams("id");
         boolean selected = req.queryParams("selected").equals("on");
 
-        System.out.println("Species instantiation / kill request for id "+id);
-        
-        GameElementSpec element = new GameElementSpec("ALIEN", null, null, null, "#"+id);
+        System.out.println("Species instantiation / kill request for id " + id);
+
+        GameElementSpec element = new GameElementSpec("ALIEN", null, null, null, "#" + id);
         if (selected) {
             ctx.engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
             System.out.println("Adding one of species id " + id);
