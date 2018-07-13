@@ -74,6 +74,7 @@ public class MainApp extends Application {
         get("/attach", "application/json", (req, res) -> doAttach(req), new JSONRT());
         get("/detach", "application/json", (req, res) -> doDetach(req), new JSONRT());
         get("/updates", "application/json", (req, res) -> doUpdates(req), new JSONRT());
+        get("/check", "application/json", (req, res) -> doCheck(req), new JSONRT());
         post("/upload", (req, res) -> uploadFile(req, res));
     }
 
@@ -323,10 +324,10 @@ public class MainApp extends Application {
             System.out.println("successfully uploaded alien jar " + file.getSubmittedFileName());
 
             GameElementSpec element = new GameElementSpec(
-                    "SPECIES", 
-                    domain+ System.getProperty("file.separator")+file.getSubmittedFileName(),
+                    "SPECIES",
+                    domain + System.getProperty("file.separator") + file.getSubmittedFileName(),
                     "",
-                    "*", 
+                    "*",
                     null);
             ctx.engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
         } catch (Exception e) {
@@ -335,6 +336,30 @@ public class MainApp extends Application {
             e.printStackTrace();
         }
         return size;
+    }
+
+    public static String doCheck(Request req) {
+        ServerContext ctx = getCtx(req);
+        if (ctx.observer == null) {
+            return "not attached";
+        }
+        
+        
+        String id = req.queryParams("id");
+        boolean selected = req.queryParams("selected").equals("on");
+
+        System.out.println("Species instantiation / kill request for id "+id);
+        
+        GameElementSpec element = new GameElementSpec("ALIEN", null, null, null, "#"+id);
+        if (selected) {
+            ctx.engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
+            System.out.println("Adding one of species id " + id);
+        } else {
+            ctx.engine.queueCommand(new GameCommand(GameCommandCode.KillElement, element));
+            System.out.println("Killing all of species id " + id);
+        }
+
+        return "ok";
     }
 
 }

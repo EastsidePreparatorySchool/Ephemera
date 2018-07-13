@@ -171,8 +171,8 @@ public class GameEngineThread extends Thread {
 
             case KillElement:
                 element = (GameElementSpec) gc.parameters[0];
-                engine.vis.debugOut("GameEngineThread: Processing Kill of GameElement " + element.kind.name() + " "
-                        + element.packageName + ":" + element.className + ", " + element.state);
+//                engine.vis.debugOut("GameEngineThread: Processing Kill of GameElement " + element.kind.name() + " "
+//                        + element.packageName + ":" + element.className + ", " + element.state);
 
                 if (element.kind != GameElementKind.INVALID) {
                     // kill all aliens of a certain species

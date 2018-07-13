@@ -4,6 +4,7 @@
  */
 package org.eastsideprep.spacecritters.scserver;
 
+import java.util.HashMap;
 import org.eastsideprep.spacecritters.alieninterfaces.AlienShapeFactory;
 import org.eastsideprep.spacecritters.gameengineinterfaces.AlienSpec;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameState;
@@ -28,7 +29,7 @@ public class LoggingVisualizer implements GameVisualizer {
     @Override
     public void registerSpecies(AlienSpec as, AlienShapeFactory asf, boolean instantiate) {
         log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ADDSPECIES, 
-                0, 0, instantiate?1:0, 0, as.getFullSpeciesName(), 0, 0.0, 0.0));
+                0, 0, as.speciesID, instantiate?1:0,  as.getFullSpeciesName(), 0, 0.0, 0.0));
     }
 
     @Override
@@ -133,5 +134,7 @@ public class LoggingVisualizer implements GameVisualizer {
     @Override
     public void shutdown() {
     }
+    
+ 
 
 }

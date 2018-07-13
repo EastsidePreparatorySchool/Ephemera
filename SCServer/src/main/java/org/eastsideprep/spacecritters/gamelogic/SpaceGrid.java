@@ -917,6 +917,24 @@ public class SpaceGrid {
         // and adds secrets one by one
     }
 
+    public void fillElementFromId(GameElementSpec element) {
+        // Kludge to get instantiation by id, for the webviewer
+        // I am not proud. 
+
+        if (element.domainName == null && element.packageName == null && element.className == null
+                && element.state.startsWith("#")) {
+            int id = Integer.parseInt((element.state.substring(1)));
+            for (InternalAlienSpecies as : speciesMap.values()) {
+                if (as.speciesID == id) {
+                    element.domainName = as.domainName;
+                    element.packageName = as.packageName;
+                    element.className = as.className;
+                    break;
+                }
+            }
+        }
+    }
+
     public void addElement(GameElementSpec element) throws IOException {
 
         if (null != element.kind) {
@@ -932,10 +950,15 @@ public class SpaceGrid {
                         }
                     }
 
+                    // Kludge to get instantiation by id, for the webviewer
+                    // I am not proud. 
+                    fillElementFromId(element);
+
                     addAlienWithParams(0, 0, element.domainName, element.packageName, element.className, 0, 1, 1, null,
                             (soParent != null) ? new DummyTrajectory(soParent) : null);
                     break;
                 case SPECIES:
+                    // special case to enable registering all species in an uploaded jar
                     if (element.className.equals("*")) {
                         File f = new File(this.engine.alienPath + System.getProperty("file.separator") + element.domainName);
                         addCustomAliensInJAR(element.domainName, f);
@@ -1026,6 +1049,10 @@ public class SpaceGrid {
     }
 
     public void killAll(GameElementSpec element) {
+        // Kludge to get instantiation by id, for the webviewer
+        // I am not proud. 
+        fillElementFromId(element);
+
         String speciesName = element.domainName + ":" + element.packageName + ":" + element.className;
 
         InternalAlienSpecies as = speciesMap.get(speciesName);

@@ -19,7 +19,7 @@ public interface GameEngine {
     void queueCommand(GameCommand gc);
 
     boolean isAlive();
-    
+
     String getAlienPath();
 
 }

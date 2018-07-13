@@ -464,8 +464,7 @@ function killAlien(content) {
 }
 
 function addSpecies(content) {
-// this first line adds the species to the hashmap as well
-    speciesMap.getColor(content.name, content.param1);
+    speciesMap.registerSpecies(content.name, content.param1, content.param2);
 }
 
 
@@ -479,44 +478,69 @@ class SpeciesMap {
 
     getMat(name) {
         var mat = this.mat[name];
-        if (mat === undefined) {
-            getColor(name);
-            mat = this.mat[name];
-        }
+//        if (mat === undefined) {
+//            getColor(name);
+//            mat = this.mat[name];
+//        }
         return mat;
     }
 
-    getColor(name, instantiate) {
+    getColor(name, id, instantiate) {
 //        console.log (this);
 //        console.log(this.map);
         var color = this.map[name];
         if (color === undefined) {
-            color = this.colors[this.count % this.colors.length];
-            this.map[name] = color;
-            this.mat[name] = new THREE.MeshBasicMaterial({color: color, wireframe: false});
-            this.count++;
-            var displayName = name.substr(name.lastIndexOf(":") + 1);
-            var displayQualifier = name.substr(0, name.lastIndexOf(":"));
-            if (displayQualifier === "org.eastsideprep.spacecritters:org.eastsideprep.spacecritters.stockelements") {
-                displayQualifier = "System";
-            }
-            displayName += " (" + displayQualifier + ")";
-            var chk = document.createElement("input");
-            chk.type = "checkbox";
-            chk.checked = instantiate;
-            species.appendChild(chk);
-            var text = document.createElement("span");
-            text.style.color = color;
-            text.innerText = " " + displayName;
-            species.appendChild(text);
-            var br = document.createElement("br");
-            species.appendChild(br);
+            color = registerSpecies(name, id, instantiate);
         }
+        return color;
+    }
+
+    registerSpecies(name, id, instantiate) {
+        var color = this.colors[this.count % this.colors.length];
+        this.map[name] = color;
+        this.mat[name] = new THREE.MeshBasicMaterial({color: color, wireframe: false});
+        this.count++;
+        var displayName = name.substr(name.lastIndexOf(":") + 1);
+        var displayQualifier = name.substr(0, name.lastIndexOf(":"));
+        if (displayQualifier === "org.eastsideprep.spacecritters:org.eastsideprep.spacecritters.stockelements") {
+            displayQualifier = "System";
+        }
+        displayName += " (" + displayQualifier + ")";
+        var chk = document.createElement("input");
+        chk.type = "checkbox";
+        chk.checked = instantiate;
+        chk.id = "chk"+id;
+        chk.onclick = function () { processCheck(id) };
+
+        species.appendChild(chk);
+        var text = document.createElement("span");
+        text.style.color = color;
+        text.innerText = " " + displayName;
+        species.appendChild(text);
+        var br = document.createElement("br");
+        species.appendChild(br);
+
         return color;
     }
 }
 
 
+function processCheck(id) {
+    var chk = document.getElementById("chk"+id);
+    
+    println ("sending request to change state of species id "+id+" to "+(chk.checked?"on":"off"));
+    request({url: "check?id="+id+"&selected="+(chk.checked?"on":"off")})
+            .then(data => {
+                if (data !== null) {
+                    println("  Response: " + data);
+                }
+            })
+            .catch(error => {
+                if (error !== null && error.length > 0) {
+                    println("  Error: '" + error + "'");
+                }
+            });
+}
 
 
 
@@ -596,7 +620,7 @@ function animate() {
 function submitForm(form) {
     var body = new FormData(form);
 
-    request({method: "POST", url: "upload", body:body})
+    request({method: "POST", url: "upload", body: body})
             .then(data => {
                 println("JAR upload successful");
             })
@@ -608,7 +632,7 @@ function submitForm(form) {
                 detach();
                 println("Server not responding, console detached.");
             });
-     return false;
+    return false;
 }
 
 

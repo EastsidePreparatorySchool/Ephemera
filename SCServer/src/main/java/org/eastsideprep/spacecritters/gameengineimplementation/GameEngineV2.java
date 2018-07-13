@@ -12,10 +12,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import java.util.Iterator;
 import org.eastsideprep.spacecritters.gamelog.GameLog;
 import org.eastsideprep.spacecritters.scgamelog.SCGameState;
-import org.eastsideprep.spacecritters.spacecritters.AlienSpeciesForDisplay;
 
 /**
  *
