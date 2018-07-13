@@ -10,6 +10,7 @@ import org.eastsideprep.spacecritters.gameengineinterfaces.GameElementSpec;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.util.Callback;
 
@@ -28,14 +29,14 @@ public class SpeciesListCell extends CheckBoxListCell<AlienSpeciesForDisplay> {
                     item.setOn(isNowSelected);
                     GameElementSpec element = new GameElementSpec("ALIEN", item.domainName, item.packageName, item.className, null);
                     //if (item.gameShell.fieldGrid.totalTurnCounter > 0) {
-                        if (isNowSelected) {
-                            item.gameShell.engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
-                            System.out.println("Adding one " + item.className);
-                        } else {
-                            //iter.remove(); // this would remove it from the display list
-                            item.gameShell.engine.queueCommand(new GameCommand(GameCommandCode.KillElement, element));
-                            System.out.println("Killing all " + item.className);
-                        }
+                    if (isNowSelected) {
+                        item.gameShell.engine.queueCommand(new GameCommand(GameCommandCode.AddElement, element));
+                        System.out.println("Adding one " + item.className);
+                    } else {
+                        //iter.remove(); // this would remove it from the display list
+                        item.gameShell.engine.queueCommand(new GameCommand(GameCommandCode.KillElement, element));
+                        System.out.println("Killing all " + item.className);
+                    }
                     //}
                 });
                 return observable;
@@ -50,11 +51,15 @@ public class SpeciesListCell extends CheckBoxListCell<AlienSpeciesForDisplay> {
 
         if (item != null && !empty) {
             this.setStyle(item.getStyle());
-            String s = item.toString();
-            //if (s.startsWith("org.eastsideprep.spacecritters:org.eastsideprep.spacecritters.stockelements:")) {
-                s = s.replace("org.eastsideprep.spacecritters:org.eastsideprep.spacecritters.stockelements:", "System:");
-            //}
+            String s = item.className + ": " + item.count;
             setText(s);
+
+            s = item.toString();
+            s = s.replace("org.eastsideprep.spacecritters:org.eastsideprep.spacecritters.stockelements:", "System:");
+            s = s.substring(0, s.lastIndexOf(":"));
+            Tooltip t = new Tooltip(s);
+            Tooltip.install(this, t);
+
         } else {
             this.setStyle("-fx-background-color: black; -fx-text-fill:black;");
         }

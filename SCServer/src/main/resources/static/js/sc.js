@@ -18,6 +18,7 @@ var planets = {};
 var stars = [];
 var speciesMap = null;
 var grid = [];
+
 const ADDSPECIES = 1;
 const ADDSTAR = 2;
 const ADDPLANET = 3;
@@ -60,7 +61,7 @@ var key = {
     check: () => {
 //put things that happen while keys are pushed here
     }
-}
+};
 
 
 
@@ -113,8 +114,13 @@ function updates() {
                 if (data !== null) {
                     //println("Raw: "+data.substr(0,100));
                     data = JSON.parse(data);
-                    processUpdates(data);
+                    try {
+                        processUpdates(data);
+                    } catch (err) {
+                        println("updates: error in processUpdates, " + err);
+                    }
                 }
+                updateCounts();
             })
             .catch(error => {
                 if (error !== null && error.length > 0) {
@@ -131,11 +137,11 @@ function processUpdates(data) {
     if (data !== null && data.length > 0) {
         for (var i = 0; i < data.length; i++) {
 // if 90% processed, file another request for updates
-            if (i > (data.length * 0.9) && !requested) {
-                setTimeout(updates, updateInterval);
-                requested = true;
-                //println ("Requested updates in processUpdates");
-            }
+//            if (i > (data.length * 0.9) && !requested) {
+//                setTimeout(updates, updateInterval);
+//                requested = true;
+//                //println ("Requested updates in processUpdates");
+//            }
             var o = data[i];
             //console.log(o);
             switch (o.type) {
@@ -180,7 +186,6 @@ function processUpdates(data) {
         requested = true;
         //println ("Requested delayed updates at the end of processUpdates");
     }
-
 }
 
 
@@ -221,7 +226,9 @@ function detach() {
     //println("purge complete.");
 
 
-    request({url: "detach"});
+    request({url: "detach"}).then(data => {
+    }).catch(error => {
+    });
 }
 
 
@@ -330,7 +337,7 @@ class Grid {
         this.halfWidth = Math.floor(width / 2);
         this.halfHeight = Math.floor(height / 2);
         for (var x = 0; x < width; x++) {
-            var col = []
+            var col = [];
             for (var y = 0; y < height; y++) {
                 col.push([]);
             }
@@ -439,9 +446,10 @@ function movePlanet(content) {
 
 
 function addAlien(content) {
-    var alien = new Alien(speciesMap.getMat(content.name), content.newX, content.newY)
+    var alien = new Alien(speciesMap.getMat(content.speciesName), content.newX, content.newY, content.id);
     aliens[content.id] = alien;
     grid.addToCell(alien, content.newX, content.newY);
+    speciesMap.addAlien(content.speciesId);
 }
 
 function moveAlien(content) {
@@ -460,11 +468,12 @@ function killAlien(content) {
     var alien = aliens[content.id];
     if (alien !== undefined) {
         alien.kill();
+        speciesMap.removeAlien(content.speciesId);
     }
 }
 
 function addSpecies(content) {
-    speciesMap.registerSpecies(content.name, content.param1, content.param2);
+    speciesMap.registerSpecies(content.speciesName, content.speciesId, content.param2);
 }
 
 
@@ -472,17 +481,41 @@ class SpeciesMap {
     constructor() {
         this.map = {};
         this.mat = {};
+        this.name = {};
+        this.id = {};
+        this.maxId = 0;
+        this.aliens = {}; // counts
         this.count = 0;
         this.colors = ["lightblue", "yellow", "lightpink", "lightgreen", "orange", "white"];
     }
 
     getMat(name) {
         var mat = this.mat[name];
-//        if (mat === undefined) {
-//            getColor(name);
-//            mat = this.mat[name];
-//        }
         return mat;
+    }
+
+    addAlien(id) {
+        if (id > this.maxId || id < 1) {
+            println("sm.addAlien: invalid id");
+            return;
+        }
+        try {
+            this.aliens[id]++;
+        } catch (err) {
+            println("removeAlien id " + id + " error: " + err.name);
+        }
+    }
+
+    removeAlien(id) {
+        if (id > this.maxId || id < 1) {
+            println("sm.removeAlien: invalid id");
+            return;
+        }
+        try {
+            this.aliens[id]--;
+        } catch (err) {
+            println("removeAlien id " + id + " error: " + err.name);
+        }
     }
 
     getColor(name, id, instantiate) {
@@ -500,36 +533,73 @@ class SpeciesMap {
         this.map[name] = color;
         this.mat[name] = new THREE.MeshBasicMaterial({color: color, wireframe: false});
         this.count++;
+        if (id > this.maxId) {
+            this.maxId = id;
+        }
+        this.id[name] = id;
+        this.name[id] = name;
+        this.aliens[id] = 0;
         var displayName = name.substr(name.lastIndexOf(":") + 1);
         var displayQualifier = name.substr(0, name.lastIndexOf(":"));
         if (displayQualifier === "org.eastsideprep.spacecritters:org.eastsideprep.spacecritters.stockelements") {
             displayQualifier = "System";
         }
-        displayName += " (" + displayQualifier + ")";
         var chk = document.createElement("input");
         chk.type = "checkbox";
         chk.checked = instantiate;
-        chk.id = "chk"+id;
-        chk.onclick = function () { processCheck(id) };
-
+        chk.id = "chk" + id;
+        chk.onclick = function () {
+            processCheck(id);
+        };
         species.appendChild(chk);
+
         var text = document.createElement("span");
         text.style.color = color;
-        text.innerText = " " + displayName;
+        text.innerText = " " + displayName + ": ";
+        text.className = "tooltip";
         species.appendChild(text);
+
+        var text2 = document.createElement("span");
+        text2.style.color = color;
+        text2.id = "species" + id;
+        text2.innerText = "0";
+        species.appendChild(text2);
+
+        var tip = document.createElement("span");
+        tip.className = "tooltiptext";
+        tip.innerText = " " + displayQualifier + ":" + id;
+        text.appendChild(tip);
+
         var br = document.createElement("br");
         species.appendChild(br);
+
+        println("registered species " + name + ", id:" + id);
 
         return color;
     }
 }
 
+function updateCounts() {
+    try {
+        for (var speciesId in speciesMap.aliens) {
+            if (speciesId < 1 || speciesId > speciesMap.maxId) {
+                println("updateCounts: speciesMap corrupt");
+                return;
+            }
+            var countSpan = document.getElementById("species" + speciesId);
+            countSpan.innerText = speciesMap.aliens[speciesId];
+        }
+    } catch (err) {
+        println("error in updateCounts: " + err.name);
+    }
+}
+
 
 function processCheck(id) {
-    var chk = document.getElementById("chk"+id);
-    
-    println ("sending request to change state of species id "+id+" to "+(chk.checked?"on":"off"));
-    request({url: "check?id="+id+"&selected="+(chk.checked?"on":"off")})
+    var chk = document.getElementById("chk" + id);
+
+    println("sending request to change state of species id " + id + " to " + (chk.checked ? "on" : "off"));
+    request({url: "check?id=" + id + "&selected=" + (chk.checked ? "on" : "off")})
             .then(data => {
                 if (data !== null) {
                     println("  Response: " + data);
@@ -550,9 +620,6 @@ function init() {
     scene = new THREE.Scene();
     width = $('#center').width();
     height = $('#center').height();
-    if (!Detector.webgl) {
-        Detector.addGetWebGLMessage();
-    }
 
     camera = new THREE.PerspectiveCamera(100, width / height, 0.1, 1000);
     camera.position.set(350, 120, 0);
@@ -571,7 +638,7 @@ function init() {
     controls.dampingFactor = 0.25;
     controls.screenSpacePanning = false;
     controls.minDistance = 100;
-    controls.maxDistance = 500
+    controls.maxDistance = 500;
     controls.maxPolarAngle = Math.PI / 2;
     light = new THREE.AmbientLight(0x404040);
     scene.add(light);

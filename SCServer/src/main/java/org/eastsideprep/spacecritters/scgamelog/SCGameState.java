@@ -100,38 +100,76 @@ public class SCGameState implements GameLogState {
                 planets.put(sge.id, new SCGameLogEntry(sge));
                 break;
             case SCGameLogEntry.Type.MOVE:
-                SCGameLogEntry sgeAdd = aliens.get(sge.id);
-                if (sgeAdd == null) {
-                    aliens.put(sge.id, new SCGameLogEntry(sge));
+                SCGameLogEntry sgePrior = aliens.get(sge.id);
+                if (sgePrior == null) {
+                    // we did not find an old record,
+                    // so we will make one on the fly
+                    sgePrior = new SCGameLogEntry(SCGameLogEntry.Type.MOVE,
+                            sge.newX, sge.newY, sge.param1, sge.param2,
+                            null, sge.speciesName, sge.id, sge.speciesId,
+                            0.0, 0.0);
+                    aliens.put(sge.id, sgePrior);
                     break;
                 }
-                sgeAdd.newX = sge.newX;
-                sgeAdd.newY = sge.newY;
-                sgeAdd.energy = sge.energy;
-                sgeAdd.tech = sge.tech;
+
+                // if we get here, a prior record was found
+                if (sgePrior.type == SCGameLogEntry.Type.ADD) {
+                    // it was an ADD record
+                    // we just ADD at the new position
+                    // and copy the rest
+                    sgePrior.newX = sge.newX;
+                    sgePrior.newY = sge.newY;
+                    sgePrior.energy = sge.energy;
+                    sgePrior.tech = sge.tech;
+                } else if (sgePrior.type == SCGameLogEntry.Type.MOVE) {
+                    // it was a MOVE record
+                    // we just update the new position
+                    // and copy the rest
+                    sgePrior.newX = sge.newX;
+                    sgePrior.newY = sge.newY;
+                }
                 break;
+                
             case SCGameLogEntry.Type.MOVEPLANET:
                 SCGameLogEntry sgePlanet = planets.get(sge.id);
                 if (sgePlanet == null) {
-                    aliens.put(sge.id, new SCGameLogEntry(sge));
+                    // no prior record found, file a new one
+                    sgePlanet = new SCGameLogEntry(SCGameLogEntry.Type.MOVEPLANET,
+                            sge.newX, sge.newY, 0, 0,
+                            sge.name, null, sge.param1, sge.param2,
+                            0.0, 0.0);
+                    planets.put(sge.id, sgePlanet);
                     break;
                 }
+                // there was an old record, update the position
                 sgePlanet.newX = sge.newX;
                 sgePlanet.newY = sge.newY;
                 break;
+                
             case SCGameLogEntry.Type.KILL:
                 if (forUpdates) {
+                    // in updates, we really need to show the kill action
+                    // unless it just kills an alien born in the same update
                     SCGameLogEntry sgeDead = aliens.get(sge.id);
                     if (sgeDead == null) {
-                        aliens.put(sge.id, new SCGameLogEntry(sge));
+                        // this alien had not been mentioned in this update before
+                        // so put a copy of the kill record in there
+                        // the client will presumably know about this id
+                        sgeDead = new SCGameLogEntry(sge);
+                        aliens.put(sgeDead.id, sgeDead);
                         break;
                     }
                     if (sgeDead.type == SCGameLogEntry.Type.ADD) {
+                        // there was a prior ADD record
+                        // let's just nix the guy
                         aliens.remove(sge.id);
-                    } else {
+                    } else if (sgeDead.type == SCGameLogEntry.Type.MOVE) {
+                        // if there was a prior MOVE record,
+                        // let's make that a KILL record instead
                         sgeDead.type = SCGameLogEntry.Type.KILL;
                     }
                 } else {
+                    // in initial states, we just get rid of the guy altogether
                     aliens.remove(sge.id);
                 }
                 break;

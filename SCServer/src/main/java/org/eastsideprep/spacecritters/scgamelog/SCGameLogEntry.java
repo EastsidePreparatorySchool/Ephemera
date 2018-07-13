@@ -19,11 +19,13 @@ public class SCGameLogEntry extends GameLogEntry {
     public int param1;
     public int param2;
     public String name;
+    public String speciesName;
     public int id;
+    public int speciesId;
     public double energy;
     public double tech;
 
-    public SCGameLogEntry(int type, int newX, int newY, int param1, int param2, String name, int id, double energy, double tech) {
+    public SCGameLogEntry(int type, int newX, int newY, int param1, int param2, String name, String speciesName, int id, int speciesId, double energy, double tech) {
         this.type = type;
         this.newX = newX;
         this.newY = newY;
@@ -33,6 +35,8 @@ public class SCGameLogEntry extends GameLogEntry {
         this.tech = tech;
         this.name = name;
         this.id = id;
+        this.speciesId = speciesId;
+        this.speciesName = speciesName;
     }
 
     public SCGameLogEntry(SCGameLogEntry sge) {
@@ -45,6 +49,8 @@ public class SCGameLogEntry extends GameLogEntry {
         this.tech = sge.tech;
         this.name = sge.name;
         this.id = sge.id;
+        this.speciesId = sge.speciesId;
+        this.speciesName = sge.speciesName;
     }
     
     public static class Type {
