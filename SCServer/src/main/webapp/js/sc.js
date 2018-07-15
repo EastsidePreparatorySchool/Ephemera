@@ -248,7 +248,7 @@ function create() {
 }
 
 function start() {
-    request({url: "start"})
+    request({url: "protected/start"})
             .then(data => {
                 if (data !== null) {
                     println("  Response: " + data);

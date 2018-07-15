@@ -200,7 +200,7 @@ public class GameEngineThread extends Thread {
                 break;
 
             case Ready:
-                engine.grid.addAllCustomAliens();
+                //engine.grid.addAllCustomAliens();
                 engine.grid.ready(); // will cause vis.showReady
                 pastReady = true;
                 break;

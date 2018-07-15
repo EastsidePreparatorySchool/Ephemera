@@ -70,10 +70,10 @@ public class GameEngineV2 implements GameEngine {
         gameState = GameState.Paused;
         this.gamePath = gamePath;
         this.alienPath = alienPath;
-        
+
         // hack the class loader so we can load alien jars
         this.getHackedClassLoader();
-        
+
         //
         // start the thread, return to shell
         //
@@ -87,13 +87,10 @@ public class GameEngineV2 implements GameEngine {
         //ArrayList<GameElementSpec> elements = new ArrayList<>(100);
         GameElementSpec[] elements;
         GameElementSpec element;
-        
-        
-        
+
         //
         // Every line has kind, package, class, state in csv format
         //
-
         String config = null;
 
         try {
@@ -136,14 +133,15 @@ public class GameEngineV2 implements GameEngine {
     public void processGameElements(GameElementSpec[] elements) {
         //
         // queue every game element
+
+        System.out.println("EngineV2: Queueing " + elements.length + " elements");
         for (GameElementSpec element : elements) {
             //if (element.className.equals("Caelusite")) System.out.println("HELLLO!: " + element.parent);
             GameCommand gc = new GameCommand(GameCommandCode.AddElement);
             gc.parameters = new GameElementSpec[]{element};
 
             //vis.debugOut("GameEngine: Queueing new game element");
-            //queueCommand(gc);
-
+            queueCommand(gc);
             // this feels like cheating - 
             // I am stripping the gameMode out here, 
             // because I need it to read the right file, 
@@ -186,9 +184,9 @@ public class GameEngineV2 implements GameEngine {
     public void getHackedClassLoader() {
         try {
             System.out.println("EngineV2: Attempting to hack class loader ...");
-            this.classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-            this.method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-            method.setAccessible(true);
+            this.classLoader = (URLClassLoader) GameEngineV2.class.getClassLoader();
+//            this.method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+//            method.setAccessible(true);
             System.out.println("EngineV2: Class loader hacked successfully");
         } catch (Exception e) {
             System.out.println("EngineV2: could not get hacked class loader");
@@ -205,7 +203,7 @@ public class GameEngineV2 implements GameEngine {
         Constructor<?> cs = null;
         String fullName = "";
         File file;
-        System.out.println("SG:loadConstructor: " + domainName + ":" + packageName + ":" + className);
+        System.out.println("EngineV2:loadConstructor: " + domainName + ":" + packageName + ":" + className);
 
         if (packageName.endsWith("stockelements")
                 || packageName.equalsIgnoreCase("alieninterfaces")) {
@@ -219,23 +217,27 @@ public class GameEngineV2 implements GameEngine {
 //                    + "SCServer-1.0-SNAPSHOT.jar";
 //            packageName = "org.eastsideprep.spacecritters.stockelements";
             CodeSource src = SpaceGrid.class.getProtectionDomain().getCodeSource();
+            System.out.println("EngineV2:loadConstructor: source name " + src.getLocation().getFile());
+
             fullName = src.getLocation().getFile();
         } else {
             fullName = this.alienPath + domainName;
         }
-        System.out.println("SG:loadConstructor: full name " + fullName);
+        System.out.println("EngineV2:loadConstructor: full name " + fullName);
         String fullClassName = null;
         try {
             file = new File(fullName);
             System.out.println("Adding path " + file.toURI().toURL());
-            method.invoke(classLoader, file.toURI().toURL());
+//            method.invoke(classLoader, file.toURI().toURL());
             System.out.println("EngineV2:loadConstructor:after addURL");
+            //URLClassLoader classLoader = new URLClassLoader(new URL[] {file.toURI().toURL()});
 
-//            URLClassLoader classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()}, this.getClass().getClassLoader());
             fullClassName = packageName.equals("") ? className : (packageName + "." + className);
 
-            System.out.println("SEngineV2G:loadConstructor:trying to load class " + fullClassName);
-            cs = ClassLoader.getSystemClassLoader().loadClass(fullClassName).getConstructor();
+            System.out.println("EngineV2:loadConstructor:trying to load class " + fullClassName);
+            cs = classLoader.loadClass(fullClassName).getConstructor();
+         
+//            cs = classLoader.getSystemClassLoader().loadClass(fullClassName).getConstructor();
             System.out.println("EngineV2: Successfully loaded constructor for " + fullClassName);
 
         } catch (Exception e) {

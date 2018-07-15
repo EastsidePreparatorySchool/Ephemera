@@ -27,6 +27,7 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void registerSpecies(AlienSpec as, AlienShapeFactory asf, boolean instantiate) {
+        System.out.println("Logging visualizer: Registering species "+as.getFullSpeciesName());
         log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ADDSPECIES, 
                 0, 0, 0, instantiate?1:0,  
                 null, as.getFullSpeciesName(), 0, as.speciesID, 
@@ -131,10 +132,12 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void debugOut(String s) {
+        System.out.println("LV debug out: "+s);
     }
 
     @Override
     public void debugErr(String s) {
+        System.out.println("LV debug out: "+s);
     }
 
     @Override

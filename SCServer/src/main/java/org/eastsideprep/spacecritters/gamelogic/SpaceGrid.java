@@ -771,6 +771,8 @@ public class SpaceGrid {
                         }
                     } catch (Exception e) {
                         System.out.println("sg.addSpecies: Error constructing class reference alien for " + speciesName);
+                        System.out.println("sg.addSpecies:  " + e.getMessage());
+                        e.printStackTrace();
                         throw (e);
                     }
 
@@ -981,7 +983,6 @@ public class SpaceGrid {
         }
     }
 
-   
     // this debugOut is not sensitive to chatter control
     public void gridDebugOut(String s) {
         vis.debugOut(s);

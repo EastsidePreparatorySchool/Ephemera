@@ -4,7 +4,10 @@
  */
 package org.eastsideprep.spacecritters.stockelements;
 
-import org.eastsideprep.spacecritters.alieninterfaces.*;
+import org.eastsideprep.spacecritters.alieninterfaces.Action;
+import org.eastsideprep.spacecritters.alieninterfaces.Alien;
+import org.eastsideprep.spacecritters.alieninterfaces.Context;
+import org.eastsideprep.spacecritters.alieninterfaces.Direction;
 
 /**
  *
