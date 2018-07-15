@@ -1,0 +1,9 @@
+[
+    {"kind":"CONSTANT","domainName":"","packageName":"","className":"lastAlienWins","state":"false","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
+    {"kind":"CONSTANT","domainName":"","packageName":"","className":"perSpeciesCap","state":"10000","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
+    {"kind":"CONSTANT","domainName":"","packageName":"","className":"perSpeciesSpawnCap","state":"10000","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
+    {"kind":"CONSTANT","domainName":"","packageName":"","className":"safeZoneRadius","state":"10","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
+    {"kind":"CONSTANT","domainName":"","packageName":"","className":"iSaidNoFighting","state":"true","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
+    {"kind":"CONSTANT","domainName":"","packageName":"","className":"emptySpaceEnergy","state":"10","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
+    {"kind":"CONSTANT","domainName":"","packageName":"","className":"maxTurns","state":"100000","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0}
+]

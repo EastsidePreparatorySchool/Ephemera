@@ -4,7 +4,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
@@ -24,22 +26,53 @@ import spark.servlet.SparkApplication;
 
 public class MainApp implements SparkApplication {
 
+	
     static SpaceCritters sc;
     static GameEngineV2 ge;
     static HashMap<String, GameEngineV2> engines;
     static MainApp app;
 
     public static void main(String[] args) {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+    	System.out.println("SCServer main() "+dateFormat.format(date)); 
+
         //System.setProperty("javafx.preloader", "org.eastsideprep.spacecritters.spacecritters.SplashScreenLoader");
 
-        app = new MainApp();
+        // invoked from main, start Spark Jetty server
+    	//staticFiles.location("/static");
+    	
+    	app = new MainApp();
         app.init();
 
+    	//MainApp.ge = createDesktopGameEngine();
+   }
+
+    /// initialization
+    @Override
+    public void init() {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+    	System.out.println("SCServer init() "+dateFormat.format(date)); 
+
+//    	before((request, response) -> {
+//    	  System.out.println("Spark request: "+request.url());
+//    	});
+        get("/protected/start", "application/json", (req, res) -> doStart(req), new JSONRT());
+        get("/protected/pause", "application/json", (req, res) -> doPause(req), new JSONRT());
+        get("/protected/listengines", "application/json", (req, res) -> doListEngines(req), new JSONRT());
+        get("/protected/create", "application/json", (req, res) -> doCreateEngine(req), new JSONRT());
+        get("/protected/attach", "application/json", (req, res) -> doAttach(req), new JSONRT());
+        get("/protected/detach", "application/json", (req, res) -> doDetach(req), new JSONRT());
+        get("/protected/updates", "application/json", (req, res) -> doUpdates(req), new JSONRT());
+        get("/protected/check", "application/json", (req, res) -> doCheck(req), new JSONRT());
+        post("/protected/upload", (req, res) -> uploadFile(req, res));
+        
         MainApp.engines = new HashMap<>();
         MainApp.engines.put("main", null); // desktop engine
 
-        MainApp.ge = createDesktopGameEngine();
-        if (ge == null) {
+        if (MainApp.app == null) {
+        	// created by Tomcat through SparkApplication.init()
             ge = MainApp.createServerGameEngine("main");
             if (ge == null) {
                 System.out.println("Could not create initial game engine");
@@ -47,21 +80,6 @@ public class MainApp implements SparkApplication {
             }
         }
         MainApp.engines.put("main", MainApp.ge); // if we get here, desktop engine won't run and our new server engine is the main
-    }
-
-    /// initialization
-    @Override
-    public void init() {
-        staticFiles.location("/static");
-        get("/start", "application/json", (req, res) -> doStart(req), new JSONRT());
-        get("/pause", "application/json", (req, res) -> doPause(req), new JSONRT());
-        get("/listengines", "application/json", (req, res) -> doListEngines(req), new JSONRT());
-        get("/create", "application/json", (req, res) -> doCreateEngine(req), new JSONRT());
-        get("/attach", "application/json", (req, res) -> doAttach(req), new JSONRT());
-        get("/detach", "application/json", (req, res) -> doDetach(req), new JSONRT());
-        get("/updates", "application/json", (req, res) -> doUpdates(req), new JSONRT());
-        get("/check", "application/json", (req, res) -> doCheck(req), new JSONRT());
-        post("/upload", (req, res) -> uploadFile(req, res));
     }
 
     // context helper
@@ -316,15 +334,15 @@ public class MainApp implements SparkApplication {
             final Path path = Paths.get(
                     domainFolder
                     + System.getProperty("file.separator")
-                    + file.getSubmittedFileName()
+                    + file.getName()
             );
             final InputStream in = file.getInputStream();
             Files.copy(in, path);
-            System.out.println("successfully uploaded alien jar " + file.getSubmittedFileName());
+            System.out.println("successfully uploaded alien jar " + file.getName());
 
             GameElementSpec element = new GameElementSpec(
                     "SPECIES",
-                    domain + System.getProperty("file.separator") + file.getSubmittedFileName(),
+                    domain + System.getProperty("file.separator") + file.getName(),
                     "",
                     "*",
                     null);

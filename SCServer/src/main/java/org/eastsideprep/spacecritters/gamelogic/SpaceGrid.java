@@ -758,9 +758,9 @@ public class SpaceGrid {
 
                 if (as.cns == null) {
                     try {
-                        as.cns = loadConstructor(engine, element.domainName, element.packageName, element.className);
+                        as.cns = engine.loadConstructor(element.domainName, element.packageName, element.className);
                     } catch (Exception e) {
-                        gridDebugOut("sg.addSpecies: Error loading contructor for " + speciesName);
+                        System.out.println("sg.addSpecies: Error loading contructor for " + speciesName);
                         //e.printStackTrace(System.out);
                     }
                     as.shapeFactory = null;
@@ -770,7 +770,7 @@ public class SpaceGrid {
                             as.shapeFactory = (AlienShapeFactory) a;
                         }
                     } catch (Exception e) {
-                        gridDebugErr("sg.addSpecies: Error constructing class reference alien for " + speciesName);
+                        System.out.println("sg.addSpecies: Error constructing class reference alien for " + speciesName);
                         throw (e);
                     }
 
@@ -783,7 +783,7 @@ public class SpaceGrid {
                 result = as;
             }
         } catch (Exception e) {
-            gridDebugErr("sg.addSpecies: Could not register alien species " + speciesName);
+            System.out.println("sg.addSpecies: Could not register alien species " + speciesName);
             speciesMap.remove(speciesName);
             speciesCounter = oldCounter;
 //            e.printStackTrace(System.out);
@@ -852,7 +852,7 @@ public class SpaceGrid {
         }
         if (soParent != null) {
             try {
-                Constructor<?> cs = this.loadConstructor(engine, element.domainName, element.packageName, element.className);
+                Constructor<?> cs = engine.loadConstructor(element.domainName, element.packageName, element.className);
                 pb = (PlanetBehavior) cs.newInstance();
             } catch (Exception e) {
                 vis.debugOut("sg.addPlanet: behavior not found: " + element.className);
@@ -981,54 +981,7 @@ public class SpaceGrid {
         }
     }
 
-    //
-    // Dynamic class loader (.jar files)
-    // stolen from StackOverflow, considered dark voodoo magic
-    //
-    public Constructor<?> loadConstructor(GameEngineV2 engine, String domainName, String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        Constructor<?> cs = null;
-        String fullName = "";
-        File file;
-
-        if (packageName.equalsIgnoreCase("stockelements")
-                || packageName.equalsIgnoreCase("alieninterfaces")) {
-//            fullName = engine.gamePath
-////                    + packageName
-////                    + System.getProperty("file.separator")
-//                    + "scserver"
-//                    + System.getProperty("file.separator")
-//                    + "target"
-//                    + System.getProperty("file.separator")
-//                    + "SCServer-1.0-SNAPSHOT.jar";
-//            packageName = "org.eastsideprep.spacecritters.stockelements";
-            CodeSource src = SpaceGrid.class.getProtectionDomain().getCodeSource();
-            fullName = src.getLocation().getFile();
-        } else {
-            fullName = engine.alienPath + domainName;
-        }
-        String fullClassName = null;
-        try {
-            file = new File(fullName);
-            URLClassLoader classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-            Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-            method.setAccessible(true);
-            System.out.println("Adding path " + file.toURI().toURL());
-            method.invoke(classLoader, file.toURI().toURL());
-
-//            URLClassLoader classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()}, this.getClass().getClassLoader());
-            fullClassName = packageName.equals("") ? className : (packageName + "." + className);
-
-            cs = ClassLoader.getSystemClassLoader().loadClass(fullClassName).getConstructor();
-            System.out.println("sg: Successfully loaded constructor for " + fullClassName);
-
-        } catch (Exception e) {
-//            e.printStackTrace(System.out);
-            vis.debugOut("sg: Could not get constructor: " + fullClassName);
-            throw e;
-        }
-        return cs;
-    }
-
+   
     // this debugOut is not sensitive to chatter control
     public void gridDebugOut(String s) {
         vis.debugOut(s);

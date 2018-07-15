@@ -12,6 +12,16 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.security.CodeSource;
 import org.eastsideprep.spacecritters.gamelog.GameLog;
 import org.eastsideprep.spacecritters.scgamelog.SCGameState;
 
@@ -32,6 +42,8 @@ public class GameEngineV2 implements GameEngine {
     public SCGameState state;
     public GameLog log;
     public String name;
+    private URLClassLoader classLoader;
+    private Method method;
 
     public GameEngineV2(String name) {
         this.gson = new Gson();
@@ -58,7 +70,10 @@ public class GameEngineV2 implements GameEngine {
         gameState = GameState.Paused;
         this.gamePath = gamePath;
         this.alienPath = alienPath;
-
+        
+        // hack the class loader so we can load alien jars
+        this.getHackedClassLoader();
+        
         //
         // start the thread, return to shell
         //
@@ -72,25 +87,46 @@ public class GameEngineV2 implements GameEngine {
         //ArrayList<GameElementSpec> elements = new ArrayList<>(100);
         GameElementSpec[] elements;
         GameElementSpec element;
+        
+        
+        
         //
         // Every line has kind, package, class, state in csv format
         //
-        FileReader in;
+
+        String config = null;
 
         try {
-            in = new FileReader(this.gamePath + fileName);
+            FileReader in = new FileReader(this.gamePath + fileName);
             char[] buffer = new char[65000];
-            int n = in.read(buffer);
-            String s = new String(buffer).trim();
-            elements = gson.fromJson(s, GameElementSpec[].class);
+            in.read(buffer);
+            config = new String(buffer).trim();
             in.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("readConfigFile: could not read main config file " + fileName + ", trying resource ...");
+
+            try {
+                byte[] buffer = new byte[65000];
+                InputStream is = GameEngineV2.class.getResourceAsStream("/sc_conf/" + fileName);
+                is.read(buffer);
+                config = new String(buffer).trim();
+            } catch (Exception e2) {
+                System.out.println("readConfigFile: could not read main config resource \\sc_conf\\ " + fileName);
+            }
+        } catch (IOException e3) {
+            System.out.println("readConfigFile: general IO exception trying to read " + fileName);
+        }
+
+        try {
+            //System.out.println("readConfigFile: parsing JSON string: "+config.substring(0, 100) + "...");
+            elements = gson.fromJson(config, GameElementSpec[].class);
         } catch (JsonSyntaxException e) {
-            vis.debugErr("GameEngineV1:init:File parse error");
-            vis.debugErr("GameEngineV1:init:     " + e.getMessage() + e.toString());
+            vis.debugErr("GameEngineV1:readConfigFile:File parse error");
+            vis.debugErr("GameEngineV1:readConfigFile:     " + e.getMessage() + e.toString());
             return null;
-        } catch (Exception e) {
-            vis.debugErr("GameEngineV1:init:File parse error");
-            vis.debugErr("GameEngineV1:init:     " + e.getMessage() + e.toString());
+        } catch (Exception e4) {
+            vis.debugErr("GameEngineV1:readConfigFile:File parse error");
+            vis.debugErr("GameEngineV1:readConfigFile:     " + e4.getMessage() + e4.toString());
             return null;
         }
         return elements;
@@ -106,7 +142,7 @@ public class GameEngineV2 implements GameEngine {
             gc.parameters = new GameElementSpec[]{element};
 
             //vis.debugOut("GameEngine: Queueing new game element");
-            queueCommand(gc);
+            //queueCommand(gc);
 
             // this feels like cheating - 
             // I am stripping the gameMode out here, 
@@ -145,6 +181,69 @@ public class GameEngineV2 implements GameEngine {
     @Override
     public String getAlienPath() {
         return this.alienPath;
+    }
+
+    public void getHackedClassLoader() {
+        try {
+            System.out.println("EngineV2: Attempting to hack class loader ...");
+            this.classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+            this.method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+            method.setAccessible(true);
+            System.out.println("EngineV2: Class loader hacked successfully");
+        } catch (Exception e) {
+            System.out.println("EngineV2: could not get hacked class loader");
+            e.printStackTrace();
+        }
+
+    }
+
+    //
+    // Dynamic class loader (.jar files)
+    // stolen from StackOverflow, considered dark voodoo magic
+    //
+    public Constructor<?> loadConstructor(String domainName, String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Constructor<?> cs = null;
+        String fullName = "";
+        File file;
+        System.out.println("SG:loadConstructor: " + domainName + ":" + packageName + ":" + className);
+
+        if (packageName.endsWith("stockelements")
+                || packageName.equalsIgnoreCase("alieninterfaces")) {
+//            fullName = engine.gamePath
+////                    + packageName
+////                    + System.getProperty("file.separator")
+//                    + "scserver"
+//                    + System.getProperty("file.separator")
+//                    + "target"
+//                    + System.getProperty("file.separator")
+//                    + "SCServer-1.0-SNAPSHOT.jar";
+//            packageName = "org.eastsideprep.spacecritters.stockelements";
+            CodeSource src = SpaceGrid.class.getProtectionDomain().getCodeSource();
+            fullName = src.getLocation().getFile();
+        } else {
+            fullName = this.alienPath + domainName;
+        }
+        System.out.println("SG:loadConstructor: full name " + fullName);
+        String fullClassName = null;
+        try {
+            file = new File(fullName);
+            System.out.println("Adding path " + file.toURI().toURL());
+            method.invoke(classLoader, file.toURI().toURL());
+            System.out.println("EngineV2:loadConstructor:after addURL");
+
+//            URLClassLoader classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()}, this.getClass().getClassLoader());
+            fullClassName = packageName.equals("") ? className : (packageName + "." + className);
+
+            System.out.println("SEngineV2G:loadConstructor:trying to load class " + fullClassName);
+            cs = ClassLoader.getSystemClassLoader().loadClass(fullClassName).getConstructor();
+            System.out.println("EngineV2: Successfully loaded constructor for " + fullClassName);
+
+        } catch (Exception e) {
+//            e.printStackTrace(System.out);
+            System.out.println("EngineV2: Could not get constructor: " + e.getMessage());
+            throw e;
+        }
+        return cs;
     }
 
 }

@@ -86,7 +86,7 @@ function request(obj) {
 // main functionality accessible from buttons
 
 function attach() {
-    request({url: "attach?engine=" + engines.value})
+    request({url: "protected/attach?engine=" + engines.value})
             .then(data => {
                 data = JSON.parse(data);
                 //println("Initial state: " + data);
@@ -109,7 +109,7 @@ function attach() {
 
 
 function updates() {
-    request({url: "updates?compact=yes"})
+    request({url: "protected/updates?compact=yes"})
             .then(data => {
                 if (data !== null) {
                     //println("Raw: "+data.substr(0,100));
@@ -226,14 +226,14 @@ function detach() {
     //println("purge complete.");
 
 
-    request({url: "detach"}).then(data => {
+    request({url: "protected/detach"}).then(data => {
     }).catch(error => {
     });
 }
 
 
 function create() {
-    request({url: "create?name=" + engineName.value})
+    request({url: "protected/create?name=" + engineName.value})
             .then(data => {
                 if (data !== null) {
                     println("  Response: " + data);
@@ -264,7 +264,7 @@ function start() {
 }
 
 function listEngines() {
-    request({url: "listengines"})
+    request({url: "protected/listengines"})
             .then(data => {
                 if (data !== null) {
                     //println ("Raw: "+data);
@@ -291,7 +291,7 @@ function listEngines() {
 
 
 function pause() {
-    request({url: "pause"})
+    request({url: "protected/pause"})
             .then(data => {
                 if (data !== null) {
                     println("  Response: " + data);
@@ -599,7 +599,7 @@ function processCheck(id) {
     var chk = document.getElementById("chk" + id);
 
     println("sending request to change state of species id " + id + " to " + (chk.checked ? "on" : "off"));
-    request({url: "check?id=" + id + "&selected=" + (chk.checked ? "on" : "off")})
+    request({url: "protected/check?id=" + id + "&selected=" + (chk.checked ? "on" : "off")})
             .then(data => {
                 if (data !== null) {
                     println("  Response: " + data);
@@ -687,7 +687,7 @@ function animate() {
 function submitForm(form) {
     var body = new FormData(form);
 
-    request({method: "POST", url: "upload", body: body})
+    request({method: "POST", url: "protected/upload", body: body})
             .then(data => {
                 println("JAR upload successful");
             })

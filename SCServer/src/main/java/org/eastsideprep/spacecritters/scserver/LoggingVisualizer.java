@@ -19,7 +19,7 @@ import org.eastsideprep.spacecritters.scgamelog.SCGameLogEntry;
  */
 public class LoggingVisualizer implements GameVisualizer {
 
-    GameLog log;
+    GameLog log;  
 
     public LoggingVisualizer(GameLog log) {
         this.log = log;
