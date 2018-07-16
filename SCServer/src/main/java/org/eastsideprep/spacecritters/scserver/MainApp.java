@@ -122,13 +122,13 @@ public class MainApp implements SparkApplication {
         return engines.keySet().toArray(result);
     }
 
-    private static String[] doListObservers(Request req) {
+    private static Object[] doListObservers(Request req) {
         ServerContext ctx = getCtx(req);
         if (ctx.observer == null) {
             return null;
         }
         LinkedList<GameLogObserver> observers = ctx.engine.log.getObservers();
-        return (String[]) observers.stream().map((o) -> o.client).toArray();
+        return observers.stream().map((o) -> o.client).toArray();
     }
 
     private static String doCreateEngine(Request req) {

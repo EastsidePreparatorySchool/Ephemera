@@ -24,6 +24,7 @@ var grid = [];
 var attached = false;
 var observers = 0;
 var seconds = 0;
+var running = false;
 
 const ADDSPECIES = 1;
 const ADDSTAR = 2;
@@ -150,10 +151,10 @@ function reactToServiceTime(start, end) {
     var t = end - start;
     if (t > (updateInterval / 2)) {
         // if request took more than 50% of our interval time, get slower
-        updateInterval *= 2;
+        updateInterval = Math.floor(updateInterval * 1.1);
     } else if (t < (updateInterval / 20)) {
         // if it took less that 5% of our interval time, get faster
-        updateInterval = Math.floor(updateInterval / 2);
+        updateInterval = Math.floor(updateInterval / 1.1);
     }
     intervalSpan.innerText = updateInterval;
 }
@@ -165,12 +166,12 @@ function processUpdates(data) {
     var requested = false;
     if (data !== null && data.length > 0) {
         for (var i = 0; i < data.length; i++) {
-// if 90% processed, file another request for updates
-//            if (i > (data.length * 0.9) && !requested) {
-//                setTimeout(updates, updateInterval);
-//                requested = true;
-//                //println ("Requested updates in processUpdates");
-//            }
+            // if 50% processed, file another request for updates
+            if (i > (data.length * 0.5) && !requested) {
+                setTimeout(updates, updateInterval);
+                requested = true;
+                //println ("Requested updates in processUpdates");
+            }
             var o = data[i];
             //console.log(o);
             switch (o.type) {
