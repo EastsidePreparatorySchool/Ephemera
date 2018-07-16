@@ -13,6 +13,7 @@ var species = document.getElementById("species");
 var statusP = document.getElementById("status");
 var countsP = document.getElementById("counts");
 var intervalSpan = document.getElementById("interval");
+var observersSpan = document.getElementById("observers");
 var engineName = document.getElementById("enginename");
 var engines = document.getElementById("engines");
 var aliens = {};
@@ -21,6 +22,8 @@ var stars = [];
 var speciesMap = null;
 var grid = [];
 var attached = false;
+var observers = 0;
+var seconds = 0;
 
 const ADDSPECIES = 1;
 const ADDSTAR = 2;
@@ -100,11 +103,14 @@ function attach() {
                 turnSpan.innerText = data.turns;
                 alienSpan.innerText = 0;
                 intervalSpan.innerText = updateInterval;
+                observersSpan.innerText = data.observers;
                 countsP.style.display = "inline";
                 statusP.innerHTML = "Attached to<br>&nbsp;Engine:&nbsp&nbsp&nbsp" + data.engine
                         + "<br>&nbsp;Observer:&nbsp" + data.observer;
                 updates();
                 //println ("Requested updates in attach");
+                seconds = 60;
+                listObservers();
             })
             .catch(error => {
                 println("Error: " + error);
@@ -147,7 +153,7 @@ function reactToServiceTime(start, end) {
         updateInterval *= 2;
     } else if (t < (updateInterval / 20)) {
         // if it took less that 5% of our interval time, get faster
-        updateInterval = Math.floor(updateInterval/2);
+        updateInterval = Math.floor(updateInterval / 2);
     }
     intervalSpan.innerText = updateInterval;
 }
@@ -315,6 +321,32 @@ function listEngines() {
             });
 }
 
+function listObservers() {
+    if (!attached) {
+        return;
+    }
+    request({url: "protected/listobservers"})
+            .then(data => {
+                if (data !== null) {
+                    //println ("Raw: "+data);
+                    data = JSON.parse(data);
+                    if (++seconds > 10) {
+                        println ("Current observers");
+                        for (var s in data) {
+                            println("Observer: '" + data[s] + "'");
+                        }
+                        seconds = 0;
+                    }
+                    observersSpan.innerText = data.length;
+                    setTimeout(listObservers, 5000);
+                }
+            })
+            .catch(error => {
+                if (error !== null && error.length > 0) {
+                    println("  Error: '" + error + "'");
+                }
+            });
+}
 
 
 function pause() {

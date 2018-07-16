@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 import org.eastsideprep.spacecritters.gameengineimplementation.GameEngineV2;
@@ -15,6 +16,7 @@ import org.eastsideprep.spacecritters.gameengineinterfaces.GameCommand;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameCommandCode;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameElementSpec;
 import org.eastsideprep.spacecritters.gamelog.GameLogEntry;
+import org.eastsideprep.spacecritters.gamelog.GameLogObserver;
 import org.eastsideprep.spacecritters.gamelogic.Constants;
 import org.eastsideprep.spacecritters.scgamelog.SCGameLogEntry;
 import org.eastsideprep.spacecritters.scgamelog.SCGameState;
@@ -63,6 +65,7 @@ public class MainApp implements SparkApplication {
         get("/protected/detach", "application/json", (req, res) -> doDetach(req), new JSONRT());
         get("/protected/updates", "application/json", (req, res) -> doUpdates(req), new JSONRT());
         get("/protected/check", "application/json", (req, res) -> doCheck(req), new JSONRT());
+        get("/protected/listobservers", "application/json", (req, res) -> doListObservers(req), new JSONRT());
         post("/protected/upload", (req, res) -> uploadFile(req, res));
 
         MainApp.engines = new HashMap<>();
@@ -85,6 +88,7 @@ public class MainApp implements SparkApplication {
         if (req.session().isNew()) {
             ctx = new ServerContext();
             req.session().attribute("ServerContext", ctx);
+            req.session().maxInactiveInterval(60); // kill this session afte 60 seconds of inactivity
         }
 
         return ctx;
@@ -118,6 +122,15 @@ public class MainApp implements SparkApplication {
         return engines.keySet().toArray(result);
     }
 
+    private static String[] doListObservers(Request req) {
+        ServerContext ctx = getCtx(req);
+        if (ctx.observer == null) {
+            return null;
+        }
+        LinkedList<GameLogObserver> observers = ctx.engine.log.getObservers();
+        return (String[]) observers.stream().map((o) -> o.client).toArray();
+    }
+
     private static String doCreateEngine(Request req) {
         String name = req.queryParams("name");
 
@@ -147,16 +160,19 @@ public class MainApp implements SparkApplication {
         String engine;
         int observer;
         int turns;
+        int observers;
 
-        AttachRecord(String n, int o, int t) {
+        AttachRecord(String n, int o, int t, int os) {
             engine = n;
             observer = o;
             turns = t;
+            observers = os;
         }
     }
 
     private static AttachRecord doAttach(Request req) {
         String engineRequest;
+        int numObservers = 1;
         try {
             ServerContext ctx = getCtx(req);
             if (ctx.observer == null) {
@@ -165,6 +181,8 @@ public class MainApp implements SparkApplication {
                 if (engineRequest == null || engineRequest.equals("")) {
                     engineRequest = "main";
                 }
+
+                ctx.client = req.ip();
 
                 ctx.engine = MainApp.engines.get(engineRequest);
                 if (ctx.engine == null) {
@@ -175,10 +193,11 @@ public class MainApp implements SparkApplication {
                     System.out.println("doAttach: Engine '" + engineRequest + "'not found");
                     return null;
                 }
-                ctx.observer = ctx.engine.log.addObserver();
+                ctx.observer = ctx.engine.log.addObserver(ctx.client);
             }
             SCGameState state = (SCGameState) ctx.observer.getInitialState();
-            return new AttachRecord(ctx.engine.name, ctx.observer.hashCode(), state.totalTurns);
+            numObservers = ctx.engine.log.getObservers().size();
+            return new AttachRecord(ctx.engine.name, ctx.observer.hashCode(), state.totalTurns, numObservers);
 
         } catch (Exception e) {
             System.out.println("exception in doAttach");

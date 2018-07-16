@@ -16,20 +16,31 @@ public class GameLogObserver {
     private GameLogState myState;
     int maxRead;
     boolean stateServed = false;
+    boolean stale = false;
+    long timeLastObserved;
+    public String client;
 
-    public GameLogObserver(GameLog l) {
+    public GameLogObserver(GameLog l, String client) {
         log = l;
         maxRead = -1;
-
+        timeLastObserved = System.currentTimeMillis();
+        this.client = client;
     }
 
     public GameLogState getInitialState() {
+        timeLastObserved = System.currentTimeMillis();
+
         myState = log.getNewGameLogState();
         maxRead = myState.getEntryCount();
         return myState;
     }
 
     public ArrayList<GameLogEntry> getNewItems() {
+        if (isStale()) {
+            return null;
+        }
+
+        timeLastObserved = System.currentTimeMillis();
         ArrayList<GameLogEntry> result;
         if (stateServed) {
             result = log.getNewItems(this);
@@ -42,5 +53,19 @@ public class GameLogObserver {
             //System.out.println("Obs " + this.hashCode() + ": Serving initial state: " + result.size() + " items");
         }
         return result;
+    }
+
+    public boolean isStale() {
+        if (stale) {
+            return true;
+        }
+
+        // kill it after 60 seconds of no reading
+        if ((System.currentTimeMillis() - timeLastObserved) > 60000) {
+            stale = true;
+            return true;
+        }
+        
+        return false;
     }
 }

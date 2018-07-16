@@ -16,6 +16,7 @@ import org.eastsideprep.spacecritters.gamelog.GameLogObserver;
 public class ServerContext {
     GameLogObserver observer;
     GameEngineV2 engine;
+    String client;
     
     public ServerContext() {
     }

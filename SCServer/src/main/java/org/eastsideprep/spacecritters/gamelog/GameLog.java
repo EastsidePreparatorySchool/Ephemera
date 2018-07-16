@@ -58,15 +58,21 @@ public class GameLog {
 //        printLogInfo("AES");
     }
 
-    public GameLogObserver addObserver() {
+    public GameLogObserver addObserver(String client) {
         collapseRead();
         GameLogObserver obs;
         synchronized (observers) {
-            obs = new GameLogObserver(this);
+            obs = new GameLogObserver(this, client);
             observers.add(obs);
         }
         printLogInfo("AO");
         return obs;
+    }
+
+    public LinkedList<GameLogObserver> getObservers() {
+        synchronized (observers) {
+            return new LinkedList<>(observers);
+        }
     }
 
     public void removeObserver(GameLogObserver obs) {
@@ -157,14 +163,27 @@ public class GameLog {
     // only call this when already synchronized on observers
     private void updateMinRead() {
         int currentMin = end;
+        boolean haveStales = false;
 
-        for (GameLogObserver o : observers) {
-            if (o.maxRead < currentMin) {
-                currentMin = o.maxRead;
+        synchronized (observers) {
+            for (GameLogObserver o : observers) {
+                if (o.isStale()) {
+                    haveStales = true;
+                } else if (o.maxRead < currentMin) {
+                    currentMin = o.maxRead;
+                }
             }
         }
         // record new minimum
         minRead = currentMin;
+
+        // deal with delinquents
+        // we do this last because we can't update the collection while iterating
+        if (haveStales) {
+            synchronized (observers) {
+                observers.removeIf((o) -> o.isStale());
+            }
+        }
     }
 
     private void printLogInfo(String op) {
