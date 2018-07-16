@@ -3,7 +3,7 @@
  */
 
 
-var updateInterval = 200;
+var updateInterval = 5000;
 var textarea = document.getElementById("output");
 var turnSpan = document.getElementById("turns");
 var alienSpan = document.getElementById("numaliens");
