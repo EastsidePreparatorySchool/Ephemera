@@ -3,7 +3,8 @@
  */
 
 
-var updateInterval = 5000;
+var updateInterval = 500;
+var updateIntervalInitial = 500;
 var textarea = document.getElementById("output");
 var turnSpan = document.getElementById("turns");
 var alienSpan = document.getElementById("numaliens");
@@ -11,6 +12,7 @@ var centerDiv = document.getElementById("center");
 var species = document.getElementById("species");
 var statusP = document.getElementById("status");
 var countsP = document.getElementById("counts");
+var intervalSpan = document.getElementById("interval");
 var engineName = document.getElementById("enginename");
 var engines = document.getElementById("engines");
 var aliens = {};
@@ -18,6 +20,7 @@ var planets = {};
 var stars = [];
 var speciesMap = null;
 var grid = [];
+var attached = false;
 
 const ADDSPECIES = 1;
 const ADDSTAR = 2;
@@ -88,6 +91,7 @@ function request(obj) {
 function attach() {
     request({url: "protected/attach?engine=" + engines.value})
             .then(data => {
+                attached = true;
                 data = JSON.parse(data);
                 //println("Initial state: " + data);
                 println("Engine id: " + data.engine);
@@ -95,6 +99,7 @@ function attach() {
                 println("Total game turns: " + data.turns);
                 turnSpan.innerText = data.turns;
                 alienSpan.innerText = 0;
+                intervalSpan.innerText = updateInterval;
                 countsP.style.display = "inline";
                 statusP.innerHTML = "Attached to<br>&nbsp;Engine:&nbsp&nbsp&nbsp" + data.engine
                         + "<br>&nbsp;Observer:&nbsp" + data.observer;
@@ -109,10 +114,13 @@ function attach() {
 
 
 function updates() {
+    var start = (new Date()).getTime();
     request({url: "protected/updates?compact=yes"})
             .then(data => {
                 if (data !== null) {
                     //println("Raw: "+data.substr(0,100));
+                    var end = (new Date()).getTime();
+                    reactToServiceTime(start, end);
                     data = JSON.parse(data);
                     try {
                         processUpdates(data);
@@ -132,7 +140,22 @@ function updates() {
             });
 }
 
+function reactToServiceTime(start, end) {
+    var t = end - start;
+    if (t > (updateInterval / 2)) {
+        // if request took more than 50% of our interval time, get slower
+        updateInterval *= 2;
+    } else if (t < (updateInterval / 20)) {
+        // if it took less that 5% of our interval time, get faster
+        updateInterval = Math.floor(updateInterval/2);
+    }
+    intervalSpan.innerText = updateInterval;
+}
+
 function processUpdates(data) {
+    if (!attached) {
+        return;
+    }
     var requested = false;
     if (data !== null && data.length > 0) {
         for (var i = 0; i < data.length; i++) {
@@ -191,6 +214,10 @@ function processUpdates(data) {
 
 
 function detach() {
+    if (!attached) {
+        return;
+    }
+    attached = false;
     countsP.style.display = "none";
     statusP.innerHTML = "";
     species.innerHTML = "";
@@ -253,7 +280,7 @@ function start() {
                 if (data !== null) {
                     println("  Response: " + data);
                 }
-                updates();
+                //updates();
                 //println ("Requested updates in start");
             })
             .catch(error => {
@@ -296,6 +323,7 @@ function pause() {
                 if (data !== null) {
                     println("  Response: " + data);
                 }
+                updateInterval = updateIntervalInitial;
             })
             .catch(error => {
                 if (error !== null && error.length > 0) {
