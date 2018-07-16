@@ -182,7 +182,7 @@ public class MainApp implements SparkApplication {
                     engineRequest = "main";
                 }
 
-                ctx.client = req.ip();
+                ctx.client = req.raw().getRemoteAddr();
 
                 ctx.engine = MainApp.engines.get(engineRequest);
                 if (ctx.engine == null) {
