@@ -231,7 +231,9 @@ public class GameEngineV2 implements GameEngine {
 
             cs = classLoader.loadClass(fullClassName).getConstructor();
         } catch (Exception e) {
-            System.out.println("EngineV2: Could not get constructor: " + e.getMessage());
+            if (!packageName.endsWith("stockelements")) {
+                System.out.println("EngineV2: Could not get constructor: " + e.getMessage());
+            }
             throw e;
         }
         return cs;
