@@ -26,7 +26,6 @@ import spark.servlet.SparkApplication;
 
 public class MainApp implements SparkApplication {
 
-	
     static SpaceCritters sc;
     static GameEngineV2 ge;
     static HashMap<String, GameEngineV2> engines;
@@ -35,25 +34,23 @@ public class MainApp implements SparkApplication {
     public static void main(String[] args) {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-    	System.out.println("SCServer main() "+dateFormat.format(date)); 
+        System.out.println("SCServer main() " + dateFormat.format(date));
 
         //System.setProperty("javafx.preloader", "org.eastsideprep.spacecritters.spacecritters.SplashScreenLoader");
-
         // invoked from main, start Spark Jetty server
-    	//staticFiles.location("/static");
-    	
-    	app = new MainApp();
+        //staticFiles.location("/static");
+        app = new MainApp();
         app.init();
 
-    	//MainApp.ge = createDesktopGameEngine();
-   }
+        //MainApp.ge = createDesktopGameEngine();
+    }
 
     /// initialization
     @Override
     public void init() {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-    	System.out.println("SCServer init() "+dateFormat.format(date)); 
+        System.out.println("SCServer init() " + dateFormat.format(date));
 
 //    	before((request, response) -> {
 //    	  System.out.println("Spark request: "+request.url());
@@ -67,12 +64,12 @@ public class MainApp implements SparkApplication {
         get("/protected/updates", "application/json", (req, res) -> doUpdates(req), new JSONRT());
         get("/protected/check", "application/json", (req, res) -> doCheck(req), new JSONRT());
         post("/protected/upload", (req, res) -> uploadFile(req, res));
-        
+
         MainApp.engines = new HashMap<>();
         MainApp.engines.put("main", null); // desktop engine
 
         if (MainApp.app == null) {
-        	// created by Tomcat through SparkApplication.init()
+            // created by Tomcat through SparkApplication.init()
             ge = MainApp.createServerGameEngine("main");
             if (ge == null) {
                 System.out.println("Could not create initial game engine");
@@ -173,7 +170,7 @@ public class MainApp implements SparkApplication {
                 if (ctx.engine == null) {
                     ctx.engine = MainApp.sc.engine;
                 }
-                
+
                 if (ctx.engine == null) {
                     System.out.println("doAttach: Engine '" + engineRequest + "'not found");
                     return null;
@@ -262,7 +259,10 @@ public class MainApp implements SparkApplication {
         } else {
             // probably started from other folder
             gamePath = System.getProperty("user.dir");
-            gamePath = gamePath.toLowerCase();
+            gamePath += System.getProperty("file.separator");
+            gamePath += "webapps";
+            gamePath += System.getProperty("file.separator");
+            gamePath += "SCServer-1.0";
             gamePath += System.getProperty("file.separator");
         }
 
@@ -275,6 +275,7 @@ public class MainApp implements SparkApplication {
 
         alienPath += System.getProperty("file.separator");
         System.out.println("createServerEngine: created folders and paths");
+        System.out.println("createServerEngine:alien path is " + alienPath);
 
         //
         // initialize Ephemera game engine and visualizer

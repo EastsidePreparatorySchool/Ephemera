@@ -132,7 +132,7 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void debugOut(String s) {
-        System.out.println("LV debug out: "+s);
+        //System.out.println("LV debug out: "+s);
     }
 
     @Override

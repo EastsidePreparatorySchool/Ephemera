@@ -762,6 +762,7 @@ public class SpaceGrid {
                     } catch (Exception e) {
                         System.out.println("sg.addSpecies: Error loading contructor for " + speciesName);
                         //e.printStackTrace(System.out);
+                        throw e;
                     }
                     as.shapeFactory = null;
                     try {
@@ -770,7 +771,7 @@ public class SpaceGrid {
                             as.shapeFactory = (AlienShapeFactory) a;
                         }
                     } catch (Exception e) {
-                        System.out.println("sg.addSpecies: Error constructing class reference alien for " + speciesName);
+                        System.out.println("sg.addSpecies: Error creating test instance for " + speciesName);
                         System.out.println("sg.addSpecies:  " + e.getMessage());
                         e.printStackTrace();
                         throw (e);

@@ -183,13 +183,13 @@ public class GameEngineV2 implements GameEngine {
 
     public void getHackedClassLoader() {
         try {
-            System.out.println("EngineV2: Attempting to hack class loader ...");
+//            System.out.println("EngineV2: Attempting to hack class loader ...");
             this.classLoader = (URLClassLoader) GameEngineV2.class.getClassLoader();
 //            this.method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
 //            method.setAccessible(true);
-            System.out.println("EngineV2: Class loader hacked successfully");
+//            System.out.println("EngineV2: Class loader hacked successfully");
         } catch (Exception e) {
-            System.out.println("EngineV2: could not get hacked class loader");
+//            System.out.println("EngineV2: could not get hacked class loader");
             e.printStackTrace();
         }
 
@@ -203,7 +203,7 @@ public class GameEngineV2 implements GameEngine {
         Constructor<?> cs = null;
         String fullName = "";
         File file;
-        System.out.println("EngineV2:loadConstructor: " + domainName + ":" + packageName + ":" + className);
+        //System.out.println("EngineV2:loadConstructor: " + domainName + ":" + packageName + ":" + className);
 
         if (packageName.endsWith("stockelements")
                 || packageName.equalsIgnoreCase("alieninterfaces")) {
@@ -217,31 +217,20 @@ public class GameEngineV2 implements GameEngine {
 //                    + "SCServer-1.0-SNAPSHOT.jar";
 //            packageName = "org.eastsideprep.spacecritters.stockelements";
             CodeSource src = SpaceGrid.class.getProtectionDomain().getCodeSource();
-            System.out.println("EngineV2:loadConstructor: source name " + src.getLocation().getFile());
+            //System.out.println("EngineV2:loadConstructor: source name " + src.getLocation().getFile());
 
             fullName = src.getLocation().getFile();
         } else {
             fullName = this.alienPath + domainName;
         }
-        System.out.println("EngineV2:loadConstructor: full name " + fullName);
+        //System.out.println("EngineV2:loadConstructor: full name " + fullName);
         String fullClassName = null;
         try {
             file = new File(fullName);
-            System.out.println("Adding path " + file.toURI().toURL());
-//            method.invoke(classLoader, file.toURI().toURL());
-            System.out.println("EngineV2:loadConstructor:after addURL");
-            //URLClassLoader classLoader = new URLClassLoader(new URL[] {file.toURI().toURL()});
-
             fullClassName = packageName.equals("") ? className : (packageName + "." + className);
 
-            System.out.println("EngineV2:loadConstructor:trying to load class " + fullClassName);
             cs = classLoader.loadClass(fullClassName).getConstructor();
-         
-//            cs = classLoader.getSystemClassLoader().loadClass(fullClassName).getConstructor();
-            System.out.println("EngineV2: Successfully loaded constructor for " + fullClassName);
-
         } catch (Exception e) {
-//            e.printStackTrace(System.out);
             System.out.println("EngineV2: Could not get constructor: " + e.getMessage());
             throw e;
         }
