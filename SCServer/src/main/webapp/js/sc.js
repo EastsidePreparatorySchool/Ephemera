@@ -3,7 +3,7 @@
  */
 
 
-var updateInterval = 500;
+var updateInterval = 50;
 var updateIntervalInitial = 500;
 var textarea = document.getElementById("output");
 var turnSpan = document.getElementById("turns");
@@ -14,6 +14,7 @@ var statusP = document.getElementById("status");
 var countsP = document.getElementById("counts");
 var intervalSpan = document.getElementById("interval");
 var observersSpan = document.getElementById("observers");
+var observerlistP = document.getElementById("observerlist");
 var engineName = document.getElementById("enginename");
 var engines = document.getElementById("engines");
 var aliens = {};
@@ -133,6 +134,8 @@ function updates() {
                         processUpdates(data);
                     } catch (err) {
                         println("updates: error in processUpdates, " + err);
+//                        console.log(err.stack);
+//                        console.trace();
                     }
                 }
                 updateCounts();
@@ -149,14 +152,14 @@ function updates() {
 
 function reactToServiceTime(start, end) {
     var t = end - start;
-    if (t > (updateInterval / 2)) {
-        // if request took more than 50% of our interval time, get slower
-        updateInterval = Math.floor(updateInterval * 1.1);
-    } else if (t < (updateInterval / 20)) {
-        // if it took less that 5% of our interval time, get faster
-        updateInterval = Math.floor(updateInterval / 1.1);
-    }
-    intervalSpan.innerText = updateInterval;
+//    if (t > (updateInterval / 2)) {
+//        // if request took more than 50% of our interval time, get slower
+//        updateInterval = Math.floor(updateInterval * 1.1);
+//    } else if (t < (updateInterval / 20)) {
+//        // if it took less that 5% of our interval time, get faster
+//        updateInterval = Math.floor(updateInterval / 1.1);
+//    }
+    intervalSpan.innerText = t;
 }
 
 function processUpdates(data) {
@@ -219,6 +222,19 @@ function processUpdates(data) {
 }
 
 
+function listAliens() {
+    var a;
+    var count = 0;
+    for (a in aliens) {
+        var alien = aliens[a];
+        println(" id:" + alien.id + ", (" + (-alien.mesh.position.z) + "," + (-alien.mesh.position.x) + "), h:" + alien.mesh.position.y);
+        if (count++ > 100) {
+            break;
+        }
+    }
+}
+
+
 
 function detach() {
     if (!attached) {
@@ -228,6 +244,7 @@ function detach() {
     countsP.style.display = "none";
     statusP.innerHTML = "";
     species.innerHTML = "";
+    observerlistP.innerHTML = "";
     speciesMap = new SpeciesMap();
     //println("starting purge ...");
 
@@ -331,15 +348,13 @@ function listObservers() {
                 if (data !== null) {
                     //println ("Raw: "+data);
                     data = JSON.parse(data);
-                    if (++seconds > 10) {
-                        println ("Current observers");
-                        for (var s in data) {
-                            println("Observer: '" + data[s] + "'");
-                        }
-                        seconds = 0;
+                    var list = "Observers:<br>";
+                    for (var s in data) {
+                        list += data[s] + "<br>";
                     }
+                    observerlistP.innerHTML = list;
                     observersSpan.innerText = data.length;
-                    setTimeout(listObservers, 5000);
+                    setTimeout(listObservers, 10000);
                 }
             })
             .catch(error => {
@@ -372,19 +387,6 @@ function pause() {
 
 
 
-// utilities
-//
-
-function print(message) {
-    message = textarea.value + message;
-    textarea.value = message.substr(-2048);
-    textarea.scrollTop = textarea.scrollHeight;
-}
-
-
-function println(message) {
-    print(message + "\n");
-}
 
 
 
@@ -407,24 +409,37 @@ class Grid {
     }
 
     addToCell(alien, x, y) {
-//console.log(x+", "+y+", "+alien);
-
         x = Math.floor(x);
         y = Math.floor(y);
         var cell = this.grid[x + this.halfWidth][y + this.halfHeight];
+        assert(() => (alien.getX() === x));
+        assert(() => (alien.getY() === y));
+        assert(() => (!cell.includes(alien)));
+
+        var h;
+        h = cell.length;
         cell.push(alien);
-        return cell.length;
+        dprintln(" cell: added at height: " + h);
+        alien.setHeight(h);
+
+        return h;
     }
 
     removeFromCell(alien, x, y) {
-//console.log(x+", "+y+", "+alien);
-
         x = Math.floor(x);
         y = Math.floor(y);
         var cell = this.grid[x + this.halfWidth][y + this.halfHeight];
+
+        assert(() => (alien.getX() === x));
+        assert(() => (alien.getY() === y));
+        assert(() => (cell.includes(alien)));
+        assert(() => (cell.length > alien.getHeight()), () => dumpAlienAndCell(alien, cell));
+
         var index = cell.indexOf(alien);
-        if (index !== undefined) {
+        if (index !== -1) {
+            dprintln(" cell: removing at index: " + index + ", length before remove: " + cell.length);
             cell.splice(index, 1);
+            cell.forEach((a, i) => {a.setHeight(i);assert(()=>(a.getHeight() === i));});
         }
     }
 }
@@ -448,6 +463,18 @@ class Alien {
         this.mesh.position.z = -x;
     }
 
+    getX() {
+        return -this.mesh.position.z;
+    }
+
+    getY() {
+        return -this.mesh.position.x;
+    }
+
+    getHeight() {
+        return this.mesh.position.y / 2;
+    }
+
     kill() {
         scene.remove(this.mesh);
         delete aliens[this.id];
@@ -456,8 +483,11 @@ class Alien {
     setHeight(height) {
         this.mesh.position.y = 2 * height;
     }
+    getHeight() {
+        return (this.mesh.position.y/2);
+    }
 }
-;
+
 // star class, use this to make aliens
 class Star {
     constructor(x, z) {
@@ -507,6 +537,7 @@ function movePlanet(content) {
 
 
 function addAlien(content) {
+    dprintln("adding alien " + content.id + " at " + content.newX + "," + content.newY);
     var alien = new Alien(speciesMap.getMat(content.speciesName), content.newX, content.newY, content.id);
     aliens[content.id] = alien;
     grid.addToCell(alien, content.newX, content.newY);
@@ -514,20 +545,22 @@ function addAlien(content) {
 }
 
 function moveAlien(content) {
+    dprintln("moving alien " + content.id + " from " + content.param1 + "," + content.param2 + " to " + content.newX + "," + content.newY);
     var alien = aliens[content.id];
     if (alien === undefined) {
+        dprintln("unknown alien for move");
         return;
     }
-
-    alien.move(content.newX, content.newY);
     grid.removeFromCell(alien, content.param1, content.param2);
-    var height = grid.addToCell(alien, content.newX, content.newY);
-    alien.setHeight(height);
+    alien.move(content.newX, content.newY);
+    grid.addToCell(alien, content.newX, content.newY);
 }
 
 function killAlien(content) {
+    dprintln("killing alien " + content.id + " at " + content.newX + "," + content.newY)
     var alien = aliens[content.id];
     if (alien !== undefined) {
+        grid.removeFromCell(alien, content.newX, content.newY);
         alien.kill();
         speciesMap.removeAlien(content.speciesId);
     }
@@ -763,6 +796,52 @@ function submitForm(form) {
     return false;
 }
 
+
+
+
+// utilities
+//
+
+function print(message) {
+    message = textarea.value + message;
+    textarea.value = message.substr(-20000);
+    textarea.scrollTop = textarea.scrollHeight;
+}
+
+
+function println(message) {
+    print(message + "\n");
+}
+
+function dprintln(message) {
+    if (debug) {
+        console.log(message);
+    }
+}
+
+
+
+function assert(condition, action) {
+    if (debug) {
+        if (!condition()) {
+            dprintln("assert failed, see console for details: " + condition);
+            if (action !== undefined) {
+                action();
+            }
+            throw new Error("assert failed");
+        } else {
+            //println("survived assert " + lambda);
+        }
+    }
+}
+
+
+function  dumpAlienAndCell(alien, cell) {
+    dprintln("dump: alien:" + alien.id);
+    dprintln(" height:" + alien.mesh.position.y / 2);
+    dprintln(" cell:");
+    cell.forEach((a, i) => dprintln(" i:" + i + ", a:" + a.id));
+}
 
 
 println("parsed");

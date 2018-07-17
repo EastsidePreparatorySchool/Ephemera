@@ -25,6 +25,8 @@ public class SCGameState implements GameLogState {
     private HashMap<Integer, SCGameLogEntry> planets = new HashMap<>();
     private ArrayList<SCGameLogEntry> stars = new ArrayList<>();
     private ArrayList<SCGameLogEntry> species = new ArrayList<>();
+    private ArrayList<SCGameLogEntry> kills = new ArrayList<>();
+
 
     // what the console uses initially, 
     // and what "copy" uses internally
@@ -156,7 +158,7 @@ public class SCGameState implements GameLogState {
                         // so put a copy of the kill record in there
                         // the client will presumably know about this id
                         sgeDead = new SCGameLogEntry(sge);
-                        aliens.put(sgeDead.id, sgeDead);
+                        kills.add(sgeDead);
                         break;
                     }
                     if (sgeDead.type == SCGameLogEntry.Type.ADD) {
@@ -165,8 +167,10 @@ public class SCGameState implements GameLogState {
                         aliens.remove(sge.id);
                     } else if (sgeDead.type == SCGameLogEntry.Type.MOVE) {
                         // if there was a prior MOVE record,
-                        // let's make that a KILL record instead
-                        sgeDead.type = SCGameLogEntry.Type.KILL;
+                        // we need to display the move before the kill, 
+                        // so just add the kill.
+                        sgeDead = new SCGameLogEntry(sge);
+                        kills.add(sgeDead);
                     }
                 } else {
                     // in initial states, we just get rid of the guy altogether
@@ -202,6 +206,7 @@ public class SCGameState implements GameLogState {
         result.addAll(planets.values());
         result.addAll(species);
         result.addAll(aliens.values());
+        result.addAll(kills);
         if (lastTurn != null) {
             result.add(lastTurn);
         }

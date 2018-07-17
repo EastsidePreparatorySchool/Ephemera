@@ -15,12 +15,14 @@
     </properties>
 
     <organization>
-        <!-- Used as the 'Vendor' for JNLP generation -->
-        <name>Your Organisation</name>
+        <name>Eastside Preparatory School</name>
     </organization>
 
     <build>
+        <finalName>root</finalName>
         <plugins>
+            
+            
             
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -94,6 +96,33 @@
                     <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
                 </configuration>
             </plugin>
+            
+            <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+                <execution>
+                    <id>copy</id>
+                    <phase>package</phase>
+                    <configuration>
+                        <target>
+                            <echo>ANT TASK - copying files....</echo>
+                            <copy todir="${user.home}/documents/github/SpaceCritters/webapps" overwrite="true" flatten="true">
+                                <fileset dir="${basedir}">
+                                    <include name="target/*.war" />
+                                </fileset>
+                            </copy>
+                        </target>
+                    </configuration>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+
+
+            
         </plugins>
     </build>
     
@@ -122,11 +151,11 @@
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-webapp</artifactId>
                 </exclusion>
-                 <exclusion>
+                <exclusion>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-servlet</artifactId>
                 </exclusion>
-                 <exclusion>
+                <exclusion>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-servlets</artifactId>
                 </exclusion>

@@ -55,6 +55,9 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) { //[Q]
+        if (oldx == x && oldy == y) {
+            return;
+        }
         log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.MOVEPLANET,
                 x, y, 0, 0, 
                 name, null, -index, -1, 
@@ -89,6 +92,9 @@ public class LoggingVisualizer implements GameVisualizer {
     public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition, boolean update, Trajectory t) { //[Q]
         //System.out.println("LOGDEBUG: MOVE" + as.hashCode);
         if (!as.isResident) {
+            if (oldX == as.x && oldY == as.y) {
+                return;
+            }
             log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.MOVE,
                     as.x, as.y, oldX, oldY, 
                     null, as.getFullSpeciesName(), as.hashCode, as.speciesID,

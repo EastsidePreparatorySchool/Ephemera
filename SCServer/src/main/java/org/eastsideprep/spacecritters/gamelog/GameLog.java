@@ -44,6 +44,8 @@ public class GameLog {
         } finally {
             wlock.unlock();
         }
+        
+        removeStaleObservers();
 //        printLogInfo("AE");
     }
 
@@ -55,6 +57,7 @@ public class GameLog {
         } finally {
             wlock.unlock();
         }
+        removeStaleObservers();
 //        printLogInfo("AES");
     }
 
@@ -160,7 +163,6 @@ public class GameLog {
         return result;
     }
 
-    // only call this when already synchronized on observers
     private void updateMinRead() {
         int currentMin = end;
         boolean haveStales = false;
@@ -183,6 +185,12 @@ public class GameLog {
             synchronized (observers) {
                 observers.removeIf((o) -> o.isStale());
             }
+        }
+    }
+
+    private void removeStaleObservers() {
+        synchronized (observers) {
+            observers.removeIf((o) -> o.isStale());
         }
     }
 
