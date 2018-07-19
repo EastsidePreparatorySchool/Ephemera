@@ -109,6 +109,9 @@ function attach() {
                 countsP.style.display = "inline";
                 statusP.innerHTML = "Attached to<br>&nbsp;Engine:&nbsp&nbsp&nbsp" + data.engine
                         + "<br>&nbsp;Observer:&nbsp" + data.observer;
+                speciesMap = new SpeciesMap();
+                grid = new Grid(501, 501);
+
                 updates();
                 //println ("Requested updates in attach");
                 seconds = 60;
@@ -240,13 +243,14 @@ function detach() {
     if (!attached) {
         return;
     }
-    println ("Last recorded turn: "+turnSpan.innerText);
+    println("Last recorded turn: " + turnSpan.innerText);
     attached = false;
     countsP.style.display = "none";
     statusP.innerHTML = "";
     species.innerHTML = "";
     observerlistP.innerHTML = "";
-    speciesMap = new SpeciesMap();
+    speciesMap = null;
+    grid = null;
     //println("starting purge ...");
 
     var a;
@@ -440,7 +444,10 @@ class Grid {
         if (index !== -1) {
             dprintln(" cell: removing at index: " + index + ", length before remove: " + cell.length);
             cell.splice(index, 1);
-            cell.forEach((a, i) => {a.setHeight(i);assert(()=>(a.getHeight() === i));});
+            cell.forEach((a, i) => {
+                a.setHeight(i);
+                assert(() => (a.getHeight() === i));
+            });
         }
     }
 }
@@ -485,7 +492,7 @@ class Alien {
         this.mesh.position.y = 2 * height;
     }
     getHeight() {
-        return (this.mesh.position.y/2);
+        return (this.mesh.position.y / 2);
     }
 }
 
@@ -744,8 +751,6 @@ function init() {
     window.addEventListener('resize', onWindowResize, false);
     animate();
     // 
-    speciesMap = new SpeciesMap();
-    grid = new Grid(501, 501);
     //addSpecies({name:"ephemera.eastsideprep.org:stockelements:test1"});
     //addSpecies({name:"someschool.org:someschmuck:test2"});
     //grid.addToCell("hah1", -250,-250);

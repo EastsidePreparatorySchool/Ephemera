@@ -33,28 +33,54 @@ public class MainApp implements SparkApplication {
     static GameEngineV2 geMain;
     static HashMap<String, GameEngineV2> engines;
     static MainApp app;
+    static Thread mainThread;
+    static boolean createServerEngine = false;
 
     // desktop initialization
     public static void main(String[] args) {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-        System.out.println("SCServer main() " + dateFormat.format(date));
+        System.out.println("SC main() (scserver) " + dateFormat.format(date));
 
         //System.setProperty("javafx.preloader", "org.eastsideprep.spacecritters.spacecritters.SplashScreenLoader");
         // invoked from main, start Spark Jetty server
         //staticFiles.location("/static");
-        MainApp.app = new MainApp();
-        String dir = System.getProperty("user.dir");
-        if (dir.toLowerCase().contains("ephemera")) {
-            dir += System.getProperty("file.separator") + "target";
-        }
-        dir += System.getProperty("file.separator") + "static";
+        if (args.length == 0 || !args[0].equalsIgnoreCase("desktoponly")) {
+            MainApp.app = new MainApp();
+            String dir = System.getProperty("user.dir");
+            if (dir.toLowerCase().contains("ephemera")) {
+                dir += System.getProperty("file.separator") + "target";
+            }
+            dir += System.getProperty("file.separator") + "static";
 
-        System.out.println("static dir: " + dir);
-        port(80);
-        staticFiles.externalLocation(dir);
-        MainApp.app.init();
-        createDesktopGameEngine();
+            System.out.println("static dir: " + dir);
+            port(80);
+            staticFiles.externalLocation(dir);
+
+            if (args.length > 0 && args[0].equalsIgnoreCase("serveronly")) {
+                MainApp.createServerEngine = true; // will cause init() to create server engine
+            }
+            MainApp.app.init();
+            mainThread = Thread.currentThread();
+        } else {
+            System.out.println("SC running in desktop-only mode");
+        }
+
+        if (args.length > 0 && args[0].equalsIgnoreCase("serveronly")) {
+            System.out.println("SC running in server-only mode");
+
+            try {
+                // loop until interrupted
+                while (true) {
+                    Thread.sleep(1000);
+                }
+            } catch (Exception e) {
+                // catch and be quiet, then exit
+            }
+        } else {
+            // this will stall until it is time to quit
+            MainApp.createDesktopGameEngine();
+        }
     }
 
     /// servlet initialization
@@ -80,7 +106,7 @@ public class MainApp implements SparkApplication {
 
         MainApp.engines = new HashMap<>();
 
-        if (MainApp.app == null) {
+        if (MainApp.createServerEngine) {
             MainApp.geMain = MainApp.createServerGameEngine("main");
 
             if (MainApp.geMain == null) {
