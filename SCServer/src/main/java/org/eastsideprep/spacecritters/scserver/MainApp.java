@@ -34,7 +34,7 @@ public class MainApp implements SparkApplication {
     static HashMap<String, GameEngineV2> engines;
     static MainApp app;
     static Thread mainThread;
-    static boolean createServerEngine = false;
+    static boolean createServerEngine = true;
 
     // desktop initialization
     public static void main(String[] args) {
@@ -57,8 +57,8 @@ public class MainApp implements SparkApplication {
             port(80);
             staticFiles.externalLocation(dir);
 
-            if (args.length > 0 && args[0].equalsIgnoreCase("serveronly")) {
-                MainApp.createServerEngine = true; // will cause init() to create server engine
+            if (args.length == 0 || !args[0].equalsIgnoreCase("serveronly")) {
+                MainApp.createServerEngine = false; // will cause init() to not create server engine, default running mode
             }
             MainApp.app.init();
             mainThread = Thread.currentThread();
