@@ -81,7 +81,9 @@
                         </goals>
                         <configuration>
                             <executable>${java.home}/bin/java</executable>
-                            <commandlineArgs>${runfx.args} desktoponly</commandlineArgs>
+                            <commandlineArgs>${runfx.args}</commandlineArgs>
+                            <!--<commandlineArgs>${runfx.args} desktoponly</commandlineArgs>-->
+                            <!--<commandlineArgs>${runfx.args} serveronly</commandlineArgs>-->
                         </configuration>
                     </execution>
                 </executions>  
