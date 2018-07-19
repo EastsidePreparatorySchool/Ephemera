@@ -4,6 +4,7 @@
  */
 package org.eastsideprep.spacecritters.spacecritters;
 
+import com.google.gson.JsonSyntaxException;
 import org.eastsideprep.spacecritters.scserver.LoggingVisualizer;
 import org.eastsideprep.spacecritters.gameengineimplementation.GameEngineV2;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameCommand;

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import javafx.application.Application;
+import javafx.stage.Stage;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 import org.eastsideprep.spacecritters.gameengineimplementation.GameEngineV2;
@@ -30,6 +32,7 @@ public class MainApp implements SparkApplication {
 
     static GameEngineV2 geMain;
     static HashMap<String, GameEngineV2> engines;
+    static MainApp app;
 
     // desktop initialization
     public static void main(String[] args) {
@@ -40,8 +43,17 @@ public class MainApp implements SparkApplication {
         //System.setProperty("javafx.preloader", "org.eastsideprep.spacecritters.spacecritters.SplashScreenLoader");
         // invoked from main, start Spark Jetty server
         //staticFiles.location("/static");
-//        app = new MainApp();
-//        app.init();
+        MainApp.app = new MainApp();
+        String dir = System.getProperty("user.dir");
+        if (dir.toLowerCase().contains("ephemera")) {
+            dir += System.getProperty("file.separator") + "target";
+        }
+        dir += System.getProperty("file.separator") + "static";
+
+        System.out.println("static dir: " + dir);
+        port(80);
+        staticFiles.externalLocation(dir);
+        MainApp.app.init();
         createDesktopGameEngine();
     }
 
@@ -67,14 +79,17 @@ public class MainApp implements SparkApplication {
         post("/protected/upload", (req, res) -> uploadFile(req, res));
 
         MainApp.engines = new HashMap<>();
-        MainApp.engines.put("main", null); // desktop engine
 
-        MainApp.geMain = MainApp.createServerGameEngine("main");
-        if (MainApp.geMain == null) {
-            System.out.println("Could not create initial game engine");
-            return;
+        if (MainApp.app == null) {
+            MainApp.geMain = MainApp.createServerGameEngine("main");
+
+            if (MainApp.geMain == null) {
+                System.out.println("Could not create initial server game engine");
+                return;
+            }
         }
-        MainApp.engines.put("main", MainApp.geMain); 
+
+        MainApp.engines.put("main", MainApp.geMain);
     }
 
     // context helper
@@ -154,6 +169,7 @@ public class MainApp implements SparkApplication {
         }
         engines.put(name, eng);
         return name;
+
     }
 
     public static class AttachRecord {
@@ -187,13 +203,14 @@ public class MainApp implements SparkApplication {
                 if (ctx.client == null) {
                     ctx.client = req.raw().getRemoteAddr();
                 }
-                if (ctx.client.contains(",")){
+                if (ctx.client.contains(",")) {
                     ctx.client = ctx.client.substring(0, ctx.client.indexOf(","));
                 }
 
                 ctx.engine = MainApp.engines.get(engineRequest);
                 if (ctx.engine == null) {
-                    return null;
+                    ctx.engine = SpaceCritters.engine;;
+                    MainApp.engines.put("main", ctx.engine);
                 }
 
                 if (ctx.engine == null) {
@@ -259,9 +276,8 @@ public class MainApp implements SparkApplication {
     }
 
     static private void createDesktopGameEngine() {
-        SpaceCritters sc = new SpaceCritters();
         try {
-            sc.main(new String[]{});
+            SpaceCritters.main(new String[]{});
             System.out.println("createDesktopEngine: created and initialized, processing");
         } catch (Exception e) {
             System.err.println("scserver init: " + e.getMessage());

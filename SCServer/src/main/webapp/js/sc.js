@@ -240,6 +240,7 @@ function detach() {
     if (!attached) {
         return;
     }
+    println ("Last recorded turn: "+turnSpan.innerText);
     attached = false;
     countsP.style.display = "none";
     statusP.innerHTML = "";

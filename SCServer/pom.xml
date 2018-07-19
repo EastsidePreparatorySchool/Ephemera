@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.eastsideprep.spacecritters</groupId>
-    <artifactId>SCServer</artifactId>
+    <artifactId>sc</artifactId>
     <version>1.0</version>
     <packaging>war</packaging>
 
@@ -11,19 +11,41 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mainClass>org.eastsideprep.spacecritters.scserver.MainApp</mainClass>
+        <mainClass>org.eastsideprep.spacecritters.scserver/MainApp</mainClass>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <organization>
         <name>Eastside Preparatory School</name>
     </organization>
+    
+  
 
     <build>
         <finalName>root</finalName>
         <plugins>
             
-            
-            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <excludeScope>system</excludeScope>
+                            <excludeGroupIds>junit,org.mockito,org.hamcrest</excludeGroupIds>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+         
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -64,6 +86,7 @@
                     </execution>
                 </executions>  
             </plugin>
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -79,6 +102,7 @@
                     </compilerArguments>
                 </configuration>
             </plugin>
+ 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -89,6 +113,7 @@
                     </additionalClasspathElements>
                 </configuration>
             </plugin>
+            
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.3</version>
@@ -98,104 +123,64 @@
             </plugin>
             
             <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.8</version>
-            <executions>
-                <execution>
-                    <id>copy</id>
-                    <phase>package</phase>
-                    <configuration>
-                        <target>
-                            <echo>ANT TASK - copying files....</echo>
-                            <copy todir="${user.home}/documents/github/SpaceCritters/webapps" overwrite="true" flatten="true">
-                                <fileset dir="${basedir}">
-                                    <include name="target/*.war" />
-                                </fileset>
-                            </copy>
-                        </target>
-                    </configuration>
-                    <goals>
-                        <goal>run</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-
-
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <echo>ANT TASK - copying files....</echo>
+                                <copy todir="${user.home}/documents/github/SpaceCritters/webapps" overwrite="true" flatten="true">
+                                    <fileset dir="${basedir}">
+                                        <include name="target/*.war" />
+                                    </fileset>
+                                </copy>       
+                                <copy todir="${basedir}/target/static/" overwrite="true">
+                                    <fileset dir="${basedir}/src/main/webapp">
+                                        <include name="*.html"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${basedir}/target/static/js" overwrite="true">
+                                    <fileset dir="${basedir}/src/main/webapp/js">
+                                        <include name="*.js"/>
+                                    </fileset>
+                                </copy>                            
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             
         </plugins>
     </build>
+   
+    
+   
     
     <dependencies>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.8.0</version>
+            <version>2.8.2</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.sparkjava</groupId>
             <artifactId>spark-core</artifactId>
             <version>2.5.5</version>
-            <exclusions>
-                
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
-                </exclusion>
-
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-server</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-webapp</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-servlet</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-servlets</artifactId>
-                </exclusion>
-
-                <exclusion>
-                    <groupId>org.eclipse.jetty.websocket</groupId>
-                    <artifactId>server</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty.websocket</groupId>
-                    <artifactId>javax-websocket-server-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty.websocket</groupId>
-                    <artifactId>websocket-servlet</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty.websocket</groupId>
-                    <artifactId>websocket-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.jetty.websocket</groupId>
-                    <artifactId>websocket-core</artifactId>
-                </exclusion>
-  
-        
-            </exclusions>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.21</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
-            <scope>provided</scope>
+            <type>jar</type>
         </dependency>
     </dependencies>
-   
    
 </project>
