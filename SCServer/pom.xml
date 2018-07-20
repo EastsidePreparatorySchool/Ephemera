@@ -81,9 +81,9 @@
                         </goals>
                         <configuration>
                             <executable>${java.home}/bin/java</executable>
-                            <commandlineArgs>${runfx.args}</commandlineArgs>
+                            <!--<commandlineArgs>${runfx.args}</commandlineArgs>-->
                             <!--<commandlineArgs>${runfx.args} desktoponly</commandlineArgs>-->
-                            <!--<commandlineArgs>${runfx.args} serveronly</commandlineArgs>-->
+                            <commandlineArgs>${runfx.args} serveronly</commandlineArgs>
                         </configuration>
                     </execution>
                 </executions>  
@@ -142,6 +142,11 @@
                                 <copy todir="${basedir}/target/static/" overwrite="true">
                                     <fileset dir="${basedir}/src/main/webapp">
                                         <include name="*.html"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${basedir}/target/static/" overwrite="true">
+                                    <fileset dir="${basedir}/src/main/webapp">
+                                        <include name="*.ico"/>
                                     </fileset>
                                 </copy>
                                 <copy todir="${basedir}/target/static/js" overwrite="true">
