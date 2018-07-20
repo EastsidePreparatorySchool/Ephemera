@@ -24,9 +24,7 @@ var speciesMap = null;
 var grid = [];
 var attached = false;
 var observers = 0;
-var seconds = 0;
 var running = false;
-
 const ADDSPECIES = 1;
 const ADDSTAR = 2;
 const ADDPLANET = 3;
@@ -70,9 +68,6 @@ var key = {
 //put things that happen while keys are pushed here
     }
 };
-
-
-
 // basic server calls in the absence of jquery
 
 function request(obj) {
@@ -94,7 +89,7 @@ function request(obj) {
 // main functionality accessible from buttons
 
 function attach() {
-    request({url: "protected/attach?engine=" + engines.value})
+    request({url: "protected/attach?engine=" + engines.value + "&clientID=" + getClientID()})
             .then(data => {
                 attached = true;
                 data = JSON.parse(data);
@@ -111,10 +106,8 @@ function attach() {
                         + "<br>&nbsp;Observer:&nbsp" + data.observer;
                 speciesMap = new SpeciesMap();
                 grid = new Grid(501, 501);
-
                 updates();
                 //println ("Requested updates in attach");
-                seconds = 60;
                 listObservers();
             })
             .catch(error => {
@@ -126,7 +119,7 @@ function attach() {
 
 function updates() {
     var start = (new Date()).getTime();
-    request({url: "protected/updates?compact=yes"})
+    request({url: "protected/updates?compact=yes&clientID=" + getClientID()})
             .then(data => {
                 if (data !== null) {
                     //println("Raw: "+data.substr(0,100));
@@ -172,7 +165,7 @@ function processUpdates(data) {
     var requested = false;
     if (data !== null && data.length > 0) {
         for (var i = 0; i < data.length; i++) {
-            // if 50% processed, file another request for updates
+// if 50% processed, file another request for updates
             if (i > (data.length * 0.5) && !requested) {
                 setTimeout(updates, updateInterval);
                 requested = true;
@@ -282,7 +275,7 @@ function detach() {
     //println("purge complete.");
 
 
-    request({url: "protected/detach"}).then(data => {
+    request({url: "protected/detach?clientID=" + getClientID()}).then(data => {
     }).catch(error => {
     });
 }
@@ -304,7 +297,7 @@ function create() {
 }
 
 function start() {
-    request({url: "protected/start"})
+    request({url: "protected/start?clientID=" + getClientID()})
             .then(data => {
                 if (data !== null) {
                     println("  Response: " + data);
@@ -348,7 +341,7 @@ function listObservers() {
     if (!attached) {
         return;
     }
-    request({url: "protected/listobservers"})
+    request({url: "protected/listobservers?clientID=" + getClientID()})
             .then(data => {
                 if (data !== null) {
                     //println ("Raw: "+data);
@@ -369,9 +362,31 @@ function listObservers() {
             });
 }
 
+function getStatus() {
+    request({url: "protected/"
+                + (attached ? "" : "all")
+                + "status"
+                + (attached ? "?clientID=" + getClientID() : "")})
+            .then(data => {
+                if (data !== null) {
+                    data = JSON.parse(data);
+                    for (var i = 0; i < data.length; i++) {
+                        println(data[i]);
+                    }
+                    setTimeout(getStatus, 10000);
+                }
+            })
+            .catch(error => {
+                if (error !== null && error.length > 0) {
+                    println("  Error: '" + error + "'");
+                }
+            });
+}
+
+
 
 function pause() {
-    request({url: "protected/pause"})
+    request({url: "protected/pause?clientID=" + getClientID()})
             .then(data => {
                 if (data !== null) {
                     println("  Response: " + data);
@@ -420,13 +435,11 @@ class Grid {
         assert(() => (alien.getX() === x));
         assert(() => (alien.getY() === y));
         assert(() => (!cell.includes(alien)));
-
         var h;
         h = cell.length;
         cell.push(alien);
         dprintln(" cell: added at height: " + h);
         alien.setHeight(h);
-
         return h;
     }
 
@@ -434,12 +447,10 @@ class Grid {
         x = Math.floor(x);
         y = Math.floor(y);
         var cell = this.grid[x + this.halfWidth][y + this.halfHeight];
-
         assert(() => (alien.getX() === x));
         assert(() => (alien.getY() === y));
         assert(() => (cell.includes(alien)));
         assert(() => (cell.length > alien.getHeight()), () => dumpAlienAndCell(alien, cell));
-
         var index = cell.indexOf(alien);
         if (index !== -1) {
             dprintln(" cell: removing at index: " + index + ", length before remove: " + cell.length);
@@ -654,29 +665,23 @@ class SpeciesMap {
             processCheck(id);
         };
         species.appendChild(chk);
-
         var text = document.createElement("span");
         text.style.color = color;
         text.innerText = " " + displayName + ": ";
         text.className = "tooltip";
         species.appendChild(text);
-
         var text2 = document.createElement("span");
         text2.style.color = color;
         text2.id = "species" + id;
         text2.innerText = "0";
         species.appendChild(text2);
-
         var tip = document.createElement("span");
         tip.className = "tooltiptext";
         tip.innerText = " " + displayQualifier + ":" + id;
         text.appendChild(tip);
-
         var br = document.createElement("br");
         species.appendChild(br);
-
         println("registered species " + name + ", id:" + id);
-
         return color;
     }
 }
@@ -699,9 +704,10 @@ function updateCounts() {
 
 function processCheck(id) {
     var chk = document.getElementById("chk" + id);
-
     println("sending request to change state of species id " + id + " to " + (chk.checked ? "on" : "off"));
-    request({url: "protected/check?id=" + id + "&selected=" + (chk.checked ? "on" : "off")})
+    request({url: "protected/check?id=" + id
+                + "&selected=" + (chk.checked ? "on" : "off")
+                + "&clientID=" + getClientID()})
             .then(data => {
                 if (data !== null) {
                     println("  Response: " + data);
@@ -722,7 +728,6 @@ function init() {
     scene = new THREE.Scene();
     width = $('#center').width();
     height = $('#center').height();
-
     camera = new THREE.PerspectiveCamera(100, width / height, 0.1, 1000);
     camera.position.set(350, 120, 0);
     camera.rotation.x = -Math.PI / 4;
@@ -759,7 +764,9 @@ function init() {
     //println(""+grid.addToCell("hah4", 250,250));
     //println(""+grid.addToCell("hah5", 250,250));
 
+    makeClientID();
     listEngines();
+    getStatus();
     println("initialized");
 }
 
@@ -785,9 +792,13 @@ function animate() {
 
 
 function submitForm(form) {
-    var body = new FormData(form);
+    if (!attached) {
+        println("upload: must be attached to upload alien jar");
+        return false;
+    }
 
-    request({method: "POST", url: "protected/upload", body: body})
+    var body = new FormData(form);
+    request({method: "POST", url: "protected/upload?clientID=" + getClientID, body: body})
             .then(data => {
                 println("JAR upload successful");
             })
@@ -800,6 +811,16 @@ function submitForm(form) {
                 println("Server not responding, console detached.");
             });
     return false;
+}
+
+
+// 
+function makeClientID() {
+    window.sessionStorage.setItem("clientID", "" + ((new Date()).getTime()) % 10000);
+}
+
+function getClientID() {
+    return window.sessionStorage.getItem("clientID");
 }
 
 

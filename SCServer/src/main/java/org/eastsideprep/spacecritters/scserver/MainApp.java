@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javax.servlet.MultipartConfigElement;
@@ -102,6 +103,8 @@ public class MainApp implements SparkApplication {
         get("/protected/updates", "application/json", (req, res) -> doUpdates(req), new JSONRT());
         get("/protected/check", "application/json", (req, res) -> doCheck(req), new JSONRT());
         get("/protected/listobservers", "application/json", (req, res) -> doListObservers(req), new JSONRT());
+        get("/protected/status", "application/json", (req, res) -> status(req), new JSONRT());
+        get("/protected/allstatus", "application/json", (req, res) -> allStatus(req), new JSONRT());
         post("/protected/upload", (req, res) -> uploadFile(req, res));
 
         MainApp.engines = new HashMap<>();
@@ -120,11 +123,18 @@ public class MainApp implements SparkApplication {
 
     // context helper
     private static ServerContext getCtx(Request req) {
-        ServerContext ctx = req.session().attribute("ServerContext");
-        if (req.session().isNew() || ctx == null) {
+        HashMap<String, ServerContext> ctxMap = req.session().attribute("ServerContexts");
+        if (req.session().isNew() || ctxMap == null) {
+            ctxMap = new HashMap<>();
+            req.session().attribute("ServerContexts", ctxMap);
+        }
+
+        String client = req.queryParams("clientID");
+        ServerContext ctx = ctxMap.get(client);
+        if (ctx == null) {
             ctx = new ServerContext();
-            req.session().attribute("ServerContext", ctx);
-            req.session().maxInactiveInterval(60); // kill this session afte 60 seconds of inactivity
+            ctx.clientSubID = client;
+            ctxMap.put(client, ctx);
         }
 
         // blow up stale contexts
@@ -133,10 +143,11 @@ public class MainApp implements SparkApplication {
             return null;
         }
 
+        req.session().maxInactiveInterval(60); // kill this session afte 60 seconds of inactivity
         return ctx;
     }
 
-    // ROUTES
+// ROUTES
     private static String doStart(Request req) {
         ServerContext ctx = getCtx(req);
         if (ctx.observer == null) {
@@ -225,6 +236,7 @@ public class MainApp implements SparkApplication {
                     engineRequest = "main";
                 }
 
+                // make a nice client id string
                 ctx.client = req.headers("X-FORWARDED-FOR");
                 if (ctx.client == null) {
                     ctx.client = req.raw().getRemoteAddr();
@@ -232,6 +244,7 @@ public class MainApp implements SparkApplication {
                 if (ctx.client.contains(",")) {
                     ctx.client = ctx.client.substring(0, ctx.client.indexOf(","));
                 }
+                ctx.client += ":" + ctx.clientSubID;
 
                 ctx.engine = MainApp.engines.get(engineRequest);
                 if (ctx.engine == null) {
@@ -244,6 +257,7 @@ public class MainApp implements SparkApplication {
                     return null;
                 }
                 ctx.observer = ctx.engine.log.addObserver(ctx.client);
+                ctx.engineName = engineRequest;
             }
             SCGameState state = (SCGameState) ctx.observer.getInitialState();
             numObservers = ctx.engine.log.getObservers().size();
@@ -443,6 +457,67 @@ public class MainApp implements SparkApplication {
         }
 
         return "ok";
+    }
+
+    public Object[] status(Request req) {
+        ArrayList<String> status = new ArrayList<>();
+
+        ServerContext ctx = getCtx(req);
+        if (ctx == null) {
+            System.out.println("status: no context");
+            status.add("status: no context");
+            return status.toArray();
+        }
+
+        if (ctx.observer == null) {
+            System.out.println("status: observer not initialized");
+            status.add("status: observer not initialized");
+            return status.toArray();
+        }
+
+        if (ctx.observer.isStale()) {
+            System.out.println("status: observer stale");
+            status.add("status: observer stale");
+            return status.toArray();
+        }
+
+        status.add("status:");
+
+        // Get current size of heap in bytes
+        long heapSize = Runtime.getRuntime().totalMemory();
+        // Get maximum size of heap in bytes. The heap cannot grow beyond this size.// Any attempt will result in an OutOfMemoryException.
+        long heapMaxSize = Runtime.getRuntime().maxMemory();
+        // Get amount of free memory within the heap in bytes. This size will increase // after garbage collection and decrease as new objects are created.
+        long heapFreeSize = Runtime.getRuntime().freeMemory();
+
+        status.add("Total JVM heap size: " + heapSize + " bytes");
+        status.add("Max JVM heap size: " + heapMaxSize + " bytes");
+        status.add("Free bytes: " + heapFreeSize);
+
+        status.add("Engine :" + ctx.engineName + ", thread: " + (ctx.engine.isAlive() ? "alive" : "dead"));
+
+        return status.toArray();
+    }
+
+    public Object[] allStatus(Request req) {
+        ArrayList<String> status = new ArrayList<>();
+        status.add("System status:");
+
+        // Get current size of heap in bytes
+        long heapSize = Runtime.getRuntime().totalMemory();
+        // Get maximum size of heap in bytes. The heap cannot grow beyond this size.// Any attempt will result in an OutOfMemoryException.
+        long heapMaxSize = Runtime.getRuntime().maxMemory();
+        // Get amount of free memory within the heap in bytes. This size will increase // after garbage collection and decrease as new objects are created.
+        long heapFreeSize = Runtime.getRuntime().freeMemory();
+
+        status.add ("Total JVM heap size: " + heapSize + " bytes");
+        status.add("Max JVM heap size: " + heapMaxSize + " bytes");
+        status.add("Free bytes: " + heapFreeSize);
+
+        for (Entry<String, GameEngineV2> entry : engines.entrySet()) {
+            status.add("Engine :" + entry.getKey() + ", thread: " + (entry.getValue().isAlive() ? "alive" : "dead"));
+        }
+        return status.toArray();
     }
 
 }
