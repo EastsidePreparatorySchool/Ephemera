@@ -14,6 +14,8 @@ var statusP = document.getElementById("status");
 var countsP = document.getElementById("counts");
 var intervalSpan = document.getElementById("interval");
 var observersSpan = document.getElementById("observers");
+var memstatsSpan = document.getElementById("memstats");
+var livenessSpan = document.getElementById("liveness");
 var observerlistP = document.getElementById("observerlist");
 var engineName = document.getElementById("enginename");
 var engines = document.getElementById("engines");
@@ -25,6 +27,9 @@ var grid = [];
 var attached = false;
 var observers = 0;
 var running = false;
+
+
+// contants for update record types need to be in sync with SCGameLogEntry.java
 const ADDSPECIES = 1;
 const ADDSTAR = 2;
 const ADDPLANET = 3;
@@ -33,7 +38,7 @@ const TURN = 5;
 const ADD = 6;
 const MOVE = 7;
 const KILL = 8;
-//initialize three.js and set all initial values
+const STATECHANGE=9;
 
 var scene;
 var camera;
@@ -203,6 +208,10 @@ function processUpdates(data) {
                     //println("Alien id: "+o.id+" died.");
                     killAlien(o);
                     break;
+                case STATECHANGE:
+                    //println("Alien id: "+o.id+" died.");
+                    println ("StateChange: "+(o.id==0?"Paused":"Running"));
+                    break;
                 default:
                     println("unknown record type" + o.type);
                     break;
@@ -370,8 +379,15 @@ function getStatus() {
             .then(data => {
                 if (data !== null) {
                     data = JSON.parse(data);
-                    for (var i = 0; i < data.length; i++) {
-                        println(data[i]);
+                    if (!attached) {
+                        for (var i = 0; i < data.length; i++) {
+                            println(data[i]);
+                        }
+                    } else {
+                        if (data.length > 1) {
+                            memstatsSpan.innerText = data[1];
+                            livenessSpan.innerText = data[2];
+                        }
                     }
                     setTimeout(getStatus, 10000);
                 }
@@ -681,7 +697,7 @@ class SpeciesMap {
         text.appendChild(tip);
         var br = document.createElement("br");
         species.appendChild(br);
-        println("registered species " + name + ", id:" + id);
+        //println("registered species " + name + ", id:" + id);
         return color;
     }
 }

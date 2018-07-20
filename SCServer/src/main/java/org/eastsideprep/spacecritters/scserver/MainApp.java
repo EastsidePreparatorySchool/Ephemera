@@ -212,11 +212,11 @@ public class MainApp implements SparkApplication {
     public static class AttachRecord {
 
         String engine;
-        int observer;
+        String observer;
         int turns;
         int observers;
 
-        AttachRecord(String n, int o, int t, int os) {
+        AttachRecord(String n, String o, int t, int os) {
             engine = n;
             observer = o;
             turns = t;
@@ -261,7 +261,7 @@ public class MainApp implements SparkApplication {
             }
             SCGameState state = (SCGameState) ctx.observer.getInitialState();
             numObservers = ctx.engine.log.getObservers().size();
-            return new AttachRecord(ctx.engine.name, ctx.observer.hashCode(), state.totalTurns, numObservers);
+            return new AttachRecord(ctx.engine.name, ctx.client, state.totalTurns, numObservers);
 
         } catch (Exception e) {
             System.out.println("exception in doAttach");
@@ -465,7 +465,7 @@ public class MainApp implements SparkApplication {
         ServerContext ctx = getCtx(req);
         if (ctx == null) {
             System.out.println("status: no context");
-            status.add("status: no context");
+            status.add("no context");
             return status.toArray();
         }
 
@@ -482,7 +482,14 @@ public class MainApp implements SparkApplication {
         }
 
         status.add("status:");
+        status.add(getHeapStats());
 
+        status.add((ctx.engine.isAlive() ? "alive" : "dead"));
+
+        return status.toArray();
+    }
+
+    private String getHeapStats() {
         // Get current size of heap in bytes
         long heapSize = Runtime.getRuntime().totalMemory();
         // Get maximum size of heap in bytes. The heap cannot grow beyond this size.// Any attempt will result in an OutOfMemoryException.
@@ -490,13 +497,20 @@ public class MainApp implements SparkApplication {
         // Get amount of free memory within the heap in bytes. This size will increase // after garbage collection and decrease as new objects are created.
         long heapFreeSize = Runtime.getRuntime().freeMemory();
 
-        status.add("Total JVM heap size: " + heapSize + " bytes");
-        status.add("Max JVM heap size: " + heapMaxSize + " bytes");
-        status.add("Free bytes: " + heapFreeSize);
+        return formatNumber(heapFreeSize) + "/" + formatNumber(heapSize) + "/" + formatNumber(heapMaxSize);
 
-        status.add("Engine :" + ctx.engineName + ", thread: " + (ctx.engine.isAlive() ? "alive" : "dead"));
+    }
 
-        return status.toArray();
+    private String formatNumber(long l) {
+        if (l > 9999999999L) {
+            return (l / 1000000000L) + "GB";
+        } else if (l > 9999999L) {
+            return (l / 1000000) + "MB";
+        } else if (l > 9999L) {
+            return (l / 1000) + "KB";
+        } else {
+            return l + "B";
+        }
     }
 
     public Object[] allStatus(Request req) {
@@ -510,12 +524,10 @@ public class MainApp implements SparkApplication {
         // Get amount of free memory within the heap in bytes. This size will increase // after garbage collection and decrease as new objects are created.
         long heapFreeSize = Runtime.getRuntime().freeMemory();
 
-        status.add ("Total JVM heap size: " + heapSize + " bytes");
-        status.add("Max JVM heap size: " + heapMaxSize + " bytes");
-        status.add("Free bytes: " + heapFreeSize);
+        status.add(getHeapStats());
 
         for (Entry<String, GameEngineV2> entry : engines.entrySet()) {
-            status.add("Engine :" + entry.getKey() + ", thread: " + (entry.getValue().isAlive() ? "alive" : "dead"));
+            status.add("Engine: " + entry.getKey() + ", thread: " + (entry.getValue().isAlive() ? "alive" : "dead"));
         }
         return status.toArray();
     }

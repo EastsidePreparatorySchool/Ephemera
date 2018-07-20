@@ -126,6 +126,10 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void showEngineStateChange(GameState gs) {
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.STATECHANGE,
+                0, 0, 0, 0, 
+                null, null, gs == GameState.Running?1:0, -1, 
+                0.0, 0.0));
     }
 
     @Override

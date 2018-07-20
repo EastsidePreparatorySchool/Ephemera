@@ -7,6 +7,7 @@ package org.eastsideprep.spacecritters.scgamelog;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import org.eastsideprep.spacecritters.gameengineinterfaces.GameState;
 import org.eastsideprep.spacecritters.gamelog.GameLogEntry;
 import org.eastsideprep.spacecritters.gamelog.GameLogState;
 
@@ -20,6 +21,7 @@ public class SCGameState implements GameLogState {
     public int totalTurns;
     public boolean forUpdates;
     public SCGameLogEntry lastTurn;
+    private SCGameLogEntry lastGameState;
 
     private HashMap<Integer, SCGameLogEntry> aliens = new HashMap<>();
     private HashMap<Integer, SCGameLogEntry> planets = new HashMap<>();
@@ -87,9 +89,13 @@ public class SCGameState implements GameLogState {
             case SCGameLogEntry.Type.TURN:
                 totalTurns = sge.param1;
                 lastTurn = new SCGameLogEntry(sge);
-
                 break;
-            case SCGameLogEntry.Type.ADD:
+                
+            case SCGameLogEntry.Type.STATECHANGE:
+                lastGameState = new SCGameLogEntry(sge);
+                break;
+                
+             case SCGameLogEntry.Type.ADD:
                 aliens.put(sge.id, new SCGameLogEntry(sge));
                 break;
             case SCGameLogEntry.Type.ADDSTAR:
@@ -209,6 +215,9 @@ public class SCGameState implements GameLogState {
         result.addAll(kills);
         if (lastTurn != null) {
             result.add(lastTurn);
+        }
+        if (lastGameState != null) {
+            result.add(lastGameState);
         }
         return result;
     }
