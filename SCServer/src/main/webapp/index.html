@@ -1,114 +1,51 @@
 <!DOCTYPE html>
+
 <html style="height:100%; margin:0; padding:0; ">
-
     <head>
-        <title>Space Critters Online V1.0</title>
+        <title>SpaceCritters - Welcome!</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-
-    <body style="margin: 0; padding: 0; height:100%" onload="init()">
-
-        <style>
-            /* Tooltip container */
-            .tooltip {
-                position: relative;
-                display: inline-block;
-                border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
-            }
-
-            /* Tooltip text */
-            .tooltip .tooltiptext {
-                visibility: hidden;
-                width: 120px;
-                background-color: #555;
-                color: #fff;
-                text-align: center;
-                padding: 5px 0;
-                border-radius: 6px;
-
-                /* Position the tooltip text */
-                position: absolute;
-                z-index: 1;
-                bottom: 125%;
-                left: 50%;
-                margin-left: -60px;
-
-                /* Fade in tooltip */
-                opacity: 0;
-                transition: opacity 0.3s;
-            }
-
-            /* Tooltip arrow */
-            .tooltip .tooltiptext::after {
-                content: "";
-                position: absolute;
-                top: 100%;
-                left: 50%;
-                margin-left: -5px;
-                border-width: 5px;
-                border-style: solid;
-                border-color: #555 transparent transparent transparent;
-            }
-
-            /* Show the tooltip text when you mouse over the tooltip container */
-            .tooltip:hover .tooltiptext {
-                visibility: visible;
-                opacity: 1;
-            }
-        </style>
+    <body onload="init()" style="height:100%; margin:0; padding:0; ">
         <link rel="shortcut icon" href="EPS-eagle-16.png">
 
-        <div style="float:left;width:75%; height:80%; text-align: center; background-color: #000000; color:#ffffff;" id="center">
+        <div id="top" style="width:100%;background-color: #344343;height:20%;text-align: center; ">
+            Top div
         </div>
 
-        <div style="float:left;width:25%; height:80%;  text-align: left;background-color: black; ;color:#fca311; font-family: monospace">
-            <div style="margin:5%">
-                Eastside Preparatory School<br>
-                SpaceCritters Console V1.0<br><br>
-                
-                <p id="attach" style="display:inline">
-                    <select style="width:40%" id="engines"></select>
-                    <button style="width:40%" onclick="attach()">Attach</button>
-                    <button style="width:80%" onclick="location.assign('welcome.html')">Back to welcome page</button>
-                </p>
-                <!--<button style="width:100px" onclick="updates()">Updates</button><br>-->
-
-                <br>
-                <p id="counts" style="color:gold;display:none">
-                    <button style="width:80%" id="startpause" onclick="start()">Start</button><br>
-                    <button style="width:80%" onclick="detach()">Detach</button><br><br>
-                    <span id="status"></span><br>
-                    <br>
-                    Turns:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="turns">0</span><br>
-                    Aliens:&nbsp;&nbsp;&nbsp;&nbsp;<span id="numaliens">0</span><br>
-                    Request:&nbsp;&nbsp;&nbsp;<span id="interval">500</span>ms<br>
-                    Observers:&nbsp;<span id="observers">0</span><br>
-                    Memory:&nbsp;&nbsp;&nbsp;&nbsp;<span id="memstats"></span><br>
-                    Liveness:&nbsp;&nbsp;<span id="liveness"></span>
-                </p>
-                <br>
-                <p id="species"></p>
-                <p id="observerlist"></p>
-                <!--                <form enctype="multipart/form-data"  onsubmit="return submitForm(this);" name="jarform">
-                                    JAR file for Alien: <input name="jarfile" type="file" />
-                                    <input type="submit" value="Upload"/>
-                                </form>-->
-            </div>
+        <div id="left" style="float:left;width:20%; height:60%;background-color: #8B9B73">
+            <form action="game.html" method="get">
+                <input type="hidden" name="attach" value="main" />
+                <input type="submit" value="Attach to main">
+            </form><br>
+            <form action="">
+                <input type="radio" name="view" value="engines" checked> Engines<br>
+                <input type="radio" name="view" value="female"> Observers<br>
+                <input type="radio" name="view" value="other"> Stats
+            </form><br>
+            <button id="adminbutton" onclick="toggleAdmin()">Show admin tools</button>
         </div>
 
-        <div style="width:100%;height:20%;background-color: #808080; clear:both;">
+        <div id="center" style="float:left;width:80%;height:60%; text-align: center; background-color: #2E2224; color:#8B9B73;">
+            Center pane<br><br>
+            <img id="splash" src ="splash.png" alt="" style="height:100%">
+        </div>
+
+        <div id = "admin" style="display:none; float:left;width:20%; height:60%; text-align: center;background-color: #63816F; font-family: monospace">
+            Engine name:<br>
+            <input type="text" id="enginename" value="" style="width:300px;">
+            <button style="width:100px" onclick="create()">Create</button><br>
+        </div>
+
+        <div id="bottom" style="width:100%;height:20%;background-color: #808080; clear:both;">
             <textarea style="width:100%; height:100%; background-color: #808080;overflow-y:scroll; resize:none;" id="output"></textarea>
         </div>
 
-        <br>
+        <script>
+            var debug = false;
+        </script>
+        <script src="js/welcome.js">
+        </script>
 
-        <script src="js/jquery-3.3.1.min.js"></script>
-        <script src="js/three.js"></script>
-        <script src="js/OrbitControls.js"></script>
-        <script src="js/Detector.js"></script>
-        <script>var debug = false;</script>
-        <script src="js/sc.js"></script>
     </body>
-
-
-
 </html>

@@ -154,16 +154,21 @@ function toggleAdmin() {
 }
 
 function killSplash() {
-    splash.style.display="none";
+    splash.style.display = "none";
 }
 
 
 function init() {
+    if (getClientID() === null) {
+        setTimeout(killSplash, 2000);
+    } else {
+        killSplash();
+    }
+
     makeClientID();
 //    queryAdmin();
     listEngines();
     getStatus();
-    setTimeout(killSplash, 1000);
     println("initialized");
 }
 
