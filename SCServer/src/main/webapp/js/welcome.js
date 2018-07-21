@@ -43,7 +43,6 @@ function create() {
             .then(data => {
                 if (data !== null) {
                     println("  Response: " + data);
-                    listEngines();
                 }
             })
             .catch(error => {
@@ -189,14 +188,14 @@ function listObservers() {
 
 
 function listStats() {
-    request({url: "protected/allstatus"})
+    request({url: "protected/allstatus2"})
             .then(data => {
                 if (data !== null) {
                     //println ("Raw: "+data);
                     data = JSON.parse(data);
                     contentP.innerHTML = "<br><br><br><br>Statistics:<br><br>";
-                    for (var i = 0; i < data.length; i++) {
-                        var engine = document.createTextNode(data[i]);
+                    for (var item in data) {
+                        var engine = document.createTextNode(item+":"+data[item]);
                         contentP.appendChild(engine);
                         contentP.appendChild(document.createElement("BR"));
                     }

@@ -152,6 +152,7 @@ public class MainApp implements SparkApplication {
         get("/protected/listobservers", "application/json", (req, res) -> doListObservers(req), new JSONRT());
         get("/protected/status", "application/json", (req, res) -> status(req), new JSONRT());
         get("/protected/allstatus", "application/json", (req, res) -> allStatus(req), new JSONRT());
+        get("/protected/allstatus2", "application/json", (req, res) -> allStatus2(req), new JSONRT());
         get("/protected/queryadmin", "application/json", (req, res) -> queryAdmin(req));
         post("/protected/upload", (req, res) -> uploadFile(req, res));
 
@@ -240,7 +241,7 @@ public class MainApp implements SparkApplication {
         synchronized (engines) {
             result = new EngineRecord[engines.size()];
             int i = 0;
-            for (Entry<String, GameEngineV2>  e : engines.entrySet()) {
+            for (Entry<String, GameEngineV2> e : engines.entrySet()) {
                 EngineRecord er = new EngineRecord();
                 er.isAlive = e.getValue().isAlive();
                 er.name = e.getKey();
@@ -249,7 +250,7 @@ public class MainApp implements SparkApplication {
                 result[i++] = er;
                 //System.out.println("  ER: "+er.name+", "+(er.isAlive?"alive":"dead"));
             }
-            Arrays.sort(result, (a,b)->b.name.compareTo(a.name));
+            Arrays.sort(result, (a, b) -> b.name.compareTo(a.name));
         }
 
         return result;
@@ -627,6 +628,34 @@ public class MainApp implements SparkApplication {
         } else {
             return l + "B";
         }
+    }
+
+    public class AllStats {
+
+        public long freeHeapSpace;
+        public long currentHeapSize;
+        public long maxHeapSize;
+        public int numEngines;
+        public int totalObservers;
+    }
+
+    public AllStats allStatus2(Request req) {
+
+        AllStats as = new AllStats();
+
+        // Get current size of heap in bytes
+        as.currentHeapSize = Runtime.getRuntime().totalMemory();
+        // Get maximum size of heap in bytes. The heap cannot grow beyond this size.// Any attempt will result in an OutOfMemoryException.
+        as.maxHeapSize = Runtime.getRuntime().maxMemory();
+        // Get amount of free memory within the heap in bytes. This size will increase // after garbage collection and decrease as new objects are created.
+        as.freeHeapSpace = Runtime.getRuntime().freeMemory();
+        
+        synchronized(engines) {
+            as.numEngines = engines.size();
+            as.totalObservers = doListObservers(req).length;
+        }
+       
+        return as;
     }
 
     public Object[] allStatus(Request req) {
