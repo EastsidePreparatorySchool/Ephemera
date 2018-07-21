@@ -9,6 +9,10 @@ var updateIntervalActive = 50;
 
 var textarea = document.getElementById("output");
 var adminP = document.getElementById("admin");
+var adminButton = document.getElementById("adminbutton");
+var center = document.getElementById("center");
+var splash = document.getElementById("splash");
+
 
 // basic server calls in the absence of jquery
 
@@ -63,9 +67,11 @@ function queryAdmin() {
     request({url: "protected/queryadmin"})
             .then(data => {
                 if (data !== null) {
-                    println ("queryAdmin: "+data);
+                    println("queryAdmin: " + data);
                     if (data === "yes") {
                         adminP.style.display = "inline";
+                        adminButton.innerText = "Hide admin tools";
+                        center.style.width = "60%";
                     }
                 }
             })
@@ -120,7 +126,7 @@ function listEngines() {
                     //println ("Raw: "+data);
                     data = JSON.parse(data);
                     for (var s in data) {
-                        println("Engine: '"+data[s]+"'");
+                        println("Engine: '" + data[s] + "'");
 //
 //                        var option = document.createElement("option");
 //                        option.value = data[s];
@@ -137,13 +143,27 @@ function listEngines() {
             });
 }
 
+function toggleAdmin() {
+    if (adminP.style.display === "none") {
+        queryAdmin();
+    } else {
+        adminP.style.display = "none";
+        adminButton.innerText = "Show admin tools";
+        center.style.width = "80%";
+    }
+}
+
+function killSplash() {
+    splash.style.display="none";
+}
 
 
 function init() {
     makeClientID();
-    queryAdmin();
+//    queryAdmin();
     listEngines();
     getStatus();
+    setTimeout(killSplash, 1000);
     println("initialized");
 }
 

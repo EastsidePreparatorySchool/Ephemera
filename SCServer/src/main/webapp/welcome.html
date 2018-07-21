@@ -17,21 +17,24 @@
             <form action="index.html" method="get">
                 <input type="hidden" name="attach" value="main" />
                 <input type="submit" value="Attach to main">
-            </form>
+            </form><br>
+            <form action="">
+                <input type="radio" name="view" value="engines" checked> Engines<br>
+                <input type="radio" name="view" value="female"> Observers<br>
+                <input type="radio" name="view" value="other"> Stats
+            </form><br>
+            <button id="adminbutton" onclick="toggleAdmin()">Show admin tools</button>
         </div>
 
-        <div id="center" style="float:left;width:60%; height:60%; text-align: center; background-color: #2E2224; color:#8B9B73;">
+        <div id="center" style="float:left;width:80%;height:60%; text-align: center; background-color: #2E2224; color:#8B9B73;">
             Center pane<br><br>
             <img id="splash" src ="splash.png" alt="" style="height:100%">
         </div>
 
-        <div id = "right" style="float:left;width:20%; height:60%; text-align: center;background-color: #63816F; font-family: monospace">
-            <button onclick="queryAdmin()">Admin tools</button>
-            <p id='admin' style="display:none">
-                Engine name:<br>
-                <input type="text" id="enginename" value="" style="width:300px;">
-                <button style="width:100px" onclick="create()">Create</button><br>
-            <p>
+        <div id = "admin" style="display:none; float:left;width:20%; height:60%; text-align: center;background-color: #63816F; font-family: monospace">
+            Engine name:<br>
+            <input type="text" id="enginename" value="" style="width:300px;">
+            <button style="width:100px" onclick="create()">Create</button><br>
         </div>
 
         <div id="bottom" style="width:100%;height:20%;background-color: #808080; clear:both;">
