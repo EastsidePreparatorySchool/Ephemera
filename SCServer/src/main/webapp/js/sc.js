@@ -357,12 +357,12 @@ function listEngines() {
                     //println ("Raw: "+data);
                     data = JSON.parse(data);
                     engines.innerHTML = "";
-                    for (var s in data) {
-                        //println("Engine: '"+data[s]+"'");
+                    for (var i = 0; i<data.length; i++) {
+                        //println("Engine: '"+data[i].name+"'");
 
                         var option = document.createElement("option");
-                        option.value = data[s];
-                        var optionText = document.createTextNode(data[s]);
+                        option.value = data[i].name;
+                        var optionText = document.createTextNode(data[i].name);
                         option.appendChild(optionText);
                         engines.appendChild(option);
                     }

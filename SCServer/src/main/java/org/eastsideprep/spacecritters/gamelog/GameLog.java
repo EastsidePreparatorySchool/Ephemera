@@ -29,6 +29,7 @@ public class GameLog {
     private int end = 0;
     private int minRead = 0;
     private final int COLLAPSE_THRESHOLD = 1000;
+    public int turnsCompleted = 0;
 
     public GameLog(GameLogState state) {
         rlock = rwl.readLock();

@@ -12,6 +12,10 @@ var adminP = document.getElementById("admin");
 var adminButton = document.getElementById("adminbutton");
 var center = document.getElementById("center");
 var splash = document.getElementById("splash");
+var contentP = document.getElementById("content");
+var engineName = document.getElementById("enginename");
+
+var updateTimer;
 
 
 // basic server calls in the absence of jquery
@@ -34,6 +38,7 @@ function request(obj) {
 
 
 function create() {
+    println("trying to create engine ...")
     request({url: "protected/create?name=" + engineName.value})
             .then(data => {
                 if (data !== null) {
@@ -48,20 +53,7 @@ function create() {
             });
 }
 
-function create() {
-    request({url: "protected/create?name=" + engineName.value})
-            .then(data => {
-                if (data !== null) {
-                    println("  Response: " + data);
-                    listEngines();
-                }
-            })
-            .catch(error => {
-                if (error !== null && error.length > 0) {
-                    println("  Error: '" + error + "'");
-                }
-            });
-}
+
 
 function queryAdmin() {
     request({url: "protected/queryadmin"})
@@ -119,20 +111,49 @@ function getStatus() {
             });
 }
 
+function enginesView() {
+    clearInterval(updateTimer);
+    updateTimer = setInterval(listEngines, 1000);
+}
+function observersView() {
+    clearInterval(updateTimer);
+    updateTimer = setInterval(listObservers, 1000);
+}
+function statsView() {
+    clearInterval(updateTimer);
+    updateTimer = setInterval(listStats, 1000);
+}
+
 function listEngines() {
     request({url: "protected/listengines"})
             .then(data => {
                 if (data !== null) {
                     //println ("Raw: "+data);
                     data = JSON.parse(data);
-                    for (var s in data) {
-                        println("Engine: '" + data[s] + "'");
-//
-//                        var option = document.createElement("option");
-//                        option.value = data[s];
-//                        var optionText = document.createTextNode(data[s]);
-//                        option.appendChild(optionText);
-//                        engines.appendChild(option);
+                    contentP.innerHTML = "<br><br><br><br>Engines:<br><br>";
+                    for (var i = 0; i < data.length; i++) {
+//                        println("Engine: '" + data[i].name + "', "
+//                                + "alive: " + data[i].isAlive + ", "
+//                                + "observers: " + data[i].observers + ", "
+//                                + "turns: " + data[i].turns);
+
+                        var atag = document.createElement("A");
+                        if (data[i].isAlive) {
+                            atag.href = "game.html?attach=" + data[i].name;
+                        } else {
+                            atag.href = "logdownload?name=" + data[i].name;
+                            atag.download = "log_" + name + "_" + (new Date()).getTime();
+                        }
+                        var engine = document.createTextNode(data[i].name);
+                        var info = document.createTextNode(", "
+                                + "status: " + (data[i].isAlive ? "alive" : "dead") + ", "
+                                + "turns: " + data[i].turns + ", "
+                                + "observers: " + data[i].observers
+                                );
+                        atag.appendChild(engine);
+                        contentP.appendChild(atag);
+                        contentP.appendChild(info);
+                        contentP.appendChild(document.createElement("BR"));
                     }
                 }
             })
@@ -143,6 +164,50 @@ function listEngines() {
             });
 }
 
+function listObservers() {
+    request({url: "protected/listobservers"})
+            .then(data => {
+                if (data !== null) {
+                    //println ("Raw: "+data);
+                    contentP.innerHTML = "<br><br><br><br>Observers:<br><br>";
+                    data = JSON.parse(data);
+                    if (data.length > 0) {
+                        for (var i = 0; i < data.length; i++) {
+                            var engine = document.createTextNode(data[i]);
+                            contentP.appendChild(engine);
+                            contentP.appendChild(document.createElement("BR"));
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                if (error !== null && error.length > 0) {
+                    println("  Error: '" + error + "'");
+                }
+            });
+}
+
+
+function listStats() {
+    request({url: "protected/allstatus"})
+            .then(data => {
+                if (data !== null) {
+                    //println ("Raw: "+data);
+                    data = JSON.parse(data);
+                    contentP.innerHTML = "<br><br><br><br>Statistics:<br><br>";
+                    for (var i = 0; i < data.length; i++) {
+                        var engine = document.createTextNode(data[i]);
+                        contentP.appendChild(engine);
+                        contentP.appendChild(document.createElement("BR"));
+                    }
+                }
+            })
+            .catch(error => {
+                if (error !== null && error.length > 0) {
+                    println("  Error: '" + error + "'");
+                }
+            });
+}
 function toggleAdmin() {
     if (adminP.style.display === "none") {
         queryAdmin();
@@ -170,6 +235,7 @@ function init() {
     listEngines();
     getStatus();
     println("initialized");
+    updateTimer = setInterval(listEngines, 1000);
 }
 
 // 

@@ -6,11 +6,13 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-    <body onload="init()" style="height:100%; margin:0; padding:0; ">
+    <body onload="init()" style="height:100%; margin:0; padding:0;" vlink="red">
         <link rel="shortcut icon" href="EPS-eagle-16.png">
 
-        <div id="top" style="width:100%;background-color: #344343;height:20%;text-align: center; ">
-            Top div
+        <div id="top" style="font-size: 30px; font-family:Verdana;width:100%;color: #8B9B73;background-color: #344343;height:20%;text-align: center; ">
+            <br>
+            <br>
+            Welcome to SpaceCritters Online!
         </div>
 
         <div id="left" style="float:left;width:20%; height:60%;background-color: #8B9B73">
@@ -19,16 +21,16 @@
                 <input type="submit" value="Attach to main">
             </form><br>
             <form action="">
-                <input type="radio" name="view" value="engines" checked> Engines<br>
-                <input type="radio" name="view" value="female"> Observers<br>
-                <input type="radio" name="view" value="other"> Stats
+                <input type="radio" name="view" value="engines" checked onclick="enginesView()"> Engines<br>
+                <input type="radio" name="view" value="observers" onclick="observersView()"> Observers<br>
+                <input type="radio" name="view" value="stats" onclick="statsView()"> Statistics
             </form><br>
             <button id="adminbutton" onclick="toggleAdmin()">Show admin tools</button>
         </div>
 
-        <div id="center" style="float:left;width:80%;height:60%; text-align: center; background-color: #2E2224; color:#8B9B73;">
-            Center pane<br><br>
+        <div id="center" style="float:left;width:80%;height:60%; background-color: #2E2224; color:#8B9B73;">
             <img id="splash" src ="splash.png" alt="" style="height:100%">
+            <p id ="content" style="margin-left:100px;"></p>
         </div>
 
         <div id = "admin" style="display:none; float:left;width:20%; height:60%; text-align: center;background-color: #63816F; font-family: monospace">

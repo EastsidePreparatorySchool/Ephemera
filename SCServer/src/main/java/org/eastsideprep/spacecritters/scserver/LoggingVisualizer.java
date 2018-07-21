@@ -78,6 +78,7 @@ public class LoggingVisualizer implements GameVisualizer {
                 0, 0, totalTurns, numAliens, 
                 null, null, -1, -1, 
                 0.0, 0.0));
+        log.turnsCompleted = totalTurns;
     }
 
     @Override

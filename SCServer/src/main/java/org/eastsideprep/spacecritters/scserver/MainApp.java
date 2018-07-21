@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -30,17 +31,64 @@ import spark.servlet.SparkApplication;
 
 public class MainApp implements SparkApplication {
 
+    private class Governor extends HashMap<String, GameEngineV2> {
+
+        Governor() {
+        }
+
+        private void init() {
+            new Thread(() -> {
+                watchDogThread();
+            }).start();
+
+        }
+
+        private void watchDogThread() {
+            try {
+                Thread.sleep(300000);
+                while (true) {
+                    int alive = 0;
+                    synchronized (this) {
+                        for (GameEngineV2 e : this.values()) {
+                            if (e.isAlive()) {
+                                alive++;
+                            }
+                        }
+                    }
+                    if (alive == 0) {
+                        System.out.println("Governor: There were none alive, so I am creating another one.");
+                        String name = getDateString();
+                        GameEngineV2 eng = MainApp.createServerGameEngine(name);
+                        synchronized (engines) {
+                            engines.put(name, eng);
+                        }
+                        Thread.sleep(5000);
+                    }
+                    Thread.sleep(1000);
+                }
+            } catch (Exception e) {
+
+            }
+
+        }
+
+    }
+
     static GameEngineV2 geMain;
-    static HashMap<String, GameEngineV2> engines;
+    static Governor engines;
     static MainApp app;
     static Thread mainThread;
     static boolean createServerEngine = true;
 
-    // desktop initialization
-    public static void main(String[] args) {
+    private static String getDateString() {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-        System.out.println("SC main() (scserver) " + dateFormat.format(date));
+        return dateFormat.format(date);
+    }
+
+    // desktop initialization
+    public static void main(String[] args) {
+        System.out.println("SC main() (scserver) " + getDateString());
 
         //System.setProperty("javafx.preloader", "org.eastsideprep.spacecritters.spacecritters.SplashScreenLoader");
         // invoked from main, start Spark Jetty server
@@ -107,7 +155,8 @@ public class MainApp implements SparkApplication {
         get("/protected/queryadmin", "application/json", (req, res) -> queryAdmin(req));
         post("/protected/upload", (req, res) -> uploadFile(req, res));
 
-        MainApp.engines = new HashMap<>();
+        MainApp.engines = new Governor();
+        MainApp.engines.init();
 
         if (MainApp.createServerEngine) {
             MainApp.geMain = MainApp.createServerGameEngine("main");
@@ -176,12 +225,34 @@ public class MainApp implements SparkApplication {
         return (name == null || name.equalsIgnoreCase("gmein@eastsideprep.org"));
     }
 
-    private static String[] doListEngines(Request req) {
-        String[] result = new String[engines.size()];
-        for (String s : engines.keySet()) {
-            System.out.println("Listing engine: '" + s + "'");
+    public static class EngineRecord {
+
+        String name;
+        boolean isAlive;
+        int turns;
+        int observers;
+
+    }
+
+    private static EngineRecord[] doListEngines(Request req) {
+        //System.out.println("ListEngines:");
+        EngineRecord[] result;
+        synchronized (engines) {
+            result = new EngineRecord[engines.size()];
+            int i = 0;
+            for (Entry<String, GameEngineV2>  e : engines.entrySet()) {
+                EngineRecord er = new EngineRecord();
+                er.isAlive = e.getValue().isAlive();
+                er.name = e.getKey();
+                er.observers = e.getValue().log.getObservers().size();
+                er.turns = e.getValue().log.turnsCompleted;
+                result[i++] = er;
+                //System.out.println("  ER: "+er.name+", "+(er.isAlive?"alive":"dead"));
+            }
+            Arrays.sort(result, (a,b)->b.name.compareTo(a.name));
         }
-        return engines.keySet().toArray(result);
+
+        return result;
     }
 
     private static Object[] doListObservers(Request req) {
@@ -189,9 +260,11 @@ public class MainApp implements SparkApplication {
 
         String name = req.queryParams("name");
         if (name != null && !name.equals("")) {
-            for (Entry<String, GameEngineV2> e : engines.entrySet()) {
-                if (Pattern.matches(name, e.getKey())) {
-                    theseEngines.add(e.getValue());
+            synchronized (engines) {
+                for (Entry<String, GameEngineV2> e : engines.entrySet()) {
+                    if (Pattern.matches(name, e.getKey())) {
+                        theseEngines.add(e.getValue());
+                    }
                 }
             }
 
@@ -215,6 +288,7 @@ public class MainApp implements SparkApplication {
     }
 
     private static String doCreateEngine(Request req) {
+        System.out.println("Create Engine request");
         if (!isAdmin(req)) {
             return "client not authorized to use this API";
         }
@@ -223,22 +297,24 @@ public class MainApp implements SparkApplication {
 
         // cannot create main engine after the fact todo: rethink that.
         if (name.equalsIgnoreCase("main")) {
-            System.err.println("Exception in doCreateEngine: can't create main engine from web interface");
+            System.out.println("Exception in doCreateEngine: can't create main engine from web interface");
             return null;
         }
 
         GameEngineV2 eng = MainApp.engines.get(name);
         if (eng != null) {
-            System.err.println("Exception in doCreateEngine: engine '" + name + "'exists already");
+            System.out.println("Exception in doCreateEngine: engine '" + name + "' already exists");
             return null;
         }
 
         try {
             eng = createServerGameEngine(name);
         } catch (Exception e) {
-            System.err.println("Exception in doCreateEngine: " + e.getMessage());
+            System.out.println("Exception in doCreateEngine: " + e.getMessage());
         }
-        engines.put(name, eng);
+        synchronized (engines) {
+            engines.put(name, eng);
+        }
         return name;
 
     }
