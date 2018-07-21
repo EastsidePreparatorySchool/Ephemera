@@ -225,6 +225,9 @@ public class MainApp implements SparkApplication {
     }
 
     private static AttachRecord doAttach(Request req) {
+//        for (String s :req.headers()) {
+//            System.out.println("Attach: header: "+s+":"+req.headers(s));
+//        }
         String engineRequest;
         int numObservers = 1;
         try {
@@ -237,12 +240,15 @@ public class MainApp implements SparkApplication {
                 }
 
                 // make a nice client id string
-                ctx.client = req.headers("X-FORWARDED-FOR");
+                ctx.client = req.headers("X-MS-CLIENT-PRINCIPAL-NAME");
                 if (ctx.client == null) {
-                    ctx.client = req.raw().getRemoteAddr();
-                }
-                if (ctx.client.contains(",")) {
-                    ctx.client = ctx.client.substring(0, ctx.client.indexOf(","));
+                    ctx.client = req.headers("X-FORWARDED-FOR");
+                    if (ctx.client == null) {
+                        ctx.client = req.raw().getRemoteAddr();
+                    }
+                    if (ctx.client.contains(",")) {
+                        ctx.client = ctx.client.substring(0, ctx.client.indexOf(","));
+                    }
                 }
                 ctx.client += ":" + ctx.clientSubID;
 

@@ -24,8 +24,10 @@ var planets = {};
 var stars = [];
 var speciesMap = null;
 var grid = [];
-var attached = false;
 var observers = 0;
+
+// global states
+var attached = false;
 var running = false;
 
 
@@ -38,7 +40,7 @@ const TURN = 5;
 const ADD = 6;
 const MOVE = 7;
 const KILL = 8;
-const STATECHANGE=9;
+const STATECHANGE = 9;
 
 var scene;
 var camera;
@@ -94,23 +96,10 @@ function request(obj) {
 // main functionality accessible from buttons
 
 function attach() {
-    request({url: "protected/attach?engine=" + engines.value + "&clientID=" + getClientID()})
+    request({url: "protected/attach?engi    ne=" + engines.value + "&clientID=" + getClientID()})
             .then(data => {
-                attached = true;
                 data = JSON.parse(data);
-                //println("Initial state: " + data);
-                println("Engine id: " + data.engine);
-                println("Observer id: " + data.observer);
-                println("Total game turns: " + data.turns);
-                turnSpan.innerText = data.turns;
-                alienSpan.innerText = 0;
-                intervalSpan.innerText = updateInterval;
-                observersSpan.innerText = data.observers;
-                countsP.style.display = "inline";
-                statusP.innerHTML = "Attached to<br>&nbsp;Engine:&nbsp&nbsp&nbsp" + data.engine
-                        + "<br>&nbsp;Observer:&nbsp" + data.observer;
-                speciesMap = new SpeciesMap();
-                grid = new Grid(501, 501);
+                uiStateChange(true, undefined, data);
                 updates();
                 //println ("Requested updates in attach");
                 listObservers();
@@ -170,7 +159,7 @@ function processUpdates(data) {
     var requested = false;
     if (data !== null && data.length > 0) {
         for (var i = 0; i < data.length; i++) {
-// if 50% processed, file another request for updates
+            // if 50% processed, file another request for updates
             if (i > (data.length * 0.5) && !requested) {
                 setTimeout(updates, updateInterval);
                 requested = true;
@@ -210,7 +199,9 @@ function processUpdates(data) {
                     break;
                 case STATECHANGE:
                     //println("Alien id: "+o.id+" died.");
-                    println ("StateChange: "+(o.id==0?"Paused":"Running"));
+                    println("StateChange: " + (o.id === 0 ? "Paused" : "Running"));
+                    running = (o.id!==0);
+                    uiStateChange(undefined, running, null);
                     break;
                 default:
                     println("unknown record type" + o.type);
@@ -245,48 +236,81 @@ function detach() {
     if (!attached) {
         return;
     }
-    println("Last recorded turn: " + turnSpan.innerText);
-    attached = false;
-    countsP.style.display = "none";
-    statusP.innerHTML = "";
-    species.innerHTML = "";
-    observerlistP.innerHTML = "";
-    speciesMap = null;
-    grid = null;
-    //println("starting purge ...");
-
-    var a;
-    var count = 0;
-    for (a in aliens) {
-        scene.remove(aliens[a].mesh);
-        count++;
-    }
-    aliens = {};
-    //println(" ... killed "+count+" aliens");
-
-    var p;
-    count = 0;
-    for (p in planets) {
-        scene.remove(planets[p].mesh);
-        count++;
-    }
-    planets = {};
-    //println(" ... destroyed "+count+" planets");
-
-    var s;
-    for (count = 0; count < stars.length; count++) {
-        scene.remove(stars[count].mesh);
-    }
-    stars = [];
-    //println(" ... extinguished "+count+" stars");
-
-    renderer.render(scene, camera);
-    //println("purge complete.");
-
-
+    uiStateChange(false, undefined, null);
     request({url: "protected/detach?clientID=" + getClientID()}).then(data => {
     }).catch(error => {
     });
+}
+
+
+function uiStateChange(attachState, runState, data) {
+    if (attachState !== undefined && attachState !== attached) {
+        // the attach state changed
+        attached = attachState;
+        if (attached) {
+            // now attached
+            //println("Initial state: " + data);
+            println("Engine id: " + data.engine);
+            println("Observer id: " + data.observer);
+            println("Total game turns: " + data.turns);
+            turnSpan.innerText = data.turns;
+            alienSpan.innerText = 0;
+            intervalSpan.innerText = updateInterval;
+            observersSpan.innerText = data.observers;
+            countsP.style.display = "inline";
+            statusP.innerHTML = "Attached to<br>&nbsp;Engine:&nbsp&nbsp&nbsp" + data.engine
+                    + "<br>&nbsp;Observer:&nbsp" + data.observer;
+            speciesMap = new SpeciesMap();
+            grid = new Grid(501, 501);
+        } else {
+            // now detached
+            println("Last recorded turn: " + turnSpan.innerText);
+            countsP.style.display = "none";
+            statusP.innerHTML = "";
+            species.innerHTML = "";
+            observerlistP.innerHTML = "";
+            speciesMap = null;
+            grid = null;
+            //println("starting purge ...");
+
+            var a;
+            var count = 0;
+            for (a in aliens) {
+                scene.remove(aliens[a].mesh);
+                count++;
+            }
+            aliens = {};
+            //println(" ... killed "+count+" aliens");
+
+            var p;
+            count = 0;
+            for (p in planets) {
+                scene.remove(planets[p].mesh);
+                count++;
+            }
+            planets = {};
+            //println(" ... destroyed "+count+" planets");
+
+            var s;
+            for (count = 0; count < stars.length; count++) {
+                scene.remove(stars[count].mesh);
+            }
+            stars = [];
+            //println(" ... extinguished "+count+" stars");
+
+            renderer.render(scene, camera);
+            //println("purge complete.");
+        }
+    }
+
+    if (runState !== undefined && runState !== running) {
+        running = runState;
+        if (running) {
+            // now running
+        } else {
+            // now paused
+        }
+    }
 }
 
 
@@ -703,6 +727,9 @@ class SpeciesMap {
 }
 
 function updateCounts() {
+    if (!attached) {
+        return;
+    }
     try {
         for (var speciesId in speciesMap.aliens) {
             if (speciesId < 1 || speciesId > speciesMap.maxId) {
