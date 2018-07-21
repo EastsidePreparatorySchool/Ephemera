@@ -55,7 +55,7 @@ public class MainApp implements SparkApplication {
             dir += System.getProperty("file.separator") + "static";
 
             System.out.println("static dir: " + dir);
-            port(80);
+            port(8080);
             staticFiles.externalLocation(dir);
 
             if (args.length == 0 || !args[0].equalsIgnoreCase("serveronly")) {

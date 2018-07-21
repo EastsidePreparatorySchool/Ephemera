@@ -4,7 +4,9 @@
 
 
 var updateInterval = 50;
-var updateIntervalInitial = 500;
+var updateIntervalInactive = 500;
+var updateIntervalActive = 50;
+
 var textarea = document.getElementById("output");
 var turnSpan = document.getElementById("turns");
 var alienSpan = document.getElementById("numaliens");
@@ -19,6 +21,9 @@ var livenessSpan = document.getElementById("liveness");
 var observerlistP = document.getElementById("observerlist");
 var engineName = document.getElementById("enginename");
 var engines = document.getElementById("engines");
+var startpauseB = document.getElementById("startpause");
+var attachP = document.getElementById("attach");
+
 var aliens = {};
 var planets = {};
 var stars = [];
@@ -56,25 +61,8 @@ var light;
 var size = 501;
 var divisions = 501;
 var rotation = 0;
-// key handlers
-
-function keyUp(event) {
-    key[event.which || event.keyCode] = false;
-}
-
-function keyDown(event) {
-    key[event.which || event.keyCode] = true;
-    //console.log(event.which);
-}
 
 
-//will, in the future handle keypresses
-
-var key = {
-    check: () => {
-//put things that happen while keys are pushed here
-    }
-};
 // basic server calls in the absence of jquery
 
 function request(obj) {
@@ -200,8 +188,7 @@ function processUpdates(data) {
                 case STATECHANGE:
                     //println("Alien id: "+o.id+" died.");
                     println("StateChange: " + (o.id === 0 ? "Paused" : "Running"));
-                    running = (o.id!==0);
-                    uiStateChange(undefined, running, null);
+                    uiStateChange(undefined, o.id !== 0, null);
                     break;
                 default:
                     println("unknown record type" + o.type);
@@ -253,6 +240,7 @@ function uiStateChange(attachState, runState, data) {
             println("Engine id: " + data.engine);
             println("Observer id: " + data.observer);
             println("Total game turns: " + data.turns);
+
             turnSpan.innerText = data.turns;
             alienSpan.innerText = 0;
             intervalSpan.innerText = updateInterval;
@@ -260,15 +248,21 @@ function uiStateChange(attachState, runState, data) {
             countsP.style.display = "inline";
             statusP.innerHTML = "Attached to<br>&nbsp;Engine:&nbsp&nbsp&nbsp" + data.engine
                     + "<br>&nbsp;Observer:&nbsp" + data.observer;
+            attachP.style.display = "none";
+
             speciesMap = new SpeciesMap();
             grid = new Grid(501, 501);
+            updateInterval = updateIntervalActive;
         } else {
             // now detached
             println("Last recorded turn: " + turnSpan.innerText);
+
             countsP.style.display = "none";
             statusP.innerHTML = "";
             species.innerHTML = "";
             observerlistP.innerHTML = "";
+            attachP.style.display = "inline";
+
             speciesMap = null;
             grid = null;
             //println("starting purge ...");
@@ -300,6 +294,7 @@ function uiStateChange(attachState, runState, data) {
 
             renderer.render(scene, camera);
             //println("purge complete.");
+            updateInterval = updateIntervalInactive;
         }
     }
 
@@ -307,8 +302,15 @@ function uiStateChange(attachState, runState, data) {
         running = runState;
         if (running) {
             // now running
+            startpauseB.innerText = "Pause";
+            startpauseB.onclick = pause;
+            updateInterval = updateIntervalActive;
+
         } else {
             // now paused
+            startpauseB.innerText = "Start";
+            startpauseB.onclick = start;
+            updateInterval = updateIntervalInactive;
         }
     }
 }
@@ -431,7 +433,6 @@ function pause() {
                 if (data !== null) {
                     println("  Response: " + data);
                 }
-                updateInterval = updateIntervalInitial;
             })
             .catch(error => {
                 if (error !== null && error.length > 0) {
@@ -793,20 +794,11 @@ function init() {
     light = new THREE.AmbientLight(0x404040);
     scene.add(light);
     renderer.render(scene, camera);
-    //listeners for keypresses
-    //document.addEventListener('keyup', keyUp, false);
-    //document.addEventListener('keydown', keyDown, false);
-    window.addEventListener('resize', onWindowResize, false);
-    animate();
-    // 
-    //addSpecies({name:"ephemera.eastsideprep.org:stockelements:test1"});
-    //addSpecies({name:"someschool.org:someschmuck:test2"});
-    //grid.addToCell("hah1", -250,-250);
-    //grid.addToCell("hah2", -250,250);
-    //grid.addToCell("hah3", 250,-250);
-    //println(""+grid.addToCell("hah4", 250,250));
-    //println(""+grid.addToCell("hah5", 250,250));
 
+    window.addEventListener("resize", onWindowResize, false);
+    window.addEventListener("beforeunload", detach);
+
+    animate();
     makeClientID();
     listEngines();
     getStatus();

@@ -71,6 +71,9 @@ public class SCGameState implements GameLogState {
             sc.lastTurn = new SCGameLogEntry(lastTurn);
         }
 
+       if (lastGameState != null) {
+            sc.lastGameState = new SCGameLogEntry(lastGameState);
+        }
         return sc;
     }
 
