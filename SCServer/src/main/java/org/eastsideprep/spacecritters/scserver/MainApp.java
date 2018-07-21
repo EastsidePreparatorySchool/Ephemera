@@ -145,6 +145,7 @@ public class MainApp implements SparkApplication {
         get("/protected/pause", "application/json", (req, res) -> doPause(req), new JSONRT());
         get("/protected/listengines", "application/json", (req, res) -> doListEngines(req), new JSONRT());
         get("/protected/create", "application/json", (req, res) -> doCreateEngine(req), new JSONRT());
+        get("/protected/kill", "application/json", (req, res) -> doKillEngine(req), new JSONRT());
         get("/protected/attach", "application/json", (req, res) -> doAttach(req), new JSONRT());
         get("/protected/detach", "application/json", (req, res) -> doDetach(req), new JSONRT());
         get("/protected/updates", "application/json", (req, res) -> doUpdates(req), new JSONRT());
@@ -320,6 +321,31 @@ public class MainApp implements SparkApplication {
 
     }
 
+    private static String doKillEngine(Request req) {
+        System.out.println("Kill Engine request");
+        if (!isAdmin(req)) {
+            return "client not authorized to use this API";
+        }
+
+        String name = req.queryParams("name");
+
+        GameEngineV2 eng = MainApp.engines.get(name);
+        if (eng == null) {
+            System.out.println("Exception in doKillEngine: engine '" + name + "' does not exist");
+            return "Exception in doKillEngine: engine '" + name + "' does not exist";
+        }
+
+        try {
+            eng.shutdown();
+        } catch (Exception e) {
+            System.out.println("Exception in doKillEngine: " + e.getMessage());
+            return "Exception in doKillEngine: " + e.getMessage();
+        }
+        
+        return "Killed: "+name;
+
+    }
+    
     public static class AttachRecord {
 
         String engine;

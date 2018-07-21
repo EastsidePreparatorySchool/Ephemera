@@ -65,7 +65,7 @@ public class GameEngineThread extends Thread {
                                 }
                             } catch (InterruptedException e) {
                                 System.err.println("GEThread interrupted: " + e.getMessage());
-                                e.printStackTrace(System.err);
+                                //e.printStackTrace(System.err);
                             }
                         }
                     } while (engine.gameState == GameState.Paused);

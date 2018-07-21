@@ -21,5 +21,7 @@ public interface GameEngine {
     boolean isAlive();
 
     String getAlienPath();
+    
+    void shutdown();
 
 }

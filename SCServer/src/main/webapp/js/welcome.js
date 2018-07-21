@@ -38,7 +38,7 @@ function request(obj) {
 
 
 function create() {
-    println("trying to create engine ...")
+    println("trying to create engine ...");
     request({url: "protected/create?name=" + engineName.value})
             .then(data => {
                 if (data !== null) {
@@ -52,6 +52,20 @@ function create() {
             });
 }
 
+function kill() {
+    println("trying to kill engine ...");
+    request({url: "protected/kill?name=" + engineName.value})
+            .then(data => {
+                if (data !== null) {
+                    println("  Response: " + data);
+                }
+            })
+            .catch(error => {
+                if (error !== null && error.length > 0) {
+                    println("  Error: '" + error + "'");
+                }
+            });
+}
 
 
 function queryAdmin() {

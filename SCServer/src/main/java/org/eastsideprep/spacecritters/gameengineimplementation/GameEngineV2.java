@@ -44,6 +44,7 @@ public class GameEngineV2 implements GameEngine {
     public String name;
     private URLClassLoader classLoader;
     private Method method;
+    private boolean dead = false;
 
     public GameEngineV2(String name) {
         this.gson = new Gson();
@@ -55,6 +56,9 @@ public class GameEngineV2 implements GameEngine {
 
     @Override
     public boolean isAlive() {
+        if (dead) {
+            return false;
+        }
         return gameThread.isAlive();
     }
 
@@ -156,6 +160,10 @@ public class GameEngineV2 implements GameEngine {
 
     @Override
     public void queueCommand(GameCommand gc) {
+        if (dead) {
+            return;
+        }
+
         //
         // queue alien info to synchronized queue
         //
@@ -237,6 +245,22 @@ public class GameEngineV2 implements GameEngine {
             throw e;
         }
         return cs;
+    }
+
+    @Override
+    public void shutdown() {
+        dead = true;
+        if (gameThread.isAlive()) {
+            gameThread.interrupt();
+            try {
+                gameThread.join(1000);
+            } catch (InterruptedException e) {
+            }
+        }
+        gameThread = null;
+        grid = null;
+        vis = null;
+        System.gc();
     }
 
 }
