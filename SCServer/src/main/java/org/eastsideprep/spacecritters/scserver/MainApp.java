@@ -10,8 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
-import javafx.application.Application;
-import javafx.stage.Stage;
+import java.util.regex.Pattern;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 import org.eastsideprep.spacecritters.gameengineimplementation.GameEngineV2;
@@ -105,6 +104,7 @@ public class MainApp implements SparkApplication {
         get("/protected/listobservers", "application/json", (req, res) -> doListObservers(req), new JSONRT());
         get("/protected/status", "application/json", (req, res) -> status(req), new JSONRT());
         get("/protected/allstatus", "application/json", (req, res) -> allStatus(req), new JSONRT());
+        get("/protected/queryadmin", "application/json", (req, res) -> queryAdmin(req));
         post("/protected/upload", (req, res) -> uploadFile(req, res));
 
         MainApp.engines = new HashMap<>();
@@ -167,6 +167,15 @@ public class MainApp implements SparkApplication {
         return "SC: Pause request queued";
     }
 
+    private static String queryAdmin(Request req) {
+        return (isAdmin(req) ? "yes" : "no");
+    }
+
+    private static boolean isAdmin(Request req) {
+        String name = req.headers("X-MS-CLIENT-PRINCIPAL-NAME");
+        return (name == null || name.equalsIgnoreCase("gmein@eastsideprep.org"));
+    }
+
     private static String[] doListEngines(Request req) {
         String[] result = new String[engines.size()];
         for (String s : engines.keySet()) {
@@ -176,15 +185,40 @@ public class MainApp implements SparkApplication {
     }
 
     private static Object[] doListObservers(Request req) {
-        ServerContext ctx = getCtx(req);
-        if (ctx == null || ctx.observer == null) {
-            return null;
+        LinkedList<GameEngineV2> theseEngines = new LinkedList<>();
+
+        String name = req.queryParams("name");
+        if (name != null && !name.equals("")) {
+            for (Entry<String, GameEngineV2> e : engines.entrySet()) {
+                if (Pattern.matches(name, e.getKey())) {
+                    theseEngines.add(e.getValue());
+                }
+            }
+
+        } else {
+            ServerContext ctx = getCtx(req);
+            if (ctx == null || ctx.observer == null) {
+                theseEngines = new LinkedList<>(engines.values());
+            } else {
+
+                theseEngines.add(ctx.engine);
+            }
         }
-        LinkedList<GameLogObserver> observers = ctx.engine.log.getObservers();
-        return observers.stream().map((o) -> o.client).toArray();
+
+        LinkedList<String> result = new LinkedList<>();
+        for (GameEngineV2 e : theseEngines) {
+            LinkedList<GameLogObserver> observers = e.log.getObservers();
+            observers.forEach((o) -> result.add(e.name + ":" + o.client));
+        }
+
+        return result.toArray();
     }
 
     private static String doCreateEngine(Request req) {
+        if (!isAdmin(req)) {
+            return "client not authorized to use this API";
+        }
+
         String name = req.queryParams("name");
 
         // cannot create main engine after the fact todo: rethink that.

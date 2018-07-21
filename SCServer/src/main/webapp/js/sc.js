@@ -83,8 +83,11 @@ function request(obj) {
 ;
 // main functionality accessible from buttons
 
-function attach() {
-    request({url: "protected/attach?engi    ne=" + engines.value + "&clientID=" + getClientID()})
+function attach(engine) {
+    if (engine === undefined) {
+        engine = engines.value;
+    }
+    request({url: "protected/attach?engine=" + engine + "&clientID=" + getClientID()})
             .then(data => {
                 data = JSON.parse(data);
                 uiStateChange(true, undefined, data);
@@ -803,6 +806,18 @@ function init() {
     listEngines();
     getStatus();
     println("initialized");
+
+    var parameter = location.search.substring(1);
+
+    // if called from another page with attach param, attach right now
+    if (parameter !== null && parameter.length > 0) {
+        var fields = parameter.split("=");
+        if (fields.length > 1
+                && fields[0].toLowerCase() === "attach"
+                && fields[1].length > 0) {
+            attach(fields[1]);
+        }
+    }
 }
 
 function onWindowResize() {

@@ -144,11 +144,13 @@
                                         <include name="*.html"/>
                                     </fileset>
                                 </copy>
+                                
                                 <copy todir="${basedir}/target/static/" overwrite="true">
                                     <fileset dir="${basedir}/src/main/webapp">
-                                        <include name="*.ico"/>
+                                        <include name="*.png" />
                                     </fileset>
                                 </copy>
+                                
                                 <copy todir="${basedir}/target/static/js" overwrite="true">
                                     <fileset dir="${basedir}/src/main/webapp/js">
                                         <include name="*.js"/>
