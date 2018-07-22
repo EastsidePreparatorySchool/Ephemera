@@ -45,6 +45,7 @@ public class GameEngineV2 implements GameEngine {
     private URLClassLoader classLoader;
     private Method method;
     private boolean dead = false;
+    public long timeOfDeath;
 
     public GameEngineV2(String name) {
         this.gson = new Gson();
@@ -59,7 +60,13 @@ public class GameEngineV2 implements GameEngine {
         if (dead) {
             return false;
         }
-        return gameThread.isAlive();
+        if (gameThread.isAlive()) {
+            return true;
+        }
+        
+        timeOfDeath = System.currentTimeMillis();
+        shutdown();
+        return false;
     }
 
     @Override

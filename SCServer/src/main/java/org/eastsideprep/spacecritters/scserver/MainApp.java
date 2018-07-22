@@ -31,49 +31,7 @@ import spark.servlet.SparkApplication;
 
 public class MainApp implements SparkApplication {
 
-    private class Governor extends HashMap<String, GameEngineV2> {
-
-        Governor() {
-        }
-
-        private void init() {
-            new Thread(() -> {
-                watchDogThread();
-            }).start();
-
-        }
-
-        private void watchDogThread() {
-            try {
-                Thread.sleep(300000);
-                while (true) {
-                    int alive = 0;
-                    synchronized (this) {
-                        for (GameEngineV2 e : this.values()) {
-                            if (e.isAlive()) {
-                                alive++;
-                            }
-                        }
-                    }
-                    if (alive == 0) {
-                        System.out.println("Governor: There were none alive, so I am creating another one.");
-                        String name = getDateString();
-                        GameEngineV2 eng = MainApp.createServerGameEngine(name);
-                        synchronized (engines) {
-                            engines.put(name, eng);
-                        }
-                        Thread.sleep(5000);
-                    }
-                    Thread.sleep(1000);
-                }
-            } catch (Exception e) {
-
-            }
-
-        }
-
-    }
-
+  
     static GameEngineV2 geMain;
     static Governor engines;
     static MainApp app;
@@ -702,5 +660,54 @@ public class MainApp implements SparkApplication {
         }
         return status.toArray();
     }
+    
+    
+      private class Governor extends HashMap<String, GameEngineV2> {
+
+        Governor() {
+        }
+
+        private void init() {
+            new Thread(() -> {
+                watchDogThread();
+            }).start();
+
+        }
+
+        private void watchDogThread() {
+            try {
+                Thread.sleep(300000);
+                while (true) {
+                    int alive = 0;
+                    synchronized (this) {
+                        for (GameEngineV2 e : this.values()) {
+                            if (e.isAlive()) {
+                                alive++;
+                            } else if (e.timeOfDeath < (System.currentTimeMillis()-(1000*60*60*24))) {
+                                // engine has been dead for 24 hours, remove from Governor map
+                                this.remove(e.name);
+                            }
+                        }
+                    }
+                    if (alive == 0) {
+                        // no live engines left, make a new one
+                        System.out.println("Governor: There were none alive, so I am creating another one.");
+                        String name = getDateString();
+                        GameEngineV2 eng = MainApp.createServerGameEngine(name);
+                        synchronized (engines) {
+                            engines.put(name, eng);
+                        }
+                        Thread.sleep(5000);
+                    }
+                    Thread.sleep(1000);
+                }
+            } catch (Exception e) {
+
+            }
+
+        }
+
+    }
+
 
 }
