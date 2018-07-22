@@ -256,18 +256,20 @@ public class GameEngineV2 implements GameEngine {
 
     @Override
     public void shutdown() {
+        System.out.println("GE: shutdown "+name);
         dead = true;
-        if (gameThread.isAlive()) {
+        if (gameThread != null && gameThread.isAlive()) {
             gameThread.interrupt();
             try {
-                gameThread.join(1000);
+                gameThread.join(5000);
             } catch (InterruptedException e) {
             }
         }
         gameThread = null;
         grid = null;
-        vis = null;
+//        vis = null; // leave this alive to allow the dying thread to post messages
         System.gc();
+        log.onDeath();
     }
 
 }

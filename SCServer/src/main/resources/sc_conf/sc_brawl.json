@@ -1,10 +1,10 @@
 [
     {"kind":"CONSTANT","className":"gameMode","state":"Brawl"},
     {"kind":"CONSTANT","className":"lastAlienWins","state":"false"},
-    {"kind":"CONSTANT","className":"perSpeciesCap","state":"10"},
+    {"kind":"CONSTANT","className":"perSpeciesCap","state":"100"},
     {"kind":"CONSTANT","className":"perSpeciesSpawnCap","state":"10000"},
     {"kind":"CONSTANT","className":"safeZoneRadius","state":"10"},
     {"kind":"CONSTANT","className":"iSaidNoFighting","state":"false"},
-    {"kind":"CONSTANT","className":"maxTurns","state":"10000000"},
+    {"kind":"CONSTANT","className":"maxTurns","state":"100000000"},
     {"kind":"CONSTANT","className":"emptySpaceEnergy","state":"1"}
 ]

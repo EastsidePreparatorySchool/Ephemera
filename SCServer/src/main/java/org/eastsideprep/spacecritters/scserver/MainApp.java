@@ -31,7 +31,6 @@ import spark.servlet.SparkApplication;
 
 public class MainApp implements SparkApplication {
 
-  
     static GameEngineV2 geMain;
     static Governor engines;
     static MainApp app;
@@ -149,7 +148,7 @@ public class MainApp implements SparkApplication {
         // blow up stale contexts
         if (ctx.observer != null && ctx.observer.isStale()) {
             ctx.observer = null;
-            return null;
+//            return null;
         }
 
         req.session().maxInactiveInterval(60); // kill this session afte 60 seconds of inactivity
@@ -299,11 +298,11 @@ public class MainApp implements SparkApplication {
             System.out.println("Exception in doKillEngine: " + e.getMessage());
             return "Exception in doKillEngine: " + e.getMessage();
         }
-        
-        return "Killed: "+name;
+
+        return "Killed: " + name;
 
     }
-    
+
     public static class AttachRecord {
 
         String engine;
@@ -418,10 +417,10 @@ public class MainApp implements SparkApplication {
 
     static private void createDesktopGameEngine() {
         try {
+            System.out.println("SCServer: Creating desktop game engine");
             SpaceCritters.main(new String[]{});
-            System.out.println("createDesktopEngine: created and initialized, processing");
         } catch (Exception e) {
-            System.err.println("scserver init: " + e.getMessage());
+            System.err.println("scserver desktop engine: " + e.getMessage());
             e.printStackTrace(System.err);
         }
     }
@@ -560,34 +559,38 @@ public class MainApp implements SparkApplication {
         return "ok";
     }
 
-    public Object[] status(Request req) {
+    public class Stats {
+
+        public String memStats;
+        public int logSize;
+        public boolean isAlive;
+    }
+
+    public Stats status(Request req) {
         ArrayList<String> status = new ArrayList<>();
 
         ServerContext ctx = getCtx(req);
         if (ctx == null) {
             System.out.println("status: no context");
-            status.add("no context");
-            return status.toArray();
+            return null;
         }
 
         if (ctx.observer == null) {
-            System.out.println("status: observer not initialized");
-            status.add("status: observer not initialized");
-            return status.toArray();
+            System.out.println("status: observer not initialized for" + ctx.client);
+            return null;
         }
 
         if (ctx.observer.isStale()) {
-            System.out.println("status: observer stale");
-            status.add("status: observer stale");
-            return status.toArray();
+            System.out.println("status: observer stale for " + ctx.client);
+            return null;
         }
+        
+        Stats result = new Stats();
+        result.isAlive = ctx.engine.isAlive();
+        result.memStats = getHeapStats();
+        result.logSize = ctx.engine.log.getLogSize();
 
-        status.add("status:");
-        status.add(getHeapStats());
-
-        status.add((ctx.engine.isAlive() ? "alive" : "dead"));
-
-        return status.toArray();
+        return result;
     }
 
     private String getHeapStats() {
@@ -616,9 +619,9 @@ public class MainApp implements SparkApplication {
 
     public class AllStats {
 
-        public long freeHeapSpace;
-        public long currentHeapSize;
-        public long maxHeapSize;
+        public String freeHeapSpace;
+        public String currentHeapSize;
+        public String maxHeapSize;
         public int numEngines;
         public int totalObservers;
     }
@@ -628,17 +631,17 @@ public class MainApp implements SparkApplication {
         AllStats as = new AllStats();
 
         // Get current size of heap in bytes
-        as.currentHeapSize = Runtime.getRuntime().totalMemory();
+        as.currentHeapSize = formatNumber(Runtime.getRuntime().totalMemory());
         // Get maximum size of heap in bytes. The heap cannot grow beyond this size.// Any attempt will result in an OutOfMemoryException.
-        as.maxHeapSize = Runtime.getRuntime().maxMemory();
+        as.maxHeapSize = formatNumber(Runtime.getRuntime().maxMemory());
         // Get amount of free memory within the heap in bytes. This size will increase // after garbage collection and decrease as new objects are created.
-        as.freeHeapSpace = Runtime.getRuntime().freeMemory();
-        
-        synchronized(engines) {
+        as.freeHeapSpace = formatNumber(Runtime.getRuntime().freeMemory());
+
+        synchronized (engines) {
             as.numEngines = engines.size();
             as.totalObservers = doListObservers(req).length;
         }
-       
+
         return as;
     }
 
@@ -660,9 +663,8 @@ public class MainApp implements SparkApplication {
         }
         return status.toArray();
     }
-    
-    
-      private class Governor extends HashMap<String, GameEngineV2> {
+
+    private class Governor extends HashMap<String, GameEngineV2> {
 
         Governor() {
         }
@@ -676,21 +678,31 @@ public class MainApp implements SparkApplication {
 
         private void watchDogThread() {
             try {
-                Thread.sleep(300000);
+                // wait for first engine
+                while (MainApp.geMain == null) {
+                    Thread.sleep(1000);
+                }
+
+                // now loop and react if they all died
                 while (true) {
                     int alive = 0;
                     synchronized (this) {
                         for (GameEngineV2 e : this.values()) {
                             if (e.isAlive()) {
+                                e.log.removeStaleObservers();
                                 alive++;
-                            } else if (e.timeOfDeath < (System.currentTimeMillis()-(1000*60*60*24))) {
-                                // engine has been dead for 24 hours, remove from Governor map
-                                this.remove(e.name);
+                            } else {
+                                if (e.timeOfDeath < (System.currentTimeMillis() - (1000 * 60 * 60 * 24))) {
+                                    // engine has been dead for 24 hours, remove from Governor map
+                                    this.remove(e.name);
+                                    System.gc();
+                                }
                             }
                         }
                     }
                     if (alive == 0) {
                         // no live engines left, make a new one
+                        System.gc();
                         System.out.println("Governor: There were none alive, so I am creating another one.");
                         String name = getDateString();
                         GameEngineV2 eng = MainApp.createServerGameEngine(name);
@@ -708,6 +720,5 @@ public class MainApp implements SparkApplication {
         }
 
     }
-
 
 }

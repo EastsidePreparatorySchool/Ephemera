@@ -35,6 +35,7 @@ public class GameLog {
         rlock = rwl.readLock();
         wlock = rwl.writeLock();
         this.state = state;
+        state.setLog(this);
     }
 
     public void addLogEntry(GameLogEntry item) {
@@ -45,7 +46,7 @@ public class GameLog {
         } finally {
             wlock.unlock();
         }
-        
+
         removeStaleObservers();
 //        printLogInfo("AE");
     }
@@ -73,6 +74,10 @@ public class GameLog {
         return obs;
     }
 
+    public int getLogSize() {
+        return collapseRead();
+    }
+
     public LinkedList<GameLogObserver> getObservers() {
         synchronized (observers) {
             return new LinkedList<>(observers);
@@ -88,35 +93,37 @@ public class GameLog {
         collapseRead();
     }
 
-    public void collapseRead() {
-        if (minRead - start <= COLLAPSE_THRESHOLD) {
-            return;
-        }
+    public int collapseRead() {
+        int result = -1;
 
         wlock.lock();
         try {
+            if (minRead - start >= COLLAPSE_THRESHOLD) {
 //            printLogInfo("CR1");
 //            System.out.println("Log: compacting");
-            // process all read items into state log, 
-            for (int i = 0; i < minRead - start; i++) {
-                state.addEntry(log.get(i));
-            }
+                // process all read items into state log, 
+                for (int i = 0; i < minRead - start; i++) {
+                    state.addEntry(log.get(i));
+                }
 
-            // take the sublist of unread items, make it the new list, 
-            ArrayList<GameLogEntry> newLog = new ArrayList<>();
-            newLog.addAll(log.subList(minRead - start, end - start));
-            log = newLog;
+                // take the sublist of unread items, make it the new list, 
+                ArrayList<GameLogEntry> newLog = new ArrayList<>();
+                newLog.addAll(log.subList(minRead - start, end - start));
+                log = newLog;
 
-            // and adjust the "start" offset
-            start = minRead;
+                // and adjust the "start" offset
+                start = minRead;
 //            printLogInfo("CR2");
-            //System.out.println("Log: compacted");
+                //System.out.println("Log: compacted");
+            }
+            result = log.size();
+
         } finally {
             wlock.unlock();
         }
+        return result;
     }
 
-    // needs rewrite with concept of observers
     public ArrayList<GameLogEntry> getNewItems(GameLogObserver obs) {
         ArrayList<GameLogEntry> result = new ArrayList<>();
 
@@ -188,8 +195,12 @@ public class GameLog {
             }
         }
     }
+    
+    public void onDeath() {
+        state.onDeath();
+    }
 
-    private void removeStaleObservers() {
+    public void removeStaleObservers() {
         synchronized (observers) {
             observers.removeIf((o) -> o.isStale());
         }

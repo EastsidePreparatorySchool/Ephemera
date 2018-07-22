@@ -7,7 +7,7 @@ package org.eastsideprep.spacecritters.scgamelog;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import org.eastsideprep.spacecritters.gameengineinterfaces.GameState;
+import org.eastsideprep.spacecritters.gamelog.GameLog;
 import org.eastsideprep.spacecritters.gamelog.GameLogEntry;
 import org.eastsideprep.spacecritters.gamelog.GameLogState;
 
@@ -17,6 +17,7 @@ import org.eastsideprep.spacecritters.gamelog.GameLogState;
  */
 public class SCGameState implements GameLogState {
 
+    private GameLog log;
     public int entries;
     public int totalTurns;
     public boolean forUpdates;
@@ -28,7 +29,6 @@ public class SCGameState implements GameLogState {
     private ArrayList<SCGameLogEntry> stars = new ArrayList<>();
     private ArrayList<SCGameLogEntry> species = new ArrayList<>();
     private ArrayList<SCGameLogEntry> kills = new ArrayList<>();
-
 
     // what the console uses initially, 
     // and what "copy" uses internally
@@ -71,7 +71,7 @@ public class SCGameState implements GameLogState {
             sc.lastTurn = new SCGameLogEntry(lastTurn);
         }
 
-       if (lastGameState != null) {
+        if (lastGameState != null) {
             sc.lastGameState = new SCGameLogEntry(lastGameState);
         }
         return sc;
@@ -93,12 +93,12 @@ public class SCGameState implements GameLogState {
                 totalTurns = sge.param1;
                 lastTurn = new SCGameLogEntry(sge);
                 break;
-                
+
             case SCGameLogEntry.Type.STATECHANGE:
                 lastGameState = new SCGameLogEntry(sge);
                 break;
-                
-             case SCGameLogEntry.Type.ADD:
+
+            case SCGameLogEntry.Type.ADD:
                 aliens.put(sge.id, new SCGameLogEntry(sge));
                 break;
             case SCGameLogEntry.Type.ADDSTAR:
@@ -140,7 +140,7 @@ public class SCGameState implements GameLogState {
                     sgePrior.newY = sge.newY;
                 }
                 break;
-                
+
             case SCGameLogEntry.Type.MOVEPLANET:
                 SCGameLogEntry sgePlanet = planets.get(sge.id);
                 if (sgePlanet == null) {
@@ -156,7 +156,7 @@ public class SCGameState implements GameLogState {
                 sgePlanet.newX = sge.newX;
                 sgePlanet.newY = sge.newY;
                 break;
-                
+
             case SCGameLogEntry.Type.KILL:
                 if (forUpdates) {
                     // in updates, we really need to show the kill action
@@ -223,6 +223,21 @@ public class SCGameState implements GameLogState {
             result.add(lastGameState);
         }
         return result;
+    }
+
+    @Override
+    public void onDeath() {
+        // just tell the log that the game is paused, 
+        // to put clients into idle mode
+          log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.STATECHANGE,
+                0, 0, 0, 0, 
+                null, null, 0 /* paused */, -1, 
+                0.0, 0.0));
+    }
+    
+    @Override 
+    public void setLog(GameLog log) {
+        this.log = log;
     }
 
 }

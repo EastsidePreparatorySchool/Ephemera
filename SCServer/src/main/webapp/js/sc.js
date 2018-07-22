@@ -4,7 +4,7 @@
 
 
 var updateInterval = 50;
-var updateIntervalInactive = 500;
+var updateIntervalInactive = 1000;
 var updateIntervalActive = 50;
 
 var textarea = document.getElementById("output");
@@ -18,11 +18,13 @@ var intervalSpan = document.getElementById("interval");
 var observersSpan = document.getElementById("observers");
 var memstatsSpan = document.getElementById("memstats");
 var livenessSpan = document.getElementById("liveness");
+var logsizeSpan = document.getElementById("logsize");
 var observerlistP = document.getElementById("observerlist");
 var engineName = document.getElementById("enginename");
 var engines = document.getElementById("engines");
 var startpauseB = document.getElementById("startpause");
 var attachP = document.getElementById("attach");
+var adminP = document.getElementById("admin");
 
 var aliens = {};
 var planets = {};
@@ -91,9 +93,6 @@ function attach(engine) {
             .then(data => {
                 data = JSON.parse(data);
                 uiStateChange(true, undefined, data);
-                updates();
-                //println ("Requested updates in attach");
-                listObservers();
             })
             .catch(error => {
                 println("Error: " + error);
@@ -240,6 +239,7 @@ function uiStateChange(attachState, runState, data) {
         if (attached) {
             // now attached
             //println("Initial state: " + data);
+            document.title = "Game: " + data.engine + " (SpaceCritters)";
             println("Engine id: " + data.engine);
             println("Observer id: " + data.observer);
             println("Total game turns: " + data.turns);
@@ -249,16 +249,20 @@ function uiStateChange(attachState, runState, data) {
             intervalSpan.innerText = updateInterval;
             observersSpan.innerText = data.observers;
             countsP.style.display = "inline";
-            statusP.innerHTML = "Attached to<br>&nbsp;Engine:&nbsp&nbsp&nbsp" + data.engine
+            statusP.innerHTML = "Attached to<br>&nbsp;Game:&nbsp&nbsp&nbsp" + data.engine
                     + "<br>&nbsp;Observer:&nbsp" + data.observer;
             attachP.style.display = "none";
 
             speciesMap = new SpeciesMap();
             grid = new Grid(501, 501);
             updateInterval = updateIntervalActive;
+            getStatus();
+            queryAdmin();
+            updates();
         } else {
             // now detached
             println("Last recorded turn: " + turnSpan.innerText);
+            document.title = "Game: <detached> (SpaceCritters)";
 
             countsP.style.display = "none";
             statusP.innerHTML = "";
@@ -357,7 +361,7 @@ function listEngines() {
                     //println ("Raw: "+data);
                     data = JSON.parse(data);
                     engines.innerHTML = "";
-                    for (var i = 0; i<data.length; i++) {
+                    for (var i = 0; i < data.length; i++) {
                         //println("Engine: '"+data[i].name+"'");
 
                         var option = document.createElement("option");
@@ -401,24 +405,38 @@ function listObservers() {
 }
 
 function getStatus() {
-    request({url: "protected/"
-                + (attached ? "" : "all")
-                + "status"
-                + (attached ? "?clientID=" + getClientID() : "")})
+    if (!attached) {
+        return;
+    }
+
+    request({url: "protected/status?clientID=" + getClientID()})
             .then(data => {
                 if (data !== null) {
                     data = JSON.parse(data);
-                    if (!attached) {
-                        for (var i = 0; i < data.length; i++) {
-                            println(data[i]);
-                        }
-                    } else {
-                        if (data.length > 1) {
-                            memstatsSpan.innerText = data[1];
-                            livenessSpan.innerText = data[2];
-                        }
+                    logsizeSpan.innerText = data.logSize;
+                    memstatsSpan.innerText = data.memStats;
+                    livenessSpan.innerText = data.isAlive;
+                    setTimeout(getStatus, 1000);
+                }
+            })
+            .catch(error => {
+                if (error !== null && error.length > 0) {
+                    println("  Error: '" + error + "'");
+                }
+            });
+}
+
+function queryAdmin() {
+    request({url: "protected/queryadmin"})
+            .then(data => {
+                if (data !== null) {
+                    println("queryAdmin: " + data);
+                    if (data === "yes") {
+                        adminP.style.display = "inline";
+                        observerlistP.style.display = "inline";
+                        listObservers();
+
                     }
-                    setTimeout(getStatus, 10000);
                 }
             })
             .catch(error => {
@@ -804,7 +822,6 @@ function init() {
     animate();
     makeClientID();
     listEngines();
-    getStatus();
     println("initialized");
 
     var parameter = location.search.substring(1);

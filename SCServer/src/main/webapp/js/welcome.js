@@ -127,14 +127,17 @@ function getStatus() {
 function enginesView() {
     clearInterval(updateTimer);
     updateTimer = setInterval(listEngines, 1000);
+    listEngines();
 }
 function observersView() {
     clearInterval(updateTimer);
     updateTimer = setInterval(listObservers, 1000);
+    listObservers();
 }
 function statsView() {
     clearInterval(updateTimer);
     updateTimer = setInterval(listStats, 1000);
+    listStats();
 }
 
 function listEngines() {
@@ -143,7 +146,7 @@ function listEngines() {
                 if (data !== null) {
                     //println ("Raw: "+data);
                     data = JSON.parse(data);
-                    contentP.innerHTML = "<br><br><br><br>Engines:<br><br>";
+                    contentP.innerHTML = "<br><br><br><br>Games:<br><br>";
                     for (var i = 0; i < data.length; i++) {
 //                        println("Engine: '" + data[i].name + "', "
 //                                + "alive: " + data[i].isAlive + ", "
@@ -153,6 +156,7 @@ function listEngines() {
                         var atag = document.createElement("A");
                         if (data[i].isAlive) {
                             atag.href = "game.html?attach=" + data[i].name;
+                            atag.target = "_blank";
                         } else {
                             atag.href = "logdownload?name=" + data[i].name;
                             atag.download = "log_" + name + "_" + (new Date()).getTime();

@@ -10,10 +10,17 @@ import java.util.ArrayList;
  *
  * @author gmein
  */
-
 public interface GameLogState {
-    GameLogState copy ();
+
+    GameLogState copy();
+
     void addEntry(GameLogEntry ge);
+
     int getEntryCount();
+
     ArrayList<GameLogEntry> getCompactedEntries();
+
+    void onDeath();
+
+    void setLog(GameLog log);
 }
