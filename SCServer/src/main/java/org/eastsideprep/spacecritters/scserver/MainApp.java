@@ -1,5 +1,6 @@
 package org.eastsideprep.spacecritters.scserver;
 
+import org.eastsideprep.spacecritters.gameengineimplementation.Compilers;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,21 +47,23 @@ public class MainApp implements SparkApplication {
     // desktop initialization
     public static void main(String[] args) {
         System.out.println("SC main() (scserver) " + getDateString());
+        String userDir = System.getProperty("user.dir");
+        String homeDir = System.getProperty("user.home");
 
         //System.setProperty("javafx.preloader", "org.eastsideprep.spacecritters.spacecritters.SplashScreenLoader");
         // invoked from main, start Spark Jetty server
         //staticFiles.location("/static");
         if (args.length == 0 || !args[0].equalsIgnoreCase("desktoponly")) {
             MainApp.app = new MainApp();
-            String dir = System.getProperty("user.dir");
-            if (dir.toLowerCase().contains("ephemera")) {
-                dir += System.getProperty("file.separator") + "target";
+            
+            if (userDir.toLowerCase().contains("ephemera")) {
+                userDir += System.getProperty("file.separator") + "target";
             }
-            dir += System.getProperty("file.separator") + "static";
+            userDir += System.getProperty("file.separator") + "static";
 
-            System.out.println("static dir: " + dir);
+            System.out.println("static dir: " + userDir);
             port(8080);
-            staticFiles.externalLocation(dir);
+            staticFiles.externalLocation(userDir);
 
             if (args.length == 0 || !args[0].equalsIgnoreCase("serveronly")) {
                 MainApp.createServerEngine = false; // will cause init() to not create server engine, default running mode
@@ -584,7 +587,7 @@ public class MainApp implements SparkApplication {
             System.out.println("status: observer stale for " + ctx.client);
             return null;
         }
-        
+
         Stats result = new Stats();
         result.isAlive = ctx.engine.isAlive();
         result.memStats = getHeapStats();

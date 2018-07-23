@@ -17,9 +17,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.eastsideprep.spacecritters.gameengineimplementation.Compilers;
 import org.eastsideprep.spacecritters.orbit.DummyTrajectory;
 import org.eastsideprep.spacecritters.orbit.Trajectory;
 
@@ -1054,6 +1057,11 @@ public class SpaceGrid {
                     addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), domain + f.getName() + System.getProperty("file.separator"));
                 } else if ((f.getName().toLowerCase().endsWith(".jar"))) {
                     addCustomAliensInJAR(domain, f);
+                } else if ((f.getName().toLowerCase().endsWith(".class"))
+                        && !Files.exists(Paths.get(f.getName().toLowerCase().replace(".class", ".java")))) {
+                    addCustomAliensInCLASS(domain, f);
+                } else if ((f.getName().toLowerCase().endsWith(".java"))) {
+                    addCustomAliensInJAVA(domain, f);
                 }
             }
         }
@@ -1066,6 +1074,7 @@ public class SpaceGrid {
         if (f.getName().toLowerCase().equals("SCServer-1.0-SNAPSHOT.jar")) {
             return;
         }
+        System.out.println("SG: adding all custom aliens in jar " + f.getName());
 
         try {
             // look for jar files and process
@@ -1079,7 +1088,8 @@ public class SpaceGrid {
                     if (entry.getName().lastIndexOf('/') != -1) {
                         // named package
                         packageName = entry.getName().substring(0, entry.getName().lastIndexOf('/'));
-                        className = entry.getName().substring(entry.getName().lastIndexOf('/') + 1).replace(".class", "");
+                        className = entry.getName().substring(entry.getName().lastIndexOf('/') + 1)
+                                .replace(".class", "");
                     } else {
                         //default package
                         packageName = "";
@@ -1100,4 +1110,50 @@ public class SpaceGrid {
         }
     }
 
+    public void addCustomAliensInCLASS(String domain, File f) {
+        String packageName = "";
+        String className = f.getName().replace(".class", "");
+
+        try {
+            System.out.println("SG: Adding species from class file " + f.getName());
+            addSpecies(new GameElementSpec("SPECIES",
+                    domain + f.getName(),
+                    packageName,
+                    className,
+                    "")
+            );
+
+        } catch (Exception e) {
+            System.err.println("addCustomAliensInCLASS: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
+    }
+
+    public void addCustomAliensInJAVA(String domain, File f) {
+        String packageName = "uploaded";
+        String className = f.getName().replace(".java", "");
+        String classFileName = f.getAbsolutePath().toLowerCase().replace(".java", ".class");
+
+        boolean compile = false;
+
+        try {
+            if (Files.exists(Paths.get(classFileName))) {
+                File cf = new File(classFileName);
+                if (f.lastModified() > cf.lastModified()) {
+                    compile = true;
+                }
+            } else {
+                compile = true;
+            }
+
+            if (compile) {
+                System.out.println("SG: Compiling " + f.getName());
+                Compilers.compileJava(Paths.get(f.getAbsolutePath()).getParent().toString(), className);
+            }
+            addCustomAliensInCLASS(domain, new File(f.getPath().replace(".java", ".class")));
+        } catch (Exception e) {
+            System.err.println("addCustomAliensInJAVA: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
+    }
 }

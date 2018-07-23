@@ -21,7 +21,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Paths;
 import java.security.CodeSource;
+import java.util.Arrays;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 import org.eastsideprep.spacecritters.gamelog.GameLog;
 import org.eastsideprep.spacecritters.scgamelog.SCGameState;
 
@@ -63,7 +70,7 @@ public class GameEngineV2 implements GameEngine {
         if (gameThread.isAlive()) {
             return true;
         }
-        
+
         timeOfDeath = System.currentTimeMillis();
         shutdown();
         return false;
@@ -210,7 +217,29 @@ public class GameEngineV2 implements GameEngine {
 
     }
 
-    //
+
+    @Override
+    public void shutdown() {
+        System.out.println("GE: shutdown " + name);
+        dead = true;
+        if (gameThread != null && gameThread.isAlive()) {
+            gameThread.interrupt();
+            try {
+                gameThread.join(5000);
+            } catch (InterruptedException e) {
+            }
+        }
+        gameThread = null;
+        grid = null;
+//        vis = null; // leave this alive to allow the dying thread to post messages
+        System.gc();
+        log.onDeath();
+    }
+
+    
+    
+    
+        //
     // Dynamic class loader (.jar files)
     // stolen from StackOverflow, considered dark voodoo magic
     //
@@ -237,13 +266,16 @@ public class GameEngineV2 implements GameEngine {
             fullName = src.getLocation().getFile();
         } else {
             fullName = this.alienPath + domainName;
+            if (fullName.toLowerCase().endsWith(".class")) {
+                fullName = Paths.get(fullName).getParent().toString();
+            }
         }
         //System.out.println("EngineV2:loadConstructor: full name " + fullName);
         String fullClassName = null;
         try {
             file = new File(fullName);
             fullClassName = packageName.equals("") ? className : (packageName + "." + className);
-
+            classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()});
             cs = classLoader.loadClass(fullClassName).getConstructor();
         } catch (Exception e) {
             if (!packageName.endsWith("stockelements")) {
@@ -254,22 +286,9 @@ public class GameEngineV2 implements GameEngine {
         return cs;
     }
 
-    @Override
-    public void shutdown() {
-        System.out.println("GE: shutdown "+name);
-        dead = true;
-        if (gameThread != null && gameThread.isAlive()) {
-            gameThread.interrupt();
-            try {
-                gameThread.join(5000);
-            } catch (InterruptedException e) {
-            }
-        }
-        gameThread = null;
-        grid = null;
-//        vis = null; // leave this alive to allow the dying thread to post messages
-        System.gc();
-        log.onDeath();
-    }
+    
+    
+    
+   
 
 }
