@@ -64,12 +64,12 @@ public class BigBoyAlien implements Alien {
         try {
             List<AlienSpecies> l = cntxt.getView((int) cntxt.getTech()).getClosestSpecificAliens(null); // changed to "null", I know I told you otherwise, but this is more efficient
             if (l != null && l.size() > 1) {
-                ClosestAlien = l.get(1).position;
+                ClosestAlien = l.get(1).position.v2();
                 cntxt.debugOut("seeing a son at " + ClosestAlien);
                 boy = true;
             }
             if (l != null && l.size() > 2) {
-                NextClosestAlien = l.get(2).position;
+                NextClosestAlien = l.get(2).position.v2();
                 cntxt.debugOut("there are multiple boys!");
             }
         } catch (NotEnoughEnergyException | NotEnoughTechException e) { 
