@@ -341,7 +341,7 @@ public class SpaceGrid {
                     displayException("Unhandled exception in showMove(): ", e);
                 }
 
-                if (acs.star != null) {
+                if (acs.star != null && !ac.isComplex) {
                     ac.kill("Death for moving into star " + acs.star.className);
                 }
             }
