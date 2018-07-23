@@ -47,8 +47,9 @@ public class SpaceGrid {
 
     // this is the only approved random generator for the game. Leave it alone!
     public Random rand;
-    
-    public SpaceGrid() {}
+
+    public SpaceGrid() {
+    }
 
     public SpaceGrid(GameEngineV1 eng, GameVisualizer vis, int width, int height, Achievement[] achievements) {
         this.vis = vis;
@@ -231,7 +232,6 @@ public class SpaceGrid {
                 ac.kill("Death for unhandled exception in getMove()/getAccelerate(): " + ex.toString());
                 ex.printStackTrace();
             }
-
         }
     }
 
@@ -250,17 +250,15 @@ public class SpaceGrid {
                 // plug planet back into grid
                 aliens.plugPlanet(p);
 
-
-
                 // now worry about the aliens at the old and new positions
                 AlienCell acsFrom = aliens.getAliensAt(pOld.round());
                 AlienCell acsTo = aliens.getAliensAt(pNew.round());
 
                 // if aliens are where the planet is moving to, and not landed, they die.
                 if (acsTo != null) {
-                // we have a cell, let's look at aliens
+                    // we have a cell, let's look at aliens
                     for (AlienContainer ac : acsTo) {
-                    // if not landed, and not freshly moved here, you die.
+                        // if not landed, and not freshly moved here, you die.
                         if (ac.planet != p && ac.nextP.equals(ac.p)) {
                             ac.kill("Death by being in path of planet " + p.className);
                         }
@@ -276,7 +274,6 @@ public class SpaceGrid {
                         ac.nextP = p.position;
                     }
                 }
-
 
                 // visualize
                 IntegerPosition pOldInt = pOld.round();
@@ -440,8 +437,9 @@ public class SpaceGrid {
             //thisAlien.debugOut(thisAlien.currentActionCode.toString());
 
             // if this guy was part of a fight, don't bother with more actions
-            if (thisAlien.participatedInAction) continue;
-
+            if (thisAlien.participatedInAction) {
+                continue;
+            }
 
             switch (thisAlien.currentActionCode) {
                 case Land:
@@ -683,8 +681,9 @@ public class SpaceGrid {
                     }
 
                     // no spawning in safezone. makes sure squatters can't win the games.
-                    if (isInSafeZone(thisAlien)) break;
-                    
+                    if (isInSafeZone(thisAlien)) {
+                        break;
+                    }
 
                     // construct a random move for the new alien depending on power and send that move through drift correction
                     // spend thisAction.power randomly on x move, y move and initital power
@@ -722,8 +721,8 @@ public class SpaceGrid {
                             thisAlien
                     );
                     newAliens.add(spec);
-                    trajectories.put(spec,thisAlien.trajectory);
-                    
+                    trajectories.put(spec, thisAlien.trajectory);
+
                     break;
             }
             // this ends our big switch statement
@@ -736,47 +735,59 @@ public class SpaceGrid {
         }
     }
 
-    void addSpecies(GameElementSpec element) {
+    InternalAlienSpecies addSpecies(GameElementSpec element) {
         String speciesName = element.domainName + ":" + element.packageName + ":" + element.className;
+        int oldCounter = speciesCounter;
+        InternalAlienSpecies result = null;
 
-        // add species if necessary
-        InternalAlienSpecies as = speciesMap.get(speciesName);
-        if (as == null) {
+        try {
+            // add species if necessary
+            InternalAlienSpecies as = speciesMap.get(speciesName);
+            if (as == null) {
 
-            as = new InternalAlienSpecies(element.domainName, element.packageName, element.className, speciesCounter, speciesMap.getAchievementCount());
-            speciesMap.put(speciesName, as);
-            speciesCounter++;
+                as = new InternalAlienSpecies(element.domainName, element.packageName, element.className, speciesCounter, speciesMap.getAchievementCount());
+                speciesMap.put(speciesName, as);
+                speciesCounter++;
 
-            if (as.cns == null) {
-                try {
-                    as.cns = loadConstructor(engine, element.domainName, element.packageName, element.className);
-                } catch (Exception e) {
-                    gridDebugErr("sg.addSpecies: Error loading contructor for " + speciesName);
-                    //throw (e);
-                }
-                as.shapeFactory = null;
-                try {
-                    Alien a = (Alien) as.cns.newInstance();
-                    if (a instanceof AlienShapeFactory) {
-                        as.shapeFactory = (AlienShapeFactory) a;
+                if (as.cns == null) {
+                    try {
+                        as.cns = loadConstructor(engine, element.domainName, element.packageName, element.className);
+                    } catch (Exception e) {
+                        gridDebugErr("sg.addSpecies: Error loading contructor for " + speciesName);
+//                        e.printStackTrace(System.out);
                     }
-                } catch (Exception e) {
-                    gridDebugErr("sg.addSpecies: Error constructing class reference alien for " + speciesName);
-                    //throw (e);
+                    as.shapeFactory = null;
+                    try {
+                        Alien a = (Alien) as.cns.newInstance();
+                        if (a instanceof AlienShapeFactory) {
+                            as.shapeFactory = (AlienShapeFactory) a;
+                        }
+                    } catch (Exception e) {
+                        gridDebugErr("sg.addSpecies: Error constructing class reference alien for " + speciesName);
+                        throw (e);
+                    }
+
                 }
 
+                if (!element.packageName.equalsIgnoreCase("stockelements")) {
+                    vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
+                }
+                result = as;
             }
-
-            if (!element.packageName.equalsIgnoreCase("stockelements")) {
-                vis.registerSpecies(new AlienSpec(as), as.shapeFactory);
-            }
+        } catch (Exception e) {
+            gridDebugErr("sg.addSpecies: Could not register alien species " + speciesName);
+            speciesMap.remove(speciesName);
+            speciesCounter = oldCounter;
+//            e.printStackTrace(System.out);
         }
+        return result;
     }
 
-
-
-    AlienContainer addAlienWithParams(int x, int y, String domainName, String alienPackageName, String alienClassName,
-            int parent, double tech, double power, String spawnMsg, Trajectory trajectory) {
+    AlienContainer addAlienWithParams(int x, int y, String domainName,
+            String alienPackageName, String alienClassName,
+            int parent, double tech, double power, String spawnMsg,
+            Trajectory trajectory
+    ) {
         AlienContainer ac = null;
 
         String speciesName = domainName + ":" + alienPackageName + ":" + alienClassName;
@@ -798,7 +809,7 @@ public class SpaceGrid {
                         domainName, alienPackageName, alienClassName, as.cns, as,
                         tech, power, // tech and power
                         parent, // no parent
-                        spawnMsg,  // no spawn state
+                        spawnMsg, // no spawn state
                         trajectory); //no trajectory
 
                 aliens.addAlienAndPlug(ac);
@@ -810,6 +821,8 @@ public class SpaceGrid {
                 this.alienCount++;
             } catch (InstantiationException e) {
                 gridDebugErr("sg: could not instantiate new " + speciesName);
+                gridDebugErr("sg: " + e.getMessage());
+                e.printStackTrace(System.out);
             }
         }
 
@@ -819,7 +832,8 @@ public class SpaceGrid {
     // Note: Having a seperate method for each InternalSpaceObject seems a little gross,
     // as there is already a large if statement in addElement and the code in
     // addPlanet and addStar is nearly identical
-    void addPlanet(GameElementSpec element) { //[Q]
+    void addPlanet(GameElementSpec element
+    ) { //[Q]
         InternalSpaceObject soParent = null;
         PlanetBehavior pb = null;
         for (InternalSpaceObject o : this.objects) {
@@ -872,8 +886,13 @@ public class SpaceGrid {
             return;
         }
 
-        addSpecies(element);
-        ac = addAlienWithParams(p.position.round().x, p.position.round().y, element.domainName, element.packageName, element.className,
+        InternalAlienSpecies as = addSpecies(element);
+        if (as == null) {
+            return;
+        }
+
+        ac = addAlienWithParams(p.position.round().x, p.position.round().y,
+                element.domainName, element.packageName, element.className,
                 0, 1, 1, element.state, null);
 
         if (ac == null) {
@@ -908,7 +927,7 @@ public class SpaceGrid {
                     }
 
                     addAlienWithParams(0, 0, element.domainName, element.packageName, element.className, 0, 1, 1, null,
-                            (soParent != null)? new DummyTrajectory(soParent):null);
+                            (soParent != null) ? new DummyTrajectory(soParent) : null);
                     break;
                 case SPECIES:
                     addSpecies(element);
@@ -953,22 +972,14 @@ public class SpaceGrid {
 
         try {
             file = new File(fullName);
-            url = file.toURI().toURL();
-            parameters = new Object[1];
-            parameters[0] = url;
 
-            URLClassLoader classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-            Method method = URLClassLoader.class
-                    .getDeclaredMethod("addURL", URL.class
-                    );
-            method.setAccessible(true);
-            Object result = method.invoke(classLoader, parameters);
+            URLClassLoader classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()}, this.getClass().getClassLoader());
 
             String fullClassName = packageName.equals("") ? className : (packageName + "." + className);
 
             cs = ClassLoader.getSystemClassLoader().loadClass(fullClassName).getConstructor();
         } catch (Exception e) {
-            //e.printStackTrace();
+//            e.printStackTrace(System.out);
             vis.debugErr("sg: Could not get constructor: " + className);
             throw e;
         }
