@@ -415,7 +415,7 @@ function getStatus() {
                     data = JSON.parse(data);
                     logsizeSpan.innerText = data.logSize;
                     memstatsSpan.innerText = data.memStats;
-                    livenessSpan.innerText = data.isAlive;
+                    livenessSpan.innerText = data.isAlive?"alive":"dead";
                     setTimeout(getStatus, 1000);
                 }
             })

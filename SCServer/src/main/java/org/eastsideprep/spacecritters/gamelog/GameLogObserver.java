@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class GameLogObserver {
 
     private final GameLog log;
-    private GameLogState myState;
+    GameLogState myState;
     int maxRead;
     boolean stateServed = false;
     boolean stale = false;
@@ -30,8 +30,6 @@ public class GameLogObserver {
     public GameLogState getInitialState() {
         timeLastObserved = System.currentTimeMillis();
 
-        myState = log.getNewGameLogState();
-        maxRead = myState.getEntryCount();
         return myState;
     }
 

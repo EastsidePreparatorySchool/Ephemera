@@ -64,11 +64,19 @@ public class GameLog {
     }
 
     public GameLogObserver addObserver(String client) {
-        collapseRead();
-        GameLogObserver obs;
-        synchronized (observers) {
-            obs = new GameLogObserver(this, client);
-            observers.add(obs);
+        GameLogObserver obs = null;
+        wlock.lock();
+        try {
+            removeStaleObservers();
+            collapseRead();
+            synchronized (observers) {
+                obs = new GameLogObserver(this, client);
+                obs.myState = getNewGameLogState();
+                obs.maxRead = obs.myState.getEntryCount();
+                observers.add(obs);
+            }
+        } finally {
+            wlock.unlock();
         }
         printLogInfo("AO");
         return obs;
@@ -195,7 +203,7 @@ public class GameLog {
             }
         }
     }
-    
+
     public void onDeath() {
         state.onDeath();
     }
