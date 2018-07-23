@@ -83,6 +83,7 @@ public class GameEngineThread extends Thread {
                         e.printStackTrace();
                     }
                     totalTurns++;
+                    Thread.sleep(50);
                     engine.vis.showCompletedTurn(totalTurns, engine.grid.getNumAliens(), System.nanoTime() - startTurnTime, engine.grid.getTech());
                 } catch (Exception e) {
                     e.printStackTrace();
