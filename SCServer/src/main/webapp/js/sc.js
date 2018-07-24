@@ -6,6 +6,7 @@
 var updateInterval = 50;
 var updateIntervalInactive = 1000;
 var updateIntervalActive = 50;
+var fightLength = 10;
 
 var textarea = document.getElementById("output");
 var turnSpan = document.getElementById("turns");
@@ -31,6 +32,7 @@ var planets = {};
 var stars = [];
 var speciesMap = null;
 var grid = [];
+var fights = [];
 var observers = 0;
 // global states
 var attached = false;
@@ -47,6 +49,7 @@ const MOVE = 7;
 const KILL = 8;
 const STATECHANGE = 9;
 const ORBIT = 10;
+const FIGHT = 11;
 
 var scene;
 var camera;
@@ -63,6 +66,7 @@ var size = 501;
 var divisions = 501;
 var rotation = 0;
 var orbitMaterial = null;
+var fightMaterial;
 
 
 
@@ -192,6 +196,9 @@ function processUpdates(data) {
                     //println("Alien id: "+o.id+" died.");
                     killAlien(o);
                     break;
+                case FIGHT:
+                    showFight(o.newX, o.newY);
+                    break;
                 case STATECHANGE:
                     //println("Alien id: "+o.id+" died.");
                     println("StateChange: " + (o.id === 0 ? "Paused" : "Running"));
@@ -248,6 +255,16 @@ function drawEllipse(centerX, centerY, radiusX, radiusY, rotation) {
     return ellipse;
 }
 
+
+function showFight(x, y) {
+    var mesh = new THREE.Mesh(planetGeo, fightMaterial);
+    mesh.position.x = -y;
+    mesh.position.z = -x;
+    mesh.position.y = 1;
+    mesh.scale.set(5, 5, 5);
+    scene.add(mesh);
+    fights.push(mesh);
+}
 
 
 function listAliens() {
@@ -340,6 +357,11 @@ function uiStateChange(attachState, runState, data) {
             }
             stars = [];
             //println(" ... extinguished "+count+" stars");
+
+            fights.forEach((f) => {
+                scene.remove(f);
+            });
+            fights = [];
 
             renderer.render(scene, camera);
             //println("purge complete.");
@@ -884,6 +906,7 @@ function init() {
     starGeo = new THREE.SphereGeometry(2.0, 32, 32);
     planetGeo = new THREE.SphereGeometry(1.0, 32, 32);
     orbitMaterial = new THREE.LineBasicMaterial({color: "goldenrod"});
+    fightMaterial = new THREE.LineBasicMaterial({color: "red"});
 
     gridHelper = new THREE.GridHelper(size, divisions, "#500000", "#500000");
     scene.add(gridHelper);
@@ -930,6 +953,17 @@ function animate() {
     requestAnimationFrame(animate);
     // required if controls.enableDamping or controls.autoRotate are set to true
     controls.update();
+    var newFights = [];
+    fights.forEach((f) => {
+        var s = f.scale.x;
+        if (s < 1) {
+            scene.remove(f);
+        } else {
+            f.scale.set(s - (1/fightLength), s - (1/fightLength), s - (1/fightLength));
+            newFights.push(f);
+        }
+    });
+    fights = newFights;
     renderer.render(scene, camera);
 }
 

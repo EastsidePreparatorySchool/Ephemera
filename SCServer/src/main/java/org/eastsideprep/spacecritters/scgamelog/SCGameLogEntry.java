@@ -52,17 +52,20 @@ public class SCGameLogEntry extends GameLogEntry {
         this.speciesId = sge.speciesId;
         this.speciesName = sge.speciesName;
     }
-    
+
     public static class Type {
-        public static final int ADDSPECIES = 1; 
+
+        public static final int ADDSPECIES = 1;
         public static final int ADDSTAR = 2;
-        public static final int ADDPLANET=3;
-        public static final int MOVEPLANET=4;
-        public static final int TURN=5;
-        public static final int ADD=6;
-        public static final int MOVE=7;
-        public static final int KILL=8;
-        public static final int STATECHANGE=9;
-        public static final int ORBIT=10;
+        public static final int ADDPLANET = 3;
+        public static final int MOVEPLANET = 4;
+        public static final int TURN = 5;
+        public static final int ADD = 6;
+        public static final int MOVE = 7;
+        public static final int KILL = 8;
+        public static final int STATECHANGE = 9;
+        public static final int ORBIT = 10;
+        public static final int FIGHT = 11;
+
     }
 }

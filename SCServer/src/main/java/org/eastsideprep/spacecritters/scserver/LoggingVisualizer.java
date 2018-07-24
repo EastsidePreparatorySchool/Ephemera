@@ -115,7 +115,10 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void showFight(int x, int y) {
-    }
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.FIGHT,
+                x, y, 0, 0,
+                null, null, -1, -1,
+                0.0, 0.0));    }
 
     @Override
     public void showSpawn(AlienSpec as, double energyAtPos, Trajectory t) {
