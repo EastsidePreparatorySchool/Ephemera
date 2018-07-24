@@ -27,11 +27,19 @@ public class Compilers {
         String fileName = folder + System.getProperty("file.separator") + className + ".java";
 
         try {
-            final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
             if (compiler == null) {
                 System.out.println("Compiler:compileJava: could not load compiler");
+//                try {
+//                    compiler.getClass();
+//                }catch (Exception e) {
+//                    System.out.println("Compiler folder:" + folder+", class "+className);
+//                    System.out.println("Compiler was invoiked through: ");
+//                    e.printStackTrace();
+//                }
                 return;
             }
+            
 //            final JavaCompiler compiler = new EclipseCompiler();
             final DiagnosticCollector< JavaFileObject> diagnostics = new DiagnosticCollector<>();
             final StandardJavaFileManager manager = compiler.getStandardFileManager(diagnostics, null, null);

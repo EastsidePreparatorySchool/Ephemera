@@ -1033,13 +1033,14 @@ public class SpaceGrid {
     }
 
     public void addAllCustomAliens() {
-        addCustomAliens(engine.alienPath, "");
         if (Constants.searchParentForAliens) {
             String parent = engine.gamePath;
             parent = parent.substring(0, parent.lastIndexOf(System.getProperty("file.separator"))); // take of trailing separator
             parent = parent.substring(0, parent.lastIndexOf(System.getProperty("file.separator")) + 1); // take off "SpaceCritters" or such
 
             addCustomAliens(parent, "");
+        } else {
+            addCustomAliens(engine.alienPath, "");
         }
     }
 

@@ -65,7 +65,7 @@ public class Constants {
     public static double deathThreshold = 5; // if you lose a fight by more than this much, you die
     public static String filters = "death; violation";
     public static boolean pauseOnError = true; // debugErr stops the show
-    public static boolean searchParentForAliens = true; // searches whole user folder in addition to aliens folder
+    public static boolean searchParentForAliens = false; // searches whole user folder in addition to aliens folder
     public static int shapeComplexityLimit = 5000; // max number of faces for custom aliens shapes
     public static boolean lastAlienWins = false; // stop game if only one species left
 
