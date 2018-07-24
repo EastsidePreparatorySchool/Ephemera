@@ -26,6 +26,7 @@ public class SCGameState implements GameLogState {
 
     private HashMap<Integer, SCGameLogEntry> aliens = new HashMap<>();
     private HashMap<Integer, SCGameLogEntry> planets = new HashMap<>();
+    private HashMap<Integer, SCGameLogEntry> orbits = new HashMap<>();
     private ArrayList<SCGameLogEntry> stars = new ArrayList<>();
     private ArrayList<SCGameLogEntry> species = new ArrayList<>();
     private ArrayList<SCGameLogEntry> kills = new ArrayList<>();
@@ -65,6 +66,11 @@ public class SCGameState implements GameLogState {
         sc.species = new ArrayList<>();
         for (SCGameLogEntry e : species) {
             sc.species.add(new SCGameLogEntry(e));
+        }
+
+        sc.orbits = new HashMap<>();
+        for (Entry<Integer, SCGameLogEntry> e : orbits.entrySet()) {
+            sc.orbits.put(e.getKey(), new SCGameLogEntry(e.getValue()));
         }
 
         if (lastTurn != null) {
@@ -109,6 +115,9 @@ public class SCGameState implements GameLogState {
                 break;
             case SCGameLogEntry.Type.ADDPLANET:
                 planets.put(sge.id, new SCGameLogEntry(sge));
+                break;
+            case SCGameLogEntry.Type.ORBIT:
+                orbits.put(sge.id, new SCGameLogEntry(sge));
                 break;
             case SCGameLogEntry.Type.MOVE:
                 SCGameLogEntry sgePrior = aliens.get(sge.id);
@@ -216,6 +225,8 @@ public class SCGameState implements GameLogState {
         result.addAll(species);
         result.addAll(aliens.values());
         result.addAll(kills);
+        result.addAll(orbits.values());
+        
         if (lastTurn != null) {
             result.add(lastTurn);
         }
@@ -229,13 +240,13 @@ public class SCGameState implements GameLogState {
     public void onDeath() {
         // just tell the log that the game is paused, 
         // to put clients into idle mode
-          log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.STATECHANGE,
-                0, 0, 0, 0, 
-                null, null, 0 /* paused */, -1, 
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.STATECHANGE,
+                0, 0, 0, 0,
+                null, null, 0 /* paused */, -1,
                 0.0, 0.0));
     }
-    
-    @Override 
+
+    @Override
     public void setLog(GameLog log) {
         this.log = log;
     }

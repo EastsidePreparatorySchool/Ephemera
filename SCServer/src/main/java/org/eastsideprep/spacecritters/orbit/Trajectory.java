@@ -17,7 +17,7 @@ import java.util.Iterator;
  */
 public class Trajectory {
 
-    ArrayList<Conic> conics = new ArrayList<>();
+    public ArrayList<Conic> conics = new ArrayList<>();
     public Orbitable currentFocus;
     public SpaceGrid sg;
     

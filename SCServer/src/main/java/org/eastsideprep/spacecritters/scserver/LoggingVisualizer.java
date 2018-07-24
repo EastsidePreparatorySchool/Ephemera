@@ -9,7 +9,9 @@ import org.eastsideprep.spacecritters.gameengineinterfaces.AlienSpec;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameState;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameVisualizer;
 import java.util.List;
+import org.eastsideprep.spacecritters.alieninterfaces.IntegerPosition;
 import org.eastsideprep.spacecritters.gamelog.GameLog;
+import org.eastsideprep.spacecritters.gamelogic.Constants;
 import org.eastsideprep.spacecritters.orbit.Trajectory;
 import org.eastsideprep.spacecritters.scgamelog.SCGameLogEntry;
 
@@ -19,7 +21,7 @@ import org.eastsideprep.spacecritters.scgamelog.SCGameLogEntry;
  */
 public class LoggingVisualizer implements GameVisualizer {
 
-    GameLog log;  
+    GameLog log;
 
     public LoggingVisualizer(GameLog log) {
         this.log = log;
@@ -27,19 +29,19 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void registerSpecies(AlienSpec as, AlienShapeFactory asf, boolean instantiate) {
-        System.out.println("Logging visualizer: Registering species "+as.getFullSpeciesName());
-        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ADDSPECIES, 
-                0, 0, 0, instantiate?1:0,  
-                null, as.getFullSpeciesName(), 0, as.speciesID, 
+        System.out.println("Logging visualizer: Registering species " + as.getFullSpeciesName());
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ADDSPECIES,
+                0, 0, 0, instantiate ? 1 : 0,
+                null, as.getFullSpeciesName(), 0, as.speciesID,
                 0.0, 0.0));
     }
 
     @Override
     public void registerStar(int x, int y, String name, int index, double luminosity, double mass) { //[Q]
-        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ADDSTAR, 
-                x, y, 0, 0, 
-                name, null, 
-                index, -1, 
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ADDSTAR,
+                x, y, 0, 0,
+                name, null,
+                index, -1,
                 0.0, 0.0));
 
     }
@@ -59,8 +61,8 @@ public class LoggingVisualizer implements GameVisualizer {
             return;
         }
         log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.MOVEPLANET,
-                x, y, 0, 0, 
-                name, null, -index, -1, 
+                x, y, 0, 0,
+                name, null, -index, -1,
                 0.0, 0.0));
     }
 
@@ -74,9 +76,9 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void showCompletedTurn(int totalTurns, int numAliens, long timeTaken, double avgTech) {
-        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.TURN, 
-                0, 0, totalTurns, numAliens, 
-                null, null, -1, -1, 
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.TURN,
+                0, 0, totalTurns, numAliens,
+                null, null, -1, -1,
                 0.0, 0.0));
         log.turnsCompleted = totalTurns;
     }
@@ -96,8 +98,16 @@ public class LoggingVisualizer implements GameVisualizer {
             if (oldX == as.x && oldY == as.y) {
                 return;
             }
+            if (t != null) {
+                IntegerPosition p = t.currentFocus.position(log.turnsCompleted*Constants.deltaT).round();
+                log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ORBIT,
+                        p.x, p.y, 0, 0,
+                        Double.toString(t.conics.get(0).rotation), null, as.hashCode, as.speciesID,
+                        t.conics.get(0).e, t.conics.get(0).p/Constants.deltaX));
+            }
+
             log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.MOVE,
-                    as.x, as.y, oldX, oldY, 
+                    as.x, as.y, oldX, oldY,
                     null, as.getFullSpeciesName(), as.hashCode, as.speciesID,
                     0.0, 0.0));
         }
@@ -110,26 +120,26 @@ public class LoggingVisualizer implements GameVisualizer {
     @Override
     public void showSpawn(AlienSpec as, double energyAtPos, Trajectory t) {
         //System.out.println("LOGDEBUG: ADD" + as.hashCode);
-        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ADD, 
-                as.x, as.y, 0, 0, 
-                null, as.getFullSpeciesName(), as.hashCode, as.speciesID, 
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ADD,
+                as.x, as.y, 0, 0,
+                null, as.getFullSpeciesName(), as.hashCode, as.speciesID,
                 0.0, 0.0));
     }
 
     @Override
     public void showDeath(AlienSpec as, double energyAtPos) {
         //System.out.println("LOGDEBUG: KILL" + as.hashCode);
-        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.KILL, 
-                as.x, as.y, 0, 0, 
-                null, as.getFullSpeciesName(), as.hashCode, as.speciesID, 
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.KILL,
+                as.x, as.y, 0, 0,
+                null, as.getFullSpeciesName(), as.hashCode, as.speciesID,
                 0.0, 0.0));
     }
 
     @Override
     public void showEngineStateChange(GameState gs) {
         log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.STATECHANGE,
-                0, 0, 0, 0, 
-                null, null, gs == GameState.Running?1:0, -1, 
+                0, 0, 0, 0,
+                null, null, gs == GameState.Running ? 1 : 0, -1,
                 0.0, 0.0));
     }
 
@@ -148,7 +158,7 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void debugErr(String s) {
-        System.out.println("LV debug out: "+s);
+        System.out.println("LV debug out: " + s);
     }
 
     @Override
@@ -171,7 +181,5 @@ public class LoggingVisualizer implements GameVisualizer {
     @Override
     public void shutdown() {
     }
-    
- 
 
 }

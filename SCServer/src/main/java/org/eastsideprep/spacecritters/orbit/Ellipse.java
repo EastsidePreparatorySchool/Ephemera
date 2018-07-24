@@ -7,7 +7,6 @@ package org.eastsideprep.spacecritters.orbit;
 
 import org.eastsideprep.spacecritters.gamelogic.SpaceGrid;
 import org.eastsideprep.spacecritters.gamelogic.Constants;
-import org.eastsideprep.spacecritters.alieninterfaces.Vector2;
 
 /**
  *

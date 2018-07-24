@@ -85,7 +85,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         // if we are all good, move us out a little from the center (Earth/Sun)
         // but only every tenth turn or so
             Position p = ctx.getPosition();
-            return new Vector2(p.scaleToLength(0.3));
+            return new Vector2(p.scaleToLength(0.4));
     }
 
     @Override

@@ -48,6 +48,7 @@ const ADD = 6;
 const MOVE = 7;
 const KILL = 8;
 const STATECHANGE = 9;
+const ORBIT = 10;
 
 var scene;
 var camera;
@@ -184,6 +185,10 @@ function processUpdates(data) {
                     //println("Move: id: "+o.id+" ("+o.param1 +","+o.param2+") -> ("+o.newX +","+o.newY+")");
                     moveAlien(o);
                     break;
+                case ORBIT:
+                    drawOrbit(o.newX, o.newY, o.energy, o.tech, Number(name));
+                    break;
+                
                 case KILL:
                     //println("Alien id: "+o.id+" died.");
                     killAlien(o);
@@ -206,6 +211,39 @@ function processUpdates(data) {
         //println ("Requested delayed updates at the end of processUpdates");
     }
 }
+
+function drawOrbit (focusX, focusY, e, p, rotation) {
+    println ("Orbit: ("+focusX+","+focusY+"), ecc:"+e+", p:"+p+", rot:"+rotation);
+    
+    var a = p/(1-e*e);
+    var b = a*Math.sqrt(1-e*e);
+    var cf = a-b;
+    var focus = new THREE.Vector2(focusX, focusY);
+    var offset = new THREE.Vector2(1,0).rotateAround(new THREE.Vector2(0,0), rotation);
+    focus = focus.sub(offset);
+    drawEllipse(focus.x, focus.y, a, b, rotation);
+    
+}
+
+function drawEllipse(centerX, centerY, radiusX, radiusY, rotation) {
+    var curve = new THREE.EllipseCurve(
+            centerX, centerY, 
+            radiusX, radiusY, 
+            0, 2 * Math.PI, 
+            false, 
+            rotation         
+            );
+
+    var points = curve.getPoints(50);
+    var geometry = new THREE.BufferGeometry().setFromPoints(points);
+    var material = new THREE.LineBasicMaterial({color: "goldenrod"});
+
+    // Create the final object to add to the scene
+    var ellipse = new THREE.Line(geometry, material);
+    ellipse.rotation.x = Math.PI / 2;
+    scene.add(ellipse);
+}
+
 
 
 function listAliens() {
@@ -384,15 +422,15 @@ function listObservers() {
     if (!attached) {
         return;
     }
-    
+
     request({url: "protected/listobservers?clientID=" + getClientID()})
             .then(data => {
                 if (data !== null) {
                     //println ("Raw: "+data);
                     data = JSON.parse(data);
                     var list = "Observers:<br>";
-                    for (var i = 0; i< data.length; i++) {
-                        list += data[i].name+":"+data[i].maxRead + "<br>";
+                    for (var i = 0; i < data.length; i++) {
+                        list += data[i].name + ":" + data[i].maxRead + "<br>";
                     }
                     observerlistP.innerHTML = list;
                     observersSpan.innerText = data.length;
@@ -417,7 +455,7 @@ function getStatus() {
                     data = JSON.parse(data);
                     logsizeSpan.innerText = data.logSize;
                     memstatsSpan.innerText = data.memStats;
-                    livenessSpan.innerText = data.isAlive?"alive":"dead";
+                    livenessSpan.innerText = data.isAlive ? "alive" : "dead";
                     setTimeout(getStatus, 1000);
                 }
             })
@@ -786,6 +824,41 @@ function processCheck(id) {
                 }
             });
 }
+
+
+
+//   public void buildTrajectory(Trajectory t, Color c) {
+//        Iterator<Vector2> positions = t.toDraw(100);
+//        
+//        Vector2 past = positions.next();
+//        past.x = Scene3D.xFromX(past.x);
+//        past.y = Scene3D.zFromY(past.y);
+//        
+//        PhongMaterial mat = new PhongMaterial(c);
+//        getChildren().remove(lines);
+//        lines = new Group();
+//        while (positions.hasNext()) {
+//            Vector2 next = positions.next();
+//            next.x = Scene3D.xFromX(next.x);
+//            next.y = Scene3D.zFromY(next.y);
+//            
+//            Box line = new BoxLine(past, next);
+//            line.setMaterial(mat);
+//            lines.getChildren().add(line);
+//            
+//            past = next;
+//        }
+//        
+//        Vector2 offset = t.positionOfFocus();
+//        offset.x = Scene3D.xFromX(offset.x);
+//        offset.y = Scene3D.zFromY(offset.y);
+//        lines.getTransforms().add(new Translate(offset.x, 0, offset.y));
+//        
+//        getChildren().add(lines);
+//        
+//    }
+
+
 
 
 

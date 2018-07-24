@@ -24,11 +24,11 @@ class OrbitException extends RuntimeException {
 
 public abstract class Conic {
 
-    double p;
-    double e;
+    public double p;
+    public double e;
     double h;
 
-    double rotation;
+    public double rotation;
 
     int orbits;
 
