@@ -108,7 +108,7 @@ public class LoggingVisualizer implements GameVisualizer {
 
             log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.MOVE,
                     as.x, as.y, oldX, oldY,
-                    null, as.getFullSpeciesName(), as.hashCode, as.speciesID,
+                    null, null, as.hashCode, as.speciesID,
                     0.0, 0.0));
         }
     }
@@ -131,7 +131,7 @@ public class LoggingVisualizer implements GameVisualizer {
         //System.out.println("LOGDEBUG: KILL" + as.hashCode);
         log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.KILL,
                 as.x, as.y, 0, 0,
-                null, as.getFullSpeciesName(), as.hashCode, as.speciesID,
+                null, null, as.hashCode, as.speciesID,
                 0.0, 0.0));
     }
 

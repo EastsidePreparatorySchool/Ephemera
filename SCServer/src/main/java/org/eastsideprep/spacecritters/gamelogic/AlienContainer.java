@@ -53,10 +53,10 @@ public class AlienContainer {
     public String outgoingMessage;
     public double outgoingPower;
     int turnsInSafeZone;
-    
+
     boolean isComplex;
     Trajectory trajectory;
-    
+
     public boolean updated = true;
 
     // Declare stats here
@@ -122,37 +122,31 @@ public class AlienContainer {
 
     }
     // class-related helpers
-    
+
     public void initComplex(Alien a, Trajectory trajectory) throws InstantiationException {
         calien = (AlienComplex) a;
         isComplex = true;
-        
-        
+
         if (trajectory == null) {
             grid.gridDebugErr("ac: No trajectory or focus given");
             throw new InstantiationException();
         }
-        
-        
-        
-        if (trajectory instanceof DummyTrajectory){
+
+        if (trajectory instanceof DummyTrajectory) {
             this.trajectory = new Trajectory(
                     trajectory.currentFocus, //focus from the dummy trajectory
-                    grid.rand.nextDouble()*3 + 5, //semi-latus rectum
-                    Math.pow(grid.rand.nextDouble(),2), //Eccentricity
-                    grid.rand.nextDouble()*2*Math.PI, //mNaught
-                    grid.rand.nextDouble()*2*Math.PI, //rotation
+                    grid.rand.nextDouble() * 3 + 5, //semi-latus rectum
+                    Math.pow(grid.rand.nextDouble(), 2), //Eccentricity
+                    grid.rand.nextDouble() * 2 * Math.PI, //mNaught
+                    grid.rand.nextDouble() * 2 * Math.PI, //rotation
                     grid);
-        } else this.trajectory = trajectory.clone();
-        
-        
+        } else {
+            this.trajectory = trajectory.clone();
+        }
+
         p = this.trajectory.positionAtTime(0);
     }
-    
-    
-    
-    
-    
+
     public double getMass() {
         return Constants.alienMass;
     }
@@ -179,7 +173,6 @@ public class AlienContainer {
     /*public AlienSpec getSimpleAlienSpec() {
         return new AlienSpec(this.domainName, this.packageName, this.className, this.species.speciesID, this.fullName, this.speciesName);
     }*/
-
     public AlienSpecies getAlienSpecies() {
         if (this.species == null) {
             assert false;
@@ -208,66 +201,66 @@ public class AlienContainer {
 
     public void move() throws NotEnoughTechException {
         // if on planet, ignore move
-        if (this.planet != null) return;
-        
-        if (isComplex) movecomplex();
-        else movestandard();
+        if (this.planet != null) {
+            return;
+        }
+
+        if (isComplex) {
+            movecomplex();
+        } else {
+            movestandard();
+        }
     }
-    
-    
-    
+
     public void movecomplex() throws NotEnoughTechException {
         /* FIND DELTAV */
         updated = true;
         Vector2 deltaV;
         try {
-            deltaV = calien.getAccelerate().scale(1f/getMass());
-        } catch (UnsupportedOperationException e) { deltaV = null; }
-        
-        if (deltaV.x == 0 && deltaV.y == 0) deltaV = null; //if there is no acceleration, don't do anything
-        
+            deltaV = calien.getAccelerate().scale(1f / getMass());
+        } catch (UnsupportedOperationException e) {
+            deltaV = null;
+        }
+
+        if (deltaV.x == 0 && deltaV.y == 0) {
+            deltaV = null; //if there is no acceleration, don't do anything
+        }
         nextP = trajectory.positionAtTime(grid.getTime());
-        
-        
-        
-        
+
         /* CHARGE ALIEN FOR DELTAV */
-        
-        //aliens cannot change their trajectory if they ar enot in the game limits
+        //aliens cannot change their trajectory if they are enot in the game limits
         if (GridDisk.isValidPoint(nextP.round())) {
             if (deltaV != null) {
                 double m = deltaV.magnitude();
                 if (m < Constants.maxDeltaV(tech)) {
                     this.energy -= Constants.accelerationCost(m);
-                } else deltaV = null;
+                } else {
+                    deltaV = null;
+                }
             }
         } else if (!trajectory.isBound()) {
-            System.out.println("Murderd for nonexistance");
+            System.out.println("Floated into the abyss");
             kill("Floated into the abyss");
             return;
         }
-        
-        
-        
-        
-        
-        
-        
+
         /* DETERMINE CURRENT FOCUS */
         Orbitable focus = findFocus();
-        
-        
+
         /* FINALLY, COMPUTE NEW TRAJECTORY */
-        
         if (focus != trajectory.currentFocus) { //make a new trajectory if the focus has changed
             System.out.println("WHO?? ");
             if (focus instanceof Planet) {
                 System.out.println("TWAS A PLANET");
                 System.out.println(((Planet) focus).className);
             }
-            if (focus instanceof Star) System.out.println("TWAS A STAR");
+            if (focus instanceof Star) {
+                System.out.println("TWAS A STAR");
+            }
             Vector2 v = trajectory.velocityAtTime(grid.getTime());
-            if (deltaV != null) v = v.add(deltaV);
+            if (deltaV != null) {
+                v = v.add(deltaV);
+            }
             trajectory = new Trajectory(focus, nextP, v, grid);
             return;
         } else if (deltaV != null) { //if not, alter the old one
@@ -276,49 +269,52 @@ public class AlienContainer {
         }
         updated = false;
     }
-    
+
     public Orbitable findFocus() {
         Orbitable focus = trajectory.currentFocus;
         boolean altered = false;
-        
+
         //if orbiting a planet and within that planet's hill sphere, you're staying there
         //if not, enter the parent star's orbit
         if (focus instanceof Planet) {
             System.out.println(focus.hillRadius());
-            if (focus.position(grid.getTime()).subtract(nextP).magnitude() <= focus.hillRadius()) return focus;
-            else {
+            if (focus.position(grid.getTime()).subtract(nextP).magnitude() <= focus.hillRadius()) {
+                return focus;
+            } else {
                 focus = ((Planet) focus).trajectory.currentFocus;
             }
         }
-        
+
         //parent must be a star if code gets here
-        
         double F = focus.mass() / focus.position(grid.getTime()).subtract(nextP).magnitude();
-        
+
         //for each star
         //if it exerts more force on you than your parent star, it becomes your new parent
-        for(InternalSpaceObject iso: grid.objects) if (iso instanceof Star && iso != focus) {
-            if (iso.mass() / iso.position(grid.getTime()).subtract(nextP).magnitude() > F) {
-                focus = iso;
-                altered = true;
-                F = focus.mass() / focus.position(grid.getTime()).subtract(nextP).magnitude();
+        for (InternalSpaceObject iso : grid.objects) {
+            if (iso instanceof Star && iso != focus) {
+                if (iso.mass() / iso.position(grid.getTime()).subtract(nextP).magnitude() > F) {
+                    focus = iso;
+                    altered = true;
+                    F = focus.mass() / focus.position(grid.getTime()).subtract(nextP).magnitude();
+                }
             }
         }
-        
+
         //for each planet orbiting your parent star
         //if you're in their hill sphere, they are your new parent
         //TODO: does not account for overlapping hill spheres
-        for(InternalSpaceObject iso: grid.objects) if (iso instanceof Planet && iso.trajectory.currentFocus == focus) {
-            if (iso.position(grid.getTime()).subtract(nextP).magnitude() <= iso.hillRadius()) {
-                focus = iso;
-                altered = true;
+        for (InternalSpaceObject iso : grid.objects) {
+            if (iso instanceof Planet && iso.trajectory.currentFocus == focus) {
+                if (iso.position(grid.getTime()).subtract(nextP).magnitude() <= iso.hillRadius()) {
+                    focus = iso;
+                    altered = true;
+                }
             }
         }
-        
+
         return focus;
     }
-    
-    
+
     public void movestandard() throws NotEnoughTechException { //[Q]
 
         // Whether the move goes off the board will be determined by the grid
@@ -330,15 +326,13 @@ public class AlienContainer {
             direction = new Direction(0, 0);
         }
 
-        
-
         checkMove(direction); // Throws an exception if illegal
 
         // we want to contain aliens in the 250 sphere, so apply the "cosmic drift"
         direction = this.containMove(p.x, p.y, direction);
-        
+
         nextP = new Position(p.add(direction));
-        
+
         this.energy -= direction.magnitude() * Constants.standardMoveCost;
     }
 
