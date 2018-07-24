@@ -23,12 +23,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
 import java.security.CodeSource;
-import java.util.Arrays;
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
 import org.eastsideprep.spacecritters.gamelog.GameLog;
 import org.eastsideprep.spacecritters.scgamelog.SCGameState;
 
@@ -49,10 +43,11 @@ public class GameEngineV2 implements GameEngine {
     public SCGameState state;
     public GameLog log;
     public String name;
-    private URLClassLoader classLoader;
-    private Method method;
     private boolean dead = false;
     public long timeOfDeath;
+
+    static private URLClassLoader classLoader;
+    static private Method addURL;
 
     public GameEngineV2(String name) {
         this.gson = new Gson();
@@ -207,16 +202,15 @@ public class GameEngineV2 implements GameEngine {
         try {
 //            System.out.println("EngineV2: Attempting to hack class loader ...");
             this.classLoader = (URLClassLoader) GameEngineV2.class.getClassLoader();
-//            this.method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-//            method.setAccessible(true);
-//            System.out.println("EngineV2: Class loader hacked successfully");
+            GameEngineV2.addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+            GameEngineV2.addURL .setAccessible(true);
+            System.out.println("EngineV2: Class loader hacked successfully");
         } catch (Exception e) {
 //            System.out.println("EngineV2: could not get hacked class loader");
             e.printStackTrace();
         }
 
     }
-
 
     @Override
     public void shutdown() {
@@ -236,10 +230,7 @@ public class GameEngineV2 implements GameEngine {
         log.onDeath();
     }
 
-    
-    
-    
-        //
+    //
     // Dynamic class loader (.jar files)
     // stolen from StackOverflow, considered dark voodoo magic
     //
@@ -275,7 +266,8 @@ public class GameEngineV2 implements GameEngine {
         try {
             file = new File(fullName);
             fullClassName = packageName.equals("") ? className : (packageName + "." + className);
-            classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()});
+//            classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()});
+            GameEngineV2.addURL.invoke(GameEngineV2.classLoader, (Object[])new URL[]{file.toURI().toURL()});
             cs = classLoader.loadClass(fullClassName).getConstructor();
         } catch (Exception e) {
             if (!packageName.endsWith("stockelements")) {
@@ -285,10 +277,5 @@ public class GameEngineV2 implements GameEngine {
         }
         return cs;
     }
-
-    
-    
-    
-   
 
 }

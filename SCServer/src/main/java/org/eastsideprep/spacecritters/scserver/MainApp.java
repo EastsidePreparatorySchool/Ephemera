@@ -48,14 +48,13 @@ public class MainApp implements SparkApplication {
     public static void main(String[] args) {
         System.out.println("SC main() (scserver) " + getDateString());
         String userDir = System.getProperty("user.dir");
-        String homeDir = System.getProperty("user.home");
 
         //System.setProperty("javafx.preloader", "org.eastsideprep.spacecritters.spacecritters.SplashScreenLoader");
         // invoked from main, start Spark Jetty server
         //staticFiles.location("/static");
         if (args.length == 0 || !args[0].equalsIgnoreCase("desktoponly")) {
             MainApp.app = new MainApp();
-            
+
             if (userDir.toLowerCase().contains("ephemera")) {
                 userDir += System.getProperty("file.separator") + "target";
             }
@@ -97,6 +96,17 @@ public class MainApp implements SparkApplication {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         System.out.println("SCServer init() " + dateFormat.format(date));
+        String userDir = System.getProperty("user.dir");
+        String homeDir = System.getProperty("user.home");
+        String javaHomeDir = System.getProperty("java.home");
+        String cp = System.getProperty("java.class.path");
+        System.out.println(" user.dir " + userDir);
+        System.out.println(" user.home " + homeDir);
+        System.out.println(" jave.home " + javaHomeDir);
+        System.out.println(" java.class.path ");
+        for (String s : cp.split(";")) {
+            System.out.println("   " + s);
+        }
 
 //    	before((request, response) -> {
 //    	  System.out.println("Spark request: "+request.url());
@@ -193,7 +203,7 @@ public class MainApp implements SparkApplication {
         boolean isAlive;
         int turns;
         int observers;
-
+        int logSize;
     }
 
     private static EngineRecord[] doListEngines(Request req) {
@@ -208,6 +218,8 @@ public class MainApp implements SparkApplication {
                 er.name = e.getKey();
                 er.observers = e.getValue().log.getObservers().size();
                 er.turns = e.getValue().log.turnsCompleted;
+                er.logSize = e.getValue().log.getLogSize();
+
                 result[i++] = er;
                 //System.out.println("  ER: "+er.name+", "+(er.isAlive?"alive":"dead"));
             }
@@ -217,36 +229,53 @@ public class MainApp implements SparkApplication {
         return result;
     }
 
-    private static Object[] doListObservers(Request req) {
+    public static class ObserverRecord {
+
+        String name;
+        int maxRead;
+
+        ObserverRecord(String name, int maxRead) {
+            this.name = name;
+            this.maxRead = maxRead;
+        }
+    }
+
+    private static ObserverRecord[] doListObservers(Request req) {
+        if (!isAdmin(req)) {
+            System.out.println("listObservers: client not authorized");
+            return null;
+        }
+
         LinkedList<GameEngineV2> theseEngines = new LinkedList<>();
 
         String name = req.queryParams("name");
         if (name != null && !name.equals("")) {
             synchronized (engines) {
                 for (Entry<String, GameEngineV2> e : engines.entrySet()) {
-                    if (Pattern.matches(name, e.getKey())) {
+                    if (name.equals("*") || Pattern.matches(name, e.getKey())) {
                         theseEngines.add(e.getValue());
                     }
                 }
             }
-
         } else {
             ServerContext ctx = getCtx(req);
             if (ctx == null || ctx.observer == null) {
-                theseEngines = new LinkedList<>(engines.values());
+                synchronized (engines) {
+                    theseEngines = new LinkedList<>(engines.values());
+                }
             } else {
-
                 theseEngines.add(ctx.engine);
             }
         }
 
-        LinkedList<String> result = new LinkedList<>();
+        LinkedList<ObserverRecord> result = new LinkedList<>();
         for (GameEngineV2 e : theseEngines) {
             LinkedList<GameLogObserver> observers = e.log.getObservers();
-            observers.forEach((o) -> result.add(e.name + ":" + o.client));
+            observers.forEach((o) -> result.add(new ObserverRecord(e.name + ":" + o.client, o.getMaxRead())));
         }
 
-        return result.toArray();
+        ObserverRecord[] data = new ObserverRecord[result.size()];
+        return result.toArray(data);
     }
 
     private static String doCreateEngine(Request req) {
@@ -496,6 +525,10 @@ public class MainApp implements SparkApplication {
         if (ctx.observer == null) {
             return 0;
         }
+        if (!isAdmin(request)) {
+            System.out.println("uploadFile: client not authorized");
+            return -1;
+        }
 
         System.out.println("upload ...");
         MultipartConfigElement multipartConfigElement
@@ -504,7 +537,7 @@ public class MainApp implements SparkApplication {
 
         long size = 0;
         try {
-            Part file = request.raw().getPart("jarfile");
+            Part file = request.raw().getPart("alienfile");
             String domain = "uploadedaliens";
 //            String domain = request.raw().getPart("domain") or such; 
             // make sure domain folder exists
@@ -518,15 +551,15 @@ public class MainApp implements SparkApplication {
             final Path path = Paths.get(
                     domainFolder
                     + System.getProperty("file.separator")
-                    + file.getName()
+                    + file.getSubmittedFileName()
             );
             final InputStream in = file.getInputStream();
             Files.copy(in, path);
-            System.out.println("successfully uploaded alien jar " + file.getName());
+            System.out.println("successfully uploaded alien file " + file.getSubmittedFileName());
 
             GameElementSpec element = new GameElementSpec(
                     "SPECIES",
-                    domain + System.getProperty("file.separator") + file.getName(),
+                    domain + System.getProperty("file.separator") + file.getSubmittedFileName(),
                     "",
                     "*",
                     null);

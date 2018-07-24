@@ -89,12 +89,13 @@
                     Liveness:&nbsp;&nbsp;<span id="liveness"></span><br>
                     Log size:&nbsp;&nbsp;<span id="logsize"></span>
                 </p>
+                <form enctype="multipart/form-data"  onsubmit="return submitForm(this);" name="alienfileform">
+                    Alien file: <input name="alienfile" type="file" />
+                    <input type="submit" value="Upload"/>
+                </form>
                 <p id="species"></p>
                 <p id="observerlist"></p>
-                <!--                <form enctype="multipart/form-data"  onsubmit="return submitForm(this);" name="jarform">
-                                    JAR file for Alien: <input name="jarfile" type="file" />
-                                    <input type="submit" value="Upload"/>
-                                </form>-->
+
             </div>
         </div>
 

@@ -18,11 +18,13 @@ public class GameEngineThread extends Thread {
 
     final private GameEngineV2 engine;
     boolean pastReady = false;
+    int sleepTime = 50;
+    int lastLogSize = -1;
 
     public GameEngineThread(GameEngineV2 ge) {
         engine = ge;
 
-        setName("GameEngineThread");
+        setName("GameEngineThread:" + ge.name);
     }
 
     @Override
@@ -83,8 +85,30 @@ public class GameEngineThread extends Thread {
                         e.printStackTrace();
                     }
                     totalTurns++;
-                    Thread.sleep(50);
                     engine.vis.showCompletedTurn(totalTurns, engine.grid.getNumAliens(), System.nanoTime() - startTurnTime, engine.grid.getTech());
+
+                    // adjustable sleeping, to make sure the log does not grow too big
+//                    if (lastLogSize == -1) {
+//                        // start of game, not important
+//                        lastLogSize = engine.log.getLogSize();
+//                    }
+//
+//                    int newLogSize = engine.log.getLogSize();
+//                    if (newLogSize > (this.lastLogSize * 1.5)) {
+//                        // 50% bigger -> twice the waiting
+//                        this.sleepTime *= 2;
+//                        this.sleepTime = Math.min(this.sleepTime, 10000);
+//                    } else if (newLogSize < (this.lastLogSize / 1.1)) {
+//                        // 10% smaller -> a little less waiting
+//                        this.sleepTime = (int) (this.sleepTime * 0.9);
+//                        this.sleepTime = Math.max(this.sleepTime, 50);
+//                    }
+//                    this.lastLogSize = newLogSize;
+                    this.sleepTime = this.engine.log.getLogSize() / 50;
+                    this.sleepTime = Math.min(this.sleepTime, 1000);
+                    this.sleepTime = Math.max(this.sleepTime, 20);
+                    Thread.sleep(this.sleepTime);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     engine.vis.debugErr("GameThread: Unknown exception: " + e.getMessage());
@@ -107,16 +131,22 @@ public class GameEngineThread extends Thread {
                 String variable = (String) gc.parameters[0];
                 String value = (String) gc.parameters[1];
 
-                for (Field field : Constants.class.getDeclaredFields()) {
+                for (Field field : Constants.class
+                        .getDeclaredFields()) {
                     if (variable.equalsIgnoreCase(field.getName())) {
                         if (field.getType().getName().equals("String")) {
-                            field.set(Constants.class, value);
+                            field.set(Constants.class,
+                                    value);
+
                         } else if (field.getType().getName().equals("int") || field.getType().getName().equals("Integer")) {
-                            field.set(Constants.class, Integer.parseInt(value));
+                            field.set(Constants.class,
+                                    Integer.parseInt(value));
                         } else if (field.getType().getName().equalsIgnoreCase("boolean")) {
                             value = value.equalsIgnoreCase("on") ? "true" : value;
                             value = value.equalsIgnoreCase("off") ? "false" : value;
-                            field.set(Constants.class, Boolean.parseBoolean(value));
+                            field
+                                    .set(Constants.class,
+                                            Boolean.parseBoolean(value));
                         }
                     }
                 }
@@ -152,17 +182,22 @@ public class GameEngineThread extends Thread {
                                 .getDeclaredFields()) {
                             if (element.className.equalsIgnoreCase(field.getName())) {
                                 if (field.getType().getName().equals("java.lang.String")) {
-                                    field.set(Constants.class, element.state);
+                                    field.set(Constants.class,
+                                            element.state);
 
                                 } else if (field.getType().getName().equals("int") || field.getType().getName().equals("Integer")) {
-                                    field.set(Constants.class, Integer.parseInt(element.state));
+                                    field.set(Constants.class,
+                                            Integer.parseInt(element.state));
 
                                 } else if (field.getType().getName().equalsIgnoreCase("double")) {
-                                    field.set(Constants.class, Double.parseDouble(element.state));
+                                    field.set(Constants.class,
+                                            Double.parseDouble(element.state));
                                 } else if (field.getType().getName().equalsIgnoreCase("boolean")) {
                                     element.state = element.state.equalsIgnoreCase("on") ? "true" : element.state;
                                     element.state = element.state.equalsIgnoreCase("off") ? "false" : element.state;
-                                    field.set(Constants.class, Boolean.parseBoolean(element.state));
+                                    field
+                                            .set(Constants.class,
+                                                    Boolean.parseBoolean(element.state));
                                 }
                             }
                         }

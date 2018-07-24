@@ -967,7 +967,13 @@ public class SpaceGrid {
                     // special case to enable registering all species in an uploaded jar
                     if (element.className.equals("*")) {
                         File f = new File(this.engine.alienPath + System.getProperty("file.separator") + element.domainName);
-                        addCustomAliensInJAR(element.domainName, f);
+                        if (f.getName().toLowerCase().endsWith(".jar")) {
+                            addCustomAliensInJAR(element.domainName, f);
+                        } else if (f.getName().toLowerCase().endsWith(".class")) {
+                            addCustomAliensInCLASS(element.domainName, f);
+                        } else if (f.getName().toLowerCase().endsWith(".java")) {
+                            addCustomAliensInJAVA(element.domainName, f);
+                        }
                     } else {
                         addSpecies(element);
                     }
@@ -1058,7 +1064,7 @@ public class SpaceGrid {
                 } else if ((f.getName().toLowerCase().endsWith(".jar"))) {
                     addCustomAliensInJAR(domain, f);
                 } else if ((f.getName().toLowerCase().endsWith(".class"))
-                        && !Files.exists(Paths.get(f.getName().toLowerCase().replace(".class", ".java")))) {
+                        && !Files.exists(Paths.get(f.getPath().toLowerCase().replace(".class", ".java")))) {
                     addCustomAliensInCLASS(domain, f);
                 } else if ((f.getName().toLowerCase().endsWith(".java"))) {
                     addCustomAliensInJAVA(domain, f);

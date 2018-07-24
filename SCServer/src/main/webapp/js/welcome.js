@@ -16,6 +16,7 @@ var contentP = document.getElementById("content");
 var engineName = document.getElementById("enginename");
 
 var updateTimer;
+var display = "engines";
 
 
 // basic server calls in the absence of jquery
@@ -87,25 +88,25 @@ function queryAdmin() {
             });
 }
 
-function listAllObservers() {
-    request({url: "protected/listobservers?clientID=" + getClientID()})
-            .then(data => {
-                if (data !== null) {
-                    //println ("Raw: "+data);
-                    data = JSON.parse(data);
-                    var list = "Observers:\Fn";
-                    for (var s in data) {
-                        list += data[s] + "\n";
-                    }
-                    println(list);
-                }
-            })
-            .catch(error => {
-                if (error !== null && error.length > 0) {
-                    println("  Error: '" + error + "'");
-                }
-            });
-}
+//function listAllObservers() {
+//    request({url: "protected/listobservers?clientID=" + getClientID()})
+//            .then(data => {
+//                if (data !== null) {
+//                    //println ("Raw: "+data);
+//                    data = JSON.parse(data);
+//                    var list = "Observers:\n";
+//                    for (var i = 0; i < data.length; i++) {
+//                        list += data[i].name + ":" + data[i].maxRead + "\n";
+//                    }
+//                    println(list);
+//                }
+//            })
+//            .catch(error => {
+//                if (error !== null && error.length > 0) {
+//                    println("  Error: '" + error + "'");
+//                }
+//            });
+//}
 
 function getStatus() {
     request({url: "protected/allstatus"})
@@ -125,24 +126,31 @@ function getStatus() {
 }
 
 function enginesView() {
+    display = "engines";
     clearInterval(updateTimer);
     updateTimer = setInterval(listEngines, 1000);
     listEngines();
 }
 function observersView() {
+    display = "observers";
     clearInterval(updateTimer);
     updateTimer = setInterval(listObservers, 1000);
     listObservers();
 }
 function statsView() {
+    display = "stats";
     clearInterval(updateTimer);
     updateTimer = setInterval(listStats, 1000);
     listStats();
 }
 
 function listEngines() {
+    if (display !== "engines")
+        return;
     request({url: "protected/listengines"})
             .then(data => {
+                if (display !== "engines")
+                    return;
                 if (data !== null) {
                     //println ("Raw: "+data);
                     data = JSON.parse(data);
@@ -165,7 +173,8 @@ function listEngines() {
                         var info = document.createTextNode(", "
                                 + "status: " + (data[i].isAlive ? "alive" : "dead") + ", "
                                 + "turns: " + data[i].turns + ", "
-                                + "observers: " + data[i].observers
+                                + "observers: " + data[i].observers+", "
+                                + "log size: "+data[i].logSize
                                 );
                         atag.appendChild(engine);
                         contentP.appendChild(atag);
@@ -182,15 +191,19 @@ function listEngines() {
 }
 
 function listObservers() {
-    request({url: "protected/listobservers"})
+    if (display !== "observers")
+        return;
+    request({url: "protected/listobservers?name=*"})
             .then(data => {
+                if (display !== "observers")
+                    return;
                 if (data !== null) {
                     //println ("Raw: "+data);
                     contentP.innerHTML = "<br><br><br><br>Observers:<br><br>";
                     data = JSON.parse(data);
                     if (data.length > 0) {
                         for (var i = 0; i < data.length; i++) {
-                            var engine = document.createTextNode(data[i]);
+                            var engine = document.createTextNode(data[i].name + ":" + data[i].maxRead);
                             contentP.appendChild(engine);
                             contentP.appendChild(document.createElement("BR"));
                         }
@@ -206,14 +219,18 @@ function listObservers() {
 
 
 function listStats() {
+    if (display !== "stats")
+        return;
     request({url: "protected/allstatus2"})
             .then(data => {
+                if (display !== "stats")
+                    return;
                 if (data !== null) {
                     //println ("Raw: "+data);
                     data = JSON.parse(data);
                     contentP.innerHTML = "<br><br><br><br>Statistics:<br><br>";
                     for (var item in data) {
-                        var engine = document.createTextNode(item+":"+data[item]);
+                        var engine = document.createTextNode(item + ":" + data[item]);
                         contentP.appendChild(engine);
                         contentP.appendChild(document.createElement("BR"));
                     }

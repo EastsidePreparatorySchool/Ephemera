@@ -89,6 +89,7 @@ function attach(engine) {
     if (engine === undefined) {
         engine = engines.value;
     }
+    makeClientID();
     request({url: "protected/attach?engine=" + engine + "&clientID=" + getClientID()})
             .then(data => {
                 data = JSON.parse(data);
@@ -383,14 +384,15 @@ function listObservers() {
     if (!attached) {
         return;
     }
+    
     request({url: "protected/listobservers?clientID=" + getClientID()})
             .then(data => {
                 if (data !== null) {
                     //println ("Raw: "+data);
                     data = JSON.parse(data);
                     var list = "Observers:<br>";
-                    for (var s in data) {
-                        list += data[s] + "<br>";
+                    for (var i = 0; i< data.length; i++) {
+                        list += data[i].name+":"+data[i].maxRead + "<br>";
                     }
                     observerlistP.innerHTML = list;
                     observersSpan.innerText = data.length;
@@ -865,9 +867,9 @@ function submitForm(form) {
     }
 
     var body = new FormData(form);
-    request({method: "POST", url: "protected/upload?clientID=" + getClientID, body: body})
+    request({method: "POST", url: "protected/upload?clientID=" + getClientID(), body: body})
             .then(data => {
-                println("JAR upload successful");
+                println("file upload successful");
             })
             .catch(error => {
                 if (error !== null && error.length > 0) {
@@ -883,7 +885,7 @@ function submitForm(form) {
 
 // 
 function makeClientID() {
-    window.sessionStorage.setItem("clientID", "" + ((new Date()).getTime()) % 10000);
+    window.sessionStorage.setItem("clientID", "" + ((new Date()).getTime()) % 100000);
 }
 
 function getClientID() {

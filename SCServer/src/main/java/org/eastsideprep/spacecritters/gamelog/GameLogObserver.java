@@ -26,6 +26,10 @@ public class GameLogObserver {
         timeLastObserved = System.currentTimeMillis();
         this.client = client;
     }
+    
+    public int getMaxRead() {
+        return maxRead;
+    }
 
     public GameLogState getInitialState() {
         timeLastObserved = System.currentTimeMillis();
