@@ -229,11 +229,17 @@ public class AlienContainer {
         nextP = trajectory.positionAtTime(grid.getTime());
         
         
+        //if just ran into star
+        if ( trajectory.currentFocus instanceof Star && trajectory.wasWithinRadius( Constants.starDeathRadius ) ) {
+            kill("Ran into star");
+            return;
+        }
+        
         
         
         /* CHARGE ALIEN FOR DELTAV */
         
-        //aliens cannot change their trajectory if they ar enot in the game limits
+        //aliens cannot change their trajectory if they are not in the game limits
         if (GridDisk.isValidPoint(nextP.round())) {
             if (deltaV != null) {
                 double m = deltaV.magnitude();
@@ -241,9 +247,8 @@ public class AlienContainer {
                     this.energy -= Constants.accelerationCost(m);
                 } else deltaV = null;
             }
-        } else if (!trajectory.isBound()) {
-            System.out.println("Murderd for nonexistance");
-            kill("Floated into the abyss");
+        } else { //alien is in limbo
+            if (!trajectory.isBound()) kill("Floated into the abyss");
             return;
         }
         
@@ -260,12 +265,9 @@ public class AlienContainer {
         /* FINALLY, COMPUTE NEW TRAJECTORY */
         
         if (focus != trajectory.currentFocus) { //make a new trajectory if the focus has changed
-            System.out.println("WHO?? ");
             if (focus instanceof Planet) {
-                System.out.println("TWAS A PLANET");
                 System.out.println(((Planet) focus).className);
             }
-            if (focus instanceof Star) System.out.println("TWAS A STAR");
             Vector2 v = trajectory.velocityAtTime(grid.getTime());
             if (deltaV != null) v = v.add(deltaV);
             trajectory = new Trajectory(focus, nextP, v, grid);

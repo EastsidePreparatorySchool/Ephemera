@@ -126,6 +126,7 @@ public class SpaceGrid {
         removeDeadAliens();
         reviewInhabitants();
 
+        moveLimboAliens();
         recordAlienMoves();
         removeDeadAliens();
 
@@ -333,7 +334,7 @@ public class SpaceGrid {
                     vis.showMove(ac.getFullAlienSpec(),
                             oldX,
                             oldY,
-                            0,
+                            0, //Why are these both zero?
                             0,
                             ac.updated,
                             ac.trajectory);
@@ -341,11 +342,14 @@ public class SpaceGrid {
                     displayException("Unhandled exception in showMove(): ", e);
                 }
 
-                if (acs.star != null && !ac.isComplex) {
+                if (acs.star != null) {
                     ac.kill("Death for moving into star " + acs.star.className);
                 }
             }
         }
+    }
+    public void moveLimboAliens() {
+        
     }
 
     public boolean isInSafeZone(AlienContainer ac) { //[Q]
@@ -367,6 +371,7 @@ public class SpaceGrid {
                 if (as != null) {
                     as.counter--;
                 }
+
             }
         }
     }
