@@ -21,7 +21,7 @@ public class Constants {
     //orbital parameters
     //selected randomly
     public static final double alienMass = 1e4;
-    public static final double deltaT = 0.001;
+    public static final double deltaT = 0.000001;
     public static final double G = 0.8e-6;
     public static final double deltaX = 5e4;
     public static final double accuracy = 1e-2;

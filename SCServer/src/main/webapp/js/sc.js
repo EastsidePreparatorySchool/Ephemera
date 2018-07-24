@@ -32,11 +32,9 @@ var stars = [];
 var speciesMap = null;
 var grid = [];
 var observers = 0;
-
 // global states
 var attached = false;
 var running = false;
-
 
 // contants for update record types need to be in sync with SCGameLogEntry.java
 const ADDSPECIES = 1;
@@ -64,6 +62,8 @@ var light;
 var size = 501;
 var divisions = 501;
 var rotation = 0;
+var orbitMaterial = null;
+
 
 
 // basic server calls in the absence of jquery
@@ -151,7 +151,7 @@ function processUpdates(data) {
     var requested = false;
     if (data !== null && data.length > 0) {
         for (var i = 0; i < data.length; i++) {
-            // if 50% processed, file another request for updates
+// if 50% processed, file another request for updates
             if (i > (data.length * 0.5) && !requested) {
                 setTimeout(updates, updateInterval);
                 requested = true;
@@ -186,9 +186,8 @@ function processUpdates(data) {
                     moveAlien(o);
                     break;
                 case ORBIT:
-                    drawOrbit(o.newX, o.newY, o.energy, o.tech, Number(name));
+                    drawOrbit(o.id, o.newX, o.newY, o.energy, o.tech, Number(name));
                     break;
-                
                 case KILL:
                     //println("Alien id: "+o.id+" died.");
                     killAlien(o);
@@ -212,36 +211,41 @@ function processUpdates(data) {
     }
 }
 
-function drawOrbit (focusX, focusY, e, p, rotation) {
-    println ("Orbit: ("+focusX+","+focusY+"), ecc:"+e+", p:"+p+", rot:"+rotation);
-    
-    var a = p/(1-e*e);
-    var b = a*Math.sqrt(1-e*e);
-    var cf = a-b;
+function drawOrbit(id, focusX, focusY, e, p, rotation) {
+    //println("Orbit: (" + focusX + "," + focusY + "), ecc:" + e + ", p:" + p + ", rot:" + rotation);
+    var a = p / (1 - e * e);
+    var b = a * Math.sqrt(1 - e * e);
+    var cf = a - b;
     var focus = new THREE.Vector2(focusX, focusY);
-    var offset = new THREE.Vector2(1,0).rotateAround(new THREE.Vector2(0,0), rotation);
+    var offset = new THREE.Vector2(1, 0).rotateAround(new THREE.Vector2(0, 0), rotation);
     focus = focus.sub(offset);
-    drawEllipse(focus.x, focus.y, a, b, rotation);
-    
+
+    var mesh = drawEllipse(focus.x, focus.y, a, b, rotation);
+
+    var a = aliens[id];
+    if (a !== undefined) {
+        if (a.orbit !== null) {
+            scene.remove(a.orbit);
+        }
+        a.orbit = mesh;
+        scene.add(a.orbit);
+    }
 }
 
 function drawEllipse(centerX, centerY, radiusX, radiusY, rotation) {
     var curve = new THREE.EllipseCurve(
-            centerX, centerY, 
-            radiusX, radiusY, 
-            0, 2 * Math.PI, 
-            false, 
-            rotation         
+            -centerY, -centerX,
+            radiusY, radiusX,
+            0, 2 * Math.PI,
+            false,
+            rotation
             );
-
     var points = curve.getPoints(50);
     var geometry = new THREE.BufferGeometry().setFromPoints(points);
-    var material = new THREE.LineBasicMaterial({color: "goldenrod"});
-
     // Create the final object to add to the scene
-    var ellipse = new THREE.Line(geometry, material);
+    var ellipse = new THREE.Line(geometry, orbitMaterial);
     ellipse.rotation.x = Math.PI / 2;
-    scene.add(ellipse);
+    return ellipse;
 }
 
 
@@ -282,7 +286,6 @@ function uiStateChange(attachState, runState, data) {
             println("Engine id: " + data.engine);
             println("Observer id: " + data.observer);
             println("Total game turns: " + data.turns);
-
             turnSpan.innerText = data.turns;
             alienSpan.innerText = 0;
             intervalSpan.innerText = updateInterval;
@@ -291,7 +294,6 @@ function uiStateChange(attachState, runState, data) {
             statusP.innerHTML = "Attached to<br>&nbsp;Game:&nbsp&nbsp&nbsp" + data.engine
                     + "<br>&nbsp;Observer:&nbsp" + data.observer;
             attachP.style.display = "none";
-
             speciesMap = new SpeciesMap();
             grid = new Grid(501, 501);
             updateInterval = updateIntervalActive;
@@ -302,13 +304,11 @@ function uiStateChange(attachState, runState, data) {
             // now detached
             println("Last recorded turn: " + turnSpan.innerText);
             document.title = "Game: <detached> (SpaceCritters)";
-
             countsP.style.display = "none";
             statusP.innerHTML = "";
             species.innerHTML = "";
             observerlistP.innerHTML = "";
             attachP.style.display = "inline";
-
             speciesMap = null;
             grid = null;
             //println("starting purge ...");
@@ -317,6 +317,9 @@ function uiStateChange(attachState, runState, data) {
             var count = 0;
             for (a in aliens) {
                 scene.remove(aliens[a].mesh);
+                if (aliens[a].orbit !== null) {
+                    scene.remove(aliens[a].orbit);
+                }
                 count++;
             }
             aliens = {};
@@ -351,7 +354,6 @@ function uiStateChange(attachState, runState, data) {
             startpauseB.innerText = "Pause";
             startpauseB.onclick = pause;
             updateInterval = updateIntervalActive;
-
         } else {
             // now paused
             startpauseB.innerText = "Start";
@@ -475,7 +477,6 @@ function queryAdmin() {
                         adminP.style.display = "inline";
                         observerlistP.style.display = "inline";
                         listObservers();
-
                     }
                 }
             })
@@ -577,10 +578,11 @@ class Alien {
         this.mesh.position.z = -x;
         this.mesh.position.y = 1;
         this.id = id;
+        this.orbit = null;
     }
 
-    move(x, z) {
-        this.mesh.position.x = -z;
+    move(x, y) {
+        this.mesh.position.x = -y;
         this.mesh.position.z = -x;
     }
 
@@ -678,12 +680,15 @@ function moveAlien(content) {
 }
 
 function killAlien(content) {
-    dprintln("killing alien " + content.id + " at " + content.newX + "," + content.newY)
+    dprintln("killing alien " + content.id + " at " + content.newX + "," + content.newY);
     var alien = aliens[content.id];
     if (alien !== undefined) {
         grid.removeFromCell(alien, content.newX, content.newY);
         alien.kill();
         speciesMap.removeAlien(content.speciesId);
+        if (alien.orbit !== null) {
+            scene.remove(alien.orbit);
+        }
     }
 }
 
@@ -878,29 +883,27 @@ function init() {
     cubeGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
     starGeo = new THREE.SphereGeometry(2.0, 32, 32);
     planetGeo = new THREE.SphereGeometry(1.0, 32, 32);
+    orbitMaterial = new THREE.LineBasicMaterial({color: "goldenrod"});
+
     gridHelper = new THREE.GridHelper(size, divisions, "#500000", "#500000");
     scene.add(gridHelper);
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
     controls.dampingFactor = 0.25;
     controls.screenSpacePanning = false;
-    controls.minDistance = 100;
+    controls.minDistance = 10;
     controls.maxDistance = 500;
     controls.maxPolarAngle = Math.PI / 2;
     light = new THREE.AmbientLight(0x404040);
     scene.add(light);
     renderer.render(scene, camera);
-
     window.addEventListener("resize", onWindowResize, false);
     window.addEventListener("beforeunload", detach);
-
     animate();
     makeClientID();
     listEngines();
     println("initialized");
-
     var parameter = location.search.substring(1);
-
     // if called from another page with attach param, attach right now
     if (parameter !== null && parameter.length > 0) {
         var fields = parameter.split("=");
@@ -999,7 +1002,7 @@ function assert(condition, action) {
             }
             throw new Error("assert failed");
         } else {
-            //println("survived assert " + lambda);
+//println("survived assert " + lambda);
         }
     }
 }
