@@ -231,14 +231,23 @@ function drawOrbit(id, focusX, focusY, e, p, rotation) {
 
     var mesh = drawEllipse(focus.x, focus.y, a, b, rotation);
 
-    var a = aliens[id];
-    if (a !== undefined) {
-        if (a.orbit !== null) {
-            scene.remove(a.orbit);
+    if (id > 0) {
+        // alien
+        var a = aliens[id];
+        if (a !== undefined) {
+            if (a.orbit !== null) {
+                scene.remove(a.orbit);
+            }
+            a.orbit = mesh;
+            scene.add(a.orbit);
         }
-        a.orbit = mesh;
-        scene.add(a.orbit);
+    } else {
+        // planet
+        var p = planets[id];
+        p.orbit = mesh;
+        scene.add(p.orbit);
     }
+
 }
 
 function drawEllipse(centerX, centerY, radiusX, radiusY, rotation) {
@@ -353,6 +362,9 @@ function uiStateChange(attachState, runState, data) {
             count = 0;
             for (p in planets) {
                 scene.remove(planets[p].mesh);
+                if (planets[p].orbit !== null) {
+                    scene.remove(planets[p].orbit);
+                }
                 count++;
             }
             planets = {};
@@ -664,6 +676,7 @@ class Planet {
         this.mesh.position.z = -x;
         this.mesh.position.y = 1;
         this.id = id;
+        this.orbit = null;
     }
     move(x, z) {
         this.mesh.position.x = -z;
@@ -940,7 +953,7 @@ function init() {
             controls.autoRotate = true;
         }, 30000);
     });
-    
+
     light = new THREE.AmbientLight(0x404040);
     scene.add(light);
     renderer.render(scene, camera);

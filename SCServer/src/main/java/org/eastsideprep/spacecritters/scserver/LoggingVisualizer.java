@@ -52,6 +52,14 @@ public class LoggingVisualizer implements GameVisualizer {
                 x, y, 0, 0,
                 name, null, -index, -1,
                 0.0, 0.0));
+        
+        if (t != null) {
+            IntegerPosition p = t.currentFocus.position(log.turnsCompleted * Constants.deltaT).round();
+            log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ORBIT,
+                    p.x, p.y, 0, 0,
+                    Double.toString(t.conics.get(0).rotation), null, -index, -1,
+                    t.conics.get(0).e, t.conics.get(0).p / Constants.deltaX));
+        }
 
     }
 
@@ -99,11 +107,11 @@ public class LoggingVisualizer implements GameVisualizer {
                 return;
             }
             if (t != null) {
-                IntegerPosition p = t.currentFocus.position(log.turnsCompleted*Constants.deltaT).round();
+                IntegerPosition p = t.currentFocus.position(log.turnsCompleted * Constants.deltaT).round();
                 log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ORBIT,
                         p.x, p.y, 0, 0,
                         Double.toString(t.conics.get(0).rotation), null, as.hashCode, as.speciesID,
-                        t.conics.get(0).e, t.conics.get(0).p/Constants.deltaX));
+                        t.conics.get(0).e, t.conics.get(0).p / Constants.deltaX));
             }
 
             log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.MOVE,
@@ -118,7 +126,8 @@ public class LoggingVisualizer implements GameVisualizer {
         log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.FIGHT,
                 x, y, 0, 0,
                 null, null, -1, -1,
-                0.0, 0.0));    }
+                0.0, 0.0));
+    }
 
     @Override
     public void showSpawn(AlienSpec as, double energyAtPos, Trajectory t) {
