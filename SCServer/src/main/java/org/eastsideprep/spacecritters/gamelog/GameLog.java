@@ -103,7 +103,7 @@ public class GameLog {
 
     public int collapseRead() {
         int result = -1;
-
+        updateMinRead();
         wlock.lock();
         try {
             if (minRead - start >= COLLAPSE_THRESHOLD) {

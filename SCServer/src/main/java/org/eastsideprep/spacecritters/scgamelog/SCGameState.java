@@ -231,6 +231,9 @@ public class SCGameState implements GameLogState {
         result.addAll(planets.values());
         result.addAll(species);
         result.addAll(aliens.values());
+        if (fights.size() > 100) {
+            fights.subList(0, fights.size()-100-1).clear();
+        }
         result.addAll(fights);
         result.addAll(kills);
         result.addAll(orbits.values());

@@ -267,7 +267,7 @@ function showFight(x, y) {
     fights.push(mesh);
     
     // no need to show more than 20 fights. If there are old ones in here, delete them.
-    while (fights.length > 20) {
+    while (fights.length > 100) {
         scene.remove(fights.shift());
     }
 }
