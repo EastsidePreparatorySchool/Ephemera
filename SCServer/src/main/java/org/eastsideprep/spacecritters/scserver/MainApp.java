@@ -600,6 +600,7 @@ public class MainApp implements SparkApplication {
         public String memStats;
         public int logSize;
         public boolean isAlive;
+        public int sleepTime;
     }
 
     public Stats status(Request req) {
@@ -625,6 +626,7 @@ public class MainApp implements SparkApplication {
         result.isAlive = ctx.engine.isAlive();
         result.memStats = getHeapStats();
         result.logSize = ctx.engine.log.getLogSize();
+        result.sleepTime = ctx.engine.gameThread.sleepTime;
 
         return result;
     }

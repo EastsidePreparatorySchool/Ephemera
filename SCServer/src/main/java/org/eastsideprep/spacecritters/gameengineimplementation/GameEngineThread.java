@@ -18,7 +18,7 @@ public class GameEngineThread extends Thread {
 
     final private GameEngineV2 engine;
     boolean pastReady = false;
-    int sleepTime = 50;
+    public int sleepTime = 50;
     int lastLogSize = -1;
 
     public GameEngineThread(GameEngineV2 ge) {
@@ -105,7 +105,7 @@ public class GameEngineThread extends Thread {
 //                    }
 //                    this.lastLogSize = newLogSize;
                     this.sleepTime = this.engine.log.getLogSize() / 50;
-                    this.sleepTime = Math.min(this.sleepTime, 1000);
+                    this.sleepTime = Math.min(this.sleepTime, 5000);
                     this.sleepTime = Math.max(this.sleepTime, 20);
                     Thread.sleep(this.sleepTime);
 

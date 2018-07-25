@@ -20,6 +20,7 @@ var observersSpan = document.getElementById("observers");
 var memstatsSpan = document.getElementById("memstats");
 var livenessSpan = document.getElementById("liveness");
 var logsizeSpan = document.getElementById("logsize");
+var sleeptimeSpan = document.getElementById("sleeptime");
 var observerlistP = document.getElementById("observerlist");
 var engineName = document.getElementById("enginename");
 var engines = document.getElementById("engines");
@@ -264,6 +265,11 @@ function showFight(x, y) {
     mesh.scale.set(5, 5, 5);
     scene.add(mesh);
     fights.push(mesh);
+    
+    // no need to show more than 20 fights. If there are old ones in here, delete them.
+    while (fights.length > 20) {
+        scene.remove(fights.shift());
+    }
 }
 
 
@@ -480,6 +486,7 @@ function getStatus() {
                     logsizeSpan.innerText = data.logSize;
                     memstatsSpan.innerText = data.memStats;
                     livenessSpan.innerText = data.isAlive ? "alive" : "dead";
+                    sleeptimeSpan.innerText = data.sleepTime;
                     setTimeout(getStatus, 1000);
                 }
             })

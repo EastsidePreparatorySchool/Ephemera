@@ -35,7 +35,7 @@ public class GameEngineV2 implements GameEngine {
     public SpaceGrid grid;
     GameVisualizer vis;
     final Queue<GameCommand> queue;
-    GameEngineThread gameThread;
+    public GameEngineThread gameThread;
     GameState gameState;
     public String gamePath;
     public String alienPath;
