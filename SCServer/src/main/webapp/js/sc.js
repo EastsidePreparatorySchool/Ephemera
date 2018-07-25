@@ -68,6 +68,7 @@ var divisions = 501;
 var rotation = 0;
 var orbitMaterial = null;
 var fightMaterial;
+var autorotateTimeout = null;
 
 
 
@@ -265,7 +266,7 @@ function showFight(x, y) {
     mesh.scale.set(5, 5, 5);
     scene.add(mesh);
     fights.push(mesh);
-    
+
     // no need to show more than 20 fights. If there are old ones in here, delete them.
     while (fights.length > 100) {
         scene.remove(fights.shift());
@@ -924,6 +925,22 @@ function init() {
     controls.minDistance = 10;
     controls.maxDistance = 500;
     controls.maxPolarAngle = Math.PI / 2;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 1.0;
+
+    // stop autorotate after the first interaction
+    controls.addEventListener('start', function () {
+        clearTimeout(autorotateTimeout);
+        controls.autoRotate = false;
+    });
+
+    // restart autorotate after the last interaction & an idle time has passed
+    this.controls.addEventListener('end', function () {
+        autorotateTimeout = setTimeout(function () {
+            controls.autoRotate = true;
+        }, 30000);
+    });
+    
     light = new THREE.AmbientLight(0x404040);
     scene.add(light);
     renderer.render(scene, camera);
@@ -966,7 +983,7 @@ function animate() {
         if (s < 1) {
             scene.remove(f);
         } else {
-            f.scale.set(s - (1/fightLength), s - (1/fightLength), s - (1/fightLength));
+            f.scale.set(s - (1 / fightLength), s - (1 / fightLength), s - (1 / fightLength));
             newFights.push(f);
         }
     });

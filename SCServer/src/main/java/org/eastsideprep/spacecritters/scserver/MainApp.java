@@ -1,11 +1,17 @@
 package org.eastsideprep.spacecritters.scserver;
 
-import org.eastsideprep.spacecritters.gameengineimplementation.Compilers;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -13,6 +19,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
 import org.eastsideprep.spacecritters.gameengineimplementation.GameEngineV2;
@@ -27,6 +35,7 @@ import org.eastsideprep.spacecritters.scgamelog.SCGameState;
 import org.eastsideprep.spacecritters.spacecritters.SpaceCritters;
 import org.eastsideprep.spacecritters.spacecritters.Utilities;
 import spark.Request;
+import spark.Response;
 import static spark.Spark.*;
 import spark.servlet.SparkApplication;
 
@@ -42,6 +51,43 @@ public class MainApp implements SparkApplication {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         return dateFormat.format(date);
+    }
+
+    private static File getJettyLogFile() {
+        Path logFolder = Paths.get(System.getProperty("user.dir")).getRoot();
+        logFolder = Paths.get(logFolder.toString(), "home\\LogFiles");
+        if (!logFolder.toFile().exists()) {
+            // not in standard azure log setup, exit
+            System.out.println("getJettyLogFile: not in Azure");
+            return null;
+        }
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
+
+        String name = "jetty_" + dateFormat.format(date) + ".stderrout.log";
+        Path logFile = Paths.get(logFolder.toString(), name);
+        System.out.println("GetJettyLog:" + logFile);
+        File f = logFile.toFile();
+        if (f.exists()) {
+            return f;
+        }
+
+        // try GMT
+        // convert date to localdatetime
+        LocalDateTime localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        // plus one
+        ZonedDateTime gmt = localDateTime.atZone(ZoneId.of("GMT"));
+
+        name = "jetty_" + dateFormat.format(gmt) + ".stderrout.log";
+        logFile = Paths.get(logFolder.toString(), name);
+        System.out.println("GetJettyLog:" + logFile);
+        f = logFile.toFile();
+        if (f.exists()) {
+            return f;
+        }
+        return null;
+
     }
 
     // desktop initialization
@@ -125,6 +171,7 @@ public class MainApp implements SparkApplication {
         get("/protected/allstatus", "application/json", (req, res) -> allStatus(req), new JSONRT());
         get("/protected/allstatus2", "application/json", (req, res) -> allStatus2(req), new JSONRT());
         get("/protected/queryadmin", "application/json", (req, res) -> queryAdmin(req));
+        get("/protected/serverlog", (req, res) -> getServerLogFile(req, res));
         post("/protected/upload", (req, res) -> uploadFile(req, res));
 
         MainApp.engines = new Governor();
@@ -195,6 +242,36 @@ public class MainApp implements SparkApplication {
     private static boolean isAdmin(Request req) {
         String name = req.headers("X-MS-CLIENT-PRINCIPAL-NAME");
         return (name == null || name.equalsIgnoreCase("gmein@eastsideprep.org"));
+    }
+
+    private static Object getServerLogFile(Request request, Response responce) {
+        System.out.println("GetServerLog");
+        File file = getJettyLogFile();
+        if (file == null) {
+            halt(505, "file not found");
+        }
+        responce.raw().setContentType("application/octet-stream");
+        responce.raw().setHeader("Content-Disposition", "attachment; filename=" + file.getName() + ".zip");
+        try {
+
+            try (ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(responce.raw().getOutputStream()));
+                    BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file))) {
+                ZipEntry zipEntry = new ZipEntry(file.getName());
+
+                zipOutputStream.putNextEntry(zipEntry);
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = bufferedInputStream.read(buffer)) > 0) {
+                    zipOutputStream.write(buffer, 0, len);
+                }
+                zipOutputStream.flush();
+                zipOutputStream.close();
+            }
+        } catch (Exception e) {
+            halt(505, "server error");
+        }
+
+        return null;
     }
 
     public static class EngineRecord {
