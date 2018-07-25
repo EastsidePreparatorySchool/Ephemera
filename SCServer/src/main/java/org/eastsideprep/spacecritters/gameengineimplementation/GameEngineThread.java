@@ -107,7 +107,11 @@ public class GameEngineThread extends Thread {
                     this.sleepTime = this.engine.log.getLogSize() / 50;
                     this.sleepTime = Math.min(this.sleepTime, 5000);
                     this.sleepTime = Math.max(this.sleepTime, 20);
-                    Thread.sleep(this.sleepTime);
+                    
+                    // now sleep, and keep sleeping if the log is greater than 10000 entries
+                    do {
+                        Thread.sleep(this.sleepTime);
+                    } while (this.engine.log.getLogSize() > 10000);
 
                 } catch (Exception e) {
                     e.printStackTrace();
