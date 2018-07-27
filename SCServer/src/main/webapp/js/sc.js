@@ -7,7 +7,7 @@ var updateInterval = 50;
 var updateIntervalInactive = 1000;
 var updateIntervalActive = 50;
 var fightLength = 10;
-var trailLength = 50;
+var trailLength = 15;
 
 var textarea = document.getElementById("output");
 var turnSpan = document.getElementById("turns");
@@ -226,12 +226,12 @@ function drawOrbit(id, focusX, focusY, e, p, rotation) {
     //println("Orbit: (" + focusX + "," + focusY + "), ecc:" + e + ", p:" + p + ", rot:" + rotation);
     var a = p / (1 - e * e);
     var b = a * Math.sqrt(1 - e * e);
-    var cf = a - b;
+    var cf = Math.sqrt(a*a - b*b);
     var focus = new THREE.Vector2(focusX, focusY);
     var offset = new THREE.Vector2(cf, 0).rotateAround(new THREE.Vector2(0, 0), rotation);
     var center = focus.sub(offset);
 
-    var mesh = drawEllipse(center.x, center.y, a, b, rotation);
+    var mesh = drawEllipse(center.x, center.y, a, b, -rotation);
 
     if (id > 0) {
         // alien

@@ -21,18 +21,19 @@ public class Ellipse extends Conic {
 
         M0 = theta; //TO DO
         prevE = M0;
-        n = mu * mu * Math.pow(1 - e * e, 2f / 3f) / h*h*h;
-        
+        n = mu * mu * Math.pow(1 - e * e, 2f / 3f) / h * h * h;
+
         orbits = 0;
     }
-    
+
     public double EAtTrue(double theta) {
         return Math.acos((Math.cos(theta) + e) / (1 + e * Math.cos(theta))) * ((theta < 0 || theta > Math.PI) ? -1 : 1);
     }
+
     public double trueAtE(double E) {
         return Math.acos((Math.cos(E) - e) / (1 - e * Math.cos(E))) * ((E < 0 || E > Math.PI) ? -1 : 1);
     }
-    
+
     public double EAtTime(double t) {
         //T = (2 pi / mu^2) * (h / root(1 - ||e||^2))^3
         //M = 2 pi t / T = n*t = E - ||e|| sin E
@@ -48,30 +49,35 @@ public class Ellipse extends Conic {
             //System.out.println("loop: " + orbits);
         }
         //find eccentric anomaly
-        double E = (t == sg.getTime()) ? prevE : M;
+        double E = (t == sg.getTime() && prevE != M0) ? prevE : M;
         double dE;
         int count = 0;
         do { //some calculouse black magic to find E (to within a certain accuracy)
             dE = E - e * Math.sin(E) - M;
             E -= dE / (1 - e * Math.cos(E));
-            if (++ count > 1000) {
+            if (++count > 1000) {
                 System.err.println("Stuck in loop in Ellipse EAtTime");
                 break;
             }
         } while (Math.abs(dE) >= Constants.accuracy);
 
-        if (t == sg.getTime()) prevE = E;
+        if (t == sg.getTime()) {
+            prevE = E;
+        }
         return E;
     }
+
+  
+
     @Override
     public double angleAtTime(double t) {
         return trueAtE(EAtTime(t));
     }
-    
+
     @Override
     public double MAtAngle(double theta) {
         double E = EAtTrue(theta);
-        return E - e*Math.sin(E);
+        return E - e * Math.sin(E);
     }
 
     @Override

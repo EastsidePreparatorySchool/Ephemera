@@ -83,16 +83,20 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         }
 
         // if we are all good, move us out a little from the center (Earth/Sun)
-        // but only every tenth turn or so
+        if (ctx.getGameTurn() < 100) {
             Position p = ctx.getPosition();
-            return new Vector2(p.scaleToLength(0.4));
+            Position p2 = new Position(-p.y, p.x);
+            return  p2.scaleToLength(1.0);
+        } else {
+            return new Vector2(0, 0);
+        }
     }
 
     @Override
     public Vector2 getMove() {
         throw new UnsupportedOperationException("Complex alien does not support simple moves");
     }
-/*
+    /*
     @Override
     public Shape3D getShape(int complexityLimit) {
         MeshView v;
@@ -116,5 +120,5 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         }
         return null;
     }
-*/
+     */
 }

@@ -52,7 +52,7 @@ public class LoggingVisualizer implements GameVisualizer {
                 x, y, 0, 0,
                 name, null, -index, -1,
                 0.0, 0.0));
-        
+
         if (t != null) {
             IntegerPosition p = t.currentFocus.position(log.turnsCompleted * Constants.deltaT).round();
             log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ORBIT,
@@ -136,6 +136,14 @@ public class LoggingVisualizer implements GameVisualizer {
                 as.x, as.y, 0, 0,
                 null, as.getFullSpeciesName(), as.hashCode, as.speciesID,
                 0.0, 0.0));
+
+        if (t != null) {
+            IntegerPosition p = t.currentFocus.position(log.turnsCompleted * Constants.deltaT).round();
+            log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ORBIT,
+                    p.x, p.y, 0, 0,
+                    Double.toString(t.conic.rotation), null, as.hashCode, as.speciesID,
+                    t.conic.e, t.conic.p / Constants.deltaX));
+        }
     }
 
     @Override
