@@ -7,6 +7,7 @@ var updateInterval = 50;
 var updateIntervalInactive = 1000;
 var updateIntervalActive = 50;
 var fightLength = 10;
+var trailLength = 50;
 
 var textarea = document.getElementById("output");
 var turnSpan = document.getElementById("turns");
@@ -69,6 +70,7 @@ var rotation = 0;
 var orbitMaterial = null;
 var fightMaterial;
 var autorotateTimeout = null;
+var trailMaterial = null
 
 
 
@@ -192,7 +194,7 @@ function processUpdates(data) {
                     moveAlien(o);
                     break;
                 case ORBIT:
-                    drawOrbit(o.id, o.newX, o.newY, o.energy, o.tech, Number(name));
+                    drawOrbit(o.id, o.newX, o.newY, o.energy, o.tech, Number(o.name));
                     break;
                 case KILL:
                     //println("Alien id: "+o.id+" died.");
@@ -226,26 +228,26 @@ function drawOrbit(id, focusX, focusY, e, p, rotation) {
     var b = a * Math.sqrt(1 - e * e);
     var cf = a - b;
     var focus = new THREE.Vector2(focusX, focusY);
-    var offset = new THREE.Vector2(1, 0).rotateAround(new THREE.Vector2(0, 0), rotation);
-    focus = focus.sub(offset);
+    var offset = new THREE.Vector2(cf, 0).rotateAround(new THREE.Vector2(0, 0), rotation);
+    var center = focus.sub(offset);
 
-    var mesh = drawEllipse(focus.x, focus.y, a, b, rotation);
+    var mesh = drawEllipse(center.x, center.y, a, b, rotation);
 
     if (id > 0) {
         // alien
-        var a = aliens[id];
-        if (a !== undefined) {
-            if (a.orbit !== null) {
-                scene.remove(a.orbit);
+        var al = aliens[id];
+        if (al !== undefined) {
+            if (al.orbit !== null) {
+                scene.remove(al.orbit);
             }
-            a.orbit = mesh;
-            scene.add(a.orbit);
+            al.orbit = mesh;
+            scene.add(al.orbit);
         }
     } else {
         // planet
-        var p = planets[id];
-        p.orbit = mesh;
-        scene.add(p.orbit);
+        var pl = planets[id];
+        pl.orbit = mesh;
+        scene.add(pl.orbit);
     }
 
 }
@@ -353,6 +355,7 @@ function uiStateChange(attachState, runState, data) {
                 if (aliens[a].orbit !== null) {
                     scene.remove(aliens[a].orbit);
                 }
+                aliens[a].trail.delete();
                 count++;
             }
             aliens = {};
@@ -365,6 +368,7 @@ function uiStateChange(attachState, runState, data) {
                 if (planets[p].orbit !== null) {
                     scene.remove(planets[p].orbit);
                 }
+                planets[p].trail.delete();
                 count++;
             }
             planets = {};
@@ -621,6 +625,7 @@ class Alien {
         this.mesh.position.y = 1;
         this.id = id;
         this.orbit = null;
+        this.trail = new Trail();
     }
 
     move(x, y) {
@@ -677,6 +682,7 @@ class Planet {
         this.mesh.position.y = 1;
         this.id = id;
         this.orbit = null;
+        this.trail = new Trail();
     }
     move(x, z) {
         this.mesh.position.x = -z;
@@ -698,6 +704,7 @@ function movePlanet(content) {
     if (planet !== undefined) {
         planet.move(content.newX, content.newY);
     }
+    planet.trail.addPoint(content.param1, content.param2);
 }
 
 
@@ -720,6 +727,9 @@ function moveAlien(content) {
     grid.removeFromCell(alien, content.param1, content.param2);
     alien.move(content.newX, content.newY);
     grid.addToCell(alien, content.newX, content.newY);
+    if (alien.orbit !== null) {
+        alien.trail.addPoint(content.param1, content.param2);
+    }
 }
 
 function killAlien(content) {
@@ -732,11 +742,38 @@ function killAlien(content) {
         if (alien.orbit !== null) {
             scene.remove(alien.orbit);
         }
+        alien.trail.delete();
     }
 }
 
 function addSpecies(content) {
     speciesMap.registerSpecies(content.speciesName, content.speciesId, content.param2);
+}
+
+class Trail {
+    constructor() {
+        this.points = [];
+    }
+
+    addPoint(x, y) {
+        var mesh = new THREE.Mesh(starGeo, trailMaterial);
+        mesh.scale.set(0.2, 0.2, 0.2);
+        mesh.position.x = -y;
+        mesh.position.z = -x;
+        mesh.position.y = 0.5;
+        scene.add(mesh);
+        this.points.push(mesh);
+        if (this.points.length > trailLength) {
+            scene.remove(this.points.shift());
+        }
+    }
+
+    delete() {
+        for (var i = 0; i < this.points.length; i++) {
+            scene.remove(this.points[i]);
+        }
+    }
+
 }
 
 
@@ -923,11 +960,13 @@ function init() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
     centerDiv.appendChild(renderer.domElement);
-    cubeGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
-    starGeo = new THREE.SphereGeometry(2.0, 32, 32);
-    planetGeo = new THREE.SphereGeometry(1.0, 32, 32);
+    cubeGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+    starGeo = new THREE.SphereGeometry(1.0, 32, 32);
+    planetGeo = new THREE.SphereGeometry(0.7, 32, 32);
     orbitMaterial = new THREE.LineBasicMaterial({color: "goldenrod"});
-    fightMaterial = new THREE.LineBasicMaterial({color: "red"});
+    fightMaterial = new THREE.MeshBasicMaterial({color: "red"});
+    trailMaterial = new THREE.MeshBasicMaterial({color: "lightblue", wireframe: false});
+
 
     gridHelper = new THREE.GridHelper(size, divisions, "#500000", "#500000");
     scene.add(gridHelper);

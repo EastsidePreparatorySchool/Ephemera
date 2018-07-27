@@ -703,7 +703,11 @@ public class MainApp implements SparkApplication {
         result.isAlive = ctx.engine.isAlive();
         result.memStats = getHeapStats();
         result.logSize = ctx.engine.log.getLogSize();
-        result.sleepTime = ctx.engine.gameThread.sleepTime;
+        if (ctx.engine.gameThread != null) {
+            result.sleepTime = ctx.engine.gameThread.sleepTime;
+        } else {
+            result.sleepTime = 0;
+        }
 
         return result;
     }
