@@ -57,8 +57,8 @@ public class LoggingVisualizer implements GameVisualizer {
             IntegerPosition p = t.currentFocus.position(log.turnsCompleted * Constants.deltaT).round();
             log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ORBIT,
                     p.x, p.y, 0, 0,
-                    Double.toString(t.conics.get(0).rotation), null, -index, -1,
-                    t.conics.get(0).e, t.conics.get(0).p / Constants.deltaX));
+                    Double.toString(t.conic.rotation), null, -index, -1,
+                    t.conic.e, t.conic.p / Constants.deltaX));
         }
 
     }
@@ -110,8 +110,8 @@ public class LoggingVisualizer implements GameVisualizer {
                 IntegerPosition p = t.currentFocus.position(log.turnsCompleted * Constants.deltaT).round();
                 log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ORBIT,
                         p.x, p.y, 0, 0,
-                        Double.toString(t.conics.get(0).rotation), null, as.hashCode, as.speciesID,
-                        t.conics.get(0).e, t.conics.get(0).p / Constants.deltaX));
+                        Double.toString(t.conic.rotation), null, as.hashCode, as.speciesID,
+                        t.conic.e, t.conic.p / Constants.deltaX));
             }
 
             log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.MOVE,

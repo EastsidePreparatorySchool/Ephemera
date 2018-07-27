@@ -17,71 +17,66 @@ import java.util.Iterator;
  */
 public class Trajectory {
 
-    public ArrayList<Conic> conics = new ArrayList<>();
+    public Conic conic;
     public Orbitable currentFocus;
     public SpaceGrid sg;
-    
-    public Trajectory () {}
+
+    public Trajectory() {
+    }
+
     public Trajectory(Orbitable focus, Vector2 r, Vector2 v, SpaceGrid sg) {
         this.sg = sg;
-        conics.add(Conic.newConic(focus, r, v, sg.getTime(), sg));
+        conic = Conic.newConic(focus, r, v, sg.getTime(), sg);
         currentFocus = focus;
     }
+
     public Trajectory(Orbitable focus, double p, double e, double mNaught, double rotation, SpaceGrid sg) {
         this.sg = sg;
-        conics.add(Conic.newConic(focus, p, e, mNaught, sg.getTime(), rotation, sg));
-        
-        
+        conic = Conic.newConic(focus, p, e, mNaught, sg.getTime(), rotation, sg);
+
         currentFocus = focus;
-        
+
     }
-    
+
     public double partialHillRadius() {
-        return conics.get(0).partialHillRadius();
+        return conic.partialHillRadius();
     }
-    
+
     public boolean isBound() {
-        return conics.get(0).e < 0;
+        return conic.e < 0;
     }
-    
+
     public void accelerate(Vector2 deltaV, double t) {
         Vector2 v = velocityAtTime(t).add(deltaV);
         Vector2 r = positionAtTime(t);
-        Orbitable focus = conics.get(0).focus;
-        
-        
-        conics.clear();
-        conics.add(Conic.newConic(focus, r, v, t, sg));
+        Orbitable focus = conic.focus;
+
+        conic = Conic.newConic(focus, r, v, t, sg);
     }
-    
-    
 
     public Position positionAtTime(double t) {
-        return conics.get(0).positionAtTime(t);
+        return conic.positionAtTime(t);
     }
+
     public Vector2 velocityAtTime(double t) {
-        return conics.get(0).getVelocityAtTime(t).add(conics.get(0).focus.velocity(t));
+        return conic.getVelocityAtTime(t).add(conic.focus.velocity(t));
     }
+
     @Override
     public Trajectory clone() {
         Trajectory trajectory = new Trajectory();
-        for (int i = 0; i < conics.size(); i++) trajectory.conics.add(conics.get(i).clone());
-        
+        trajectory.conic = conic;
+
         trajectory.currentFocus = currentFocus;
         return trajectory;
-    }   
-    
-    
-    
-    
-    
-    
+    }
+
     public Iterator<Vector2> toDraw(int segments) {
         double dTheta = 2 * Math.PI / segments;
         double topBound;
         double bottomBound;
-        
-        Conic conic = conics.get(0);
+
+        Conic conic = this.conic;
         if (conic instanceof Hyperbola) {
             topBound = Math.acos(-1f / conic.e) + conic.rotation;
             bottomBound = conic.rotation - Math.acos(-1f / conic.e);
@@ -89,17 +84,18 @@ public class Trajectory {
             topBound = Math.PI;
             bottomBound = dTheta - Math.PI;
         }
-        
+
         ArrayList<Vector2> points = new ArrayList<>();
         for (double theta = bottomBound; theta < topBound; theta += dTheta) {
             points.add(conic.positionAtAngle(theta));
         }
-        if (conic.e < 1) points.add(conics.get(0).positionAtAngle(dTheta - Math.PI));
-        
-        
+        if (conic.e < 1) {
+            points.add(conic.positionAtAngle(dTheta - Math.PI));
+        }
+
         return points.iterator();
     }
-    
+
     public Vector2 positionOfFocus() {
         return currentFocus.position(sg.getTime());
     }
