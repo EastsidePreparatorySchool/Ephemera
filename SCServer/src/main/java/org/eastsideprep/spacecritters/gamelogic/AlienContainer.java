@@ -137,7 +137,6 @@ public class AlienContainer {
                     trajectory.currentFocus, //focus from the dummy trajectory
                     grid.rand.nextDouble() * 3 + 5, //semi-latus rectum
                     Math.pow(grid.rand.nextDouble(), 2), //Eccentricity
-                    grid.rand.nextDouble() * 2 * Math.PI, //mNaught
                     grid.rand.nextDouble() * 2 * Math.PI, //rotation
                     grid);
         } else {

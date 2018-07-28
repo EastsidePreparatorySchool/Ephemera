@@ -703,8 +703,10 @@ function movePlanet(content) {
     var planet = planets[content.id];
     if (planet !== undefined) {
         planet.move(content.newX, content.newY);
+        planet.trail.addPoint(content.param1, content.param2);
+    } else {
+        println ("planet index "+content.id+" undefined");
     }
-    planet.trail.addPoint(content.param1, content.param2);
 }
 
 

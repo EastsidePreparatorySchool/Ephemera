@@ -69,7 +69,7 @@ public class LoggingVisualizer implements GameVisualizer {
             return;
         }
         log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.MOVEPLANET,
-                x, y, 0, 0,
+                x, y, oldx, oldy,
                 name, null, -index, -1,
                 0.0, 0.0));
     }

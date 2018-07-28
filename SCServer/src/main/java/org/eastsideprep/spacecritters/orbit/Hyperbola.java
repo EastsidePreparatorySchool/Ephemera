@@ -6,7 +6,6 @@
 package org.eastsideprep.spacecritters.orbit;
 
 import org.eastsideprep.spacecritters.gamelogic.Constants;
-import org.eastsideprep.spacecritters.alieninterfaces.Vector2;
 import org.eastsideprep.spacecritters.gamelogic.SpaceGrid;
 
 /**
@@ -17,8 +16,8 @@ public class Hyperbola extends Conic {
 
     double prevF;
 
-    public Hyperbola(Orbitable focus, double p, double e, double theta, double tNaught, double rotation, SpaceGrid sg) {
-        super(focus, p, e, theta, tNaught, rotation, sg);
+    public Hyperbola(Orbitable focus, double p, double e, double theta, double rotation, SpaceGrid sg) {
+        super(focus, p, e, theta, rotation, sg);
 
         M0 = theta;//TO DO
         prevF = M0;

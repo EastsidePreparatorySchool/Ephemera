@@ -38,7 +38,6 @@ public abstract class Conic {
     double n;
     
     double theta;
-    double tNaught;
 
     SpaceGrid sg;
     
@@ -63,35 +62,32 @@ public abstract class Conic {
         double p = hm*hm/mu;
         double rotation = Math.atan2(e.y, e.x);//Math.asin( v.dot(r.unit()) * hm / (mu*em) ) - theta;
         double theta = r.angle() - rotation;//Math.acos((p/rm - 1) / em);//Math.acos(e.dot(r) / (em*rm));
-        double tNaught = 0; //I don't knw what I wanted this to be
         
-        /*
-        System.out.println("some values:");
-        System.out.println("e: " + em);
-        System.out.println("p: " + p/Constants.deltaX);
+//        System.out.println("some values:");
+//        System.out.println("e: " + em);
+//        System.out.println("p: " + p/Constants.deltaX);
         System.out.println("theta: " + theta);
-        System.out.println("rotation of conic: " + rotation);
-        */
+//        System.out.println("rotation of conic: " + rotation);
         
-        return newConic(focus, p/Constants.deltaX, em, theta, tNaught, rotation, sg);
+        return newConic(focus, p/Constants.deltaX, em, theta, rotation, sg);
     }
-    public static Conic newConic(Orbitable focus, double p, double e, double theta, double tNaught, double rotation, SpaceGrid sg) {
+    public static Conic newConic(Orbitable focus, double p, double e, double theta, double rotation, SpaceGrid sg) {
         if (e == 0) {
-            return new Circle(focus, p, e, theta, tNaught, rotation, sg);
+            return new Circle(focus, p, e, theta, rotation, sg);
         }
         if (e < 1) {
-            return new Ellipse(focus, p, e, theta, tNaught, rotation, sg);
+            return new Ellipse(focus, p, e, theta, rotation, sg);
         }
         if (e == 1) {
-            return new Parabola(focus, p, e, theta, tNaught, rotation, sg);
+            return new Parabola(focus, p, e, theta, rotation, sg);
         }
         if (e > 1) {
-            return new Hyperbola(focus, p, e, theta, tNaught, rotation, sg);
+            return new Hyperbola(focus, p, e, theta, rotation, sg);
         }
         throw new OrbitException("Invalid Eccentricity: " + e);
     }
 
-    Conic(Orbitable focus, double p, double e, double theta, double tNaught, double rotation, SpaceGrid sg) {
+    Conic(Orbitable focus, double p, double e, double theta, double rotation, SpaceGrid sg) {
         this.p = p * Constants.deltaX;
         this.e = e;
         this.rotation = rotation;
@@ -104,10 +100,9 @@ public abstract class Conic {
         
         this.h = Math.sqrt(this.p * mu);
         
-        
+        this.theta = theta;
         this.M0 = MAtAngle(theta);
         
-        this.tNaught = tNaught; //thetaNaught?
 
         //p = h^2 / mu              semi-latus rectum
         //r = p / (1 + ||e|| cos theta)
@@ -146,7 +141,7 @@ public abstract class Conic {
     
     @Override
     public Conic clone() {
-        return newConic(focus, p/Constants.deltaX, e, theta, tNaught, rotation, sg);
+        return newConic(focus, p/Constants.deltaX, e, theta, rotation, sg);
     }
     public Vector2 getVelocityAtTime(double t) {
         double theta = angleAtTime(t);

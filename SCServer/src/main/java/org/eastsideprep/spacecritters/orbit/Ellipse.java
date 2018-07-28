@@ -16,8 +16,8 @@ public class Ellipse extends Conic {
 
     double prevE;
 
-    public Ellipse(Orbitable focus, double p, double e, double theta, double tNaught, double rotation, SpaceGrid sg) {
-        super(focus, p, e, theta, tNaught, rotation, sg);
+    public Ellipse(Orbitable focus, double p, double e, double theta,  double rotation, SpaceGrid sg) {
+        super(focus, p, e, theta, rotation, sg);
 
         M0 = theta; //TO DO
         prevE = M0;

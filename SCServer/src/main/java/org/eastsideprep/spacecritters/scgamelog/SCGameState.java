@@ -157,8 +157,8 @@ public class SCGameState implements GameLogState {
                 if (sgePlanet == null) {
                     // no prior record found, file a new one
                     sgePlanet = new SCGameLogEntry(SCGameLogEntry.Type.MOVEPLANET,
-                            sge.newX, sge.newY, 0, 0,
-                            sge.name, null, sge.param1, sge.param2,
+                            sge.newX, sge.newY, sge.param1, sge.param2,
+                            null, null, sge.id, -1,
                             0.0, 0.0);
                     planets.put(sge.id, sgePlanet);
                     break;

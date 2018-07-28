@@ -14,8 +14,8 @@ import org.eastsideprep.spacecritters.gamelogic.SpaceGrid;
  */
 public class Parabola extends Conic {
 
-    public Parabola(Orbitable focus, double p, double e, double theta, double tNaught, double rotation, SpaceGrid sg) {
-        super(focus, p, e, theta, tNaught, rotation, sg);
+    public Parabola(Orbitable focus, double p, double e, double theta, double rotation, SpaceGrid sg) {
+        super(focus, p, e, theta, rotation, sg);
 
         M0 = theta;
         n = mu * mu / (h * h * h);
@@ -29,15 +29,15 @@ public class Parabola extends Conic {
         double M = n * t + M0;
 
         double c = Math.pow(3 * M + Math.sqrt(9 * M * M + 1), 1f / 3f);
-        
+
         return 2 * Math.atan(c + 1f / c);
 
         //always returns the same number. This is probably an issue
     }
-    
+
     @Override
     public double MAtAngle(double theta) {
-        return Math.tan(theta/2)/2 + Math.pow(Math.tan(theta/2), 2)/6;
+        return Math.tan(theta / 2) / 2 + Math.pow(Math.tan(theta / 2), 2) / 6;
     }
 
     @Override

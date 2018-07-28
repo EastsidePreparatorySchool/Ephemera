@@ -30,9 +30,9 @@ public class Trajectory {
         currentFocus = focus;
     }
 
-    public Trajectory(Orbitable focus, double p, double e, double mNaught, double rotation, SpaceGrid sg) {
+    public Trajectory(Orbitable focus, double p, double e, double rotation, SpaceGrid sg) {
         this.sg = sg;
-        conic = Conic.newConic(focus, p, e, mNaught, sg.getTime(), rotation, sg);
+        conic = Conic.newConic(focus, p, e, sg.getTime(), rotation, sg);
 
         currentFocus = focus;
 
