@@ -72,8 +72,8 @@ public class Constants {
     /*
     ** Not truly adjustable yet - do not change these, do not put in config file
      */
-    final public static int width = 501; // grid width 
-    final public static int height = 501; // grid height
+    final public static int width = 5001; // grid width 
+    final public static int height = 5001; // grid height
 
     public static Object getValue(String variable) {
         try {

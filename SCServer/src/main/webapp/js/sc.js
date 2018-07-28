@@ -64,13 +64,12 @@ var startGeo;
 var planetGeo;
 var gridHelper;
 var light;
-var size = 501;
-var divisions = 501;
+var size = 5001;
 var rotation = 0;
 var orbitMaterial = null;
 var fightMaterial;
 var autorotateTimeout = null;
-var trailMaterial = null
+var trailMaterial = null;
 
 
 
@@ -260,7 +259,7 @@ function drawEllipse(centerX, centerY, radiusX, radiusY, rotation) {
             false,
             rotation
             );
-    var points = curve.getPoints(50);
+    var points = curve.getPoints(200);
     var geometry = new THREE.BufferGeometry().setFromPoints(points);
     // Create the final object to add to the scene
     var ellipse = new THREE.Line(geometry, orbitMaterial);
@@ -330,7 +329,7 @@ function uiStateChange(attachState, runState, data) {
                     + "<br>&nbsp;Observer:&nbsp" + data.observer;
             attachP.style.display = "none";
             speciesMap = new SpeciesMap();
-            grid = new Grid(501, 501);
+            grid = new Grid(size, size);
             updateInterval = updateIntervalActive;
             getStatus();
             queryAdmin();
@@ -955,14 +954,14 @@ function init() {
     scene = new THREE.Scene();
     width = $('#center').width();
     height = $('#center').height();
-    camera = new THREE.PerspectiveCamera(100, width / height, 0.1, 1000);
-    camera.position.set(350, 120, 0);
+    camera = new THREE.PerspectiveCamera(100, width / height, 0.1, 5000);
+    camera.position.set(50, 50, 0);
     camera.rotation.x = -Math.PI / 4;
     renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
     centerDiv.appendChild(renderer.domElement);
-    cubeGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+    cubeGeo = new THREE.BoxGeometry(1.0, 1.0, 1.0);
     starGeo = new THREE.SphereGeometry(1.0, 32, 32);
     planetGeo = new THREE.SphereGeometry(0.7, 32, 32);
     orbitMaterial = new THREE.LineBasicMaterial({color: "goldenrod"});
@@ -970,14 +969,15 @@ function init() {
     trailMaterial = new THREE.MeshBasicMaterial({color: "lightblue", wireframe: false});
 
 
-    gridHelper = new THREE.GridHelper(size, divisions, "#500000", "#500000");
+    gridHelper = new THREE.GridHelper(size, size, "#500000", "#500000");
     scene.add(gridHelper);
+    //scene.add(drawEllipse(0,0,1000,300,0));
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
     controls.dampingFactor = 0.25;
     controls.screenSpacePanning = false;
     controls.minDistance = 10;
-    controls.maxDistance = 500;
+    controls.maxDistance = 6000;
     controls.maxPolarAngle = Math.PI / 2;
     controls.autoRotate = true;
     controls.autoRotateSpeed = 1.0;
@@ -1001,9 +1001,12 @@ function init() {
     window.addEventListener("resize", onWindowResize, false);
     window.addEventListener("beforeunload", detach);
     animate();
+
     makeClientID();
     listEngines();
+    
     println("initialized");
+ 
     var parameter = location.search.substring(1);
     // if called from another page with attach param, attach right now
     if (parameter !== null && parameter.length > 0) {
@@ -1043,6 +1046,7 @@ function animate() {
     });
     fights = newFights;
     renderer.render(scene, camera);
+    //println(" cam:("+camera.position.x+","+camera.position.y+","+camera.position.z+")");
 }
 
 
@@ -1126,6 +1130,7 @@ function  dumpAlienAndCell(alien, cell) {
     dprintln(" cell:");
     cell.forEach((a, i) => dprintln(" i:" + i + ", a:" + a.id));
 }
+
 
 
 println("parsed");
