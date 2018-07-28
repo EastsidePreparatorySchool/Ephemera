@@ -40,6 +40,8 @@ public class Constants {
         }
         return (c < 0) ? 0 : c;
     }
+    
+    public static double starDeathRadius = 1.3e6;
 
     public static final double standardMoveCost = 0.1;
 

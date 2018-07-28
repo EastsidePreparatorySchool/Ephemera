@@ -72,7 +72,9 @@ public class Trajectory {
     }   
     
     
-    
+    public boolean wasWithinRadius(double r) {
+        return false; //GOT TO FIX THIS HERE, BOY O BOY
+    }
     
     
     
