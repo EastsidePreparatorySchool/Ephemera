@@ -39,7 +39,7 @@ public class LoggingVisualizer implements GameVisualizer {
     @Override
     public void registerStar(int x, int y, String name, int index, double luminosity, double mass) { //[Q]
         log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ADDSTAR,
-                x, y, 0, 0,
+                x, y, (int) luminosity, 0,
                 name, null,
                 index, -1,
                 0.0, 0.0));

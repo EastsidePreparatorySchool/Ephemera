@@ -31,18 +31,18 @@ public class Star3D {
         this.energy = energy;
         this.index = index;
 
-        this.s = new Sphere(1.0);
+        this.s = new Sphere(energy/5);
         s.setMaterial(new PhongMaterial(Color.rgb(255, 255, 255, 0.9)));
         s.setDrawMode(DrawMode.FILL);
         s.setTranslateX(Scene3D.xFromX(x));
-        s.setTranslateY(gameShell.mainScene.objectElevation);
+        s.setTranslateY(gameShell.mainScene.objectElevation+(energy/10));
         s.setTranslateZ(Scene3D.zFromY(y));
 
     }
 
     public void forceUpdatePosition() {
         s.setTranslateX(Scene3D.xFromX(x));
-        s.setTranslateY(gameShell.mainScene.objectElevation);
+        s.setTranslateY(gameShell.mainScene.objectElevation+(energy/10));
         s.setTranslateZ(Scene3D.zFromY(y));
 
     }

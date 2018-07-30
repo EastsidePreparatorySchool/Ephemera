@@ -225,7 +225,7 @@ function drawOrbit(id, focusX, focusY, e, p, rotation) {
     //println("Orbit: (" + focusX + "," + focusY + "), ecc:" + e + ", p:" + p + ", rot:" + rotation);
     var a = p / (1 - e * e);
     var b = a * Math.sqrt(1 - e * e);
-    var cf = Math.sqrt(a*a - b*b);
+    var cf = Math.sqrt(a * a - b * b);
     var focus = new THREE.Vector2(focusX, focusY);
     var offset = new THREE.Vector2(cf, 0).rotateAround(new THREE.Vector2(0, 0), rotation);
     var center = focus.sub(offset);
@@ -264,6 +264,7 @@ function drawEllipse(centerX, centerY, radiusX, radiusY, rotation) {
     // Create the final object to add to the scene
     var ellipse = new THREE.Line(geometry, orbitMaterial);
     ellipse.rotation.x = Math.PI / 2;
+    ellipse.position.y = 1.0;
     return ellipse;
 }
 
@@ -615,7 +616,7 @@ class Grid {
 
 // alien class, use this to make aliens
 class Alien {
-    constructor(material, x, z, id) {
+    constructor(material, x, z, id, speciesId) {
         this.mat = material;
         this.mesh = new THREE.Mesh(cubeGeo, this.mat);
         scene.add(this.mesh);
@@ -623,6 +624,7 @@ class Alien {
         this.mesh.position.z = -x;
         this.mesh.position.y = 1;
         this.id = id;
+        this.speciesId = speciesId;
         this.orbit = null;
         this.trail = new Trail();
     }
@@ -659,13 +661,15 @@ class Alien {
 
 // star class, use this to make aliens
 class Star {
-    constructor(x, z) {
+    constructor(x, y, mag) {
+        mag = Math.max(mag, 10);
         this.mat = new THREE.MeshBasicMaterial({color: "white", wireframe: false});
         this.mesh = new THREE.Mesh(starGeo, this.mat);
+        this.mesh.scale.set(mag / 10, mag / 10, mag / 10);
         scene.add(this.mesh);
-        this.mesh.position.x = -z;
+        this.mesh.position.x = -y;
         this.mesh.position.z = -x;
-        this.mesh.position.y = 1;
+        this.mesh.position.y = mag / 10;
     }
 
 }
@@ -690,7 +694,7 @@ class Planet {
 }
 ;
 function addStar(content) {
-    stars.push(new Star(content.newX, content.newY));
+    stars.push(new Star(content.newX, content.newY, content.param1));
 }
 
 
@@ -704,7 +708,7 @@ function movePlanet(content) {
         planet.move(content.newX, content.newY);
         planet.trail.addPoint(content.param1, content.param2);
     } else {
-        println ("planet index "+content.id+" undefined");
+        println("planet index " + content.id + " undefined");
     }
 }
 
@@ -712,7 +716,7 @@ function movePlanet(content) {
 
 function addAlien(content) {
     dprintln("adding alien " + content.id + " at " + content.newX + "," + content.newY);
-    var alien = new Alien(speciesMap.getMat(content.speciesName), content.newX, content.newY, content.id);
+    var alien = new Alien(speciesMap.getMat(content.speciesName), content.newX, content.newY, content.id, content.speciesId);
     aliens[content.id] = alien;
     grid.addToCell(alien, content.newX, content.newY);
     speciesMap.addAlien(content.speciesId);
@@ -858,10 +862,29 @@ class SpeciesMap {
         text.innerText = " " + displayName + ": ";
         text.className = "tooltip";
         species.appendChild(text);
+
         var text2 = document.createElement("span");
         text2.style.color = color;
         text2.id = "species" + id;
         text2.innerText = "0";
+        text2.onmouseover = function () {
+            //println("highlight " + id);
+            for (var a in aliens) {
+                var al = aliens[a];
+                if (al.speciesId === id){
+                    al.mesh.scale.set(2, 20, 2);
+                }
+            };
+        };
+        text2.onmouseout = function () {
+            //println("highlight off");
+           for (var a in aliens) {
+                var al = aliens[a];
+                if (al.speciesId === id){
+                    al.mesh.scale.set(1, 1, 1);
+                }
+            };
+        };
         species.appendChild(text2);
         var tip = document.createElement("span");
         tip.className = "tooltiptext";
@@ -873,6 +896,7 @@ class SpeciesMap {
         return color;
     }
 }
+
 
 function updateCounts() {
     if (!attached) {
@@ -1004,9 +1028,9 @@ function init() {
 
     makeClientID();
     listEngines();
-    
+
     println("initialized");
- 
+
     var parameter = location.search.substring(1);
     // if called from another page with attach param, attach right now
     if (parameter !== null && parameter.length > 0) {
