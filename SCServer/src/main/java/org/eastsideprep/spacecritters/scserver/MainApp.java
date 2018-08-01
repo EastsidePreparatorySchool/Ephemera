@@ -34,18 +34,35 @@ import org.eastsideprep.spacecritters.scgamelog.SCGameLogEntry;
 import org.eastsideprep.spacecritters.scgamelog.SCGameState;
 import org.eastsideprep.spacecritters.spacecritters.SpaceCritters;
 import org.eastsideprep.spacecritters.spacecritters.Utilities;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import spark.Request;
 import spark.Response;
 import static spark.Spark.*;
 import spark.servlet.SparkApplication;
 
-public class MainApp implements SparkApplication {
+/*
+public class Application extends SpringBootServletInitializer {  
+  
+    @Override  
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {  
+        return application.sources(Application.class);  
+    }  
+ */
+@SpringBootApplication
+public class MainApp extends SpringBootServletInitializer implements SparkApplication {
 
     static GameEngineV2 geMain;
     static Governor engines;
     static MainApp app;
     static Thread mainThread;
     static boolean createServerEngine = true;
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(MainApp.class);
+    }
 
     private static String getDateString() {
         Date date = new Date();
@@ -119,7 +136,8 @@ public class MainApp implements SparkApplication {
             System.out.println("SC running in desktop-only mode");
         }
 
-        if (args.length > 0 && args[0].equalsIgnoreCase("serveronly")) {
+        if ((args.length > 0 && args[0].equalsIgnoreCase("serveronly"))
+                || args.length == 0) {
             System.out.println("SC running in server-only mode");
 
             try {
@@ -130,7 +148,9 @@ public class MainApp implements SparkApplication {
             } catch (Exception e) {
                 // catch and be quiet, then exit
             }
-        } else {
+        } else if (args.length > 0
+                && (args[0].equalsIgnoreCase("desktoponly")
+                || args[0].equalsIgnoreCase("both"))) {
             // this will stall until it is time to quit
             MainApp.createDesktopGameEngine();
         }
@@ -142,10 +162,12 @@ public class MainApp implements SparkApplication {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
         System.out.println("SCServer init() " + dateFormat.format(date));
+        String os = System.getProperty("os.name");
         String userDir = System.getProperty("user.dir");
         String homeDir = System.getProperty("user.home");
         String javaHomeDir = System.getProperty("java.home");
         String cp = System.getProperty("java.class.path");
+        System.out.println(" os.name " + os);
         System.out.println(" user.dir " + userDir);
         System.out.println(" user.home " + homeDir);
         System.out.println(" jave.home " + javaHomeDir);

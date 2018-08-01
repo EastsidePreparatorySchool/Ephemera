@@ -248,13 +248,14 @@ public class AlienContainer {
 
         /* FINALLY, COMPUTE NEW TRAJECTORY */
         if (focus != trajectory.currentFocus) { //make a new trajectory if the focus has changed
-            System.out.println("WHO?? ");
+            System.out.print("Changing focus ");
             if (focus instanceof Planet) {
-                System.out.println("TWAS A PLANET");
+                System.out.print("to plant ");
                 System.out.println(((Planet) focus).className);
             }
             if (focus instanceof Star) {
-                System.out.println("TWAS A STAR");
+                System.out.print("to star ");
+                System.out.println(((Star) focus).className);
             }
             Vector2 v = trajectory.velocityAtTime(grid.getTime());
             if (deltaV != null) {

@@ -29,6 +29,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
 
     static TriangleMesh vger;
     boolean tooComplex = false;
+    int startTurn;
 
     // don't do anything in the contructor, implicitly or explicitly!
     public Voyager() {
@@ -38,6 +39,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
     public void init(Context ctx, int id, int parentId, String message) {
         // hang on to the context object
         this.ctx = ctx;
+        this.startTurn = ctx.getGameTurn();
     }
 
     @Override
@@ -83,7 +85,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         }
 
         // if we are all good, move us out a little from the center (Earth/Sun)
-        if (ctx.getGameTurn() < 100) {
+        if ((ctx.getGameTurn()-this.startTurn) < 50) {
             Position p = ctx.getPosition();
             Position p2 = new Position(-p.y, p.x);
             return  p2.scaleToLength(1.0);
