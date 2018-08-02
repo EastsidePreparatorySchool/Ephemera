@@ -76,7 +76,7 @@ function queryAdmin() {
                     println("queryAdmin: " + data);
                     if (data === "yes") {
                         adminP.style.display = "inline";
-                        adminButton.innerText = "Hide admin tools";
+                        //adminButton.innerText = "Hide admin tools";
                         center.style.width = "60%";
                     }
                 }
@@ -265,9 +265,8 @@ function init() {
     }
 
     makeClientID();
-//    queryAdmin();
+    queryAdmin();
     listEngines();
-    getStatus();
     println("initialized");
     updateTimer = setInterval(listEngines, 1000);
 }

@@ -217,6 +217,7 @@ public class GameEngineV2 implements GameEngine {
     public void shutdown() {
         System.out.println("GE: shutdown " + name);
         dead = true;
+        this.timeOfDeath = System.currentTimeMillis();
         if (gameThread != null && gameThread.isAlive()) {
             gameThread.interrupt();
             try {

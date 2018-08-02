@@ -836,7 +836,9 @@ public class MainApp implements SparkApplication {
                                     // engine has been dead for 24 hours, remove from Governor map
                                     this.remove(e.name);
                                     System.gc();
-                                }
+                                    
+                                    System.out.println("Removed engine "+e.name +" time of death "+e.timeOfDeath);
+                                    System.out.println(" Current time "+System.currentTimeMillis());}
                             }
                         }
                     }
