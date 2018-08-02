@@ -31,7 +31,7 @@ public class Trajectory {
     }
     public Trajectory(Orbitable focus, double p, double e, double mNaught, double rotation, SpaceGrid sg) {
         this.sg = sg;
-        conic = Conic.newConic(focus, p, e, sg.getTime(), rotation, sg);
+        conic = Conic.newConic(focus, p, e, mNaught, sg.getTime(), rotation, sg);
 
         currentFocus = focus;
 
@@ -98,7 +98,6 @@ public class Trajectory {
     }
     
     public boolean wasWithinRadius(double r) {
-        Conic conic = conics.get(0);
         double theta0 = conic.theta0;
         double theta1 = conic.theta1;
         if ( conic.periapse() > r ) return false;
