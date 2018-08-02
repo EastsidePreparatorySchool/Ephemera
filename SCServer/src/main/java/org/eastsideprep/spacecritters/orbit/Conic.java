@@ -38,8 +38,13 @@ public abstract class Conic {
     double n;
     
     double theta;
+    double tNaught;
 
     SpaceGrid sg;
+    
+    
+    double theta0;
+    double theta1;
     
     
     public static Conic newConic(Orbitable focus, Vector2 r, Vector2 v, double t, SpaceGrid sg) {
@@ -62,6 +67,7 @@ public abstract class Conic {
         double p = hm*hm/mu;
         double rotation = Math.atan2(e.y, e.x);//Math.asin( v.dot(r.unit()) * hm / (mu*em) ) - theta;
         double theta = r.angle() - rotation;//Math.acos((p/rm - 1) / em);//Math.acos(e.dot(r) / (em*rm));
+        double tNaught = 0; //I don't knw what I wanted this to be
         
 //        System.out.println("some values:");
 //        System.out.println("e: " + em);
@@ -69,25 +75,25 @@ public abstract class Conic {
         System.out.println("theta: " + theta);
 //        System.out.println("rotation of conic: " + rotation);
         
-        return newConic(focus, p/Constants.deltaX, em, theta, rotation, sg);
+        return newConic(focus, p/Constants.deltaX, em, theta, tNaught, rotation, sg);
     }
-    public static Conic newConic(Orbitable focus, double p, double e, double theta, double rotation, SpaceGrid sg) {
+    public static Conic newConic(Orbitable focus, double p, double e, double theta, double tNaught, double rotation, SpaceGrid sg) {
         if (e == 0) {
-            return new Circle(focus, p, e, theta, rotation, sg);
+            return new Circle(focus, p, e, theta, tNaught, rotation, sg);
         }
         if (e < 1) {
-            return new Ellipse(focus, p, e, theta, rotation, sg);
+            return new Ellipse(focus, p, e, theta, tNaught, rotation, sg);
         }
         if (e == 1) {
-            return new Parabola(focus, p, e, theta, rotation, sg);
+            return new Parabola(focus, p, e, theta, tNaught, rotation, sg);
         }
         if (e > 1) {
-            return new Hyperbola(focus, p, e, theta, rotation, sg);
+            return new Hyperbola(focus, p, e, theta, tNaught, rotation, sg);
         }
         throw new OrbitException("Invalid Eccentricity: " + e);
     }
 
-    Conic(Orbitable focus, double p, double e, double theta, double rotation, SpaceGrid sg) {
+    Conic(Orbitable focus, double p, double e, double theta, double tNaught, double rotation, SpaceGrid sg) {
         this.p = p * Constants.deltaX;
         this.e = e;
         this.rotation = rotation;
@@ -100,9 +106,10 @@ public abstract class Conic {
         
         this.h = Math.sqrt(this.p * mu);
         
-        this.theta = theta;
+        
         this.M0 = MAtAngle(theta);
         
+        this.tNaught = tNaught; //thetaNaught?
 
         //p = h^2 / mu              semi-latus rectum
         //r = p / (1 + ||e|| cos theta)
@@ -124,15 +131,18 @@ public abstract class Conic {
     public abstract double nextTimeAtAngle(double theta, double t);
     
     public abstract double MAtAngle(double theta);
-
+    
+    public double radiusAtAngle(double theta) { return p / (1 + e * Math.cos(theta)); }
+    public double angleAtRadius(double r) { return Math.acos((r - p) / (-r*e)); }
+    
     public Position positionAtAngle(double theta) {
-        double r = p / (1 + e * Math.cos(theta));
+        double r = radiusAtAngle(theta);
         if (r < 0 && Math.abs(theta) < Math.PI) {
             System.out.println("Radius was negative at angle " + theta);
         }
         return new Position(r * Math.cos(theta + rotation), r * Math.sin(theta + rotation)).scale(1f / Constants.deltaX);
     }
-
+    
     public Position positionAtTime(double t) {
         double theta = angleAtTime(t);
         return positionAtAngle(theta).add(focus.position(t));
@@ -141,7 +151,7 @@ public abstract class Conic {
     
     @Override
     public Conic clone() {
-        return newConic(focus, p/Constants.deltaX, e, theta, rotation, sg);
+        return newConic(focus, p/Constants.deltaX, e, theta, tNaught, rotation, sg);
     }
     public Vector2 getVelocityAtTime(double t) {
         double theta = angleAtTime(t);
@@ -155,5 +165,11 @@ public abstract class Conic {
     
     public double partialHillRadius() {
         return p  * (1-e)/ ( (1-e*e) * Math.pow(3*focus.mass(), 1f/3) ) / Constants.deltaX;
+    }
+    
+    public double periapse() { return radiusAtAngle(0); }
+    public double apoapse() { 
+        if (this instanceof Parabola || this instanceof Hyperbola) return Double.POSITIVE_INFINITY;
+        return radiusAtAngle(Math.PI);
     }
 }

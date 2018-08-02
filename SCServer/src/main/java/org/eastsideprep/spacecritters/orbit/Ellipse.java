@@ -16,8 +16,8 @@ public class Ellipse extends Conic {
 
     double prevE;
 
-    public Ellipse(Orbitable focus, double p, double e, double theta,  double rotation, SpaceGrid sg) {
-        super(focus, p, e, theta, rotation, sg);
+    public Ellipse(Orbitable focus, double p, double e, double theta, double tNaught, double rotation, SpaceGrid sg) {
+        super(focus, p, e, theta, tNaught, rotation, sg);
 
         M0 = theta; //TO DO
         prevE = M0;
@@ -25,15 +25,14 @@ public class Ellipse extends Conic {
 
         orbits = 0;
     }
-
+    
     public double EAtTrue(double theta) {
         return Math.acos((Math.cos(theta) + e) / (1 + e * Math.cos(theta))) * ((theta < 0 || theta > Math.PI) ? -1 : 1);
     }
-
     public double trueAtE(double E) {
         return Math.acos((Math.cos(E) - e) / (1 - e * Math.cos(E))) * ((E < 0 || E > Math.PI) ? -1 : 1);
     }
-
+    
     public double EAtTime(double t) {
         //T = (2 pi / mu^2) * (h / root(1 - ||e||^2))^3
         //M = 2 pi t / T = n*t = E - ||e|| sin E
@@ -49,7 +48,7 @@ public class Ellipse extends Conic {
             //System.out.println("loop: " + orbits);
         }
         //find eccentric anomaly
-        double E = (t == sg.getTime() && prevE != M0) ? prevE : M;
+        double E = (t == sg.getTime()) ? prevE : M;
         double dE;
         int count = 0;
         do { //some calculouse black magic to find E (to within a certain accuracy)
@@ -71,7 +70,12 @@ public class Ellipse extends Conic {
 
     @Override
     public double angleAtTime(double t) {
-        return trueAtE(EAtTime(t));
+        double theta = trueAtE(EAtTime(t));
+        if (t == sg.getTime()) {
+            theta0 = theta1;
+            theta1 = theta;
+        }
+        return theta;
     }
 
     @Override

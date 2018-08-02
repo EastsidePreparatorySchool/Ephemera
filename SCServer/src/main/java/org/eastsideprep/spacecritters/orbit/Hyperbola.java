@@ -16,8 +16,8 @@ public class Hyperbola extends Conic {
 
     double prevF;
 
-    public Hyperbola(Orbitable focus, double p, double e, double theta, double rotation, SpaceGrid sg) {
-        super(focus, p, e, theta, rotation, sg);
+    public Hyperbola(Orbitable focus, double p, double e, double theta, double tNaught, double rotation, SpaceGrid sg) {
+        super(focus, p, e, theta, tNaught, rotation, sg);
 
         M0 = theta;//TO DO
         prevF = M0;
@@ -60,8 +60,15 @@ public class Hyperbola extends Conic {
                 break;
             }
         } while (dF > Constants.accuracy);
-
-        return trueAtF(F);
+        
+        
+        
+        double theta = trueAtF(F);
+        if (t == sg.getTime()) {
+            theta0 = theta1;
+            theta1 = theta;
+        }
+        return theta;
     }
     
     @Override

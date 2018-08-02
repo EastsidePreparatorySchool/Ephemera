@@ -29,8 +29,7 @@ public class Trajectory {
         conic = Conic.newConic(focus, r, v, sg.getTime(), sg);
         currentFocus = focus;
     }
-
-    public Trajectory(Orbitable focus, double p, double e, double rotation, SpaceGrid sg) {
+    public Trajectory(Orbitable focus, double p, double e, double mNaught, double rotation, SpaceGrid sg) {
         this.sg = sg;
         conic = Conic.newConic(focus, p, e, sg.getTime(), rotation, sg);
 
@@ -57,11 +56,9 @@ public class Trajectory {
     public Position positionAtTime(double t) {
         return conic.positionAtTime(t);
     }
-
     public Vector2 velocityAtTime(double t) {
         return conic.getVelocityAtTime(t).add(conic.focus.velocity(t));
     }
-
     @Override
     public Trajectory clone() {
         Trajectory trajectory = new Trajectory();
@@ -98,5 +95,20 @@ public class Trajectory {
 
     public Vector2 positionOfFocus() {
         return currentFocus.position(sg.getTime());
+    }
+    
+    public boolean wasWithinRadius(double r) {
+        Conic conic = conics.get(0);
+        double theta0 = conic.theta0;
+        double theta1 = conic.theta1;
+        if ( conic.periapse() > r ) return false;
+        if ( conic.apoapse() <= r ) return true;
+        
+        if ( conic.radiusAtAngle(theta1) <= r ) return true;
+        
+        double theta = conic.angleAtRadius(r);
+        if (theta0 > theta) theta = 2*Math.PI - theta;
+        
+        return theta1 < theta0 || theta1 > theta;
     }
 }
