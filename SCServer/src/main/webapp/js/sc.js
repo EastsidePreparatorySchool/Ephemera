@@ -356,6 +356,8 @@ function uiStateChange(attachState, runState, data) {
             attachP.style.display = "inline";
             speciesMap = null;
             grid = null;
+            controls.autoRotate = false;
+
             //println("starting purge ...");
 
             var a;
@@ -572,17 +574,15 @@ function pause() {
 
 class Grid {
     constructor(width, height) {
-        this.grid = [];
+        this.grid = Array(width);
         this.width = width;
         this.height = height;
         this.halfWidth = Math.floor(width / 2);
         this.halfHeight = Math.floor(height / 2);
         for (var x = 0; x < width; x++) {
-            var col = [];
-            for (var y = 0; y < height; y++) {
-                col.push([]);
-            }
-            this.grid.push(col);
+            var col = Array(height);
+          
+            this.grid[x] = col;
         }
     }
 
@@ -590,6 +590,10 @@ class Grid {
         x = Math.floor(x);
         y = Math.floor(y);
         var cell = this.grid[x + this.halfWidth][y + this.halfHeight];
+        if (cell === undefined) {
+            cell = [];
+            this.grid[x + this.halfWidth][y + this.halfHeight] = cell;
+        }
         assert(() => (alien.getX() === x));
         assert(() => (alien.getY() === y));
         assert(() => (!cell.includes(alien)));
