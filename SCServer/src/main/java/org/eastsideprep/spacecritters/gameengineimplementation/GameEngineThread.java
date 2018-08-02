@@ -104,10 +104,13 @@ public class GameEngineThread extends Thread {
 //                        this.sleepTime = Math.max(this.sleepTime, 50);
 //                    }
 //                    this.lastLogSize = newLogSize;
-                    this.sleepTime = this.engine.log.getLogSize() / 50;
-                    this.sleepTime = Math.min(this.sleepTime, 5000);
-                    this.sleepTime = Math.max(this.sleepTime, 20);
-                    
+                    if (engine.slow) {
+                        this.sleepTime = 1000;
+                    } else {
+                        this.sleepTime = this.engine.log.getLogSize() / 50;
+                        this.sleepTime = Math.min(this.sleepTime, 5000);
+                        this.sleepTime = Math.max(this.sleepTime, 20);
+                    }
                     // now sleep, and keep sleeping if the log is greater than 10000 entries
                     do {
                         Thread.sleep(this.sleepTime);
@@ -249,6 +252,16 @@ public class GameEngineThread extends Thread {
                 engine.vis.debugOut("GameEngineThread: End request, thread closing");
                 gameOver = true;
                 engine.vis.showGameOver();
+                break;
+
+            case SlowModeOn:
+                engine.vis.debugOut("GameEngineThread: SlowMode on");
+                engine.slow = true;
+                break;
+
+            case SlowModeOff:
+                engine.vis.debugOut("GameEngineThread: SlowMode on");
+                engine.slow = false;
                 break;
 
             default:

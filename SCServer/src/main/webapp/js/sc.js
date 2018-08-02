@@ -28,6 +28,7 @@ var engines = document.getElementById("engines");
 var startpauseB = document.getElementById("startpause");
 var attachP = document.getElementById("attach");
 var adminP = document.getElementById("admin");
+var slowMode = document.getElementById("slowmode");
 
 var aliens = {};
 var planets = {};
@@ -278,10 +279,19 @@ function showFight(x, y) {
     scene.add(mesh);
     fights.push(mesh);
 
-    // no need to show more than 20 fights. If there are old ones in here, delete them.
+    // no need to show more than 100 fights. If there are old ones in here, delete them.
     while (fights.length > 100) {
         scene.remove(fights.shift());
     }
+}
+
+function slowmode() {
+    request({url: "protected/slowmode?"
+                + "clientID=" + getClientID()
+                + "&state=" + (slowMode.checked ? "on" : "off")
+    }).then(data => {
+    }).catch(error => {
+    });
 }
 
 
@@ -312,11 +322,11 @@ function detach() {
 
 function uiStateChange(attachState, runState, data) {
     if (attachState !== undefined && attachState !== attached) {
-        // the attach state changed
+// the attach state changed
         attached = attachState;
         if (attached) {
-            // now attached
-            //println("Initial state: " + data);
+// now attached
+//println("Initial state: " + data);
             document.title = "Game: " + data.engine + " (SpaceCritters)";
             println("Engine id: " + data.engine);
             println("Observer id: " + data.observer);
@@ -336,7 +346,7 @@ function uiStateChange(attachState, runState, data) {
             queryAdmin();
             updates();
         } else {
-            // now detached
+// now detached
             println("Last recorded turn: " + turnSpan.innerText);
             document.title = "Game: <detached> (SpaceCritters)";
             countsP.style.display = "none";
@@ -385,7 +395,6 @@ function uiStateChange(attachState, runState, data) {
                 scene.remove(f);
             });
             fights = [];
-
             renderer.render(scene, camera);
             //println("purge complete.");
             updateInterval = updateIntervalInactive;
@@ -395,12 +404,12 @@ function uiStateChange(attachState, runState, data) {
     if (runState !== undefined && runState !== running) {
         running = runState;
         if (running) {
-            // now running
+// now running
             startpauseB.innerText = "Pause";
             startpauseB.onclick = pause;
             updateInterval = updateIntervalActive;
         } else {
-            // now paused
+// now paused
             startpauseB.innerText = "Start";
             startpauseB.onclick = start;
             updateInterval = updateIntervalInactive;
@@ -862,7 +871,6 @@ class SpeciesMap {
         text.innerText = " " + displayName + ": ";
         text.className = "tooltip";
         species.appendChild(text);
-
         var text2 = document.createElement("span");
         text2.style.color = color;
         text2.id = "species" + id;
@@ -871,19 +879,21 @@ class SpeciesMap {
             //println("highlight " + id);
             for (var a in aliens) {
                 var al = aliens[a];
-                if (al.speciesId === id){
+                if (al.speciesId === id) {
                     al.mesh.scale.set(2, 20, 2);
                 }
-            };
+            }
+            ;
         };
         text2.onmouseout = function () {
             //println("highlight off");
-           for (var a in aliens) {
+            for (var a in aliens) {
                 var al = aliens[a];
-                if (al.speciesId === id){
+                if (al.speciesId === id) {
                     al.mesh.scale.set(1, 1, 1);
                 }
-            };
+            }
+            ;
         };
         species.appendChild(text2);
         var tip = document.createElement("span");
@@ -991,8 +1001,6 @@ function init() {
     orbitMaterial = new THREE.LineBasicMaterial({color: "goldenrod"});
     fightMaterial = new THREE.MeshBasicMaterial({color: "red"});
     trailMaterial = new THREE.MeshBasicMaterial({color: "lightblue", wireframe: false});
-
-
     gridHelper = new THREE.GridHelper(size, size, "#500000", "#500000");
     scene.add(gridHelper);
     //scene.add(drawEllipse(0,0,1000,300,0));
@@ -1005,32 +1013,26 @@ function init() {
     controls.maxPolarAngle = Math.PI / 2;
     controls.autoRotate = true;
     controls.autoRotateSpeed = 1.0;
-
     // stop autorotate after the first interaction
     controls.addEventListener('start', function () {
         clearTimeout(autorotateTimeout);
         controls.autoRotate = false;
     });
-
     // restart autorotate after the last interaction & an idle time has passed
     this.controls.addEventListener('end', function () {
         autorotateTimeout = setTimeout(function () {
             controls.autoRotate = true;
         }, 30000);
     });
-
     light = new THREE.AmbientLight(0x404040);
     scene.add(light);
     renderer.render(scene, camera);
     window.addEventListener("resize", onWindowResize, false);
     window.addEventListener("beforeunload", detach);
     animate();
-
     makeClientID();
     listEngines();
-
     println("initialized");
-
     var parameter = location.search.substring(1);
     // if called from another page with attach param, attach right now
     if (parameter !== null && parameter.length > 0) {

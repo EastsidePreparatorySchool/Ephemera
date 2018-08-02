@@ -34,78 +34,18 @@ import org.eastsideprep.spacecritters.scgamelog.SCGameLogEntry;
 import org.eastsideprep.spacecritters.scgamelog.SCGameState;
 import org.eastsideprep.spacecritters.spacecritters.SpaceCritters;
 import org.eastsideprep.spacecritters.spacecritters.Utilities;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import spark.Request;
 import spark.Response;
 import static spark.Spark.*;
 import spark.servlet.SparkApplication;
 
-/*
-public class Application extends SpringBootServletInitializer {  
-  
-    @Override  
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {  
-        return application.sources(Application.class);  
-    }  
- */
-@SpringBootApplication
-public class MainApp extends SpringBootServletInitializer implements SparkApplication {
+public class MainApp implements SparkApplication {
 
     static GameEngineV2 geMain;
     static Governor engines;
     static MainApp app;
     static Thread mainThread;
     static boolean createServerEngine = true;
-
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(MainApp.class);
-    }
-
-    private static String getDateString() {
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-        return dateFormat.format(date);
-    }
-
-    private static File getJettyLogFile() {
-        Path logFolder = Paths.get(System.getProperty("user.dir")).getRoot();
-        logFolder = Paths.get(logFolder.toString(), "home\\LogFiles");
-        if (!logFolder.toFile().exists()) {
-            // not in standard azure log setup, exit
-            System.out.println("getJettyLogFile: not in Azure");
-            return null;
-        }
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
-
-        String name = "jetty_" + dateFormat.format(date) + ".stderrout.log";
-        Path logFile = Paths.get(logFolder.toString(), name);
-        System.out.println("GetJettyLog:" + logFile);
-        File f = logFile.toFile();
-        if (f.exists()) {
-            return f;
-        }
-
-        // try GMT
-        // convert date to localdatetime
-        LocalDateTime localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-
-        // plus one
-        ZonedDateTime gmt = localDateTime.atZone(ZoneId.of("GMT"));
-
-        name = "jetty_" + dateFormat.format(gmt) + ".stderrout.log";
-        logFile = Paths.get(logFolder.toString(), name);
-        System.out.println("GetJettyLog:" + logFile);
-        f = logFile.toFile();
-        if (f.exists()) {
-            return f;
-        }
-        return null;
-
-    }
 
     // desktop initialization
     public static void main(String[] args) {
@@ -190,10 +130,11 @@ public class MainApp extends SpringBootServletInitializer implements SparkApplic
         get("/protected/check", "application/json", (req, res) -> doCheck(req), new JSONRT());
         get("/protected/listobservers", "application/json", (req, res) -> doListObservers(req), new JSONRT());
         get("/protected/status", "application/json", (req, res) -> status(req), new JSONRT());
-        get("/protected/allstatus", "application/json", (req, res) -> allStatus(req), new JSONRT());
+//        get("/protected/allstatus", "application/json", (req, res) -> allStatus(req), new JSONRT());
         get("/protected/allstatus2", "application/json", (req, res) -> allStatus2(req), new JSONRT());
         get("/protected/queryadmin", "application/json", (req, res) -> queryAdmin(req));
         get("/protected/serverlog", (req, res) -> getServerLogFile(req, res));
+        get("/protected/slowmode", (req, res) -> doSlowMode(req));
         post("/protected/upload", (req, res) -> uploadFile(req, res));
 
         MainApp.engines = new Governor();
@@ -255,6 +196,21 @@ public class MainApp extends SpringBootServletInitializer implements SparkApplic
         }
         ctx.engine.queueCommand(new GameCommand(GameCommandCode.Pause));
         return "SC: Pause request queued";
+    }
+
+    private static String doSlowMode(Request req) {
+        ServerContext ctx = getCtx(req);
+        if (ctx.observer == null) {
+            return "SC: slowmode: not attached";
+        }
+        String state = req.queryParams("state");
+        if (state != null && state.equalsIgnoreCase("on")) {
+            ctx.engine.queueCommand(new GameCommand(GameCommandCode.SlowModeOn));
+        } else {
+            ctx.engine.queueCommand(new GameCommand(GameCommandCode.SlowModeOff));
+        }
+
+        return "SC: slowmode "+state+" requested";
     }
 
     private static String queryAdmin(Request req) {
@@ -805,6 +761,49 @@ public class MainApp extends SpringBootServletInitializer implements SparkApplic
         return status.toArray();
     }
 
+    private static String getDateString() {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+        return dateFormat.format(date);
+    }
+
+    private static File getJettyLogFile() {
+        Path logFolder = Paths.get(System.getProperty("user.dir")).getRoot();
+        logFolder = Paths.get(logFolder.toString(), "home\\LogFiles");
+        if (!logFolder.toFile().exists()) {
+            // not in standard azure log setup, exit
+            System.out.println("getJettyLogFile: not in Azure");
+            return null;
+        }
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
+
+        String name = "jetty_" + dateFormat.format(date) + ".stderrout.log";
+        Path logFile = Paths.get(logFolder.toString(), name);
+        System.out.println("GetJettyLog:" + logFile);
+        File f = logFile.toFile();
+        if (f.exists()) {
+            return f;
+        }
+
+        // try GMT
+        // convert date to localdatetime
+        LocalDateTime localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        // plus one
+        ZonedDateTime gmt = localDateTime.atZone(ZoneId.of("GMT"));
+
+        name = "jetty_" + dateFormat.format(gmt) + ".stderrout.log";
+        logFile = Paths.get(logFolder.toString(), name);
+        System.out.println("GetJettyLog:" + logFile);
+        f = logFile.toFile();
+        if (f.exists()) {
+            return f;
+        }
+        return null;
+
+    }
+
     private class Governor extends HashMap<String, GameEngineV2> {
 
         Governor() {
@@ -833,7 +832,7 @@ public class MainApp extends SpringBootServletInitializer implements SparkApplic
                                 e.log.removeStaleObservers();
                                 alive++;
                             } else {
-                                if (e.timeOfDeath < (System.currentTimeMillis() - (1000 * 60 * 60 * 24))) {
+                                if (e.timeOfDeath < (System.currentTimeMillis() - (1000L * 60L * 60L * 24L))) {
                                     // engine has been dead for 24 hours, remove from Governor map
                                     this.remove(e.name);
                                     System.gc();

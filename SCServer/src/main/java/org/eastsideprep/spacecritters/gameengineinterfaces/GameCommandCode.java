@@ -9,5 +9,7 @@ package org.eastsideprep.spacecritters.gameengineinterfaces;
  * @author gmein
  */
 public enum GameCommandCode {
-    AddElement, KillElement, Pause, Resume, List, End, RandSeed, Ready, SetConstant
+    AddElement, KillElement, Pause, Resume,
+    List, End, RandSeed, Ready, SetConstant,
+    SlowModeOn, SlowModeOff
 }

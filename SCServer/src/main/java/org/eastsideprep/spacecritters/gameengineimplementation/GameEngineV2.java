@@ -45,6 +45,7 @@ public class GameEngineV2 implements GameEngine {
     public String name;
     private boolean dead = false;
     public long timeOfDeath;
+    public boolean slow = false;
 
     static private URLClassLoader classLoader;
     static private Method addURL;
