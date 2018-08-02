@@ -7,7 +7,6 @@ package org.eastsideprep.spacecritters.gamelogic;
 import org.eastsideprep.spacecritters.gameengineinterfaces.AlienSpec;
 import org.eastsideprep.spacecritters.alieninterfaces.*;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameVisualizer;
-import gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import org.eastsideprep.spacecritters.orbit.DummyTrajectory;
