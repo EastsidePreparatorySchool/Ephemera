@@ -19,7 +19,7 @@ public class Ellipse extends Conic {
     public Ellipse(Orbitable focus, double p, double e, double theta,  double rotation, SpaceGrid sg) {
         super(focus, p, e, theta, rotation, sg);
 
-        M0 = theta; //TO DO
+        //M0 = theta; //TO DO
         prevE = M0;
         n = mu * mu * Math.pow(1 - e * e, 2f / 3f) / h * h * h;
 
@@ -41,7 +41,7 @@ public class Ellipse extends Conic {
         //I have math from this point on
 
         //find mean anomaly
-        double M = (n * t) - (orbits * 2 * Math.PI) + M0;
+        double M = (n * (t-t0)) - (orbits * 2 * Math.PI) + M0;
         //System.out.println("M: " + M);
         while (M > Math.PI) {
             M -= 2 * Math.PI;
@@ -49,7 +49,7 @@ public class Ellipse extends Conic {
             //System.out.println("loop: " + orbits);
         }
         //find eccentric anomaly
-        double E = (t == sg.getTime() && prevE != M0) ? prevE : M;
+        double E = (t == sg.getTime() && prevE != M0) ? prevE : Math.PI;
         double dE;
         int count = 0;
         do { //some calculouse black magic to find E (to within a certain accuracy)
