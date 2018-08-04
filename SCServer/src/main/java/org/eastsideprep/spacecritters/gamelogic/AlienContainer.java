@@ -131,13 +131,16 @@ public class AlienContainer {
             grid.gridDebugErr("ac: No trajectory or focus given");
             throw new InstantiationException();
         }
-
-        if (trajectory instanceof DummyTrajectory) {
+        
+        
+        
+        if (trajectory instanceof DummyTrajectory){
             this.trajectory = new Trajectory(
                     trajectory.currentFocus, //focus from the dummy trajectory
                     grid.rand.nextDouble() * 5 + 5, //semi-latus rectum
                     Math.pow(grid.rand.nextDouble(), 3), //Eccentricity
-                    grid.rand.nextDouble() * 2 * Math.PI, //rotation
+                    grid.rand.nextDouble()*2*Math.PI, //mNaught
+                    grid.rand.nextDouble()*2*Math.PI, //rotation
                     grid);
         } else {
             this.trajectory = trajectory.clone();
@@ -210,7 +213,9 @@ public class AlienContainer {
             movestandard();
         }
     }
-
+    
+    
+    
     public void movecomplex() throws NotEnoughTechException {
         /* FIND DELTAV */
         updated = true;
@@ -235,7 +240,16 @@ public class AlienContainer {
         
         // get next point on current trajectory
         nextP = trajectory.positionAtTime(grid.getTime());
-
+        
+        
+        //if just ran into star
+        if ( trajectory.currentFocus instanceof Star && trajectory.wasWithinRadius( Constants.starDeathRadius ) ) {
+            kill("Ran into star");
+            return;
+        }
+        
+        
+        
         /* CHARGE ALIEN FOR DELTAV */
         //aliens cannot change their trajectory if they are enot in the game limits
         if (GridDisk.isValidPoint(nextP.round())) {
@@ -247,9 +261,8 @@ public class AlienContainer {
                     deltaV = null;
                 }
             }
-        } else if (!trajectory.isBound()) {
-            System.out.println("Floated into the abyss");
-            kill("Floated into the abyss");
+        } else { //alien is in limbo
+            if (!trajectory.isBound()) kill("Floated into the abyss");
             return;
         }
 

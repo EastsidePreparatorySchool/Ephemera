@@ -29,9 +29,14 @@ public class Parabola extends Conic {
         double M = n * t + M0;
 
         double c = Math.pow(3 * M + Math.sqrt(9 * M * M + 1), 1f / 3f);
-
-        return 2 * Math.atan(c + 1f / c);
-
+        
+        
+        double theta = 2 * Math.atan(c + 1f / c);
+        if (t == sg.getTime()) {
+            theta0 = theta1;
+            theta1 = theta;
+        }
+        return theta;
         //always returns the same number. This is probably an issue
     }
 

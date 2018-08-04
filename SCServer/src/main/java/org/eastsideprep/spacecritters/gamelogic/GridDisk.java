@@ -117,6 +117,9 @@ public class GridDisk extends AbstractCollection<IntegerPosition> {
     public static boolean isValidPoint(IntegerPosition point) {
         return isValidX(point.x) && isValidY(point.y);
     }
+    public static boolean isValidPoint(int x, int y) {
+        return isValidX(x) && isValidY(y);
+    }
 
     public static boolean isValidX(int x) {
         return x > -Constants.width / 2 && x < Constants.width / 2 - 1;

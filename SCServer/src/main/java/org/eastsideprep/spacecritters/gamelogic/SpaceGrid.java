@@ -336,7 +336,7 @@ public class SpaceGrid {
                     vis.showMove(ac.getFullAlienSpec(),
                             oldX,
                             oldY,
-                            0,
+                            0, //Why are these both zero?
                             0,
                             ac.updated,
                             ac.trajectory);
