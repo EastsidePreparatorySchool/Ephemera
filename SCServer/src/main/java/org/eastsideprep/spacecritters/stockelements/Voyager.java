@@ -21,7 +21,7 @@ import static org.eastsideprep.spacecritters.stockelements.AggressiveAlien.dalek
 
 public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
 
-    final double MIN_ENERGY = 20.0;
+    final double MIN_ENERGY = 50.0;
     final double MIN_TECH = 10.0;
     final int RESEARCH_PERCENT = 30;
 
@@ -30,7 +30,9 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
     static TriangleMesh vger;
     boolean tooComplex = false;
     int startTurn;
-    long tLastAcc = 0;
+    long tBurn = 0;
+    SpaceObject target = null;
+    Position targetPosition = null;
 
     // don't do anything in the contructor, implicitly or explicitly!
     public Voyager() {
@@ -41,6 +43,8 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         // hang on to the context object
         this.ctx = ctx;
         this.startTurn = ctx.getGameTurn();
+        this.target = ctx.getSpaceObject("ProximaCentauri");
+        this.targetPosition = target.position;
     }
 
     @Override
@@ -79,6 +83,13 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
 
     @Override
     public Vector2 getAccelerate() {
+        Vector3 v = ctx.getVelocity();
+        Vector3 p = ctx.getPosition();
+        Vector3 f = ctx.getFocus().position;
+        double M = ctx.getMeanAnomaly();
+        Vector3 d3;
+        Vector2 d2;
+        double indicator;
 
         // if we are orbiting anything else than SOL, lay off the gas pedal
         SpaceObject so = ctx.getFocus();
@@ -90,16 +101,20 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
 
         // first, do we have energy and tech?
         if (ctx.getEnergy() < MIN_ENERGY || ctx.getTech() < MIN_TECH) {
-            return new Vector2(0, 0);
+            return null;
         }
 
-        // if we are all good, move us out a little from the center (Earth/Sun)
-        if ((System.currentTimeMillis() - tLastAcc) > 1000) {
-            tLastAcc = System.currentTimeMillis();
-            Vector2 v = ctx.getVelocity();
-            return v.scaleToLength(0.2);
+        // accelerate at the right time
+        d2 = new Vector2(f.subtract(this.targetPosition));
+        if (((d2.angle() - M) < 0.2) && ((d2.angle() - M) > -0.1)) {
+            tBurn = System.currentTimeMillis();
+            return new Vector2(v.scaleToLength(0.19));
         } else {
-            return null;
+            // widen the orbit a bit, but push toward target     
+            tBurn = System.currentTimeMillis();
+            Vector3 k = new Vector3(0, 0, 1);
+            d3 = d2.scale(-1).scaleToLength(0.0005);
+            return new Vector2(d3);
         }
     }
 

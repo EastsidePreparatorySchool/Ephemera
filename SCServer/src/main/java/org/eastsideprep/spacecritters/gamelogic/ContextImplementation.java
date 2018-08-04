@@ -233,6 +233,14 @@ public class ContextImplementation implements Context {
     }
 
     @Override
+    public double getMeanAnomaly() {
+        if (ac.trajectory != null) {
+            return ac.trajectory.conic.angleAtTime(ac.grid.getTime());
+        }
+        return (0.0);
+    }
+
+    @Override
     public SpaceObject getFocus() {
         if (ac.trajectory != null) {
             Orbitable focus = ac.trajectory.currentFocus;
@@ -255,10 +263,10 @@ public class ContextImplementation implements Context {
             if (iso.className.equalsIgnoreCase(name)) {
                 if (iso instanceof Star) {
                     Star s = (Star) iso;
-                    return new SpaceObject("STAR", s.className, s.position, s.mass, s.hillRadius);
+                    return new SpaceObject("STAR", s.className, new Position(s.position), s.mass, s.hillRadius);
                 } else if (iso instanceof Planet) {
                     Planet p = (Planet) iso;
-                    return new SpaceObject("PLANET", p.className, p.position, p.mass, p.hillRadius);
+                    return new SpaceObject("PLANET", p.className, new Position(p.position), p.mass, p.hillRadius);
                 }
             }
         }

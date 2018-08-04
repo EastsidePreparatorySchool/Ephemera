@@ -113,10 +113,10 @@ public class Vector2 extends Vector3 {
     }
 
     public static double normalizeAngle(double theta) {
-        while (theta < 0) {
+        while (theta < -Math.PI) {
             theta += 2 * Math.PI;
         }
-        while (theta > 2 * Math.PI) {
+        while (theta > Math.PI) {
             theta -= 2 * Math.PI;
         }
         return theta;
@@ -149,7 +149,7 @@ public class Vector2 extends Vector3 {
 
     @Override
     public String toString() {
-        return "(" + Math.round(x * 100) / 100 + "," + Math.round(y * 100) / 100 + ")";
+        return "(" +x+ "," + y+ ")";
     }
 
 }

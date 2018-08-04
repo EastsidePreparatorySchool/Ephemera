@@ -150,12 +150,12 @@ public abstract class Conic {
     }
 
     public Vector2 getVelocityAtTime(double t) {
-        double theta = angleAtTime(t);
+        double theta1 = angleAtTime(t);
 
-        double vperp = mu * (1 + e * Math.cos(theta)) / h * signum;
-        double vrad = mu * e * Math.sin(theta) / h;
+        double vperp = mu * (1 + e * Math.cos(theta1)) / h * signum;
+        double vrad = mu * e * Math.sin(theta1) / h;
 
-        Vector2 v = new Vector2(vrad, vperp).rotate(rotation + theta);
+        Vector2 v = new Vector2(vrad, vperp).rotate(rotation + theta1);
         return v;
     }
 

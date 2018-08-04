@@ -1061,9 +1061,7 @@ function onWindowResize() {
 
 
 function animate() {
-    if (!attached) {
-        return;
-    }
+  
     requestAnimationFrame(animate);
     // required if controls.enableDamping or controls.autoRotate are set to true
     controls.update();

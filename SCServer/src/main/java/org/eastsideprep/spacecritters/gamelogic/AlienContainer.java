@@ -215,6 +215,8 @@ public class AlienContainer {
     public void movecomplex() throws NotEnoughTechException {
         /* FIND DELTAV */
         updated = true;
+        double tolerance = 10; // percent
+
         Vector2 deltaV;
         try {
             deltaV = calien.getAccelerate();
@@ -267,14 +269,33 @@ public class AlienContainer {
             if (deltaV != null) {
                 v = v.add(deltaV);
             }
-            System.out.println("  exit velocity: " + v);
-            trajectory = new Trajectory(focus, nextP, v, grid);
 
-            v = trajectory.velocityAtTime(grid.getTime());
-            System.out.println("  entry velocity: " + v);
+            Trajectory trajectoryNew = new Trajectory(focus, nextP, v, grid);
+            Vector2 v2 = trajectoryNew.velocityAtTime(grid.getTime());
+
+            if (Math.abs(v.x / v2.x) > (1.0 + tolerance / 100.0)
+                    || Math.abs(v.x / v2.x) < (1.0 - tolerance / 100.0)
+                    || Math.abs(v.y / v2.y) > (1.0 + tolerance / 100.0)
+                    || Math.abs(v.y / v2.y) < (1.0 - tolerance / 100.0)) {
+                System.out.println("Focus change: entry/exit velocities do not match within tolerance values");
+                System.out.println("  exit velocity: " + v);
+                System.out.println("  entry velocity: " + v2);
+            }
+            trajectory = trajectoryNew;
             return;
         } else if (deltaV != null) { //if not, alter the old one
+            Vector2 v = trajectory.velocityAtTime(grid.getTime());
             trajectory.accelerate(deltaV, grid.getTime());
+            Vector2 v2 = trajectory.velocityAtTime(grid.getTime()).subtract(deltaV);
+            
+            if (Math.abs(v.x / v2.x) > (1.0 + tolerance / 100.0)
+                    || Math.abs(v.x / v2.x) < (1.0 - tolerance / 100.0)
+                    || Math.abs(v.y / v2.y) > (1.0 + tolerance / 100.0)
+                    || Math.abs(v.y / v2.y) < (1.0 - tolerance / 100.0)) {
+                System.out.println("Accelerate: adjusted entry/exit velocities do not match within tolerance values");
+                System.out.println("  exit velocity: " + v);
+                System.out.println("  entry velocity: " + v2);
+            }
             return;
         }
         updated = false;
