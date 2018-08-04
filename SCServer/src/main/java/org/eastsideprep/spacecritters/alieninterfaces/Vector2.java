@@ -48,11 +48,6 @@ public class Vector2 extends Vector3 {
         return new IntegerVector2(this);
     }
 
-    @Override
-    public String toString() {
-        return "(" + x + "," + y + ")";
-    }
-
     public boolean equals(Vector2 v) {
         return v.x == x && v.y == y;
     }
@@ -150,6 +145,11 @@ public class Vector2 extends Vector3 {
 
     public static Vector2 scaleToLength(Vector2 v, double scale) {
         return v.unit().scale(scale);
+    }
+
+    @Override
+    public String toString() {
+        return "(" + Math.round(x * 100) / 100 + "," + Math.round(y * 100) / 100 + ")";
     }
 
 }

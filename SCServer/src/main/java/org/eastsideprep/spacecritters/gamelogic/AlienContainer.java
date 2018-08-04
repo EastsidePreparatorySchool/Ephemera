@@ -226,7 +226,7 @@ public class AlienContainer {
         if (deltaV != null) {
             deltaV = deltaV.scale(1f / getMass());
         }
-        
+
         if (deltaV != null && deltaV.x == 0 && deltaV.y == 0) {
             deltaV = null; //if there is no acceleration, don't do anything
         }
@@ -267,7 +267,11 @@ public class AlienContainer {
             if (deltaV != null) {
                 v = v.add(deltaV);
             }
+            System.out.println("  exit velocity: " + v);
             trajectory = new Trajectory(focus, nextP, v, grid);
+
+            v = trajectory.velocityAtTime(grid.getTime());
+            System.out.println("  entry velocity: " + v);
             return;
         } else if (deltaV != null) { //if not, alter the old one
             trajectory.accelerate(deltaV, grid.getTime());
