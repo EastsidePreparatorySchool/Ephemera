@@ -10,7 +10,14 @@ package org.eastsideprep.spacecritters.stockelements;
  */
 import org.eastsideprep.spacecritters.alieninterfaces.*;
 //import com.interactivemesh.jfx.importer.stl.StlMeshImporter;
+import javafx.geometry.Point3D;
+import javafx.scene.shape.MeshView;
+import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.TriangleMesh;
+import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Scale;
+import javafx.scene.transform.Translate;
+import static org.eastsideprep.spacecritters.stockelements.AggressiveAlien.dalekMesh;
 
 public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
 
@@ -19,7 +26,6 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
     final int RESEARCH_PERCENT = 30;
 
     Context ctx;
-    long lastTime;
 
     static TriangleMesh vger;
     boolean tooComplex = false;
@@ -75,16 +81,14 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
 
         // first, do we have energy and tech?
         if (ctx.getEnergy() < MIN_ENERGY || ctx.getTech() < MIN_TECH) {
-            return null;
+            return new Vector2(0, 0);
         }
 
         // if we are all good, move us out a little from the center (Earth/Sun)
-        if ((System.currentTimeMillis() - lastTime) > 1000) {
-            lastTime = System.currentTimeMillis();
-            System.out.println("Voyager: accelerating");
+        if ((ctx.getGameTurn()-this.startTurn) < 50) {
             Position p = ctx.getPosition();
             Position p2 = new Position(-p.y, p.x);
-            return  p2.scaleToLength(0.1);
+            return  p2.scaleToLength(1.0);
         } else {
             return new Vector2(0, 0);
         }

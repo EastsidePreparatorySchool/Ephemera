@@ -45,7 +45,6 @@
                     </execution>
                 </executions>
             </plugin>
-            
          
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -83,9 +82,8 @@
                         <configuration>
                             <executable>${java.home}/bin/java</executable>
                             <!--<commandlineArgs>${runfx.args} both</commandlineArgs>-->
-                            <commandlineArgs>${runfx.args}</commandlineArgs>
                             <!--<commandlineArgs>${runfx.args} desktoponly</commandlineArgs>-->
-                            <!--<commandlineArgs>-Xmx400M ${runfx.args} serveronly</commandlineArgs>-->
+                            <commandlineArgs>-Xmx400M ${runfx.args} serveronly</commandlineArgs>
                         </configuration>
                     </execution>
                 </executions>  
@@ -131,37 +129,7 @@
                 <version>1.8</version>
                 <executions>
                     <execution>
-                        <id>copy1</id>
-                        <phase>compile</phase>
-                        <configuration>
-                            <target>
-                                <echo>ANT TASK - copying files....</echo>
-                                      
-                                <copy todir="${basedir}/src/main/resources/static/" overwrite="true">
-                                    <fileset dir="${basedir}/src/main/webapp">
-                                        <include name="*.html"/>
-                                    </fileset>
-                                </copy>
-                                
-                                <copy todir="${basedir}/src/main/resources/static/" overwrite="true">
-                                    <fileset dir="${basedir}/src/main/webapp">
-                                        <include name="*.png" />
-                                    </fileset>
-                                </copy>
-                                
-                                <copy todir="${basedir}/src/main/resources/static/js" overwrite="true">
-                                    <fileset dir="${basedir}/src/main/webapp/js">
-                                        <include name="*.js"/>
-                                    </fileset>
-                                </copy>                            
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution> 
-                    <execution>
-                        <id>copy2</id>
+                        <id>copy</id>
                         <phase>package</phase>
                         <configuration>
                             <target>

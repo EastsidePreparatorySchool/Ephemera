@@ -40,7 +40,6 @@ var observers = 0;
 // global states
 var attached = false;
 var running = false;
-var abort = false;
 
 // contants for update record types need to be in sync with SCGameLogEntry.java
 const ADDSPECIES = 1;
@@ -346,7 +345,6 @@ function uiStateChange(attachState, runState, data) {
             getStatus();
             queryAdmin();
             updates();
-            animate();
         } else {
 // now detached
             println("Last recorded turn: " + turnSpan.innerText);
@@ -359,7 +357,6 @@ function uiStateChange(attachState, runState, data) {
             speciesMap = null;
             grid = null;
             controls.autoRotate = false;
-            abort = true;
 
             //println("starting purge ...");
 
@@ -584,7 +581,7 @@ class Grid {
         this.halfHeight = Math.floor(height / 2);
         for (var x = 0; x < width; x++) {
             var col = Array(height);
-
+          
             this.grid[x] = col;
         }
     }
@@ -1064,11 +1061,6 @@ function onWindowResize() {
 
 
 function animate() {
-    if (abort) {
-        abort = false;
-        return;
-    }
-    
     requestAnimationFrame(animate);
     // required if controls.enableDamping or controls.autoRotate are set to true
     controls.update();

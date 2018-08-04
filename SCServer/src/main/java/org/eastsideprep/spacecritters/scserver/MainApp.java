@@ -64,19 +64,10 @@ public class MainApp implements SparkApplication {
             userDir += System.getProperty("file.separator") + "static";
 
             System.out.println("static dir: " + userDir);
+            port(8080);
+            staticFiles.externalLocation(userDir);
 
-            String port = System.getenv("PORT");
-            if (port != null) {
-                System.out.println("SC: environment prescribes using port " + port);
-                port(Integer.parseInt(port));
-            } else {
-                System.out.println("SC: listening on port 8080");
-                port(8080);
-            }
-//            staticFiles.externalLocation(userDir);
-            staticFiles.location("/static");
-
-            if (!(args.length == 0 || args[0].equalsIgnoreCase("serveronly"))) {
+            if (args.length == 0 || !args[0].equalsIgnoreCase("serveronly")) {
                 MainApp.createServerEngine = false; // will cause init() to not create server engine, default running mode
             }
             MainApp.app.init();
@@ -97,7 +88,6 @@ public class MainApp implements SparkApplication {
             } catch (Exception e) {
                 // catch and be quiet, then exit
             }
-            System.out.println("SC server exiting");
         } else if (args.length > 0
                 && (args[0].equalsIgnoreCase("desktoponly")
                 || args[0].equalsIgnoreCase("both"))) {
@@ -213,11 +203,6 @@ public class MainApp implements SparkApplication {
         if (ctx.observer == null) {
             return "SC: slowmode: not attached";
         }
-
-        if (!isAdmin(req)) {
-            return "client not authorized to use this API";
-        }
-
         String state = req.queryParams("state");
         if (state != null && state.equalsIgnoreCase("on")) {
             ctx.engine.queueCommand(new GameCommand(GameCommandCode.SlowModeOn));
@@ -225,7 +210,7 @@ public class MainApp implements SparkApplication {
             ctx.engine.queueCommand(new GameCommand(GameCommandCode.SlowModeOff));
         }
 
-        return "SC: slowmode " + state + " requested";
+        return "SC: slowmode "+state+" requested";
     }
 
     private static String queryAdmin(Request req) {
@@ -851,10 +836,9 @@ public class MainApp implements SparkApplication {
                                     // engine has been dead for 24 hours, remove from Governor map
                                     this.remove(e.name);
                                     System.gc();
-
-                                    System.out.println("Removed engine " + e.name + " time of death " + e.timeOfDeath);
-                                    System.out.println(" Current time " + System.currentTimeMillis());
-                                }
+                                    
+                                    System.out.println("Removed engine "+e.name +" time of death "+e.timeOfDeath);
+                                    System.out.println(" Current time "+System.currentTimeMillis());}
                             }
                         }
                     }

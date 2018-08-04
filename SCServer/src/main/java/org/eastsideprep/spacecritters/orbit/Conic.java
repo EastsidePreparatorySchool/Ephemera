@@ -36,48 +36,41 @@ public abstract class Conic {
     double mu;
     double M0;
     double n;
-    double t0;
-   
-
+    
     double theta;
 
     SpaceGrid sg;
-
+    
+    
     public static Conic newConic(Orbitable focus, Vector2 r, Vector2 v, double t, SpaceGrid sg) {
         v = v.subtract(focus.velocity(sg.getTime()));
         r = r.subtract(focus.position(sg.getTime())).scale(Constants.deltaX);
-        System.out.println("r angle to f: " + Vector2.normalizeAngle(r.angle()));
-//        System.out.println("r: ("+r.x+","+r.y+","+r.z+")");
-
+        //System.out.println("Measured angle: " + r.angle());
+        
         Vector3 h = r.cross(v);
-//        System.out.println("h: ("+h.x+","+h.y+","+h.z+")");
         double hm = h.magnitude();
-//        System.out.println("New H: " + hm);
-
+        //System.out.println("New H: " + hm);
+        
         double mu = focus.mass() * Constants.G;
-
+        
         double rm = r.magnitude();
-
-        Vector3 e = v.cross(h).scale(1 / mu).subtract(r.unit());
-        //e = (r.scale(Math.pow(v.magnitude(),2)-mu/r.magnitude()).subtract(v.scale(r.dot(v)))).scale(1/mu);
-
+        
+        Vector3 e = v.cross(h).scale(1/mu).subtract(r.unit());
+        
         double em = e.magnitude();
-
-        double p = hm * hm / mu;
-        double rotation = Vector2.normalizeAngle(Math.atan2(e.y, e.x));//Math.asin( v.dot(r.unit()) * hm / (mu*em) ) - theta;
-        System.out.println("rotation: " + rotation);
-        double theta = Vector2.normalizeAngle(r.angle() - rotation);
-        System.out.println("theta: " + theta);
-        ////
+        
+        double p = hm*hm/mu;
+        double rotation = Math.atan2(e.y, e.x);//Math.asin( v.dot(r.unit()) * hm / (mu*em) ) - theta;
+        double theta = r.angle() - rotation;//Math.acos((p/rm - 1) / em);//Math.acos(e.dot(r) / (em*rm));
+        
 //        System.out.println("some values:");
 //        System.out.println("e: " + em);
 //        System.out.println("p: " + p/Constants.deltaX);
-//        System.out.println("theta: " + theta);
+        System.out.println("theta: " + theta);
 //        System.out.println("rotation of conic: " + rotation);
-
-        return newConic(focus, p / Constants.deltaX, em, theta, rotation, sg);
+        
+        return newConic(focus, p/Constants.deltaX, em, theta, rotation, sg);
     }
-
     public static Conic newConic(Orbitable focus, double p, double e, double theta, double rotation, SpaceGrid sg) {
         if (e == 0) {
             return new Circle(focus, p, e, theta, rotation, sg);
@@ -103,12 +96,13 @@ public abstract class Conic {
         this.mu = Constants.G * focus.mass();
 
         this.sg = sg;
-
+        
+        
         this.h = Math.sqrt(this.p * mu);
-
+        
         this.theta = theta;
         this.M0 = MAtAngle(theta);
-        this.t0 = sg.getTime();
+        
 
         //p = h^2 / mu              semi-latus rectum
         //r = p / (1 + ||e|| cos theta)
@@ -128,7 +122,7 @@ public abstract class Conic {
     public abstract double timeAtAngle(double theta);
 
     public abstract double nextTimeAtAngle(double theta, double t);
-
+    
     public abstract double MAtAngle(double theta);
 
     public Position positionAtAngle(double theta) {
@@ -143,23 +137,23 @@ public abstract class Conic {
         double theta = angleAtTime(t);
         return positionAtAngle(theta).add(focus.position(t));
     }
-
+    
+    
     @Override
     public Conic clone() {
-        return newConic(focus, p / Constants.deltaX, e, theta, rotation, sg);
+        return newConic(focus, p/Constants.deltaX, e, theta, rotation, sg);
     }
-
     public Vector2 getVelocityAtTime(double t) {
         double theta = angleAtTime(t);
-
-        double vperp = mu * (1 + e * Math.cos(theta)) / h;
+        
+        double vperp = mu * (1+ e*Math.cos(theta)) / h;
         double vrad = mu * e * Math.sin(theta) / h;
-
+        
         Vector2 v = new Vector2(vrad, vperp).rotate(rotation + theta);
         return v;
     }
-
+    
     public double partialHillRadius() {
-        return p * (1 - e) / ((1 - e * e) * Math.pow(3 * focus.mass(), 1f / 3)) / Constants.deltaX;
+        return p  * (1-e)/ ( (1-e*e) * Math.pow(3*focus.mass(), 1f/3) ) / Constants.deltaX;
     }
 }

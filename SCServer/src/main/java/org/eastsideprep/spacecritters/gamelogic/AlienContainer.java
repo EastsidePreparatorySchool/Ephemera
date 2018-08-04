@@ -135,8 +135,8 @@ public class AlienContainer {
         if (trajectory instanceof DummyTrajectory) {
             this.trajectory = new Trajectory(
                     trajectory.currentFocus, //focus from the dummy trajectory
-                    grid.rand.nextDouble() * 5 + 5, //semi-latus rectum
-                    Math.pow(grid.rand.nextDouble(), 3), //Eccentricity
+                    grid.rand.nextDouble() * 3 + 5, //semi-latus rectum
+                    Math.pow(grid.rand.nextDouble(), 2), //Eccentricity
                     grid.rand.nextDouble() * 2 * Math.PI, //rotation
                     grid);
         } else {
@@ -215,25 +215,15 @@ public class AlienContainer {
         /* FIND DELTAV */
         updated = true;
         Vector2 deltaV;
-        
-        // get from alien
         try {
-            deltaV = calien.getAccelerate();
+            deltaV = calien.getAccelerate().scale(1f / getMass());
         } catch (UnsupportedOperationException e) {
             deltaV = null;
         }
 
-        // scale to mass
-        if (deltaV != null) {
-            deltaV = deltaV.scale(1f / getMass());
-        }
-        
-        // check for null
-        if (deltaV != null && deltaV.x == 0 && deltaV.y == 0) {
+        if (deltaV.x == 0 && deltaV.y == 0) {
             deltaV = null; //if there is no acceleration, don't do anything
         }
-        
-        // get next point on current trajectory
         nextP = trajectory.positionAtTime(grid.getTime());
 
         /* CHARGE ALIEN FOR DELTAV */
