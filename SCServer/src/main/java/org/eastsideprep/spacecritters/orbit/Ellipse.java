@@ -5,6 +5,7 @@
  */
 package org.eastsideprep.spacecritters.orbit;
 
+import org.eastsideprep.spacecritters.alieninterfaces.Vector2;
 import org.eastsideprep.spacecritters.gamelogic.SpaceGrid;
 import org.eastsideprep.spacecritters.gamelogic.Constants;
 
@@ -19,9 +20,9 @@ public class Ellipse extends Conic {
     public Ellipse(Orbitable focus, double p, double e, double theta,  double rotation, SpaceGrid sg) {
         super(focus, p, e, theta, rotation, sg);
 
-        M0 = theta; //TO DO
-        prevE = M0;
-        n = mu * mu * Math.pow(1 - e * e, 2f / 3f) / h * h * h;
+        //M0 = theta; // to do: This overrrides the more meaningful code in super()
+        prevE = Math.PI; // seeding point for finding E. Pi always converges.
+        n = mu * mu * Math.pow(1 - e * e, 2f / 3f) / h * h * h; // angular velocity
 
         orbits = 0;
     }
@@ -48,21 +49,25 @@ public class Ellipse extends Conic {
             orbits++;
             //System.out.println("loop: " + orbits);
         }
-        //find eccentric anomaly
-        double E = (t == sg.getTime() && prevE != M0) ? prevE : M;
+        
+        //find eccentric anomaly using the Newton-Raphson method on Kepler's equation
+        double E = prevE;
         double dE;
         int count = 0;
-        do { //some calculouse black magic to find E (to within a certain accuracy)
+        do { 
             dE = E - e * Math.sin(E) - M;
             E -= dE / (1 - e * Math.cos(E));
             if (++count > 1000) {
-                System.err.println("Stuck in loop in Ellipse EAtTime");
+                System.err.println("Stuck in Newton-Raphson loop in Ellipse:EAtTime");
                 break;
             }
         } while (Math.abs(dE) >= Constants.accuracy);
 
+        // give us a good starting point for next time
         if (t == sg.getTime()) {
             prevE = E;
+        } else {
+            prevE = Math.PI;
         }
         return E;
     }

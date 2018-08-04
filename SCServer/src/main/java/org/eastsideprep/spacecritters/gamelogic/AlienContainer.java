@@ -135,8 +135,8 @@ public class AlienContainer {
         if (trajectory instanceof DummyTrajectory) {
             this.trajectory = new Trajectory(
                     trajectory.currentFocus, //focus from the dummy trajectory
-                    grid.rand.nextDouble() * 3 + 5, //semi-latus rectum
-                    Math.pow(grid.rand.nextDouble(), 2), //Eccentricity
+                    grid.rand.nextDouble() * 5 + 5, //semi-latus rectum
+                    Math.pow(grid.rand.nextDouble(), 3), //Eccentricity
                     grid.rand.nextDouble() * 2 * Math.PI, //rotation
                     grid);
         } else {
