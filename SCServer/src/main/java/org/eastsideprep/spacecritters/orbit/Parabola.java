@@ -14,8 +14,8 @@ import org.eastsideprep.spacecritters.gamelogic.SpaceGrid;
  */
 public class Parabola extends Conic {
 
-    public Parabola(Orbitable focus, double p, double e, double theta, double rotation, SpaceGrid sg) {
-        super(focus, p, e, theta, rotation, sg);
+    public Parabola(Orbitable focus, double p, double e, double theta, double signum, double rotation, SpaceGrid sg) {
+        super(focus, p, e, theta,  signum, rotation, sg);
 
         M0 = theta;
         n = mu * mu / (h * h * h);

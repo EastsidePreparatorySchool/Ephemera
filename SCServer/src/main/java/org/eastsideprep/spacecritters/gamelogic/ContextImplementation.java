@@ -9,12 +9,13 @@ import org.eastsideprep.spacecritters.gameengineinterfaces.GameVisualizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import org.eastsideprep.spacecritters.orbit.Orbitable;
 
 /**
  *
  * @author guberti
  */
-public  class ContextImplementation implements Context {
+public class ContextImplementation implements Context {
 
     private final AlienContainer ac;
     public GameVisualizer vis;
@@ -201,12 +202,12 @@ public  class ContextImplementation implements Context {
     public double getDistance(Vector2 p1, Vector2 p2) {
         return p1.subtract(p2).magnitude();
     }
-    
+
     @Override
     public int getDistance(IntegerPosition p1, IntegerPosition p2) {
         return (int) p1.subtract(p2).magnitude();
     }
-    
+
     @Override
     public List<IntegerPosition> computeOrbit(IntegerPosition center, int radius) { //Note: DISABLED. No one uses it and it needs to be rewtirren with conics anyway
         //GridCircle gc = new GridCircle(center.x, center.y, radius);
@@ -221,6 +222,47 @@ public  class ContextImplementation implements Context {
     @Override
     public AlienSpecies getMyAlienSpecies() {
         return new AlienSpecies(ac.domainName, ac.packageName, ac.className, ac.speciesID, ac.p.round().x, ac.p.round().y); //[kludge]
+    }
+
+    @Override
+    public Vector2 getVelocity() {
+        if (ac.trajectory != null) {
+            return ac.trajectory.velocityAtTime(ac.grid.getTime());
+        }
+        return (null);
+    }
+
+    @Override
+    public SpaceObject getFocus() {
+        if (ac.trajectory != null) {
+            Orbitable focus = ac.trajectory.currentFocus;
+            if (focus != null) {
+                if (focus instanceof Star) {
+                    Star s = (Star) focus;
+                    return new SpaceObject("STAR", s.className, s.position, s.mass, s.hillRadius);
+                } else if (focus instanceof Planet) {
+                    Planet p = (Planet) focus;
+                    return new SpaceObject("PLANET", p.className, p.position, p.mass, p.hillRadius);
+                }
+            }
+        }
+        return (null);
+    }
+
+    @Override
+    public SpaceObject getSpaceObject(String name) {
+        for (InternalSpaceObject iso : this.ac.grid.objects) {
+            if (iso.className.equalsIgnoreCase(name)) {
+                if (iso instanceof Star) {
+                    Star s = (Star) iso;
+                    return new SpaceObject("STAR", s.className, s.position, s.mass, s.hillRadius);
+                } else if (iso instanceof Planet) {
+                    Planet p = (Planet) iso;
+                    return new SpaceObject("PLANET", p.className, p.position, p.mass, p.hillRadius);
+                }
+            }
+        }
+        return null;
     }
 
 }

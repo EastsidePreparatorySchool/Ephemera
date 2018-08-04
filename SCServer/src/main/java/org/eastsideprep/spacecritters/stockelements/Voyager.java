@@ -80,6 +80,14 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
     @Override
     public Vector2 getAccelerate() {
 
+        // if we are orbiting anything else than SOL, lay off the gas pedal
+        SpaceObject so = ctx.getFocus();
+        if (so != null) {
+            if (!so.name.equalsIgnoreCase("SOL")) {
+                return null;
+            }
+        }
+
         // first, do we have energy and tech?
         if (ctx.getEnergy() < MIN_ENERGY || ctx.getTech() < MIN_TECH) {
             return new Vector2(0, 0);
@@ -88,9 +96,8 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         // if we are all good, move us out a little from the center (Earth/Sun)
         if ((System.currentTimeMillis() - tLastAcc) > 1000) {
             tLastAcc = System.currentTimeMillis();
-            Position p = ctx.getPosition();
-            Position p2 = new Position(-p.y, p.x);
-            return  p2.scaleToLength(0.1);
+            Vector2 v = ctx.getVelocity();
+            return v.scaleToLength(0.2);
         } else {
             return null;
         }

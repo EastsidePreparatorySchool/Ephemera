@@ -17,13 +17,13 @@ public class Ellipse extends Conic {
 
     double prevE;
 
-    public Ellipse(Orbitable focus, double p, double e, double theta,  double rotation, SpaceGrid sg) {
-        super(focus, p, e, theta, rotation, sg);
+    public Ellipse(Orbitable focus, double p, double e, double theta, double signum, double rotation, SpaceGrid sg) {
+        super(focus, p, e, theta, signum, rotation, sg);
 
-        //M0 = theta; // to do: This overrrides the more meaningful code in super()
         prevE = Math.PI; // seeding point for finding E. Pi always converges.
-        n = mu * mu * Math.pow(1 - e * e, 2f / 3f) / h * h * h; // angular velocity
-
+        n = (mu * mu) * Math.pow(1 - e * e, 2f / 3f) / h * h * h; // angular velocity
+        n *= signum;
+        System.out.println("New ellipse: signum " + signum);
         orbits = 0;
     }
 
@@ -42,24 +42,31 @@ public class Ellipse extends Conic {
         //I have math from this point on
 
         //find mean anomaly
-        double M = (n * (t-t0)) - (orbits * 2 * Math.PI) + M0;
+        double M = (n * (t - t0)) - (orbits * 2 * Math.PI) + M0;
         //System.out.println("M: " + M);
         while (M > Math.PI) {
             M -= 2 * Math.PI;
             orbits++;
             //System.out.println("loop: " + orbits);
         }
-        
+
         //find eccentric anomaly using the Newton-Raphson method on Kepler's equation
         double E = prevE;
         double dE;
+        boolean retry = true;
         int count = 0;
-        do { 
+        do {
             dE = E - e * Math.sin(E) - M;
             E -= dE / (1 - e * Math.cos(E));
-            if (++count > 1000) {
-                System.err.println("Stuck in Newton-Raphson loop in Ellipse:EAtTime");
-                break;
+            if (++count > 20) {
+                if (retry) {
+                    retry = false;
+                    System.err.println("Stuck in Newton-Raphson loop in Ellipse:EAtTime - retrying from Pi");
+                    E = Math.PI;
+                } else {
+                    System.err.println("Stuck in Newton-Raphson loop in Ellipse:EAtTime - aborting");
+                    break;
+                }
             }
         } while (Math.abs(dE) >= Constants.accuracy);
 
@@ -71,8 +78,6 @@ public class Ellipse extends Conic {
         }
         return E;
     }
-
-  
 
     @Override
     public double angleAtTime(double t) {

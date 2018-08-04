@@ -19,6 +19,12 @@ public interface Context {
 
     Position getPosition();
     
+    Vector2 getVelocity();
+    
+    SpaceObject getFocus();
+    
+    SpaceObject getSpaceObject(String name);
+    
     IntegerPosition getIntegerPosition();
 
     View getView(int size) throws NotEnoughEnergyException, NotEnoughTechException;

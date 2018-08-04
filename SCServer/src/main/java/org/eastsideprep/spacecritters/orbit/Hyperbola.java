@@ -16,8 +16,8 @@ public class Hyperbola extends Conic {
 
     double prevF;
 
-    public Hyperbola(Orbitable focus, double p, double e, double theta, double rotation, SpaceGrid sg) {
-        super(focus, p, e, theta, rotation, sg);
+    public Hyperbola(Orbitable focus, double p, double e, double theta, double signum, double rotation, SpaceGrid sg) {
+        super(focus, p, e, theta, signum, rotation, sg);
 
         M0 = theta;//TO DO
         prevF = M0;

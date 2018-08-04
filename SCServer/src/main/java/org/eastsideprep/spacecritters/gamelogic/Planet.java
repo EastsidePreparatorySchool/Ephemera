@@ -35,7 +35,12 @@ public class Planet extends InternalSpaceObject {
 
     public void init() {
         // slight random eccentricity
-        this.trajectory = new Trajectory(parent,radius,grid.rand.nextDouble()* 0.5,grid.rand.nextDouble()*Math.PI,grid);
+        this.trajectory = new Trajectory(parent,
+                radius, // p
+                grid.rand.nextDouble()* 0.5, // e
+                1.0,    // signum
+                grid.rand.nextDouble()*Math.PI, //rotation
+                grid);
         position = trajectory.positionAtTime(grid.getTime());
         
         hillRadius = trajectory.partialHillRadius() * Math.pow(mass, 1f/3);

@@ -13,10 +13,14 @@ public class SpaceObject {
     final public String kind;
     final public String name;
     final public Position position;
+    final public double mass;
+    final public double hillRadius;
 
-    public SpaceObject(String kind, String name, Position position) {
+    public SpaceObject(String kind, String name, Position position, double mass, double hillRadius) {
         this.name = name;
         this.kind = kind;
         this.position = position;
+        this.mass = mass;
+        this.hillRadius = hillRadius;
     }
 }

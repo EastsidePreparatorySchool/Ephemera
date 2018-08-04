@@ -61,11 +61,11 @@ public class ViewImplementation implements View {
     public List<AlienSpecies> getAliensInView() { //[Q]
         LinkedList<AlienSpecies> as = new LinkedList<>();
 
-        for (IntegerPosition p: new GridDisk(centerX, centerY, size)) {
+        for (IntegerPosition p : new GridDisk(centerX, centerY, size)) {
             AlienCell acs = ag.getAliensAt(p);
-                if (acs != null) {
-                    as.addAll(acs.speciesMap.keySet());
-                }
+            if (acs != null) {
+                as.addAll(acs.speciesMap.keySet());
+            }
         }
 
         return as;
@@ -83,11 +83,13 @@ public class ViewImplementation implements View {
         AlienCell acs = ag.getAliensAt(p);
         if (acs != null) {
             if (acs.star != null) {
-                return new SpaceObject("Star", acs.star.className, acs.star.position);
+                return new SpaceObject("Star", acs.star.className, acs.star.position, acs.star.mass, acs.star.hillRadius);
             } else if (acs.planet != null) {
                 return new SpaceObject("Planet",
                         p.v2().subtract(new Vector2(centerX, centerY)).magnitude() < 1 ? acs.planet.className : "",
-                        acs.planet.position);
+                        acs.planet.position,
+                        acs.star.mass,
+                        acs.star.hillRadius);
                 // you only get to know the name of a planet by landing on it
             }
         }
@@ -98,18 +100,24 @@ public class ViewImplementation implements View {
     public List<SpaceObject> getSpaceObjectsInView() { //[Q]
         LinkedList<SpaceObject> sos = new LinkedList<>();
         SpaceObject so = null;
-        
-        for (IntegerPosition p: new GridDisk(centerX, centerY, size, true)) {
+
+        for (IntegerPosition p : new GridDisk(centerX, centerY, size, true)) {
             so = null;
             AlienCell acs = ag.getAliensAt(p);
             if (acs != null) {
                 if (acs.star != null) {
-                    so = new SpaceObject("Star", acs.star.className, acs.star.position);
+                    so = new SpaceObject("Star", acs.star.className, acs.star.position,
+                        acs.star.mass,
+                        acs.star.hillRadius);
                 } else if (acs.planet != null) {
-                    so = new SpaceObject("Planet", "", acs.planet.position);
+                    so = new SpaceObject("Planet", "", acs.planet.position,
+                        acs.planet.mass,
+                        acs.planet.hillRadius);
                 }
             }
-            if (so != null) sos.add(so);
+            if (so != null) {
+                sos.add(so);
+            }
         }
 
         return sos;
@@ -119,12 +127,14 @@ public class ViewImplementation implements View {
     public List<AlienSpecies> getClosestAliens() { //[Q]
 
         LinkedList<AlienSpecies> as = new LinkedList<>();
-        
+
         SortedGridDisk gd = new SortedGridDisk(centerX, centerY, size);
-        for (IntegerPosition p: gd) {
+        for (IntegerPosition p : gd) {
             AlienCell acs = ag.getAliensAt(p);
-            if (acs != null) as.addAll(acs.speciesMap.keySet());
-            
+            if (acs != null) {
+                as.addAll(acs.speciesMap.keySet());
+            }
+
             if (as.size() > 0 && gd.isLastOfShell(p)) {
                 return as;
             }
@@ -148,10 +158,9 @@ public class ViewImplementation implements View {
         LinkedList<AlienSpecies> as = null;
 
         SortedGridDisk gd = new SortedGridDisk(centerX, centerY, size, true);
-        for (IntegerPosition p: gd) {
+        for (IntegerPosition p : gd) {
             AlienCell acs = ag.getAliensAt(p);
             if (acs != null) {
-
 
                 LinkedList<AlienSpecies> bunch = acs.getAllSpeciesWithPredicateAndPosition((species) -> species == specific, p);
                 if (bunch != null) {
@@ -182,9 +191,9 @@ public class ViewImplementation implements View {
             avoid = this.ac.grid.speciesMap.get(notThisOne.getFullSpeciesName());
         }
         LinkedList<AlienSpecies> as = null;
-        
+
         SortedGridDisk gd = new SortedGridDisk(centerX, centerY, size);
-        for (IntegerPosition p:gd) {
+        for (IntegerPosition p : gd) {
             AlienCell acs = ag.getAliensAt(p);
             if (acs != null) {
                 LinkedList<AlienSpecies> bunch = acs.getAllSpeciesWithPredicateAndPosition((species) -> species != avoid, p);
@@ -196,11 +205,12 @@ public class ViewImplementation implements View {
                 }
             }
             // if any added in this circle, return
-            if (as != null && as.size() > 0 && gd.isLastOfShell(p)) return as;
-            
+            if (as != null && as.size() > 0 && gd.isLastOfShell(p)) {
+                return as;
+            }
+
         }
-        
-        
+
         return as;
     }
 

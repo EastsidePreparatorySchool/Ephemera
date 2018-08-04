@@ -1026,7 +1026,7 @@ function init() {
     this.controls.addEventListener('end', function () {
         autorotateTimeout = setTimeout(function () {
             controls.autoRotate = true;
-        }, 30000);
+        }, 120000);
     });
     light = new THREE.AmbientLight(0x404040);
     scene.add(light);
@@ -1061,6 +1061,9 @@ function onWindowResize() {
 
 
 function animate() {
+    if (!attached) {
+        return;
+    }
     requestAnimationFrame(animate);
     // required if controls.enableDamping or controls.autoRotate are set to true
     controls.update();
