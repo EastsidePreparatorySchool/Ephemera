@@ -10,7 +10,6 @@ package org.eastsideprep.spacecritters.alieninterfaces;
  * @author qbowers
  */
 public class Vector2 extends Vector3 {
-    
 
     public Vector2() {
     }
@@ -73,7 +72,7 @@ public class Vector2 extends Vector3 {
     public Vector2 add(Vector2 v) {
         return Vector2.add(this, v);
     }
-    
+
     public Vector3 add(Vector3 v) {
         return Vector3.add(this, v);
     }
@@ -81,6 +80,7 @@ public class Vector2 extends Vector3 {
     public Vector2 subtract(Vector2 v) {
         return Vector2.subtract(this, v);
     }
+
     public Vector3 subtract(Vector3 v) {
         return Vector3.subtract(this, v);
     }
@@ -100,31 +100,32 @@ public class Vector2 extends Vector3 {
     public Vector2 scaleToLength(double scale) {
         return Vector2.scaleToLength(this, scale);
     }
-    
-    
+
     public Vector2 rotate(double theta) {
         return Vector2.rotate(this, theta);
     }
-    
+
     public double angle() {
-        double angle = Math.atan2(y,x);
-        return angle + (angle < 0 ? 2*Math.PI:0);
+        double angle = Math.atan2(y, x);
+        return angle + (angle < 0 ? 2 * Math.PI : 0);
     }
-    
-    
+
     public static Vector2 rotate(Vector2 v, double theta) {
-        double x = v.x*Math.cos(theta) - v.y*Math.sin(theta);
-        double y = v.x*Math.sin(theta) + v.y*Math.cos(theta);
-        
-        return new Vector2(x,y);
+        double x = v.x * Math.cos(theta) - v.y * Math.sin(theta);
+        double y = v.x * Math.sin(theta) + v.y * Math.cos(theta);
+
+        return new Vector2(x, y);
     }
 
-    
-    
-
-    
-
-    
+    public static double normalizeAngle(double theta) {
+        while (theta < 0) {
+            theta += 2 * Math.PI;
+        }
+        while (theta > 2 * Math.PI) {
+            theta -= 2 * Math.PI;
+        }
+        return theta;
+    }
 
     public static Vector2 add(Vector2 a, Vector2 b) {
         return new Vector2(a.x + b.x, a.y + b.y);

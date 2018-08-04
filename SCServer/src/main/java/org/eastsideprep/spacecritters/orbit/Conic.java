@@ -46,6 +46,7 @@ public abstract class Conic {
     public static Conic newConic(Orbitable focus, Vector2 r, Vector2 v, double t, SpaceGrid sg) {
         v = v.subtract(focus.velocity(sg.getTime()));
         r = r.subtract(focus.position(sg.getTime())).scale(Constants.deltaX);
+        double rAngle = Vector2.normalizeAngle(r.angle());
         //System.out.println("Measured angle: " + r.angle());
         
         Vector3 h = r.cross(v);
@@ -62,12 +63,14 @@ public abstract class Conic {
         
         double p = hm*hm/mu;
         double rotation = Math.atan2(e.y, e.x);//Math.asin( v.dot(r.unit()) * hm / (mu*em) ) - theta;
-        double theta = r.angle() - rotation;//Math.acos((p/rm - 1) / em);//Math.acos(e.dot(r) / (em*rm));
+        rotation = Vector2.normalizeAngle(rotation);
+        double theta = rAngle - rotation;//Math.acos((p/rm - 1) / em);//Math.acos(e.dot(r) / (em*rm));
+        theta = Vector2.normalizeAngle(theta);
         
 //        System.out.println("some values:");
 //        System.out.println("e: " + em);
 //        System.out.println("p: " + p/Constants.deltaX);
-        System.out.println("theta: " + theta);
+//        System.out.println("theta: " + theta);
 //        System.out.println("rotation of conic: " + rotation);
         
         return newConic(focus, p/Constants.deltaX, em, theta, rotation, sg);
