@@ -40,11 +40,9 @@ public abstract class Conic {
    
 
     double theta;
-    
-    double theta0;
-    double theta1;
 
     SpaceGrid sg;
+
     public static Conic newConic(Orbitable focus, Vector2 r, Vector2 v, double t, SpaceGrid sg) {
         v = v.subtract(focus.velocity(sg.getTime()));
         r = r.subtract(focus.position(sg.getTime())).scale(Constants.deltaX);
@@ -111,7 +109,6 @@ public abstract class Conic {
         this.theta = theta;
         this.M0 = MAtAngle(theta);
         this.t0 = sg.getTime();
-        
 
         //p = h^2 / mu              semi-latus rectum
         //r = p / (1 + ||e|| cos theta)
@@ -133,18 +130,15 @@ public abstract class Conic {
     public abstract double nextTimeAtAngle(double theta, double t);
 
     public abstract double MAtAngle(double theta);
-    
-    public double radiusAtAngle(double theta) { return p / (1 + e * Math.cos(theta)); }
-    public double angleAtRadius(double r) { return Math.acos((r - p) / (-r*e)); }
-    
+
     public Position positionAtAngle(double theta) {
-        double r = radiusAtAngle(theta);
+        double r = p / (1 + e * Math.cos(theta));
         if (r < 0 && Math.abs(theta) < Math.PI) {
             System.out.println("Radius was negative at angle " + theta);
         }
         return new Position(r * Math.cos(theta + rotation), r * Math.sin(theta + rotation)).scale(1f / Constants.deltaX);
     }
-    
+
     public Position positionAtTime(double t) {
         double theta = angleAtTime(t);
         return positionAtAngle(theta).add(focus.position(t));
@@ -167,11 +161,5 @@ public abstract class Conic {
 
     public double partialHillRadius() {
         return p * (1 - e) / ((1 - e * e) * Math.pow(3 * focus.mass(), 1f / 3)) / Constants.deltaX;
-    }
-    
-    public double periapse() { return radiusAtAngle(0); }
-    public double apoapse() { 
-        if (this instanceof Parabola || this instanceof Hyperbola) return Double.POSITIVE_INFINITY;
-        return radiusAtAngle(Math.PI);
     }
 }

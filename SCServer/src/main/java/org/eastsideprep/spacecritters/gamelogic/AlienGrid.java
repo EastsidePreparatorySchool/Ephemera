@@ -16,7 +16,6 @@ import java.util.LinkedList;
 public class AlienGrid extends LinkedList<AlienContainer> {
 
     AlienCell[][] acGrid;
-    public AlienCell limbo = new AlienCell();
     int centerX;
     int centerY;
     int width;
@@ -55,24 +54,19 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         return ac;
     }
 
-    public void move(AlienContainer ac, int oldX, int oldY, int newX, int newY) {
-        AlienCell acs = getAliensAt(oldX, oldY);//acGrid[oldX + centerX][oldY + centerY];
-        
+    public void move(AlienContainer ac, int oldX, int oldY, int newX, int newY) { //[Q]
+        AlienCell acs = acGrid[oldX + centerX][oldY + centerY];
         //ac.debugOut("Grid: removing from list " + getXYString(oldX, oldY));
         acs.remove(ac);
         acs.energyPerAlien = 0;
         if (canBeRemoved(acs)) {
             acGrid[oldX + centerX][oldY + centerY] = null;
         }
-        
-        if (GridDisk.isValidPoint(newX, newY)) {
-            acs = acGrid[newX + centerX][newY + centerY];
-            if (acs == null) {
-                acs = new AlienCell();
-                acGrid[newX + centerX][newY + centerY] = acs;
-            }
-        } else {
-            acs = limbo;
+
+        acs = acGrid[newX + centerX][newY + centerY];
+        if (acs == null) {
+            acs = new AlienCell();
+            acGrid[newX + centerX][newY + centerY] = acs;
         }
         acs.add(ac);
         acs.energyPerAlien = 0;
@@ -80,7 +74,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         //ac.debugOut("Grid: added to list " + getXYString(newX, newY));
     }
 
-    public void unplug(AlienContainer ac) {
+    public void unplug(AlienContainer ac) { //[Q]
         // remove alien from grid 
         IntegerPosition p = ac.p.round();
 
@@ -101,13 +95,12 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     }
 
     public AlienCell getAliensAt(IntegerVector2 p) {
-        if (GridDisk.isValidPoint(new IntegerPosition(p))) return acGrid[p.x + centerX][p.y + centerY];
-        else return limbo;
+        return getAliensAt(p.x, p.y);
     }
 
-    /*public AlienCell getAliensAt(int x, int y) {
+    public AlienCell getAliensAt(int x, int y) {
         return acGrid[x + centerX][y + centerY];
-    }*/
+    }
 
     public boolean isEmptyAt(int x, int y) {
         return acGrid[x + centerX][y + centerY] == null;
@@ -131,7 +124,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         acs.energy = st.energy;
     }
 
-    public void plugPlanet(Planet planet) {
+    public void plugPlanet(Planet planet) { //[Q]
         // add alien to grid 
         IntegerPosition p = planet.position.round();
 
@@ -145,7 +138,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         acs.tech = planet.tech;
     }
 
-    public void unplugPlanet(Planet p) {
+    public void unplugPlanet(Planet p) { //[Q]
         // add alien to grid 
         IntegerPosition pos = p.position.round();
 
@@ -155,7 +148,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         acs.tech = 0;
     }
 
-    public void distributeStarEnergy(int x, int y, double energy) {
+    public void distributeStarEnergy(int x, int y, double energy) { //[Q]
         // probe around our current position,
         // tracing an imaginary square of increasing size,
         // starting from the midpoints of the sides
@@ -168,7 +161,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         
     }
 
-    void putEnergyAt(IntegerPosition p, double energy) {
+    void putEnergyAt(IntegerPosition p, double energy) { //[Q]
         int x = p.x;
         int y = p.y;
 
@@ -194,7 +187,7 @@ public class AlienGrid extends LinkedList<AlienContainer> {
         return getEnergyAt(p.x, p.y);
     }
 
-    public double getEnergyAt(int x, int y) {
+    public double getEnergyAt(int x, int y) { //[Q]
         // off grid?
         if (x + centerX >= width || x + centerX < 0
                 || y + centerY >= height || y + centerY < 0) {

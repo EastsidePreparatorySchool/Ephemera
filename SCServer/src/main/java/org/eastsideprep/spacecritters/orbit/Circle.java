@@ -14,8 +14,8 @@ import org.eastsideprep.spacecritters.gamelogic.SpaceGrid;
  */
 public class Circle extends Conic {
 
-    public Circle(Orbitable focus, double p, double e, double theta,  double rotation, SpaceGrid sg) {
-        super(focus, p, e, theta,  rotation, sg);
+    public Circle(Orbitable focus, double p, double e, double theta, double rotation, SpaceGrid sg) {
+        super(focus, p, e, theta, rotation, sg);
 
         M0 = theta; //TO DO
         n = Math.sqrt(mu / p);

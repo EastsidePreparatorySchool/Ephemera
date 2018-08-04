@@ -25,8 +25,6 @@ public class Constants {
     public static final double G = 0.8e-6;
     public static final double deltaX = 5e4;
     public static final double accuracy = 1e-6;
-    
-    public static final double starDeathRadius = 1e6;
 
     public static final double minAllowedDeltaV = 5;
 
