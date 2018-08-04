@@ -113,7 +113,7 @@ function attach(engine) {
 
 function updates() {
     var start = (new Date()).getTime();
-    request({url: "protected/updates?compact=yes&clientID=" + getClientID()})
+    request({url: "protected/updates?compact=no&clientID=" + getClientID()})
             .then(data => {
                 if (data !== null) {
                     //println("Raw: "+data.substr(0,100));

@@ -30,6 +30,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
     static TriangleMesh vger;
     boolean tooComplex = false;
     int startTurn;
+    long tLastAcc = 0;
 
     // don't do anything in the contructor, implicitly or explicitly!
     public Voyager() {
@@ -85,12 +86,13 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         }
 
         // if we are all good, move us out a little from the center (Earth/Sun)
-        if ((ctx.getGameTurn()-this.startTurn) < 50) {
+        if ((System.currentTimeMillis() - tLastAcc) > 1000) {
+            tLastAcc = System.currentTimeMillis();
             Position p = ctx.getPosition();
             Position p2 = new Position(-p.y, p.x);
-            return  p2.scaleToLength(1.0);
+            return  p2.scaleToLength(0.1);
         } else {
-            return new Vector2(0, 0);
+            return null;
         }
     }
 

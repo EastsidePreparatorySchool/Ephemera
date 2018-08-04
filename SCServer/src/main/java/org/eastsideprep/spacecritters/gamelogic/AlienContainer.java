@@ -216,12 +216,17 @@ public class AlienContainer {
         updated = true;
         Vector2 deltaV;
         try {
-            deltaV = calien.getAccelerate().scale(1f / getMass());
+            deltaV = calien.getAccelerate();
+
         } catch (UnsupportedOperationException e) {
             deltaV = null;
         }
 
-        if (deltaV.x == 0 && deltaV.y == 0) {
+        if (deltaV != null) {
+            deltaV = deltaV.scale(1f / getMass());
+        }
+        
+        if (deltaV != null && deltaV.x == 0 && deltaV.y == 0) {
             deltaV = null; //if there is no acceleration, don't do anything
         }
         nextP = trajectory.positionAtTime(grid.getTime());

@@ -36,6 +36,7 @@ public abstract class Conic {
     double mu;
     double M0;
     double n;
+    double t0;
     
     double theta;
 
@@ -102,6 +103,7 @@ public abstract class Conic {
         
         this.theta = theta;
         this.M0 = MAtAngle(theta);
+        this.t0 = sg.getTime();
         
 
         //p = h^2 / mu              semi-latus rectum

@@ -41,7 +41,7 @@ public class Ellipse extends Conic {
         //I have math from this point on
 
         //find mean anomaly
-        double M = (n * t) - (orbits * 2 * Math.PI) + M0;
+        double M = (n * (t-t0)) - (orbits * 2 * Math.PI) + M0;
         //System.out.println("M: " + M);
         while (M > Math.PI) {
             M -= 2 * Math.PI;
