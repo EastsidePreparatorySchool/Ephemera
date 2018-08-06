@@ -6,6 +6,7 @@ package org.eastsideprep.spacecritters.gamelogic;
 
 import org.eastsideprep.spacecritters.alieninterfaces.Position;
 import org.eastsideprep.spacecritters.alieninterfaces.Vector2;
+import org.eastsideprep.spacecritters.alieninterfaces.WorldVector;
 import org.eastsideprep.spacecritters.gameengineinterfaces.PlanetBehavior;
 import org.eastsideprep.spacecritters.orbit.Orbitable;
 import org.eastsideprep.spacecritters.orbit.Trajectory;
@@ -17,6 +18,7 @@ import org.eastsideprep.spacecritters.orbit.Trajectory;
 public abstract class InternalSpaceObject implements Orbitable {
 
     public Position position;
+    public WorldVector worldPosition;
     public final String domainName;
     public final String packageName;
     public final String className;
@@ -25,7 +27,7 @@ public abstract class InternalSpaceObject implements Orbitable {
     public boolean isPlanet = false;
     public int index;
     public PlanetBehavior pb;
-    
+
     public double hillRadius = 0;
 
     double mass;
@@ -36,6 +38,7 @@ public abstract class InternalSpaceObject implements Orbitable {
 
     public InternalSpaceObject(SpaceGrid grid, Position p, int index, String domainName, String packageName, String className, double energy, double tech, double mass) { //[Q]
         this.position = new Position(p);
+        this.worldPosition = new WorldVector(p);
         this.energy = energy;
         this.tech = tech;
         this.domainName = domainName;
@@ -55,20 +58,36 @@ public abstract class InternalSpaceObject implements Orbitable {
         return fullName;
 
     }
-    
+
     @Override
-    public double mass() { return mass; }
-    @Override
-    public Position position(double t) { 
-        if (trajectory != null) return trajectory.positionAtTime(t);
-        return new Position(position);
+    public double mass() {
+        return mass;
     }
+
     @Override
-    public Vector2 velocity(double t) {
-        if (trajectory == null) return new Vector2(0,0);
+    public Position position(double t) {
+        if (trajectory != null) {
+            position = new Position (trajectory.worldPositionAtTime(t));
+        }
+        return position;
+    }
+
+    @Override
+    public WorldVector worldPosition(double t) {
+        if (trajectory != null) {
+            worldPosition =  trajectory.worldPositionAtTime(t);
+        }
+        return worldPosition;
+    }
+
+    @Override
+    public WorldVector velocity(double t) {
+        if (trajectory == null) {
+            return new WorldVector(0, 0);
+        }
         return trajectory.velocityAtTime(t);
     }
-    
+
     public double hillRadius() {
         return hillRadius;
     }

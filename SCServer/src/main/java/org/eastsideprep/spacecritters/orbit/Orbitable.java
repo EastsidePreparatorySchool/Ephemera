@@ -3,6 +3,7 @@ package org.eastsideprep.spacecritters.orbit;
 
 import org.eastsideprep.spacecritters.alieninterfaces.Position;
 import org.eastsideprep.spacecritters.alieninterfaces.Vector2;
+import org.eastsideprep.spacecritters.alieninterfaces.WorldVector;
 
 /**
  *
@@ -13,6 +14,7 @@ import org.eastsideprep.spacecritters.alieninterfaces.Vector2;
 public interface Orbitable {
     public double mass();
     public Position position(double t);
-    public Vector2 velocity(double t);
+    public WorldVector worldPosition(double t);
+    public WorldVector velocity(double t);
     public double hillRadius();
 }

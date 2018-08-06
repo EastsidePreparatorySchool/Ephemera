@@ -5,11 +5,11 @@
  */
 package org.eastsideprep.spacecritters.orbit;
 
-import org.eastsideprep.spacecritters.alieninterfaces.Position;
 import org.eastsideprep.spacecritters.alieninterfaces.Vector2;
 import org.eastsideprep.spacecritters.gamelogic.SpaceGrid;
 import java.util.ArrayList;
 import java.util.Iterator;
+import org.eastsideprep.spacecritters.alieninterfaces.WorldVector;
 
 /**
  *
@@ -46,20 +46,25 @@ public class Trajectory {
         return conic.e < 0;
     }
 
-    public void accelerate(Vector2 deltaV, double t) {
-        Vector2 v = velocityAtTime(t).add(deltaV);
-        Vector2 r = positionAtTime(t);
+    public void accelerate(WorldVector deltaV, double t) {
+        Vector2 v = velocityAtTime(t);
+        Vector2 v2 = v.add(deltaV);
+        Vector2 r = worldPositionAtTime(t);
         Orbitable focus = conic.focus;
 
-        conic = Conic.newConic(focus, r, v, t, sg);
+        conic = Conic.newConic(focus, r, v2, t, sg);
+        Vector2 v3 = velocityAtTime(t);
+        if (v.unit().dot(v3.unit()) < 0) {
+            System.out.println("Unexplained velocity reversal in accelerate");
+        }
     }
 
-    public Position positionAtTime(double t) {
-        return conic.positionAtTime(t);
+    public WorldVector worldPositionAtTime(double t) {
+        return conic.worldPositionAtTime(t);
     }
 
-    public Vector2 velocityAtTime(double t) {
-        return conic.getVelocityAtTime(t).add(conic.focus.velocity(t));
+    public WorldVector velocityAtTime(double t) {
+        return new WorldVector(conic.getVelocityAtTime(t).add(conic.focus.velocity(t)));
     }
 
     @Override
@@ -87,16 +92,16 @@ public class Trajectory {
 
         ArrayList<Vector2> points = new ArrayList<>();
         for (double theta = bottomBound; theta < topBound; theta += dTheta) {
-            points.add(conic.positionAtAngle(theta));
+            points.add(conic.worldPositionAtAngle(theta));
         }
         if (conic.e < 1) {
-            points.add(conic.positionAtAngle(dTheta - Math.PI));
+            points.add(conic.worldPositionAtAngle(dTheta - Math.PI));
         }
 
         return points.iterator();
     }
 
-    public Vector2 positionOfFocus() {
-        return currentFocus.position(sg.getTime());
+    public WorldVector positionOfFocus() {
+        return new WorldVector(currentFocus.position(sg.getTime()));
     }
 }

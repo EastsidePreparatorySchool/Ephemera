@@ -20,12 +20,12 @@ public class TrajanAlien implements Alien, AlienComplex {
     spawn a lot when we are far away from all aliens
     
      */
-    Context ctx;
+    ContextComplex ctx;
 
     public TrajanAlien() {}
 
     @Override
-    public void init(Context ctx, int id, int parentId, String message) {
+    public void initComplex(ContextComplex ctx, int id, int parentId, String message) {
         this.ctx = ctx;
     }
 
@@ -102,12 +102,12 @@ public class TrajanAlien implements Alien, AlienComplex {
     }
 
     @Override
-    public Vector2 getAccelerate() {
+    public WorldVector getAccelerate() {
 
         //if i have no energy i cant move anywhere, so i
         //just stay in my orbit and collect energy
         if (ctx.getEnergy() < 18) {
-            return new Vector2(0, 0);
+            return new WorldVector(0, 0);
         }
 
         //goal is to get to a specific orbit that passes through this point
@@ -152,17 +152,22 @@ public class TrajanAlien implements Alien, AlienComplex {
         int counter = 1;
         if (counter == 1) {
             counter++;
-            return new Vector2(vec1, 0);
+            return new WorldVector(vec1, 0);
         }
         if (counter == 2) {
             counter++;
-            return new Vector2(vec2, 0);
+            return new WorldVector(vec2, 0);
         }
-        return new Vector2(0, 0);
+        return new WorldVector(0, 0);
     }
 
     @Override
     public Vector2 getMove() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void init(Context ctx, int id, int parent, String message) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

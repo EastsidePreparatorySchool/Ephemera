@@ -10,6 +10,8 @@ package org.eastsideprep.spacecritters.alieninterfaces;
  */
 public interface AlienComplex {
 
-    Vector2 getAccelerate();
+    void initComplex(ContextComplex ctx, int id, int parent, String message);
+
+    WorldVector getAccelerate();
 
 }

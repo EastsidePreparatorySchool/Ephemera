@@ -10,6 +10,8 @@ import org.eastsideprep.spacecritters.gameengineinterfaces.GameState;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameVisualizer;
 import java.util.List;
 import org.eastsideprep.spacecritters.alieninterfaces.IntegerPosition;
+import org.eastsideprep.spacecritters.alieninterfaces.Vector2;
+import org.eastsideprep.spacecritters.alieninterfaces.WorldVector;
 import org.eastsideprep.spacecritters.gamelog.GameLog;
 import org.eastsideprep.spacecritters.gamelogic.Constants;
 import org.eastsideprep.spacecritters.orbit.Trajectory;
@@ -108,8 +110,9 @@ public class LoggingVisualizer implements GameVisualizer {
             }
             if (t != null) {
                 IntegerPosition p = t.currentFocus.position(log.turnsCompleted * Constants.deltaT).round();
+                WorldVector v = t.conic.getVelocityAtTime(log.turnsCompleted * Constants.deltaT);
                 log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ORBIT,
-                        p.x, p.y, 0, 0,
+                        p.x, p.y, (int)(v.x*10000), (int) (v.y*10000),
                         Double.toString(t.conic.rotation), null, as.hashCode, as.speciesID,
                         t.conic.e, t.conic.p / Constants.deltaX));
             }

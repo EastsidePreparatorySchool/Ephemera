@@ -19,11 +19,7 @@ public interface Context {
 
     Position getPosition();
 
-    Vector2 getVelocity();
-
-    double getMeanAnomaly();
-
-    SpaceObject getFocus();
+ 
 
     SpaceObject getSpaceObject(String name);
 
@@ -66,5 +62,4 @@ public interface Context {
 
     AlienSpecies getMyAlienSpecies();
 
-    double getMass();
 }

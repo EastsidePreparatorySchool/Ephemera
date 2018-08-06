@@ -9,6 +9,7 @@ import org.eastsideprep.spacecritters.alieninterfaces.*;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import org.eastsideprep.spacecritters.alieninterfaces.GridVector;
 import org.eastsideprep.spacecritters.orbit.DummyTrajectory;
 import org.eastsideprep.spacecritters.orbit.Orbitable;
 import org.eastsideprep.spacecritters.orbit.Trajectory;
@@ -100,9 +101,7 @@ public class AlienContainer {
         try {
             a = (Alien) cns.newInstance();
             this.alien = a;
-            if (a instanceof AlienComplex) {
-                initComplex(a, trajectory);
-            }
+
             this.alienHashCode = ++currentID;
         } catch (Throwable t) {
             this.alien = null;
@@ -112,7 +111,12 @@ public class AlienContainer {
         }
 
         try {
-            a.init(this.ctx, alienHashCode, parent, message);
+            if (a instanceof AlienComplex) {
+                initComplex(a, trajectory);
+                ((AlienComplex)a).initComplex(this.ctx, this.alienHashCode, parent, message);
+            } else {
+                a.init(this.ctx, this.alienHashCode, parent, message);
+            }
         } catch (UnsupportedOperationException e) {
             // let this go
         }
@@ -135,7 +139,7 @@ public class AlienContainer {
         if (trajectory instanceof DummyTrajectory) {
             this.trajectory = new Trajectory(
                     trajectory.currentFocus, //focus from the dummy trajectory
-                    grid.rand.nextDouble() * 5 + 5, //semi-latus rectum
+                    (grid.rand.nextDouble() * 5 + 5)* Constants.deltaX, //semi-latus rectum
                     Math.pow(grid.rand.nextDouble(), 3), //Eccentricity
                     1, //signum
                     grid.rand.nextDouble() * 2 * Math.PI, //rotation
@@ -144,7 +148,7 @@ public class AlienContainer {
             this.trajectory = trajectory.clone();
         }
 
-        p = this.trajectory.positionAtTime(0);
+        p = new Position(this.trajectory.worldPositionAtTime(0));
     }
 
     public double getMass() {
@@ -217,7 +221,7 @@ public class AlienContainer {
         updated = true;
         double tolerance = 10; // percent
 
-        Vector2 deltaV;
+        WorldVector deltaV;
         try {
             deltaV = calien.getAccelerate();
 
@@ -226,13 +230,14 @@ public class AlienContainer {
         }
 
         if (deltaV != null) {
-            deltaV = deltaV.scale(1f / getMass());
+            deltaV = new WorldVector(deltaV.scale(1f / getMass()));
         }
 
         if (deltaV != null && deltaV.x == 0 && deltaV.y == 0) {
             deltaV = null; //if there is no acceleration, don't do anything
         }
-        nextP = trajectory.positionAtTime(grid.getTime());
+
+        nextP = new Position(trajectory.worldPositionAtTime(grid.getTime()));
 
         /* CHARGE ALIEN FOR DELTAV */
         //aliens cannot change their trajectory if they are enot in the game limits
@@ -260,12 +265,11 @@ public class AlienContainer {
             if (focus instanceof Planet) {
                 System.out.print("to plant ");
                 System.out.println(((Planet) focus).className);
-            }
-            if (focus instanceof Star) {
+            } else if (focus instanceof Star) {
                 System.out.print("to star ");
                 System.out.println(((Star) focus).className);
             }
-            Vector2 v = trajectory.velocityAtTime(grid.getTime());
+            WorldVector v = trajectory.velocityAtTime(grid.getTime());
             if (deltaV != null) {
                 v = v.add(deltaV);
             }
@@ -278,8 +282,8 @@ public class AlienContainer {
                     || Math.abs(v.y / v2.y) > (1.0 + tolerance / 100.0)
                     || Math.abs(v.y / v2.y) < (1.0 - tolerance / 100.0)) {
                 System.out.println("Focus change: entry/exit velocities do not match within tolerance values");
-                System.out.println("  exit velocity: " + v);
-                System.out.println("  entry velocity: " + v2);
+                System.out.println("  exit velocity: " + v + " mag " + v.magnitude());
+                System.out.println("  entry velocity: " + v2 + " mag " + v2.magnitude());
             }
             trajectory = trajectoryNew;
             return;
@@ -287,14 +291,14 @@ public class AlienContainer {
             Vector2 v = trajectory.velocityAtTime(grid.getTime());
             trajectory.accelerate(deltaV, grid.getTime());
             Vector2 v2 = trajectory.velocityAtTime(grid.getTime()).subtract(deltaV);
-            
-            if (Math.abs(v.x / v2.x) > (1.0 + tolerance / 100.0)
-                    || Math.abs(v.x / v2.x) < (1.0 - tolerance / 100.0)
-                    || Math.abs(v.y / v2.y) > (1.0 + tolerance / 100.0)
-                    || Math.abs(v.y / v2.y) < (1.0 - tolerance / 100.0)) {
+
+            if ((v.x / v2.x) > (1.0 + tolerance / 100.0)
+                    || (v.x / v2.x) < (1.0 - tolerance / 100.0)
+                    || (v.y / v2.y) > (1.0 + tolerance / 100.0)
+                    || (v.y / v2.y) < (1.0 - tolerance / 100.0)) {
                 System.out.println("Accelerate: adjusted entry/exit velocities do not match within tolerance values");
-                System.out.println("  exit velocity: " + v);
-                System.out.println("  entry velocity: " + v2);
+                System.out.println("  exit velocity: " + v + " mag " + v.magnitude());
+                System.out.println("  entry velocity: " + v2 + " mag " + v2.magnitude());
             }
             return;
         }

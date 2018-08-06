@@ -8,14 +8,18 @@ package org.eastsideprep.spacecritters.alieninterfaces;
  *
  * @author gmein
  */
-public class Position extends Vector2 {
+public class Position extends GridVector {
 
     public Position(Vector2 v) {
         super(v);
     }
+    
+    public Position(WorldVector v) {
+        super(v);
+    }
 
     public Position(IntegerVector2 v) {
-        super(v);
+        super(v.x, v.y);
     }
 
     public Position(double x, double y) {

@@ -36,12 +36,13 @@ public class Planet extends InternalSpaceObject {
     public void init() {
         // slight random eccentricity
         this.trajectory = new Trajectory(parent,
-                radius, // p
+                radius * Constants.deltaX, // p
                 grid.rand.nextDouble()* 0.5, // e
                 1.0,    // signum
                 grid.rand.nextDouble()*Math.PI, //rotation
                 grid);
-        position = trajectory.positionAtTime(grid.getTime());
+        worldPosition = trajectory.worldPositionAtTime(grid.getTime());
+        position = new Position(worldPosition);
         
         hillRadius = trajectory.partialHillRadius() * Math.pow(mass, 1f/3);
         
@@ -50,7 +51,7 @@ public class Planet extends InternalSpaceObject {
     }
 
     public void move() {
-        this.position = trajectory.positionAtTime(grid.getTime());
+        //this.position = trajectory.worldPositionAtTime(grid.getTime());
     }
 
     public void reviewInhabitants() {
@@ -75,4 +76,6 @@ public class Planet extends InternalSpaceObject {
             // that's ok.
         }
     }
+
+   
 }

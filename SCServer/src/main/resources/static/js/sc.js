@@ -194,7 +194,7 @@ function processUpdates(data) {
                     moveAlien(o);
                     break;
                 case ORBIT:
-                    drawOrbit(o.id, o.newX, o.newY, o.energy, o.tech, Number(o.name));
+                    drawOrbit(o.id, o.newX, o.newY, o.energy, o.tech, Number(o.name), o.param1, o.param2);
                     break;
                 case KILL:
                     //println("Alien id: "+o.id+" died.");
@@ -222,7 +222,7 @@ function processUpdates(data) {
     }
 }
 
-function drawOrbit(id, focusX, focusY, e, p, rotation) {
+function drawOrbit(id, focusX, focusY, e, p, rotation, vx, vy) {
     //println("Orbit: (" + focusX + "," + focusY + "), ecc:" + e + ", p:" + p + ", rot:" + rotation);
     var a = p / (1 - e * e);
     var b = a * Math.sqrt(1 - e * e);
@@ -240,7 +240,16 @@ function drawOrbit(id, focusX, focusY, e, p, rotation) {
             if (al.orbit !== null) {
                 scene.remove(al.orbit);
             }
+            if (al.vector !== null) {
+                scene.remove(al.vector);
+            }
+            if (vx !== undefined && vy !== undefined) {
+                al.vector = drawVelocity(al, vx, vy);
+            } else {
+                al.vector = null;
+            }
             al.orbit = mesh;
+            scene.add(al.vector);
             scene.add(al.orbit);
         }
     } else {
@@ -249,6 +258,12 @@ function drawOrbit(id, focusX, focusY, e, p, rotation) {
         pl.orbit = mesh;
         scene.add(pl.orbit);
     }
+
+}
+
+function drawVelocity(alien, vx, vy) {
+    return drawLine(-alien.mesh.position.z, -alien.mesh.position.x,
+            -alien.mesh.position.z - vx, -alien.mesh.position.x - vy);
 
 }
 
@@ -267,6 +282,18 @@ function drawEllipse(centerX, centerY, radiusX, radiusY, rotation) {
     ellipse.rotation.x = Math.PI / 2;
     ellipse.position.y = 1.0;
     return ellipse;
+}
+
+function drawLine(x1, y1, x2, y2) {
+    var vector = new THREE.Geometry();
+    vector.vertices.push(
+            new THREE.Vector3(-y1, 1, -x1),
+            new THREE.Vector3(-y2, 1, -x2),
+            );
+
+    var line = new THREE.Line(vector, orbitMaterial);
+    return line;
+
 }
 
 
@@ -366,6 +393,9 @@ function uiStateChange(attachState, runState, data) {
                 scene.remove(aliens[a].mesh);
                 if (aliens[a].orbit !== null) {
                     scene.remove(aliens[a].orbit);
+                }
+                if (aliens[a].vector !== null) {
+                    scene.remove(aliens[a].vector);
                 }
                 aliens[a].trail.delete();
                 count++;
@@ -581,7 +611,7 @@ class Grid {
         this.halfHeight = Math.floor(height / 2);
         for (var x = 0; x < width; x++) {
             var col = Array(height);
-          
+
             this.grid[x] = col;
         }
     }
@@ -759,6 +789,9 @@ function killAlien(content) {
         speciesMap.removeAlien(content.speciesId);
         if (alien.orbit !== null) {
             scene.remove(alien.orbit);
+        }
+        if (alien.vector !== null) {
+            scene.remove(alien.vector);
         }
         alien.trail.delete();
     }
@@ -1061,7 +1094,7 @@ function onWindowResize() {
 
 
 function animate() {
-  
+
     requestAnimationFrame(animate);
     // required if controls.enableDamping or controls.autoRotate are set to true
     controls.update();

@@ -17,7 +17,7 @@ public class Caelusite implements Alien, AlienComplex {
     public Caelusite() {}
 
     @Override
-    public void init(Context game_ctx, int id, int parent, String message) {
+    public void initComplex(ContextComplex game_ctx, int id, int parent, String message) {
         ctx = game_ctx;
         
     }
@@ -73,12 +73,17 @@ public class Caelusite implements Alien, AlienComplex {
     }
 
     @Override
-    public Vector2 getAccelerate() {
+    public WorldVector getAccelerate() {
         
         
         if (ctx.getGameTurn() % 15 == 0) {
-            return new Vector2(1,0);
+            return new WorldVector(1,0);
         }
-        return new Vector2(0,0); 
+        return new WorldVector(0,0); 
+    }
+
+    @Override
+    public void init(Context ctx, int id, int parent, String message) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -331,7 +331,7 @@ public class SpaceGrid {
                 AlienCell acs = aliens.getAliensAt(ac.p);
 
                 // call shell visualizer
-                // just make sure we don't blow up the alien beacuse of an exception in the shell
+                // just make sure we don't blow up the alien because of an exception in the shell
                 try {
                     vis.showMove(ac.getFullAlienSpec(),
                             oldX,

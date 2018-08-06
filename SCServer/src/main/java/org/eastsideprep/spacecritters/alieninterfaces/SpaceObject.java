@@ -15,6 +15,7 @@ public class SpaceObject {
     final public Position position;
     final public double mass;
     final public double hillRadius;
+    final public WorldVector worldPosition;
 
     public SpaceObject(String kind, String name, Position position, double mass, double hillRadius) {
         this.name = name;
@@ -22,5 +23,6 @@ public class SpaceObject {
         this.position = position;
         this.mass = mass;
         this.hillRadius = hillRadius;
+        this.worldPosition = new WorldVector(position);
     }
 }

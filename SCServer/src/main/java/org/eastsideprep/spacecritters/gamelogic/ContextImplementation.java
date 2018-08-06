@@ -15,7 +15,7 @@ import org.eastsideprep.spacecritters.orbit.Orbitable;
  *
  * @author guberti
  */
-public class ContextImplementation implements Context {
+public class ContextImplementation implements ContextComplex {
 
     private final AlienContainer ac;
     public GameVisualizer vis;
@@ -225,7 +225,7 @@ public class ContextImplementation implements Context {
     }
 
     @Override
-    public Vector2 getVelocity() {
+    public WorldVector getVelocity() {
         if (ac.trajectory != null) {
             return ac.trajectory.velocityAtTime(ac.grid.getTime());
         }
@@ -238,6 +238,20 @@ public class ContextImplementation implements Context {
             return ac.trajectory.conic.angleAtTime(ac.grid.getTime());
         }
         return (0.0);
+    }
+
+    @Override
+    public Orbit getOrbit() {
+        if (ac.trajectory != null) {
+            Orbit o = new Orbit();
+            o.focus = getFocus();
+            o.e = ac.trajectory.conic.e;
+            o.a = ac.trajectory.conic.p / (1 - o.e * o.e);
+            o.rotation = ac.trajectory.conic.rotation;
+            o.signum = ac.trajectory.conic.signum;
+        }
+
+        return null;
     }
 
     @Override

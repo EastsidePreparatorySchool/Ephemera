@@ -6,6 +6,7 @@
 package org.eastsideprep.spacecritters.orbit;
 
 import org.eastsideprep.spacecritters.alieninterfaces.Vector2;
+import org.eastsideprep.spacecritters.alieninterfaces.WorldVector;
 import org.eastsideprep.spacecritters.gamelogic.SpaceGrid;
 import org.eastsideprep.spacecritters.gamelogic.Constants;
 
@@ -20,10 +21,10 @@ public class Ellipse extends Conic {
     public Ellipse(Orbitable focus, double p, double e, double theta, double signum, double rotation, SpaceGrid sg) {
         super(focus, p, e, theta, signum, rotation, sg);
 
-        prevE = Math.PI; // seeding point for finding E. Pi always converges.
-        n = (mu * mu) * Math.pow(1 - e * e, 2f / 3f) / h * h * h; // angular velocity
+        prevE = -10; // seeding point for finding E. Pi always converges.
+        n = (mu * mu) * Math.pow(1 - e * e, 2f / 3f) / (h * h * h); // angular velocity
         n *= signum;
-        System.out.println("New ellipse: signum " + signum);
+        //System.out.println("New ellipse: signum " + signum);
         orbits = 0;
     }
 
@@ -50,23 +51,39 @@ public class Ellipse extends Conic {
             //System.out.println("loop: " + orbits);
         }
 
+        double E;
+
         //find eccentric anomaly using the Newton-Raphson method on Kepler's equation
-        double E = prevE;
+        if (prevE != -10) {
+            E = prevE;
+        } else {
+            if (e < 0.8) {
+                E = M;
+            } else {
+                E = Math.PI;
+            }
+        }
         double dE;
-        boolean retry = true;
-        int count = 0;
+        double E0 = E;
+        int count = 100;
         do {
             dE = E - e * Math.sin(E) - M;
-            E -= dE / (1 - e * Math.cos(E));
-            if (++count > 20) {
-                if (retry) {
-                    retry = false;
-                    System.err.println("Stuck in Newton-Raphson loop in Ellipse:EAtTime - retrying from Pi");
-                    E = Math.PI;
-                } else {
-                    System.err.println("Stuck in Newton-Raphson loop in Ellipse:EAtTime - aborting");
-                    break;
+            E = (M - e * (E * Math.cos(E) - Math.sin(E))) / (1 - e * Math.cos(E));
+            try {
+                int i = 100 / --count;
+            } catch (Exception ex) {
+                System.out.println("ell" + this + " Stuck in Newton-Raphson loop in Ellipse:EAtTime - aborting");
+                System.out.println("  e: " + e);
+                System.out.println(" E0: " + E0);
+                System.out.println(" pE: " + prevE);
+                System.out.println("  M: " + M);
+                System.out.println("  t: " + t);
+                ex.printStackTrace();
+
+                if (e > 0.999) {
+                    E = M;
                 }
+                break;
             }
         } while (Math.abs(dE) >= Constants.accuracy);
 
@@ -74,8 +91,9 @@ public class Ellipse extends Conic {
         if (t == sg.getTime()) {
             prevE = E;
         } else {
-            prevE = Math.PI;
+            prevE = -10.0;
         }
+        System.out.println("ell" + this + " E: " + E + " e " + e);
         return E;
     }
 
@@ -98,5 +116,39 @@ public class Ellipse extends Conic {
     @Override
     public double nextTimeAtAngle(double theta, double t) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public WorldVector getVelocityAtTime(double t) {
+        // from https://space.stackexchange.com/questions/22172/calculating-velocity-state-vector-with-orbital-elements-in-2d
+
+        double a = p / (1 - e * e);             // semi-major axis
+        double b = a * Math.sqrt(1 - e * e);    // semi-minor axis
+
+        double E = EAtTime(t);                  // eccentric anomaly
+        double f = trueAtE(E);                  // true anomaly
+        double rm;                              // length of position vector from focus
+        double vm;                              // velocity magnitude
+
+        if (e < 0.999) {
+            rm = a * Math.sqrt(1 - e * e) / (1 + e * Math.cos(f));
+            vm = mu * (2 / rm - 1 / a);
+        } else {
+            rm = a;
+            vm = mu / a;
+        }
+        System.out.println("ell" + this + " e.v: rlength " + rm + " velocity " + vm + " t " + t);
+
+        double cosfpa = h / (rm * vm);          // cosine of flight path angle
+        double sinfpa = cosfpa // sin of flight path angle
+                * (e * Math.sin(f))
+                / (1 + e * Math.cos(f));
+        double fpa = Math.atan2(cosfpa, sinfpa);// flight path angle
+
+        Vector2 v = new Vector2(-a * Math.sin(E), b * Math.cos(E)).unit();
+        v = v.scale(vm * signum);
+        System.out.println("ell" + this + " e.v: vx " + v.x + " vy " + v.y);
+
+        return new WorldVector(v);
     }
 }
