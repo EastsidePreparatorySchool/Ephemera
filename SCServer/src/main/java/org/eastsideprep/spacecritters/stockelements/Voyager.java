@@ -108,8 +108,10 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         double indicator = d1.unit().dot(d2.unit());
         if ((indicator < -0.9) && (ctx.getGameTurn() - this.startTurn < 1000)) {
             tBurn = System.currentTimeMillis();
+            v = v.scale(0.01);
+            v = null;
             WorldVector deltaV = new WorldVector(v);
-            System.out.println(" acc "+deltaV+", mag "+deltaV.magnitude());
+            System.out.println("--------------acc "+deltaV+", mag "+deltaV.magnitude());
             return deltaV;
         } 
         return null;

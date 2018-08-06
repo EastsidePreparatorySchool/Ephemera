@@ -132,10 +132,10 @@ public class Ellipse extends Conic {
 
         if (e < 0.999) {
             rm = a * Math.sqrt(1 - e * e) / (1 + e * Math.cos(f));
-            vm = mu * (2 / rm - 1 / a);
+            vm = Math.sqrt(mu * (2 / rm - 1 / a));
         } else {
             rm = a;
-            vm = mu / a;
+            vm = Math.sqrt(mu / a);
         }
         System.out.println("ell" + this + " e.v: rlength " + rm + " velocity " + vm + " t " + t);
 

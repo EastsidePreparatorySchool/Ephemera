@@ -24,7 +24,7 @@ public class Trajectory {
     public Trajectory() {
     }
 
-    public Trajectory(Orbitable focus, Vector2 r, Vector2 v, SpaceGrid sg) {
+    public Trajectory(Orbitable focus, WorldVector r, WorldVector v, SpaceGrid sg) {
         this.sg = sg;
         conic = Conic.newConic(focus, r, v, sg.getTime(), sg);
         currentFocus = focus;
@@ -51,8 +51,14 @@ public class Trajectory {
         Vector2 v2 = v.add(deltaV);
         Vector2 r = worldPositionAtTime(t);
         Orbitable focus = conic.focus;
+        System.out.println("<<<<<Old conic:");
+        conic.dump();
 
         conic = Conic.newConic(focus, r, v2, t, sg);
+
+        System.out.println(">>>>>New conic:");
+        conic.dump();
+
         Vector2 v3 = velocityAtTime(t);
         if (v.unit().dot(v3.unit()) < 0) {
             System.out.println("Unexplained velocity reversal in accelerate");

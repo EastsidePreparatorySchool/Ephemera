@@ -51,6 +51,7 @@ public class AlienContainer {
     boolean participatedInAction;
     public Position p = new Position(0, 0);
     public Position nextP;
+    public WorldVector nextWP;
     public String outgoingMessage;
     public double outgoingPower;
     int turnsInSafeZone;
@@ -113,7 +114,7 @@ public class AlienContainer {
         try {
             if (a instanceof AlienComplex) {
                 initComplex(a, trajectory);
-                ((AlienComplex)a).initComplex(this.ctx, this.alienHashCode, parent, message);
+                ((AlienComplex) a).initComplex(this.ctx, this.alienHashCode, parent, message);
             } else {
                 a.init(this.ctx, this.alienHashCode, parent, message);
             }
@@ -139,7 +140,7 @@ public class AlienContainer {
         if (trajectory instanceof DummyTrajectory) {
             this.trajectory = new Trajectory(
                     trajectory.currentFocus, //focus from the dummy trajectory
-                    (grid.rand.nextDouble() * 5 + 5)* Constants.deltaX, //semi-latus rectum
+                    (grid.rand.nextDouble() * 5 + 5) * Constants.deltaX, //semi-latus rectum
                     Math.pow(grid.rand.nextDouble(), 3), //Eccentricity
                     1, //signum
                     grid.rand.nextDouble() * 2 * Math.PI, //rotation
@@ -229,15 +230,30 @@ public class AlienContainer {
             deltaV = null;
         }
 
-        if (deltaV != null) {
-            deltaV = new WorldVector(deltaV.scale(1f / getMass()));
+        // don't scale deltav by mass. we will fix accounting some other time.
+//        if (deltaV != null) {
+//            deltaV = new WorldVector(deltaV.scale(1f / getMass()));
+//        }
+// DEBUG
+//        if (deltaV != null && deltaV.x == 0 && deltaV.y == 0) {
+//            deltaV = null; //if there is no acceleration, don't do anything
+//        }
+// let's see if this thing can handle 0,0 accelerations. In theory, the new conic should look very similar to the old conic.
+        if (deltaV == null) {
+            deltaV = new WorldVector(0, 0);
         }
+// END DEBUG
 
-        if (deltaV != null && deltaV.x == 0 && deltaV.y == 0) {
-            deltaV = null; //if there is no acceleration, don't do anything
+        WorldVector oldWP = nextWP;
+        nextWP = trajectory.worldPositionAtTime(grid.getTime());
+        nextP = new Position(nextWP);
+
+        // debug:
+        // calculate apparent velocity from move distance
+        if (oldWP != null) {
+            Vector2 d = nextWP.subtract(oldWP).scale(1 / Constants.deltaT);
+            System.out.println("apparent alien velocity: " + d + ", mag:" + d.magnitude());
         }
-
-        nextP = new Position(trajectory.worldPositionAtTime(grid.getTime()));
 
         /* CHARGE ALIEN FOR DELTAV */
         //aliens cannot change their trajectory if they are enot in the game limits
@@ -263,7 +279,7 @@ public class AlienContainer {
         if (focus != trajectory.currentFocus) { //make a new trajectory if the focus has changed
             System.out.print("Changing focus ");
             if (focus instanceof Planet) {
-                System.out.print("to plant ");
+                System.out.print("to planet ");
                 System.out.println(((Planet) focus).className);
             } else if (focus instanceof Star) {
                 System.out.print("to star ");
@@ -274,7 +290,7 @@ public class AlienContainer {
                 v = v.add(deltaV);
             }
 
-            Trajectory trajectoryNew = new Trajectory(focus, nextP, v, grid);
+            Trajectory trajectoryNew = new Trajectory(focus, nextWP, v, grid);
             Vector2 v2 = trajectoryNew.velocityAtTime(grid.getTime());
 
             if (Math.abs(v.x / v2.x) > (1.0 + tolerance / 100.0)

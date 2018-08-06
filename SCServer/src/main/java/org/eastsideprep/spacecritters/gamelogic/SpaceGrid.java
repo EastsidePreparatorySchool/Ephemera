@@ -846,8 +846,11 @@ public class SpaceGrid {
     // Note: Having a seperate method for each InternalSpaceObject seems a little gross,
     // as there is already a large if statement in addElement and the code in
     // addPlanet and addStar is nearly identical
-    void addPlanet(GameElementSpec element
-    ) { //[Q]
+    void addPlanet(GameElementSpec element) { //[Q]
+        if (!element.state.equalsIgnoreCase("true")) {
+            return;
+        }
+
         InternalSpaceObject soParent = null;
         PlanetBehavior pb = null;
         for (InternalSpaceObject o : this.objects) {

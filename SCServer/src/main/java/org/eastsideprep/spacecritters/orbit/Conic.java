@@ -46,6 +46,9 @@ public abstract class Conic {
     Vector2 lastV;
 
     public static Conic newConic(Orbitable focus, Vector2 r, Vector2 v, double t, SpaceGrid sg) {
+        System.out.println("----------- new conic");
+        System.out.println("-- input v: "+v.magnitude());
+        /*
         //p = h^2 / mu              semi-latus rectum
         //r = p / (1 + ||e|| cos theta)
         //h = specific angular momentum = r (position vector) cross rdot (velocity vector)
@@ -57,6 +60,9 @@ public abstract class Conic {
         //e is a vector with the magnitude of the eccentricity, which points towards periapse
         //||r|| + ||r||||e||cos theta = h^2 / mu
         //r_p (radius at periapse) = (h^2 / mu) / (1 + ||e|| cos theta)    v = v.subtract(focus.velocity(sg.getTime()));
+        
+        
+        
         r = r.subtract(focus.worldPosition(sg.getTime()));
         double rAngle = Vector2.normalizeAngle(r.angle());
         //System.out.println("Measured angle: " + r.angle());
@@ -83,13 +89,47 @@ public abstract class Conic {
         double rotation = Math.atan2(e.y, e.x);//Math.asin( v.dot(r.unit()) * hm / (mu*em) ) - theta;
         rotation = Vector2.normalizeAngle(rotation);
         double theta = Vector2.normalizeAngle(rAngle - rotation);//Math.acos((p/rm - 1) / em);//Math.acos(e.dot(r) / (em*rm));
+         */
 
-//        System.out.println("some values:");
-//        System.out.println("e: " + em);
-//        System.out.println("p: " + p/Constants.deltaX);
-//        System.out.println("theta: " + theta);
-//        System.out.println("rotation of conic: " + rotation);
-        return newConic(focus, p, em, theta, signum, rotation, sg);
+        r = r.subtract(focus.worldPosition(sg.getTime()));
+        double rAngle = Vector2.normalizeAngle(r.angle());
+        //System.out.println("Measured angle: " + r.angle());     
+        double rm = r.magnitude();
+        double vm = v.magnitude();
+
+        double mu = focus.mass() * Constants.G;
+
+        Vector3 h = r.cross(v);
+        double hm = h.magnitude();
+        double signum = Math.signum(h.z);
+        double energy = vm * vm / 2 - mu / rm;
+
+        Vector3 e = (r.scale(vm * vm - mu / rm).subtract(v.scale(r.dot(v)))).scale(1 / mu);
+        double em = e.magnitude();
+
+        double p;
+
+        if (Math.abs(em - 1.0) > 0.001) {
+            double a = -mu / (2 * energy);
+            p = a * (1 - em * em);
+        } else {
+            p = hm * hm / mu;
+        }
+
+        double rotation = Math.atan2(e.x,e.y);
+        double theta = Vector2.normalizeAngle(rAngle - rotation);
+
+       
+        Conic c = newConic(focus, p, em, theta, signum, rotation, sg);
+        
+        return c;
+    }
+    
+    public void dump (){
+        System.out.println("--e:        " + e);
+        System.out.println("--p:        " + p);
+        System.out.println("--theta:    " + theta);
+        System.out.println("--rotation: " + rotation);
     }
 
     public static Conic newConic(Orbitable focus, double p, double e, double theta, double signum, double rotation, SpaceGrid sg) {
