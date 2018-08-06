@@ -12,34 +12,32 @@ import org.eastsideprep.spacecritters.gamelogic.Constants;
  * @author gunnar
  */
 public class WorldVector extends Vector2 {
-    
+
     public WorldVector(double x, double y) {
-        super(x,y);
+        super(x, y);
     }
-    
+
     public WorldVector(GridVector v) {
-        super(v.x*Constants.deltaX,v.y*Constants.deltaX);
+        super(v.x * Constants.deltaX, v.y * Constants.deltaX);
     }
 
     public WorldVector(Vector2 v) {
-        super(v.x,v.y);
+        super(v.x, v.y);
     }
-    
+
     public WorldVector(Vector3 v) {
-        super(v.x,v.y);
+        super(v.x, v.y);
     }
-    
+
     public WorldVector(Position p) {
-        super (p.x*Constants.deltaX, p.y*Constants.deltaX);
+        super(p.x * Constants.deltaX, p.y * Constants.deltaX);
     }
-    
+
     public WorldVector(IntegerPosition p) {
-        super (p.x*Constants.deltaX, p.y*Constants.deltaX);
+        super(p.x * Constants.deltaX, p.y * Constants.deltaX);
     }
-    
+
     public WorldVector add(WorldVector v) {
-        this.x += v.x;
-        this.y += v.y;
-        return this;
+        return new WorldVector(this.x + v.x, this.y += v.y);
     }
 }
