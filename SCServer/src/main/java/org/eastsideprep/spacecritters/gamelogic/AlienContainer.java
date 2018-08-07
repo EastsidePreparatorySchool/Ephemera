@@ -140,16 +140,16 @@ public class AlienContainer {
         if (trajectory instanceof DummyTrajectory) {
             this.trajectory = new Trajectory(
                     trajectory.currentFocus, //focus from the dummy trajectory
-                    (grid.rand.nextDouble() * 5 + 5) * Constants.deltaX, //semi-latus rectum
-                    Math.pow(grid.rand.nextDouble(), 3), //Eccentricity
+                    10 * Constants.deltaX, //semi-latus rectum
+                    0.1, //Eccentricity
                     1, //signum
-                    grid.rand.nextDouble() * 2 * Math.PI, //rotation
+                    Vector2.normalizeAngle(grid.rand.nextDouble() * 2 * Math.PI), //rotation
                     grid);
         } else {
             this.trajectory = trajectory.clone();
         }
 
-        p = new Position(this.trajectory.worldPositionAtTime(0));
+        p = new Position(this.trajectory.getWorldPositionAtTime(0));
     }
 
     public double getMass() {
@@ -222,6 +222,8 @@ public class AlienContainer {
         updated = true;
         double tolerance = 10; // percent
 
+        trajectory.conic.updateStateVectors(grid.getTime());
+
         WorldVector deltaV;
         try {
             deltaV = calien.getAccelerate();
@@ -234,26 +236,20 @@ public class AlienContainer {
 //        if (deltaV != null) {
 //            deltaV = new WorldVector(deltaV.scale(1f / getMass()));
 //        }
-// DEBUG
-//        if (deltaV != null && deltaV.x == 0 && deltaV.y == 0) {
-//            deltaV = null; //if there is no acceleration, don't do anything
-//        }
-// let's see if this thing can handle 0,0 accelerations. In theory, the new conic should look very similar to the old conic.
-        if (deltaV == null) {
-            deltaV = new WorldVector(0, 0);
+        if (deltaV != null && deltaV.x == 0 && deltaV.y == 0) {
+            deltaV = null; //if there is no acceleration, don't do anything
         }
-// END DEBUG
 
         WorldVector oldWP = nextWP;
-        nextWP = trajectory.worldPositionAtTime(grid.getTime());
+        nextWP = trajectory.getWorldPositionAtTime(grid.getTime());
         nextP = new Position(nextWP);
 
         // debug:
         // calculate apparent velocity from move distance
-        if (oldWP != null) {
-            Vector2 d = nextWP.subtract(oldWP).scale(1 / Constants.deltaT);
-            System.out.println("apparent alien velocity: " + d + ", mag:" + d.magnitude());
-        }
+//        if (oldWP != null) {
+//            Vector2 d = nextWP.subtract(oldWP).scale(1 / Constants.deltaT);
+//            System.out.println("apparent alien velocity: " + d + ", mag:" + d.magnitude());
+//        }
 
         /* CHARGE ALIEN FOR DELTAV */
         //aliens cannot change their trajectory if they are enot in the game limits
@@ -272,6 +268,21 @@ public class AlienContainer {
             return;
         }
 
+        if (deltaV != null) { // alter the old trajectory
+            Vector2 v = trajectory.getVelocityAtTime(grid.getTime());
+            trajectory.accelerate(deltaV, grid.getTime());
+            Vector2 v2 = trajectory.getVelocityAtTime(grid.getTime()).subtract(deltaV);
+
+            if ((v.x / v2.x) > (1.0 + tolerance / 100.0)
+                    || (v.x / v2.x) < (1.0 - tolerance / 100.0)
+                    || (v.y / v2.y) > (1.0 + tolerance / 100.0)
+                    || (v.y / v2.y) < (1.0 - tolerance / 100.0)) {
+                System.out.println("Accelerate: adjusted entry/exit velocities do not match within tolerance values");
+                System.out.println("  exit velocity: " + v + " mag " + v.magnitude());
+                System.out.println("  entry velocity: " + v2 + " mag " + v2.magnitude());
+            }
+        }
+
         /* DETERMINE CURRENT FOCUS */
         Orbitable focus = findFocus();
 
@@ -285,13 +296,10 @@ public class AlienContainer {
                 System.out.print("to star ");
                 System.out.println(((Star) focus).className);
             }
-            WorldVector v = trajectory.velocityAtTime(grid.getTime());
-            if (deltaV != null) {
-                v = v.add(deltaV);
-            }
 
-            Trajectory trajectoryNew = new Trajectory(focus, nextWP, v, grid);
-            Vector2 v2 = trajectoryNew.velocityAtTime(grid.getTime());
+            Vector2 v = trajectory.getVelocityAtTime(grid.getTime());
+            trajectory.setFocus(focus);
+            Vector2 v2 = trajectory.getVelocityAtTime(grid.getTime());
 
             if (Math.abs(v.x / v2.x) > (1.0 + tolerance / 100.0)
                     || Math.abs(v.x / v2.x) < (1.0 - tolerance / 100.0)
@@ -301,24 +309,7 @@ public class AlienContainer {
                 System.out.println("  exit velocity: " + v + " mag " + v.magnitude());
                 System.out.println("  entry velocity: " + v2 + " mag " + v2.magnitude());
             }
-            trajectory = trajectoryNew;
-            return;
-        } else if (deltaV != null) { //if not, alter the old one
-            Vector2 v = trajectory.velocityAtTime(grid.getTime());
-            trajectory.accelerate(deltaV, grid.getTime());
-            Vector2 v2 = trajectory.velocityAtTime(grid.getTime()).subtract(deltaV);
-
-            if ((v.x / v2.x) > (1.0 + tolerance / 100.0)
-                    || (v.x / v2.x) < (1.0 - tolerance / 100.0)
-                    || (v.y / v2.y) > (1.0 + tolerance / 100.0)
-                    || (v.y / v2.y) < (1.0 - tolerance / 100.0)) {
-                System.out.println("Accelerate: adjusted entry/exit velocities do not match within tolerance values");
-                System.out.println("  exit velocity: " + v + " mag " + v.magnitude());
-                System.out.println("  entry velocity: " + v2 + " mag " + v2.magnitude());
-            }
-            return;
         }
-        updated = false;
     }
 
     public Orbitable findFocus() {
@@ -328,7 +319,7 @@ public class AlienContainer {
         //if orbiting a planet and within that planet's hill sphere, you're staying there
         //if not, enter the parent star's orbit
         if (focus instanceof Planet) {
-            System.out.println(focus.hillRadius());
+            System.out.println("hill radius: "+focus.hillRadius());
             if (focus.position(grid.getTime()).subtract(nextP).magnitude() <= focus.hillRadius()) {
                 return focus;
             } else {
@@ -443,6 +434,7 @@ public class AlienContainer {
     public void getAction() throws NotEnoughEnergyException, UnknownActionException {
         Action a = alien.getAction();
 
+        this.currentAction = a;
         this.currentActionCode = a.code;
         this.currentActionPower = a.power;
         this.currentActionMessage = a.message;

@@ -22,6 +22,7 @@ import static org.eastsideprep.spacecritters.stockelements.AggressiveAlien.dalek
 public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
 
     final double MIN_ENERGY = 50.0;
+    final double SPAWN_ENERGY = 200.0;
     final double MIN_TECH = 10.0;
     final int RESEARCH_PERCENT = 30;
 
@@ -33,6 +34,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
     long tBurn = 0;
     SpaceObject target = null;
     Position targetPosition = null;
+    boolean accelerate;
 
     // don't do anything in the contructor, implicitly or explicitly!
     public Voyager() {
@@ -45,6 +47,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         this.startTurn = ctx.getGameTurn();
         this.target = ctx.getSpaceObject("ProximaCentauri");
         this.targetPosition = target.position;
+        this.accelerate = true;
     }
 
     @Override
@@ -60,7 +63,13 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
             if (ctx.getRandomInt(100) > (100 - RESEARCH_PERCENT)) {
                 return new Action(Action.ActionCode.Research);
             }
-            return new Action(Action.ActionCode.Gain);
+            if (accelerate || ctx.getEnergy() < SPAWN_ENERGY) {
+                return new Action(Action.ActionCode.Gain);
+            }
+            return new Action(Action.ActionCode.Spawn, 
+                    new WorldVector(ctx.getVelocity()
+                            .scale(0.001*ctx.getRandomInt(10))
+                            .rotate(Math.PI/ctx.getRandomInt(10)-Math.PI/2)), 5);
 
         } catch (Exception e) {
             ctx.debugOut("Something went wrong in getAction, " + ctx.getStateString());
@@ -83,37 +92,39 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
 
     @Override
     public WorldVector getAccelerate() {
-        Vector3 v = ctx.getVelocity();
-        Vector3 p = ctx.getPosition();
-        Vector3 f = ctx.getFocus().position;
-        double M = ctx.getMeanAnomaly();
-      
+        WorldVector v = ctx.getVelocity();
+        WorldVector p = ctx.getWorldPosition();
+        WorldVector f = ctx.getFocus().worldPosition;
 
         // if we are orbiting anything else than SOL, lay off the gas pedal
+        // even if we later go back
         SpaceObject so = ctx.getFocus();
         if (so != null) {
             if (!so.name.equalsIgnoreCase("SOL")) {
-                return null;
+                accelerate = false;
             }
         }
 
-        // first, do we have energy and tech?
-        if (ctx.getEnergy() < MIN_ENERGY || ctx.getTech() < MIN_TECH) {
-            return null;
+        if (accelerate) {
+            // first, do we have energy and tech?
+            if (ctx.getEnergy() < MIN_ENERGY || ctx.getTech() < MIN_TECH) {
+                return null;
+            }
+
+            // accelerate at the right time
+            Vector3 d1 = p.subtract(f);
+            Vector3 d2 = this.targetPosition.subtract(f);
+            double indicator = d1.unit().dot(d2.unit());
+            if (indicator < -0.9) {
+                tBurn = System.currentTimeMillis();
+                // add a deltaV of 1.3% every turn while in the right position
+                v = v.scale(0.013);
+                WorldVector deltaV = v;
+                System.out.println("--------------acc " + deltaV + ", mag " + deltaV.magnitude());
+                return deltaV;
+            }
         }
 
-        // accelerate at the right time
-        Vector3 d1 = p.subtract(f);
-        Vector3 d2 = this.targetPosition.subtract(f);
-        double indicator = d1.unit().dot(d2.unit());
-        if ((indicator < -0.9) && (ctx.getGameTurn() - this.startTurn < 1000)) {
-            tBurn = System.currentTimeMillis();
-            v = v.scale(0.01);
-            v = null;
-            WorldVector deltaV = new WorldVector(v);
-            System.out.println("--------------acc "+deltaV+", mag "+deltaV.magnitude());
-            return deltaV;
-        } 
         return null;
     }
 
@@ -121,6 +132,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
     public Vector2 getMove() {
         throw new UnsupportedOperationException("Complex alien does not support simple moves");
     }
+
     /*
     @Override
     public Shape3D getShape(int complexityLimit) {
@@ -146,7 +158,6 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         return null;
     }
      */
-
     @Override
     public void init(Context ctx, int id, int parent, String message) {
     }

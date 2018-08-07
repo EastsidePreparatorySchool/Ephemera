@@ -295,7 +295,8 @@ public class SpaceGrid {
                 IntegerPosition pOldInt = pOld.round();
                 IntegerPosition pNewInt = pNew.round();
 
-                vis.showPlanetMove(pOldInt.x, pOldInt.y, pNewInt.x, pNewInt.y, p.className, p.index, p.energy, (int) p.tech);
+                vis.showPlanetMove(pOldInt.x, pOldInt.y, pNewInt.x, pNewInt.y, 
+                        p.className, p.index, p.energy, (int) p.tech, getTime());
             }
         }
     }
@@ -318,12 +319,12 @@ public class SpaceGrid {
         // now for all the aliens
         for (AlienContainer ac : aliens) {
             if (ac.energy > 0) {// not accidentally killed by moving planet in this phase
-                int oldX = ac.p.round().x; //[kludge]
-                int oldY = ac.p.round().y;
+                double oldX = ac.p.x; 
+                double oldY = ac.p.y;
 
                 if (oldX != ac.nextP.x || oldY != ac.nextP.y) {
                     ac.p.set(ac.nextP);
-                    aliens.move(ac, oldX, oldY, ac.p.round().x, ac.p.round().y);
+                    aliens.move(ac, (int)Math.round(oldX), (int)Math.round(oldY), ac.p.round().x, ac.p.round().y);
                 }
 
                 // need to go through all the rest to mark cell fresh for display,
@@ -339,7 +340,8 @@ public class SpaceGrid {
                             0,
                             0,
                             ac.updated,
-                            ac.trajectory);
+                            ac.trajectory,
+                            ac.grid.getTime());
                 } catch (Exception e) {
                     displayException("Unhandled exception in showMove(): ", e);
                 }
@@ -731,7 +733,12 @@ public class SpaceGrid {
                             thisAlien
                     );
                     newAliens.add(spec);
-                    trajectories.put(spec, thisAlien.trajectory);
+                    Trajectory t = thisAlien.trajectory;
+                    if (t != null) {
+                        t = t.clone();
+                        t.accelerate(thisAlien.currentAction.deltaV, getTime());
+                    }
+                    trajectories.put(spec, t);
 
                     break;
             }
@@ -800,8 +807,7 @@ public class SpaceGrid {
     AlienContainer addAlienWithParams(int x, int y, String domainName,
             String alienPackageName, String alienClassName,
             int parent, double tech, double power, String spawnMsg,
-            Trajectory trajectory
-    ) {
+            Trajectory trajectory) {
         AlienContainer ac = null;
 
         String speciesName = domainName + ":" + alienPackageName + ":" + alienClassName;

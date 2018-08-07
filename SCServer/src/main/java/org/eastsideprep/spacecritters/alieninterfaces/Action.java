@@ -15,6 +15,7 @@ public class Action {
     final public int sellPrice;
     final public int buyPrice;
     final public String message;
+    final public WorldVector deltaV;
 
     // for power actions
     public Action(ActionCode code, int power) {
@@ -23,6 +24,7 @@ public class Action {
         this.message = null;
         this.sellPrice = 0;
         this.buyPrice = 0;
+        this.deltaV = null;
     }
 
     // for simple actions
@@ -32,8 +34,19 @@ public class Action {
         this.message = null;
         this.sellPrice = 0;
         this.buyPrice = 0;
+                this.deltaV = null;
+    }
+    
+public Action(ActionCode code, WorldVector deltaV, int power) {
+        this.code = code;
+        this.power = power;
+        this.message = null;
+        this.sellPrice = 0;
+        this.buyPrice = 0;
+        this.deltaV = deltaV;
     }
 
+    
     // for messages
     public Action(ActionCode code, int power, String message) {
         this.code = code;
@@ -41,6 +54,7 @@ public class Action {
         this.message = message;
         this.sellPrice = 0;
         this.buyPrice = 0;
+                this.deltaV = null;
     }
 
     // for trades and defense
@@ -50,7 +64,8 @@ public class Action {
         this.message = message;
         this.sellPrice = sellPrice;
         this.buyPrice = buyPrice;
-    }
+                 this.deltaV = null;
+   }
 
     public enum ActionCode {
         None, Gain, Research, Spawn, TradeOrDefend, Fight, Land, Launch

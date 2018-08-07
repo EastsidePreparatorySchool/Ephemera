@@ -15,6 +15,7 @@ public interface Orbitable {
     public double mass();
     public Position position(double t);
     public WorldVector worldPosition(double t);
+    public WorldVector worldPositionAtAngle(double theta);
     public WorldVector velocity(double t);
     public double hillRadius();
 }

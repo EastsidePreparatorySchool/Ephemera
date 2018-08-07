@@ -9,6 +9,7 @@ import org.eastsideprep.spacecritters.alieninterfaces.Vector2;
 import org.eastsideprep.spacecritters.gamelogic.SpaceGrid;
 import java.util.ArrayList;
 import java.util.Iterator;
+import org.eastsideprep.spacecritters.alieninterfaces.Position;
 import org.eastsideprep.spacecritters.alieninterfaces.WorldVector;
 
 /**
@@ -47,37 +48,40 @@ public class Trajectory {
     }
 
     public void accelerate(WorldVector deltaV, double t) {
-        Vector2 v = velocityAtTime(t);
-        Vector2 v2 = v.add(deltaV);
-        Vector2 r = worldPositionAtTime(t);
+        WorldVector v = getVelocityAtTime(t);
+        WorldVector v2 = v.add(deltaV);
+        WorldVector r = getWorldPositionAtTime(t);
         Orbitable focus = conic.focus;
-        System.out.println("<<<<<Old conic:");
-        conic.dump();
-
         conic = Conic.newConic(focus, r, v2, t, sg);
+    }
 
-        System.out.println(">>>>>New conic:");
-        conic.dump();
+    public void setFocus(Orbitable focus) {
+        WorldVector v = getVelocityAtTime(sg.getTime());
+        WorldVector r = getWorldPositionAtTime(sg.getTime());
 
-        Vector2 v3 = velocityAtTime(t);
-        if (v.unit().dot(v3.unit()) < 0) {
-            System.out.println("Unexplained velocity reversal in accelerate");
+        conic = Conic.newConic(focus, r, v, sg.getTime(), sg);
+        currentFocus = focus;
+    }
+
+    public WorldVector getWorldPositionAtTime(double t) {
+        if (t == conic.tCurrent) {
+            return conic.rCurrent;
         }
+        return conic.calculateWorldPositionAtTime(t);
     }
 
-    public WorldVector worldPositionAtTime(double t) {
-        return conic.worldPositionAtTime(t);
-    }
-
-    public WorldVector velocityAtTime(double t) {
-        return new WorldVector(conic.getVelocityAtTime(t).add(conic.focus.velocity(t)));
+    public WorldVector getVelocityAtTime(double t) {
+        if (t == conic.tCurrent) {
+            return conic.vCurrent;
+        }
+        return new WorldVector(conic.calculateVelocityAtTime(t));
     }
 
     @Override
     public Trajectory clone() {
         Trajectory trajectory = new Trajectory();
         trajectory.conic = conic;
-
+        trajectory.sg = sg;
         trajectory.currentFocus = currentFocus;
         return trajectory;
     }
@@ -98,16 +102,16 @@ public class Trajectory {
 
         ArrayList<Vector2> points = new ArrayList<>();
         for (double theta = bottomBound; theta < topBound; theta += dTheta) {
-            points.add(conic.worldPositionAtAngle(theta));
+            points.add(conic.calculateWorldPositionAtAngle(theta));
         }
         if (conic.e < 1) {
-            points.add(conic.worldPositionAtAngle(dTheta - Math.PI));
+            points.add(conic.calculateWorldPositionAtAngle(dTheta - Math.PI));
         }
 
         return points.iterator();
     }
 
-    public WorldVector positionOfFocus() {
-        return new WorldVector(currentFocus.position(sg.getTime()));
+    public Position positionOfFocus() {
+        return currentFocus.position(sg.getTime());
     }
 }

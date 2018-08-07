@@ -5,7 +5,6 @@
  */
 package org.eastsideprep.spacecritters.orbit;
 
-import org.eastsideprep.spacecritters.alieninterfaces.Position;
 import org.eastsideprep.spacecritters.alieninterfaces.Vector2;
 import org.eastsideprep.spacecritters.alieninterfaces.Vector3;
 import org.eastsideprep.spacecritters.alieninterfaces.WorldVector;
@@ -39,15 +38,21 @@ public abstract class Conic {
     double M0;  // mean anomaly (cicrle angle) at time t0
     double n;   // angular velocity
     double t0;  // time this orbit was entered
+    
 
-    double theta;
+    public WorldVector rCurrent;
+    public WorldVector vCurrent;
+    public double  tCurrent = -1;
+    
+    double theta = 0;
 
     SpaceGrid sg;
     Vector2 lastV;
 
-    public static Conic newConic(Orbitable focus, Vector2 r, Vector2 v, double t, SpaceGrid sg) {
-        System.out.println("----------- new conic");
-        System.out.println("-- input v: "+v.magnitude());
+    public static Conic newConic(Orbitable focus, WorldVector r, WorldVector v, double t, SpaceGrid sg) {
+//        System.out.println("----------- new conic");
+//        System.out.println("-- input r: " + r + ", mag: " + r.magnitude());
+//        System.out.println("-- input v: " + v + ", mag: " + v.magnitude());
         /*
         //p = h^2 / mu              semi-latus rectum
         //r = p / (1 + ||e|| cos theta)
@@ -80,13 +85,9 @@ public abstract class Conic {
         Vector3 e = v.cross(h).scale(1 / mu).subtract(r.unit());
 
         double em = e.magnitude();
-        System.out.println("new con: new e:" + em);
-        if (em > 0.9) {
-            System.out.println("hah!");
-        }
 
         double p = hm * hm / mu;
-        double rotation = Math.atan2(e.y, e.x);//Math.asin( v.dot(r.unit()) * hm / (mu*em) ) - theta;
+        double rotation = Math.atan2(e.x, e.y);//Math.asin( v.dot(r.unit()) * hm / (mu*em) ) - theta;
         rotation = Vector2.normalizeAngle(rotation);
         double theta = Vector2.normalizeAngle(rAngle - rotation);//Math.acos((p/rm - 1) / em);//Math.acos(e.dot(r) / (em*rm));
          */
@@ -98,34 +99,36 @@ public abstract class Conic {
         double vm = v.magnitude();
 
         double mu = focus.mass() * Constants.G;
+        //System.out.println("mu: "+mu);
 
         Vector3 h = r.cross(v);
         double hm = h.magnitude();
         double signum = Math.signum(h.z);
         double energy = vm * vm / 2 - mu / rm;
 
-        Vector3 e = (r.scale(vm * vm - mu / rm).subtract(v.scale(r.dot(v)))).scale(1 / mu);
+        WorldVector e = r.scale(vm * vm / mu - 1 / rm).subtract(v.scale(r.dot(v) / mu));
+        //System.out.println("evec " + e);
         double em = e.magnitude();
 
         double p;
 
         if (Math.abs(em - 1.0) > 0.001) {
             double a = -mu / (2 * energy);
+            //System.out.println("a: "+a);
             p = a * (1 - em * em);
         } else {
             p = hm * hm / mu;
         }
 
-        double rotation = Math.atan2(e.x,e.y);
+        double rotation = Vector2.normalizeAngle(Math.atan2(e.y, e.x));
         double theta = Vector2.normalizeAngle(rAngle - rotation);
 
-       
         Conic c = newConic(focus, p, em, theta, signum, rotation, sg);
-        
+
         return c;
     }
-    
-    public void dump (){
+
+    public void dump() {
         System.out.println("--e:        " + e);
         System.out.println("--p:        " + p);
         System.out.println("--theta:    " + theta);
@@ -176,17 +179,18 @@ public abstract class Conic {
 
     public abstract double MAtAngle(double theta);
 
-    public WorldVector worldPositionAtAngle(double theta) {
-        double r = p / (1 + e * Math.cos(theta));
-        if (r < 0 && Math.abs(theta) < Math.PI) {
-            System.out.println("Radius was negative at angle " + theta);
+    public WorldVector calculateWorldPositionAtAngle(double theta1) {
+        double r = p / (1 + e * Math.cos(theta1));
+        if (r < 0 && Math.abs(theta1) < Math.PI) {
+            System.out.println("Radius was negative at angle " + theta1);
         }
-        return new WorldVector(r * Math.cos(theta + rotation), r * Math.sin(theta + rotation));
+        Vector2 v = new Vector2(r * Math.cos(theta1 + rotation), r * Math.sin(theta1 + rotation));
+        return new WorldVector(v.add(focus.worldPositionAtAngle(theta1)));
     }
 
-    public WorldVector worldPositionAtTime(double t) {
-        double theta = angleAtTime(t);
-        return new WorldVector(worldPositionAtAngle(theta).add(focus.worldPosition(t)));
+    public WorldVector calculateWorldPositionAtTime(double t) {
+        double theta1 = angleAtTime(t);
+        return new WorldVector(calculateWorldPositionAtAngle(theta1));
     }
 
     @Override
@@ -194,7 +198,26 @@ public abstract class Conic {
         return newConic(focus, p, e, theta, signum, rotation, sg);
     }
 
-    public WorldVector getVelocityAtTime(double t) {
+    public void updateStateVectors(double t) {
+        double theta1 = angleAtTime(t);
+        vCurrent = calculateVelocityAtAngle(theta1);
+        rCurrent = calculateWorldPositionAtAngle(theta1);
+        tCurrent = t;
+    }
+
+    public WorldVector calculateVelocityAtAngle(double theta1) {
+        double vperp = mu * (1 + e * Math.cos(theta1)) / h * (signum);
+        double vrad = mu * e * Math.sin(theta1) / h;
+
+        WorldVector v = new WorldVector(new Vector2(vrad, vperp).rotate(rotation + theta1));
+        if (v.dot(lastV) < 0) {
+            System.out.println("  velocity sign reversal");
+        }
+        lastV = v;
+
+        return v;
+    }
+    public WorldVector calculateVelocityAtTime(double t) {
         double theta1 = angleAtTime(t);
 
         double vperp = mu * (1 + e * Math.cos(theta1)) / h * (signum);

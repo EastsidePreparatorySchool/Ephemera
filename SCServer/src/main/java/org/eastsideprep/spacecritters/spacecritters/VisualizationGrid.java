@@ -129,7 +129,7 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showMove(AlienSpec as, int oldx, int oldy, double energyAtNew, double energyAtOld, boolean update, Trajectory t) { //[Q]
+    public void showMove(AlienSpec as, double oldx, double oldy, double energyAtNew, double energyAtOld, boolean update, Trajectory t, double time) { //[Q]
         int x = as.x;
         int y = as.y;
 
@@ -362,7 +362,7 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
-    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) { //[Q]
+    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech, double time) { //[Q]
         gameShell.mainScene.planets.get(index).recordMoveTo(x, y);
     }
 

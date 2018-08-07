@@ -98,7 +98,7 @@ public class SCGameState implements GameLogState {
         }
         switch (sge.type) {
             case SCGameLogEntry.Type.TURN:
-                totalTurns = sge.param1;
+                totalTurns = (int)sge.param1;
                 lastTurn = new SCGameLogEntry(sge);
                 break;
 

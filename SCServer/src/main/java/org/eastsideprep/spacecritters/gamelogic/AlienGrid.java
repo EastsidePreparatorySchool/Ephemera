@@ -139,26 +139,30 @@ public class AlienGrid extends LinkedList<AlienContainer> {
     }
 
     public void unplugPlanet(Planet p) { //[Q]
-        // add alien to grid 
         IntegerPosition pos = p.position.round();
 
         AlienCell acs = acGrid[pos.x + centerX][pos.y + centerY];
+        if (acs == null) {
+            System.out.println("AG: Planet "+p.className+ " is not here! " + pos);
+            return;
+        }
+
         acs.planet = null;
         acs.energy -= p.energy;
         acs.tech = 0;
+
     }
 
     public void distributeStarEnergy(int x, int y, double energy) { //[Q]
         // probe around our current position,
         // tracing an imaginary square of increasing size,
         // starting from the midpoints of the sides
-        for (IntegerPosition p:new GridDisk(x,y, (int) Math.round(energy))) {
+        for (IntegerPosition p : new GridDisk(x, y, (int) Math.round(energy))) {
             double r = p.magnitude();
-            double pointEnergy = ((double) (energy * Constants.starEnergyPerLuminosity) / (r*r));
+            double pointEnergy = ((double) (energy * Constants.starEnergyPerLuminosity) / (r * r));
             putEnergyAt(p, pointEnergy);
         }
-        
-        
+
     }
 
     void putEnergyAt(IntegerPosition p, double energy) { //[Q]

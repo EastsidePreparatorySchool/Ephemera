@@ -37,6 +37,8 @@ var speciesMap = null;
 var grid = [];
 var fights = [];
 var observers = 0;
+var engineList = null;
+var attachedName = null;
 // global states
 var attached = false;
 var running = false;
@@ -102,6 +104,7 @@ function attach(engine) {
     request({url: "protected/attach?engine=" + engine + "&clientID=" + getClientID()})
             .then(data => {
                 data = JSON.parse(data);
+                attachedName = engine;
                 uiStateChange(true, undefined, data);
             })
             .catch(error => {
@@ -263,7 +266,8 @@ function drawOrbit(id, focusX, focusY, e, p, rotation, vx, vy) {
 
 function drawVelocity(alien, vx, vy) {
     return drawLine(-alien.mesh.position.z, -alien.mesh.position.x,
-            -alien.mesh.position.z - vx, -alien.mesh.position.x - vy);
+            -alien.mesh.position.z + vx, -alien.mesh.position.x + vy,
+            fightMaterial);
 
 }
 
@@ -284,14 +288,14 @@ function drawEllipse(centerX, centerY, radiusX, radiusY, rotation) {
     return ellipse;
 }
 
-function drawLine(x1, y1, x2, y2) {
+function drawLine(x1, y1, x2, y2, material) {
     var vector = new THREE.Geometry();
     vector.vertices.push(
             new THREE.Vector3(-y1, 1, -x1),
             new THREE.Vector3(-y2, 1, -x2),
             );
 
-    var line = new THREE.Line(vector, orbitMaterial);
+    var line = new THREE.Line(vector, ((material !== undefined) ? material : orbitMaterial));
     return line;
 
 }
@@ -430,6 +434,12 @@ function uiStateChange(attachState, runState, data) {
             renderer.render(scene, camera);
             //println("purge complete.");
             updateInterval = updateIntervalInactive;
+
+            // in 2 seconds, start polling to reattach
+            setTimeout(() => {
+                engineList = null;
+                setInterval(reattach, 200);
+            }, 2000);
         }
     }
 
@@ -481,12 +491,30 @@ function start() {
             });
 }
 
+
+function reattach() {
+    listEngines();
+    if (engineList !== null) {
+        engineList.forEach((e) => {
+            if (e.name === attachedName) {
+                println("reattaching to " + attachedName);
+                println(location);
+                location.reload();
+            }
+        });
+    }
+    println("waiting to reattach ...");
+}
+
 function listEngines() {
     request({url: "protected/listengines"})
             .then(data => {
                 if (data !== null) {
                     //println ("Raw: "+data);
                     data = JSON.parse(data);
+                    if (!attached) {
+                        engineList = data;
+                    }
                     engines.innerHTML = "";
                     for (var i = 0; i < data.length; i++) {
                         //println("Engine: '"+data[i].name+"'");
@@ -617,8 +645,8 @@ class Grid {
     }
 
     addToCell(alien, x, y) {
-        x = Math.floor(x);
-        y = Math.floor(y);
+        x = Math.round(x);
+        y = Math.round(y);
         var cell = this.grid[x + this.halfWidth][y + this.halfHeight];
         if (cell === undefined) {
             cell = [];
@@ -636,8 +664,8 @@ class Grid {
     }
 
     removeFromCell(alien, x, y) {
-        x = Math.floor(x);
-        y = Math.floor(y);
+        x = Math.round(x);
+        y = Math.round(y);
         var cell = this.grid[x + this.halfWidth][y + this.halfHeight];
         assert(() => (alien.getX() === x));
         assert(() => (alien.getY() === y));
@@ -695,10 +723,10 @@ class Alien {
     }
 
     setHeight(height) {
-        this.mesh.position.y = 2 * height;
+        this.mesh.position.y = 2 * height+1;
     }
     getHeight() {
-        return (this.mesh.position.y / 2);
+        return ((this.mesh.position.y-1) / 2);
     }
 }
 
@@ -811,7 +839,7 @@ class Trail {
         mesh.scale.set(0.2, 0.2, 0.2);
         mesh.position.x = -y;
         mesh.position.z = -x;
-        mesh.position.y = 0.5;
+        mesh.position.y = 1.0;
         scene.add(mesh);
         this.points.push(mesh);
         if (this.points.length > trailLength) {
@@ -1040,7 +1068,12 @@ function init() {
     trailMaterial = new THREE.MeshBasicMaterial({color: "lightblue", wireframe: false});
     gridHelper = new THREE.GridHelper(size, size, "#500000", "#500000");
     scene.add(gridHelper);
-    //scene.add(drawEllipse(0,0,1000,300,0));
+    var xa = drawLine(0, 0, size / 2, 0, fightMaterial);
+    xa.position.y = 0.5;
+    var ya = drawLine(0, 0, 0, size / 2);
+    ya.position.y = 0.5;
+    scene.add(xa);
+    scene.add(ya);
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
     controls.dampingFactor = 0.25;

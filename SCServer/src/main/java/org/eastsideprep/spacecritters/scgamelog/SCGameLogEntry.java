@@ -14,10 +14,10 @@ public class SCGameLogEntry extends GameLogEntry {
 
     // to record: moves, acceleration, state change (t,e, orbital, secrets), comm, trade, 
     public int type;
-    public int newX;
-    public int newY;
-    public int param1;
-    public int param2;
+    public double newX;
+    public double newY;
+    public double param1;
+    public double param2;
     public String name;
     public String speciesName;
     public int id;
@@ -25,7 +25,7 @@ public class SCGameLogEntry extends GameLogEntry {
     public double energy;
     public double tech;
 
-    public SCGameLogEntry(int type, int newX, int newY, int param1, int param2, String name, String speciesName, int id, int speciesId, double energy, double tech) {
+    public SCGameLogEntry(int type, double newX, double newY, double param1, double param2, String name, String speciesName, int id, int speciesId, double energy, double tech) {
         this.type = type;
         this.newX = newX;
         this.newY = newY;

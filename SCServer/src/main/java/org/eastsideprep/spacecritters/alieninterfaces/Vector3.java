@@ -60,7 +60,7 @@ public class Vector3 {
 
     @Override
     public String toString() {  //[Q] (doubles will be messy)
-        return "(" + x + "," + y + "," + z + ")";
+        return "V3(" + x + "," + y + "," + z + ")";
     }
 
     public boolean equals(Vector3 v) {

@@ -149,7 +149,7 @@ public class Vector2 extends Vector3 {
 
     @Override
     public String toString() {
-        return "(" +x+ "," + y+ ")";
+        return "V2(" +x+ "," + y+ ")";
     }
 
 }

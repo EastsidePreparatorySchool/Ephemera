@@ -12,8 +12,8 @@ package org.eastsideprep.spacecritters.alieninterfaces;
 public interface ContextComplex extends Context {
 
     WorldVector getVelocity();
-
-    double getMeanAnomaly();
+    
+    WorldVector getWorldPosition();
 
     SpaceObject getFocus();
 

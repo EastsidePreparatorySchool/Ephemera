@@ -227,18 +227,12 @@ public class ContextImplementation implements ContextComplex {
     @Override
     public WorldVector getVelocity() {
         if (ac.trajectory != null) {
-            return ac.trajectory.velocityAtTime(ac.grid.getTime());
+            return ac.trajectory.getVelocityAtTime(ac.grid.getTime());
         }
         return (null);
     }
 
-    @Override
-    public double getMeanAnomaly() {
-        if (ac.trajectory != null) {
-            return ac.trajectory.conic.angleAtTime(ac.grid.getTime());
-        }
-        return (0.0);
-    }
+ 
 
     @Override
     public Orbit getOrbit() {
@@ -285,6 +279,14 @@ public class ContextImplementation implements ContextComplex {
             }
         }
         return null;
+    }
+
+    @Override
+    public WorldVector getWorldPosition() {
+        if (ac.trajectory.conic.tCurrent != ac.grid.getTime()) {
+            ac.trajectory.conic.updateStateVectors(ac.grid.getTime());
+        }
+        return new WorldVector(ac.trajectory.conic.rCurrent);
     }
 
 }

@@ -36,5 +36,10 @@ public class DummyMass implements Orbitable {
     public double hillRadius() {
         return 0;
     }
+
+    @Override
+    public WorldVector worldPositionAtAngle(double theta) {
+        return worldPosition(0);
+    }
     
 }

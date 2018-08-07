@@ -24,7 +24,7 @@ public interface GameVisualizer {
 
     void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass, Trajectory t); //[Q]
 
-    void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech);  //[Q]
+    void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech, double time);  //[Q]
 
     void mapEnergy(int x, int y, double energy);
 
@@ -36,7 +36,7 @@ public interface GameVisualizer {
 
     void showAliens(List<AlienSpec> aliens);
 
-    void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition, boolean update, Trajectory t); //[Q]
+    void showMove(AlienSpec as, double oldX, double oldY, double energyAtNewPosition, double energyAtOldPosition, boolean update, Trajectory t, double time); //[Q]
 
     void showFight(int x, int y);
 

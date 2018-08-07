@@ -41,7 +41,7 @@ public class Planet extends InternalSpaceObject {
                 1.0,    // signum
                 grid.rand.nextDouble()*Math.PI, //rotation
                 grid);
-        worldPosition = trajectory.worldPositionAtTime(grid.getTime());
+        worldPosition = trajectory.getWorldPositionAtTime(grid.getTime());
         position = new Position(worldPosition);
         
         hillRadius = trajectory.partialHillRadius() * Math.pow(mass, 1f/3);
@@ -51,8 +51,8 @@ public class Planet extends InternalSpaceObject {
     }
 
     public void move() {
-        //this.worldPosition = trajectory.worldPositionAtTime(grid.getTime());
-        //this.position = new Position (worldPosition);
+        this.worldPosition = trajectory.getWorldPositionAtTime(grid.getTime());
+        this.position = new Position (worldPosition);
     }
 
     public void reviewInhabitants() {

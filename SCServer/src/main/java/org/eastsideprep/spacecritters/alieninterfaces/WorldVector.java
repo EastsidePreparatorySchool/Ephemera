@@ -38,6 +38,16 @@ public class WorldVector extends Vector2 {
     }
 
     public WorldVector add(WorldVector v) {
-        return new WorldVector(this.x + v.x, this.y += v.y);
+        return new WorldVector(this.x + v.x, this.y + v.y);
     }
+
+    public WorldVector subtract(WorldVector v) {
+        return new WorldVector(this.x - v.x, this.y - v.y);
+    }
+
+    @Override
+    public WorldVector scale(double d) {
+        return new WorldVector(this.x * d, this.y * d);
+    }
+ 
 }

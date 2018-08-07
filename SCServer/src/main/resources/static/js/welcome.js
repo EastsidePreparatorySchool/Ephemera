@@ -173,8 +173,8 @@ function listEngines() {
                         var info = document.createTextNode(", "
                                 + "status: " + (data[i].isAlive ? "alive" : "dead") + ", "
                                 + "turns: " + data[i].turns + ", "
-                                + "observers: " + data[i].observers+", "
-                                + "log size: "+data[i].logSize
+                                + "observers: " + data[i].observers + ", "
+                                + "log size: " + data[i].logSize
                                 );
                         atag.appendChild(engine);
                         contentP.appendChild(atag);
@@ -187,6 +187,7 @@ function listEngines() {
                 if (error !== null && error.length > 0) {
                     println("  Error: '" + error + "'");
                 }
+                contentP.innerHTML = "<br><br><br><br>Server offline<br><br>";
             });
 }
 

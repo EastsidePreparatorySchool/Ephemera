@@ -63,10 +63,10 @@ public class MultiVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech) { //[Q]
+    public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech, double time) { //[Q]
         cgv.forEach(e -> {
             try {
-                e.showPlanetMove(oldx, oldy, x, y, name, index, energy, tech);
+                e.showPlanetMove(oldx, oldy, x, y, name, index, energy, tech, time);
             } catch (UnsupportedOperationException ex) {
                 System.err.println("multivis: " + ex.getMessage());
                 ex.printStackTrace(System.err);
@@ -135,10 +135,10 @@ public class MultiVisualizer implements GameVisualizer {
     }
 
     @Override
-    public void showMove(AlienSpec as, int oldX, int oldY, double energyAtNewPosition, double energyAtOldPosition, boolean update, Trajectory t) { //[Q]
+    public void showMove(AlienSpec as, double oldX, double oldY, double energyAtNewPosition, double energyAtOldPosition, boolean update, Trajectory t, double time) { //[Q]
         cgv.forEach(e -> {
             try {
-                e.showMove(as, oldX, oldY, energyAtNewPosition, energyAtOldPosition, update, t);
+                e.showMove(as, oldX, oldY, energyAtNewPosition, energyAtOldPosition, update, t, time);
             } catch (UnsupportedOperationException ex) {
                  System.err.println("multivis: " + ex.getMessage());
                 ex.printStackTrace(System.err);
