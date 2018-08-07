@@ -52,15 +52,21 @@ public class Trajectory {
         WorldVector v2 = v.add(deltaV);
         WorldVector r = getWorldPositionAtTime(t);
         Orbitable focus = conic.focus;
-        conic = Conic.newConic(focus, r, v2, t, sg);
+        Conic c = Conic.newConic(focus, r, v2, t, sg);
+        if (c != null) {
+            conic = c;
+        }
     }
 
     public void setFocus(Orbitable focus) {
         WorldVector v = getVelocityAtTime(sg.getTime());
         WorldVector r = getWorldPositionAtTime(sg.getTime());
 
-        conic = Conic.newConic(focus, r, v, sg.getTime(), sg);
-        currentFocus = focus;
+        Conic c = Conic.newConic(focus, r, v, sg.getTime(), sg);
+        if (c != null) {
+            conic = c;
+            currentFocus = focus;
+        }
     }
 
     public WorldVector getWorldPositionAtTime(double t) {

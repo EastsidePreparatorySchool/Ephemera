@@ -66,10 +66,12 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
             if (accelerate || ctx.getEnergy() < SPAWN_ENERGY) {
                 return new Action(Action.ActionCode.Gain);
             }
-            return new Action(Action.ActionCode.Spawn, 
-                    new WorldVector(ctx.getVelocity()
-                            .scale(0.001*ctx.getRandomInt(10))
-                            .rotate(Math.PI/ctx.getRandomInt(10)-Math.PI/2)), 5);
+            WorldVector deltaV = new WorldVector(ctx.getVelocity()
+                    .scale(0.001 * ctx.getRandomInt(10))
+                    .rotate(Math.PI / (ctx.getRandomInt(10)+1) - Math.PI / 2));
+            //System.out.println("  spawn v "+ctx.getVelocity());
+            //System.out.println("  spawn acc " + deltaV);
+            return new Action(Action.ActionCode.Spawn, deltaV, 5);
 
         } catch (Exception e) {
             ctx.debugOut("Something went wrong in getAction, " + ctx.getStateString());

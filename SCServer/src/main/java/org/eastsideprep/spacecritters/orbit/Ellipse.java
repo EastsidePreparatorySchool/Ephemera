@@ -127,32 +127,32 @@ public class Ellipse extends Conic {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-//    @Override
-//    public WorldVector getVelocityAtTime(double t) {
-//        // from https://space.stackexchange.com/questions/22172/calculating-velocity-state-vector-with-orbital-elements-in-2d
-//
-//        double a = p / (1 - e * e);             // semi-major axis
-//        double b = a * Math.sqrt(1 - e * e);    // semi-minor axis
-//
-//        double E = EAtTime(t);                  // eccentric anomaly
-//        double f = trueAtE(E);                  // true anomaly
-//        double rm;                              // length of position vector from focus
-//        double vm;                              // velocity magnitude
-//
-//        if (e < 0.999) {
-//            rm = a * Math.sqrt(1 - e * e) / (1 + e * Math.cos(f));
-//            vm = Math.sqrt(mu * (2 / rm - 1 / a));
-//        } else {
-//            rm = a;
-//            vm = Math.sqrt(mu / a);
-//        }
-//        //System.out.println("ell" + this + " e.v: rlength " + rm + " velocity " + vm + " t " + t);
-//
-//      
-//        Vector2 v = new Vector2(-a * Math.sin(E), b * Math.cos(E)).rotate(rotation).unit();
-//        v = v.scale(vm * signum);
-//        //System.out.println("ell" + this + " e.v: vx " + v.x + " vy " + v.y);
-//
-//        return new WorldVector(v);
-//    }
+    @Override
+    public WorldVector calculateVelocityAtTime(double t) {
+        // from https://space.stackexchange.com/questions/22172/calculating-velocity-state-vector-with-orbital-elements-in-2d
+
+        double a = p / (1 - e * e);             // semi-major axis
+        double b = a * Math.sqrt(1 - e * e);    // semi-minor axis
+
+        double E = EAtTime(t);                  // eccentric anomaly
+        double f = trueAtE(E);                  // true anomaly
+        double rm;                              // length of position vector from focus
+        double vm;                              // velocity magnitude
+
+        if (e < 0.999) {
+            rm = a * Math.sqrt(1 - e * e) / (1 + e * Math.cos(f));
+            vm = Math.sqrt(mu * (2 / rm - 1 / a));
+        } else {
+            rm = a;
+            vm = Math.sqrt(mu / a);
+        }
+        //System.out.println("ell" + this + " e.v: rlength " + rm + " velocity " + vm + " t " + t);
+
+      
+        Vector2 v = new Vector2(-a * Math.sin(E), b * Math.cos(E)).rotate(rotation).unit();
+        v = v.scale(vm * signum);
+        //System.out.println("ell" + this + " e.v: vx " + v.x + " vy " + v.y);
+
+        return new WorldVector(v);
+    }
 }

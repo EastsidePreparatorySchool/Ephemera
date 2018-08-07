@@ -38,12 +38,11 @@ public abstract class Conic {
     double M0;  // mean anomaly (cicrle angle) at time t0
     double n;   // angular velocity
     double t0;  // time this orbit was entered
-    
 
     public WorldVector rCurrent;
     public WorldVector vCurrent;
-    public double  tCurrent = -1;
-    
+    public double tCurrent = -1;
+
     double theta = 0;
 
     SpaceGrid sg;
@@ -109,6 +108,13 @@ public abstract class Conic {
         WorldVector e = r.scale(vm * vm / mu - 1 / rm).subtract(v.scale(r.dot(v) / mu));
         //System.out.println("evec " + e);
         double em = e.magnitude();
+
+        if (!Double.isFinite(em)) {
+            System.out.println("Invalid eccentricity from state vectors: " + em);
+            System.out.println("  r: " + r);
+            System.out.println("  v: " + v);
+            return null;
+        }
 
         double p;
 
@@ -217,6 +223,7 @@ public abstract class Conic {
 
         return v;
     }
+
     public WorldVector calculateVelocityAtTime(double t) {
         double theta1 = angleAtTime(t);
 
