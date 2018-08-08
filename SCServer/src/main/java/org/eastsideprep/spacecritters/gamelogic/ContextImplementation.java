@@ -236,8 +236,9 @@ public class ContextImplementation implements ContextComplex {
 
     @Override
     public Orbit getOrbit() {
+        Orbit o = null;
         if (ac.trajectory != null) {
-            Orbit o = new Orbit();
+             o = new Orbit();
             o.focus = getFocus();
             o.e = ac.trajectory.conic.e;
             o.a = ac.trajectory.conic.p / (1 - o.e * o.e);
@@ -245,7 +246,7 @@ public class ContextImplementation implements ContextComplex {
             o.signum = ac.trajectory.conic.signum;
         }
 
-        return null;
+        return o;
     }
 
     @Override

@@ -33,7 +33,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
     int startTurn;
     long tBurn = 0;
     SpaceObject target = null;
-    Position targetPosition = null;
+    WorldVector targetWorldPosition = null;
     boolean accelerate;
 
     // don't do anything in the contructor, implicitly or explicitly!
@@ -46,7 +46,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         this.ctx = ctx;
         this.startTurn = ctx.getGameTurn();
         this.target = ctx.getSpaceObject("ProximaCentauri");
-        this.targetPosition = target.position;
+        this.targetWorldPosition = target.worldPosition;
         this.accelerate = true;
     }
 
@@ -115,12 +115,14 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
 
             // accelerate at the right time
             Vector3 d1 = p.subtract(f);
-            Vector3 d2 = this.targetPosition.subtract(f);
+            Vector3 d2 = this.targetWorldPosition.subtract(f);
             double indicator = d1.unit().dot(d2.unit());
-            if (indicator < -0.9) {
+            double a = ctx.getOrbit().a;
+            //System.out.println("Current a :"+a+" dist to target: "+d2.magnitude());
+            if ((indicator < -0.95) && (a*1.5 < d2.magnitude())) {
                 tBurn = System.currentTimeMillis();
                 // add a deltaV of 1.3% every turn while in the right position
-                v = v.scale(0.013);
+                v = v.scale(0.011);
                 WorldVector deltaV = v;
                 System.out.println("--------------acc " + deltaV + ", mag " + deltaV.magnitude());
                 return deltaV;

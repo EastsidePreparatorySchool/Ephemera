@@ -134,6 +134,7 @@ public class Ellipse extends Conic {
 
  
     
+    @Override
     public void updateStateVectors(double t) {
         if (tCurrent != t) {
             double E = EAtTime(t);
@@ -159,7 +160,7 @@ public class Ellipse extends Conic {
         if (e > 0.001) {
             rm = p / (1 + e * Math.cos(f));
             vm = Math.sqrt(mu * (2 / rm - 1 / a));
-//            vm = mu / h * Math.sqrt(2*e*Math.cos(f) + e*e + 1);
+//            vm = mu / h * Math.sqrt(2*e*Math.cos(f) + e*e + 1); // this also works
         } else {
             vm = Math.sqrt(mu / a);
         }
