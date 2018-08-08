@@ -206,7 +206,7 @@ public abstract class Conic {
 
     public void updateStateVectors(double t) {
         double theta1 = angleAtTime(t);
-        vCurrent = calculateVelocityAtAngle(theta1);
+        vCurrent = calculateVelocityAtTime(t);
         rCurrent = calculateWorldPositionAtAngle(theta1);
         tCurrent = t;
     }
@@ -215,7 +215,8 @@ public abstract class Conic {
         double vperp = mu * (1 + e * Math.cos(theta1)) / h * (signum);
         double vrad = mu * e * Math.sin(theta1) / h;
 
-        WorldVector v = new WorldVector(new Vector2(vrad, vperp).rotate(rotation + theta1));
+        WorldVector v = new WorldVector(new Vector2(vrad, vperp).rotate(theta1-signum*rotation));
+        System.out.println("theta "+ theta1+" v angle "+v.angle());
         if (v.dot(lastV) < 0) {
             System.out.println("  velocity sign reversal");
         }
@@ -227,16 +228,7 @@ public abstract class Conic {
     public WorldVector calculateVelocityAtTime(double t) {
         double theta1 = angleAtTime(t);
 
-        double vperp = mu * (1 + e * Math.cos(theta1)) / h * (signum);
-        double vrad = mu * e * Math.sin(theta1) / h;
-
-        WorldVector v = new WorldVector(new Vector2(vrad, vperp).rotate(rotation + theta1));
-        if (v.dot(lastV) < 0) {
-            System.out.println("  velocity sign reversal");
-        }
-        lastV = v;
-
-        return v;
+        return calculateVelocityAtAngle(theta1);
     }
 
     public double partialHillRadius() {

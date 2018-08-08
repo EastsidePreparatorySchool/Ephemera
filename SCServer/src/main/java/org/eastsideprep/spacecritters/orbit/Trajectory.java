@@ -70,17 +70,17 @@ public class Trajectory {
     }
 
     public WorldVector getWorldPositionAtTime(double t) {
-        if (t == conic.tCurrent) {
-            return conic.rCurrent;
+        if (t != conic.tCurrent) {
+            conic.updateStateVectors(t);
         }
-        return conic.calculateWorldPositionAtTime(t);
+        return conic.rCurrent;
     }
 
     public WorldVector getVelocityAtTime(double t) {
-        if (t == conic.tCurrent) {
-            return conic.vCurrent;
+       if (t != conic.tCurrent) {
+            conic.updateStateVectors(t);
         }
-        return new WorldVector(conic.calculateVelocityAtTime(t));
+        return conic.vCurrent;
     }
 
     @Override
