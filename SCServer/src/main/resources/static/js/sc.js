@@ -2,7 +2,6 @@
  SpaceCritters online - GM, QB, PM
  */
 
-debug = true;
 
 var updateInterval = 50;
 var updateIntervalInactive = 1000;
@@ -128,8 +127,8 @@ function updates() {
                         processUpdates(data);
                     } catch (err) {
                         println("updates: error in processUpdates, " + err);
-                        console.log(err.stack);
-                        console.trace();
+//                        console.log(err.stack);
+//                        console.trace();
                     }
                 }
                 updateCounts();

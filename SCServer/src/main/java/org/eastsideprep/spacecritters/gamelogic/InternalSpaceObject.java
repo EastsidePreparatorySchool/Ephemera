@@ -65,7 +65,7 @@ public abstract class InternalSpaceObject implements Orbitable {
     }
 
     @Override
-    public Position getPositionAtTime(double t) {
+    public Position position(double t) {
         if (trajectory != null) {
             position = new Position (trajectory.getWorldPositionAtTime(t));
         }
@@ -73,21 +73,27 @@ public abstract class InternalSpaceObject implements Orbitable {
     }
 
     @Override
-    public WorldVector getWorldPositionAtTime(double t) {
+    public WorldVector worldPosition(double t) {
         if (trajectory != null) {
             worldPosition =  trajectory.getWorldPositionAtTime(t);
         }
         return worldPosition;
     }
+    @Override
+    public WorldVector worldPositionAtAngle(double theta) {
+        if (trajectory != null) {
+            worldPosition =  trajectory.conic.calculateWorldPositionAtAngle(theta);
+        }
+        return worldPosition;
+    }
 
     @Override
-    public WorldVector getVelocityAtTime(double t) {
+    public WorldVector velocity(double t) {
         if (trajectory == null) {
             return new WorldVector(0, 0);
         }
         return trajectory.getVelocityAtTime(t);
     }
-
 
     public double hillRadius() {
         return hillRadius;

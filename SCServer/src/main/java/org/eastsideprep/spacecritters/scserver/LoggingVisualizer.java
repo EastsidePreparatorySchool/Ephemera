@@ -58,7 +58,7 @@ public class LoggingVisualizer implements GameVisualizer {
                 0.0, 0.0));
 
         if (t != null) {
-            IntegerPosition p = t.currentFocus.getPositionAtTime(log.turnsCompleted * Constants.deltaT).round();
+            IntegerPosition p = t.currentFocus.position(log.turnsCompleted * Constants.deltaT).round();
             log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ORBIT,
                     p.x, p.y, 0, 0,
                     Double.toString(t.conic.rotation), null, -index, -1,
@@ -111,7 +111,7 @@ public class LoggingVisualizer implements GameVisualizer {
                 return;
             }
             if (t != null) {
-                Position pf = t.currentFocus.getPositionAtTime(time);
+                Position pf = t.currentFocus.position(time);
                 Position p = new Position(t.getWorldPositionAtTime(time));
                 WorldVector v = t.getVelocityAtTime(time);
                 
@@ -149,7 +149,7 @@ public class LoggingVisualizer implements GameVisualizer {
                 0.0, 0.0));
 
         if (t != null) {
-            IntegerPosition p = t.currentFocus.getPositionAtTime(log.turnsCompleted * Constants.deltaT).round();
+            IntegerPosition p = t.currentFocus.position(log.turnsCompleted * Constants.deltaT).round();
             log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ORBIT,
                     p.x, p.y, 0, 0,
                     Double.toString(t.conic.rotation), null, as.hashCode, as.speciesID,

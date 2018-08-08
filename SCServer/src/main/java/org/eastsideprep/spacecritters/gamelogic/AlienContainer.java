@@ -140,10 +140,10 @@ public class AlienContainer {
         if (trajectory instanceof DummyTrajectory) {
             this.trajectory = new Trajectory(
                     trajectory.currentFocus, //focus from the dummy trajectory
-                    10 * Constants.deltaX,//(grid.rand.nextDouble() *5 + 10) * Constants.deltaX, //semi-latus rectum
-                    0.1,//grid.rand.nextDouble() / 5, //Eccentricity
-                    1,//(grid.rand.nextInt(2) == 0)? 1:-1, //signum
-                    0,// Vector2.normalizeAngle(grid.rand.nextDouble() * 2 * Math.PI), //rotation
+                    10 * Constants.deltaX, //semi-latus rectum
+                    0.1, //Eccentricity
+                    1, //signum
+                    Vector2.normalizeAngle(grid.rand.nextDouble() * 2 * Math.PI), //rotation
                     grid);
         } else {
             this.trajectory = trajectory.clone();
@@ -220,7 +220,7 @@ public class AlienContainer {
     public void movecomplex() throws NotEnoughTechException {
         /* FIND DELTAV */
         updated = true;
-        double tolerance = 2; // percent
+        double tolerance = 10; // percent
 
         trajectory.conic.updateStateVectors(grid.getTime());
 
@@ -243,24 +243,13 @@ public class AlienContainer {
         WorldVector oldWP = nextWP;
         nextWP = trajectory.getWorldPositionAtTime(grid.getTime());
         nextP = new Position(nextWP);
-        System.out.println("r: " + nextWP + ", mag:" + nextWP.magnitude());
-        WorldVector v1 = trajectory.getVelocityAtTime(grid.getTime());
-        System.out.println("v: " + v1 + ", mag:" + v1.magnitude());
 
         // debug:
         // calculate apparent velocity from move distance
-        if (oldWP != null) {
-            WorldVector d = nextWP.subtract(oldWP).scale(1 / Constants.deltaT);
-            double dm = d.magnitude();
-            double vm = v1.magnitude();
-
-            double percent = 4;
-            if ((vm / dm) > (1.0 + percent / 100) || (vm / dm) < (1.0 - percent / 100)) {
-                System.out.println("Apparent v does not match supposed v:" + Math.round(((vm / dm) - 1.0) * 100) + "%");
-                System.out.println("supposed alien velocity: " + v1 + ", mag:" + v1.magnitude());
-                System.out.println("apparent alien velocity: " + d + ", mag:" + d.magnitude());
-            }
-        }
+//        if (oldWP != null) {
+//            Vector2 d = nextWP.subtract(oldWP).scale(1 / Constants.deltaT);
+//            System.out.println("apparent alien velocity: " + d + ", mag:" + d.magnitude());
+//        }
 
         /* CHARGE ALIEN FOR DELTAV */
         //aliens cannot change their trajectory if they are enot in the game limits
@@ -330,8 +319,8 @@ public class AlienContainer {
         //if orbiting a planet and within that planet's hill sphere, you're staying there
         //if not, enter the parent star's orbit
         if (focus instanceof Planet) {
-            System.out.println("hill radius: " + focus.hillRadius());
-            if (focus.getPositionAtTime(grid.getTime()).subtract(nextP).magnitude() <= focus.hillRadius()) {
+            System.out.println("hill radius: "+focus.hillRadius());
+            if (focus.position(grid.getTime()).subtract(nextP).magnitude() <= focus.hillRadius()) {
                 return focus;
             } else {
                 focus = ((Planet) focus).trajectory.currentFocus;
@@ -339,16 +328,16 @@ public class AlienContainer {
         }
 
         //parent must be a star if code gets here
-        double F = focus.mass() / focus.getPositionAtTime(grid.getTime()).subtract(nextP).magnitude();
+        double F = focus.mass() / focus.position(grid.getTime()).subtract(nextP).magnitude();
 
         //for each star
         //if it exerts more force on you than your parent star, it becomes your new parent
         for (InternalSpaceObject iso : grid.objects) {
             if (iso instanceof Star && iso != focus) {
-                if (iso.mass() / iso.getPositionAtTime(grid.getTime()).subtract(nextP).magnitude() > F) {
+                if (iso.mass() / iso.position(grid.getTime()).subtract(nextP).magnitude() > F) {
                     focus = iso;
                     altered = true;
-                    F = focus.mass() / focus.getPositionAtTime(grid.getTime()).subtract(nextP).magnitude();
+                    F = focus.mass() / focus.position(grid.getTime()).subtract(nextP).magnitude();
                 }
             }
         }
@@ -358,7 +347,7 @@ public class AlienContainer {
         //TODO: does not account for overlapping hill spheres
         for (InternalSpaceObject iso : grid.objects) {
             if (iso instanceof Planet && iso.trajectory.currentFocus == focus) {
-                if (iso.getPositionAtTime(grid.getTime()).subtract(nextP).magnitude() <= iso.hillRadius()) {
+                if (iso.position(grid.getTime()).subtract(nextP).magnitude() <= iso.hillRadius()) {
                     focus = iso;
                     altered = true;
                 }

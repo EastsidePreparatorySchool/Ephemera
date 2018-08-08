@@ -49,9 +49,9 @@ public abstract class Conic {
     Vector2 lastV;
 
     public static Conic newConic(Orbitable focus, WorldVector r, WorldVector v, double t, SpaceGrid sg) {
-        System.out.println("----------- new conic");
-        System.out.println("-- input r: " + r + ", mag: " + r.magnitude());
-        System.out.println("-- input v: " + v + ", mag: " + v.magnitude());
+//        System.out.println("----------- new conic");
+//        System.out.println("-- input r: " + r + ", mag: " + r.magnitude());
+//        System.out.println("-- input v: " + v + ", mag: " + v.magnitude());
         /*
         //p = h^2 / mu              semi-latus rectum
         //r = p / (1 + ||e|| cos theta)
@@ -91,7 +91,7 @@ public abstract class Conic {
         double theta = Vector2.normalizeAngle(rAngle - rotation);//Math.acos((p/rm - 1) / em);//Math.acos(e.dot(r) / (em*rm));
          */
 
-        r = r.subtract(focus.getWorldPositionAtTime(sg.getTime()));
+        r = r.subtract(focus.worldPosition(sg.getTime()));
         double rAngle = Vector2.normalizeAngle(r.angle());
         //System.out.println("Measured angle: " + r.angle());     
         double rm = r.magnitude();
@@ -106,9 +106,8 @@ public abstract class Conic {
         double energy = vm * vm / 2 - mu / rm;
 
         WorldVector e = r.scale(vm * vm / mu - 1 / rm).subtract(v.scale(r.dot(v) / mu));
-        System.out.println("evec " + e);
+        //System.out.println("evec " + e);
         double em = e.magnitude();
-        System.out.println("e " + em);
 
         if (!Double.isFinite(em)) {
             System.out.println("Invalid eccentricity from state vectors: " + em);
@@ -172,7 +171,7 @@ public abstract class Conic {
         this.h = Math.sqrt(this.p * mu);
 
         this.theta = theta;
-        this.M0 = theta;//MAtAngle(theta);
+        this.M0 = MAtAngle(theta);
         this.t0 = sg.getTime();
         this.lastV = new Vector2(0, 0);
 
@@ -191,13 +190,13 @@ public abstract class Conic {
         if (r < 0 && Math.abs(theta1) < Math.PI) {
             System.out.println("Radius was negative at angle " + theta1);
         }
-        WorldVector v = new WorldVector(r * Math.cos(theta1 + rotation), r * Math.sin(theta1 + rotation));
-        return v;
+        Vector2 v = new Vector2(r * Math.cos(theta1 + rotation), r * Math.sin(theta1 + rotation));
+        return new WorldVector(v.add(focus.worldPositionAtAngle(theta1)));
     }
 
     public WorldVector calculateWorldPositionAtTime(double t) {
         double theta1 = angleAtTime(t);
-        return calculateWorldPositionAtAngle(theta1);
+        return new WorldVector(calculateWorldPositionAtAngle(theta1));
     }
 
     @Override
@@ -207,24 +206,20 @@ public abstract class Conic {
 
     public void updateStateVectors(double t) {
         double theta1 = angleAtTime(t);
-        //vCurrent = calculateVelocityAtAngle(theta1);
-        vCurrent = calculateVelocityAtTime(t);
+        vCurrent = calculateVelocityAtAngle(theta1);
         rCurrent = calculateWorldPositionAtAngle(theta1);
         tCurrent = t;
     }
 
     public WorldVector calculateVelocityAtAngle(double theta1) {
-
-        System.out.println("hah!");
-        double vperp = signum * mu * (1 + e * Math.cos(theta1)) / h;
+        double vperp = mu * (1 + e * Math.cos(theta1)) / h * (signum);
         double vrad = mu * e * Math.sin(theta1) / h;
 
-        WorldVector v = new WorldVector(vrad, vperp).rotate(rotation + theta1);
+        WorldVector v = new WorldVector(new Vector2(vrad, vperp).rotate(rotation + theta1));
         if (v.dot(lastV) < 0) {
             System.out.println("  velocity sign reversal");
         }
         lastV = v;
-        
 
         return v;
     }
@@ -232,7 +227,16 @@ public abstract class Conic {
     public WorldVector calculateVelocityAtTime(double t) {
         double theta1 = angleAtTime(t);
 
-        return calculateVelocityAtAngle(theta1);
+        double vperp = mu * (1 + e * Math.cos(theta1)) / h * (signum);
+        double vrad = mu * e * Math.sin(theta1) / h;
+
+        WorldVector v = new WorldVector(new Vector2(vrad, vperp).rotate(rotation + theta1));
+        if (v.dot(lastV) < 0) {
+            System.out.println("  velocity sign reversal");
+        }
+        lastV = v;
+
+        return v;
     }
 
     public double partialHillRadius() {

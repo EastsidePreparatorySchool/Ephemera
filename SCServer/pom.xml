@@ -144,7 +144,7 @@
                                 
                                 <copy todir="${basedir}/src/main/resources/static/" overwrite="true">
                                     <fileset dir="${basedir}/src/main/webapp">
-                                        <include name="*.jpg" />
+                                        <include name="*.png" />
                                     </fileset>
                                 </copy>
                                 
@@ -178,7 +178,7 @@
                                 
                                 <copy todir="${basedir}/target/static/" overwrite="true">
                                     <fileset dir="${basedir}/src/main/webapp">
-                                        <include name="*.jpg" />
+                                        <include name="*.png" />
                                     </fileset>
                                 </copy>
                                 

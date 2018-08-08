@@ -17,13 +17,13 @@ import org.eastsideprep.spacecritters.gamelogic.Constants;
 public class Ellipse extends Conic {
 
     double prevE;
-    double ECurrent;
 
     public Ellipse(Orbitable focus, double p, double e, double theta, double signum, double rotation, SpaceGrid sg) {
         super(focus, p, e, theta, signum, rotation, sg);
 
         prevE = -10; // seeding point for finding E. -10 = invalid, start from M
         n = (mu * mu) * Math.pow(1 - e * e, 2f / 3f) / (h * h * h); // angular velocity
+        n *= signum;
         //System.out.println("New ellipse: signum " + signum);
         orbits = 0;
 
@@ -49,23 +49,12 @@ public class Ellipse extends Conic {
         //I have math from this point on
 
         //find mean anomaly
-        double M;
-        if (signum > 0) {
-            M = (n * (t - t0)) - (orbits * 2 * Math.PI) + M0;
-            //System.out.println("M: " + M);
-            while (M > Math.PI) {
-                M -= 2 * Math.PI;
-                orbits++;
-                //System.out.println("loop: " + orbits);
-            }
-        } else {
-            M = (-n * (t - t0)) + (orbits * 2 * Math.PI) + M0;
-            //System.out.println("M: " + M);
-            while (M < -Math.PI) {
-                M += 2 * Math.PI;
-                orbits++;
-                //System.out.println("loop: " + orbits);
-            }
+        double M = (n * (t - t0)) - (orbits * 2 * Math.PI) + M0;
+        //System.out.println("M: " + M);
+        while (M > Math.PI) {
+            M -= 2 * Math.PI;
+            orbits++;
+            //System.out.println("loop: " + orbits);
         }
 
         if (true) {
@@ -139,25 +128,13 @@ public class Ellipse extends Conic {
     }
 
     @Override
-    public void updateStateVectors(double t) {
-        ECurrent = EAtTime(t);
-        double theta1 = trueAtE(ECurrent);
-        //vCurrent = calculateVelocityAtAngle(theta1);
-        vCurrent = calculateVelocityAtE(ECurrent);
-        rCurrent = calculateWorldPositionAtAngle(theta1);
-        tCurrent = t;
-    }
-    @Override
     public WorldVector calculateVelocityAtTime(double t) {
-        double E = EAtTime(t);                  // eccentric anomaly
-        return calculateVelocityAtE(E);
-    } 
-    
-    public WorldVector calculateVelocityAtE(double E) {
         // from https://space.stackexchange.com/questions/22172/calculating-velocity-state-vector-with-orbital-elements-in-2d
 
         double a = p / (1 - e * e);             // semi-major axis
         double b = a * Math.sqrt(1 - e * e);    // semi-minor axis
+
+        double E = EAtTime(t);                  // eccentric anomaly
         double f = trueAtE(E);                  // true anomaly
         double rm;                              // length of position vector from focus
         double vm;                              // velocity magnitude
@@ -177,6 +154,5 @@ public class Ellipse extends Conic {
         //System.out.println("ell" + this + " e.v: vx " + v.x + " vy " + v.y);
 
         return new WorldVector(v);
-    } 
-    
+    }
 }
