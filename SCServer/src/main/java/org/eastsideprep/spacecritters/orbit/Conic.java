@@ -169,11 +169,11 @@ public abstract class Conic {
         this.sg = sg;
 
         this.h = Math.sqrt(this.p * mu);
+        this.lastV = new Vector2(0, 0);
 
         this.theta = theta;
-        this.M0 = MAtAngle(theta);
         this.t0 = sg.getTime();
-        this.lastV = new Vector2(0, 0);
+        this.M0 = MAtAngle(theta);
 
     }
 
