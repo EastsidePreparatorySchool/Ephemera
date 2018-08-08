@@ -132,53 +132,52 @@ public class Ellipse extends Conic {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+ 
+    
     @Override
-    public WorldVector calculateVelocityAtAngle(double theta1) {
-        double vperp = mu * (1 + e * Math.cos(theta1)) / h * (signum);
-        double vrad = mu * e * Math.sin(theta1) / h;
-
-        WorldVector v = new WorldVector(new Vector2(vrad, vperp).rotate(theta1 + rotation));
-        if (v.dot(lastV) < 0) {
-            System.out.println("  velocity sign reversal");
+    public void updateStateVectors(double t) {
+        if (tCurrent != t) {
+            double E = EAtTime(t);
+            double f = trueAtE(E);
+            rCurrent = calculateWorldPositionAtAngle(f);
+            vCurrent = calculateVelocityAtE(E);
+            tCurrent = t;
         }
-        lastV = v;
+    }
+    
+    
 
-        return v;
+ 
+
+    public WorldVector calculateVelocityAtE(double E) {
+      double a = p / (1 - e * e);               // semi-major axis
+        double b = a * Math.sqrt(1 - e * e);    // semi-minor axis
+
+        double rm;                              // length of position vector from focus
+        double vm;                              // velocity magnitude
+        double f = trueAtE(E);                  // true anomaly
+
+        if (e > 0.001) {
+            rm = p / (1 + e * Math.cos(f));
+            vm = Math.sqrt(mu * (2 / rm - 1 / a));
+//            vm = mu / h * Math.sqrt(2*e*Math.cos(f) + e*e + 1); // this also works
+        } else {
+            vm = Math.sqrt(mu / a);
+        }
+        //System.out.println("ell" + this + " e.v: rlength " + rm + " velocity " + vm + " t " + t);
+
+        Vector2 v = new Vector2(-a * Math.sin(E), b * Math.cos(E)).rotate(rotation).unit();
+        v = v.scale(vm * signum);
+        //System.out.println("ell" + this + " e.v: vx " + v.x + " vy " + v.y);
+
+        return new WorldVector(v);
     }
 
     @Override
     public WorldVector calculateVelocityAtTime(double t) {
-        double theta1 = angleAtTime(t);
-        return calculateVelocityAtAngle(theta1);
+      
+        double E = EAtTime(t);                  // eccentric anomaly
+     
+        return calculateVelocityAtE(E);
     }
-
-//    Careful this makes everything fail
-//    @Override
-//    public WorldVector calculateVelocityAtTime(double t) {
-//        // from https://space.stackexchange.com/questions/22172/calculating-velocity-state-vector-with-orbital-elements-in-2d
-//
-//        double a = p / (1 - e * e);             // semi-major axis
-//        double b = a * Math.sqrt(1 - e * e);    // semi-minor axis
-//
-//        double E = EAtTime(t);                  // eccentric anomaly
-//        double f = trueAtE(E);                  // true anomaly
-//        double rm;                              // length of position vector from focus
-//        double vm;                              // velocity magnitude
-//
-//        if (e < 0.999) {
-//            rm = a * Math.sqrt(1 - e * e) / (1 + e * Math.cos(f));
-//            vm = Math.sqrt(mu * (2 / rm - 1 / a));
-//        } else {
-//            rm = a;
-//            vm = Math.sqrt(mu / a);
-//        }
-//        //System.out.println("ell" + this + " e.v: rlength " + rm + " velocity " + vm + " t " + t);
-//
-//      
-//        Vector2 v = new Vector2(-a * Math.sin(E), b * Math.cos(E)).rotate(rotation).unit();
-//        v = v.scale(vm * signum);
-//        //System.out.println("ell" + this + " e.v: vx " + v.x + " vy " + v.y);
-//
-//        return new WorldVector(v);
-//    }
 }
