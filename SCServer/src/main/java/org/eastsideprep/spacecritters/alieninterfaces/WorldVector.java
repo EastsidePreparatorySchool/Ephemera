@@ -49,5 +49,13 @@ public class WorldVector extends Vector2 {
     public WorldVector scale(double d) {
         return new WorldVector(this.x * d, this.y * d);
     }
- 
+
+    @Override
+    public WorldVector rotate(double theta) {
+        double x = this.x * Math.cos(theta) - this.y * Math.sin(theta);
+        double y = this.x * Math.sin(theta) + this.y * Math.cos(theta);
+
+        return new WorldVector(x, y);
+    }
+
 }

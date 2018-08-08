@@ -33,7 +33,7 @@ public class Trajectory {
 
     public Trajectory(Orbitable focus, double p, double e, double signum, double rotation, SpaceGrid sg) {
         this.sg = sg;
-        conic = Conic.newConic(focus, p, e, sg.getTime(), signum, rotation, sg);
+        conic = Conic.newConic(focus, p, e, 0/*sg.getTime()*/, signum, rotation, sg);
 
         currentFocus = focus;
 
@@ -51,8 +51,7 @@ public class Trajectory {
         WorldVector v = getVelocityAtTime(t);
         WorldVector v2 = v.add(deltaV);
         WorldVector r = getWorldPositionAtTime(t);
-        Orbitable focus = conic.focus;
-        Conic c = Conic.newConic(focus, r, v2, t, sg);
+        Conic c = Conic.newConic(conic.focus, r, v2, t, sg);
         if (c != null) {
             conic = c;
         }
@@ -70,17 +69,18 @@ public class Trajectory {
     }
 
     public WorldVector getWorldPositionAtTime(double t) {
-        if (t == conic.tCurrent) {
-            return conic.rCurrent;
+        if (t != conic.tCurrent) {
+            conic.updateStateVectors(t);
         }
-        return conic.calculateWorldPositionAtTime(t);
+        
+        return conic.rCurrent.add(conic.focus.getWorldPositionAtTime(t));
     }
 
     public WorldVector getVelocityAtTime(double t) {
-        if (t == conic.tCurrent) {
-            return conic.vCurrent;
+         if (t != conic.tCurrent) {
+            conic.updateStateVectors(t);
         }
-        return new WorldVector(conic.calculateVelocityAtTime(t));
+        return conic.vCurrent.add(conic.focus.getVelocityAtTime(t));
     }
 
     @Override
@@ -118,6 +118,6 @@ public class Trajectory {
     }
 
     public Position positionOfFocus() {
-        return currentFocus.position(sg.getTime());
+        return currentFocus.getPositionAtTime(sg.getTime());
     }
 }

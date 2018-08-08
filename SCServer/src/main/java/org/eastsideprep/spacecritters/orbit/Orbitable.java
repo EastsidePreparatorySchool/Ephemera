@@ -13,9 +13,8 @@ import org.eastsideprep.spacecritters.alieninterfaces.WorldVector;
 
 public interface Orbitable {
     public double mass();
-    public Position position(double t);
-    public WorldVector worldPosition(double t);
-    public WorldVector worldPositionAtAngle(double theta);
-    public WorldVector velocity(double t);
+    public Position getPositionAtTime(double t);
+    public WorldVector getWorldPositionAtTime(double t);
+    public WorldVector getVelocityAtTime(double t);
     public double hillRadius();
 }

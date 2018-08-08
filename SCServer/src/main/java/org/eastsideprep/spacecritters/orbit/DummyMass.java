@@ -19,17 +19,17 @@ public class DummyMass implements Orbitable {
     }
 
     @Override
-    public Position position(double t) {
+    public Position getPositionAtTime(double t) {
         return new Position(0,0);
     }
 
     @Override
-    public WorldVector worldPosition(double t) {
+    public WorldVector getWorldPositionAtTime(double t) {
         return new WorldVector(0,0);
     }
 
     @Override
-    public WorldVector velocity(double t) {
+    public WorldVector getVelocityAtTime(double t) {
         return new WorldVector(0,0);
     }
     
@@ -37,9 +37,5 @@ public class DummyMass implements Orbitable {
         return 0;
     }
 
-    @Override
-    public WorldVector worldPositionAtAngle(double theta) {
-        return worldPosition(0);
-    }
     
 }
