@@ -143,7 +143,7 @@ public class AlienContainer {
                     10 * Constants.deltaX, //semi-latus rectum
                     0.1, //Eccentricity
                     1, //signum
-                    Vector2.normalizeAngle(grid.rand.nextDouble() * 2 * Math.PI), //rotation
+                    0,//Vector2.normalizeAngle(grid.rand.nextDouble() * 2 * Math.PI), //rotation
                     grid);
         } else {
             this.trajectory = trajectory.clone();

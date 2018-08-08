@@ -205,18 +205,20 @@ public abstract class Conic {
     }
 
     public void updateStateVectors(double t) {
-        double theta1 = angleAtTime(t);
-        vCurrent = calculateVelocityAtTime(t);
-        rCurrent = calculateWorldPositionAtAngle(theta1);
-        tCurrent = t;
+        if (tCurrent != t) {
+            double theta1 = angleAtTime(t);
+            rCurrent = calculateWorldPositionAtAngle(theta1);
+            vCurrent = calculateVelocityAtTime(t);
+            tCurrent = t;
+        }
     }
 
     public WorldVector calculateVelocityAtAngle(double theta1) {
         double vperp = mu * (1 + e * Math.cos(theta1)) / h * (signum);
         double vrad = mu * e * Math.sin(theta1) / h;
 
-        WorldVector v = new WorldVector(new Vector2(vrad, vperp).rotate(theta1-signum*rotation));
-        System.out.println("theta "+ theta1+" v angle "+v.angle());
+        WorldVector v = new WorldVector(new Vector2(vrad, vperp).rotate(theta1 - signum * rotation));
+        System.out.println("theta " + theta1 + " v angle " + v.angle());
         if (v.dot(lastV) < 0) {
             System.out.println("  velocity sign reversal");
         }
