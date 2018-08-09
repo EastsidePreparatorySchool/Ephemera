@@ -675,10 +675,14 @@ class Grid {
         if (index !== -1) {
             dprintln(" cell: removing at index: " + index + ", length before remove: " + cell.length);
             cell.splice(index, 1);
-            cell.forEach((a, i) => {
-                a.setHeight(i);
-                assert(() => (a.getHeight() === i));
-            });
+            if (cell.length = 0) {
+                this.grid[x + this.halfWidth][y + this.halfHeight] = undefined;
+            } else {
+                cell.forEach((a, i) => {
+                    a.setHeight(i);
+                    assert(() => (a.getHeight() === i));
+                });
+            }
         }
     }
 }
@@ -723,10 +727,10 @@ class Alien {
     }
 
     setHeight(height) {
-        this.mesh.position.y = 2 * height+1;
+        this.mesh.position.y = 2 * height + 1;
     }
     getHeight() {
-        return ((this.mesh.position.y-1) / 2);
+        return ((this.mesh.position.y - 1) / 2);
     }
 }
 

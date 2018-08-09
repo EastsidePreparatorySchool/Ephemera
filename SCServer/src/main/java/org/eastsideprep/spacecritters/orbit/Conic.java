@@ -26,7 +26,7 @@ public abstract class Conic {
 
     public double p;
     public double e;
-    double h;
+    public double h;
     public double signum;
 
     public double rotation;
@@ -34,7 +34,7 @@ public abstract class Conic {
     int orbits;
 
     Orbitable focus;
-    double mu;
+    public double mu;
     double M0;  // mean anomaly (cicrle angle) at time t0
     double n;   // angular velocity
     double t0;  // time this orbit was entered

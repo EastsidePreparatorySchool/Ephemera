@@ -68,7 +68,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
             }
             WorldVector deltaV = new WorldVector(ctx.getVelocity()
                     .scale(0.001 * ctx.getRandomInt(10))
-                    .rotate(Math.PI / (ctx.getRandomInt(10)+1) - Math.PI / 2));
+                    .rotate(Math.PI / (ctx.getRandomInt(10) + 1) - Math.PI / 2));
             //System.out.println("  spawn v "+ctx.getVelocity());
             //System.out.println("  spawn acc " + deltaV);
             return new Action(Action.ActionCode.Spawn, deltaV, 5);
@@ -117,19 +117,30 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
             Vector3 d1 = p.subtract(f);
             Vector3 d2 = this.targetWorldPosition.subtract(f);
             double indicator = d1.unit().dot(d2.unit());
-            double a = ctx.getOrbit().a;
-            //System.out.println("Current a :"+a+" dist to target: "+d2.magnitude());
-            if ((indicator < -0.95) && (a*1.5 < d2.magnitude())) {
+            if ((indicator < -0.999999) && tBurn == 0) {
                 tBurn = System.currentTimeMillis();
-                // add a deltaV of 1.3% every turn while in the right position
-                v = v.scale(0.011);
-                WorldVector deltaV = v;
+                double mu = ctx.getOrbit().mu;
+                double vTransfer = calculateHohmannTranferDeltaV(mu, p, v, targetWorldPosition);
+
+                WorldVector deltaV = v.scaleTo(vTransfer);
                 System.out.println("--------------acc " + deltaV + ", mag " + deltaV.magnitude());
                 return deltaV;
             }
         }
 
         return null;
+    }
+
+    double calculateHohmannTranferDeltaV(double mu, WorldVector r, WorldVector v, WorldVector target) {
+        double vm = v.magnitude();
+        double rm = r.magnitude();
+        double d = target.magnitude();
+
+        double vTransfer = Math.sqrt(mu / rm) * (Math.sqrt(2 * d / (rm + d)) - 1);
+        
+        vTransfer *= 1.00; // because life is not perfect
+        
+        return vTransfer;
     }
 
     @Override

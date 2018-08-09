@@ -244,6 +244,8 @@ public class ContextImplementation implements ContextComplex {
             o.a = ac.trajectory.conic.p / (1 - o.e * o.e);
             o.rotation = ac.trajectory.conic.rotation;
             o.signum = ac.trajectory.conic.signum;
+            o.mu = ac.trajectory.conic.mu;
+            o.h = ac.trajectory.conic.h;
         }
 
         return o;

@@ -12,6 +12,7 @@ var adminP = document.getElementById("admin");
 var adminButton = document.getElementById("adminbutton");
 var center = document.getElementById("center");
 var splash = document.getElementById("splash");
+var splashDiv = document.getElementById("splashdiv");
 var contentP = document.getElementById("content");
 var engineName = document.getElementById("enginename");
 
@@ -254,13 +255,13 @@ function toggleAdmin() {
 }
 
 function killSplash() {
-    splash.style.display = "none";
+    splashDiv.style.display = "none";
 }
 
 
 function init() {
     if (getClientID() === null) {
-        setTimeout(killSplash, 2000);
+        setTimeout(killSplash, 5000);
     } else {
         killSplash();
     }

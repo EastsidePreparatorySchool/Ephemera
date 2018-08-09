@@ -50,4 +50,13 @@ public class WorldVector extends Vector2 {
         return new WorldVector(this.x * d, this.y * d);
     }
  
+    @Override
+    public WorldVector unit() {
+        return this.scale(1/this.magnitude());
+    }
+ 
+    public WorldVector scaleTo(double d) {
+        return this.scale(d/this.magnitude());
+    }
+
 }

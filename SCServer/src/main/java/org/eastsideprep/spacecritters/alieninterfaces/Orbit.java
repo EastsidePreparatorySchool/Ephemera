@@ -17,4 +17,6 @@ public class Orbit {
     public double e;            // eccentricity
     public double rotation;     // 
     public double signum;       // 1.0 = counter-clockwise
+    public double mu;           // G*M
+    public double h;
 }
