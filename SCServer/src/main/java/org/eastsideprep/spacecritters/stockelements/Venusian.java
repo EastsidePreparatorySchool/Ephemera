@@ -41,6 +41,7 @@ public class Venusian implements Alien {
             List<AlienSpecies> nearestAliens = ctx.getView((int) ctx.getTech()).getClosestXenos(null);
             if (nearestAliens != null && nearestAliens.size() > 0) {
                 IntegerPosition nearest = nearestAliens.get(0).position;
+                System.out.println("Venusian at " + ctx.getStateString() + " sees alien at " + nearest);
 
                 if (nearest.x > ctx.getPosition().x) {
                     x = -1;
@@ -84,6 +85,7 @@ public class Venusian implements Alien {
 
     @Override
     public Action getAction() {
+        try {
 
         //ctx.debugOut("Action requested,"
         //        + " E:" + Integer.toString(ctx.getEnergy())
@@ -93,6 +95,7 @@ public class Venusian implements Alien {
         try {
             view = ctx.getView((int) ctx.getTech());
         } catch (Exception e) {
+            return null;
         }
 
         //goal is to make a ton of Venusians fast and be good at hiding
@@ -112,27 +115,38 @@ public class Venusian implements Alien {
             }
         } catch (Exception e) {
             // do something here to deal with errors
+            return null;
         }
 
         //
         // if we have spare energy, research tech
         //tech is not a priority
-        if (ctx.getEnergy() > (ctx.getTech() + 5)) {
+        try {
+            if (ctx.getEnergy() > (ctx.getTech() + 5)) {
 
-            // TODO: Assumption: spawning cost will never be greater than 20
-            if (ctx.getEnergy() > ctx.getSpawningCost() + 10) {
-                //should spawn fast at the beggining,
-                ctx.debugOut("Spawning");
-                return new Action(Action.ActionCode.Spawn, 5);
+                // TODO: Assumption: spawning cost will never be greater than 20
+                if (ctx.getEnergy() > ctx.getSpawningCost() + 10) {
+                    //should spawn fast at the beggining,
+                    ctx.debugOut("Spawning");
+                    return new Action(Action.ActionCode.Spawn, 5);
+                }
+                if (ctx.getTech() < 30) {
+                    ctx.debugOut("Researching");
+                    return new Action(Action.ActionCode.Research);
+                }
             }
-            if (ctx.getTech() < 30) {
-                ctx.debugOut("Researching");
-                return new Action(Action.ActionCode.Research);
-            }
+        } catch (Exception e) {
+            System.out.println("Venusian:"+e);
+            e.printStackTrace();
         }
         ctx.debugOut("Gaining");
 
         return new Action(Action.ActionCode.Gain);
+        } catch (Exception e){
+           System.out.println("Venusian:"+e);
+            e.printStackTrace();   
+        }
+        return null;
     }
 
     @Override

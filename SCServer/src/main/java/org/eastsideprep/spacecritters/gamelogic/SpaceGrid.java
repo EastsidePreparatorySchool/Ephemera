@@ -295,7 +295,7 @@ public class SpaceGrid {
                 IntegerPosition pOldInt = pOld.round();
                 IntegerPosition pNewInt = pNew.round();
 
-                vis.showPlanetMove(pOldInt.x, pOldInt.y, pNewInt.x, pNewInt.y, 
+                vis.showPlanetMove(pOldInt.x, pOldInt.y, pNewInt.x, pNewInt.y,
                         p.className, p.index, p.energy, (int) p.tech, getTime());
             }
         }
@@ -319,12 +319,12 @@ public class SpaceGrid {
         // now for all the aliens
         for (AlienContainer ac : aliens) {
             if (ac.energy > 0) {// not accidentally killed by moving planet in this phase
-                double oldX = ac.p.x; 
+                double oldX = ac.p.x;
                 double oldY = ac.p.y;
 
                 if (oldX != ac.nextP.x || oldY != ac.nextP.y) {
                     ac.p.set(ac.nextP);
-                    aliens.move(ac, (int)Math.round(oldX), (int)Math.round(oldY), ac.p.round().x, ac.p.round().y);
+                    aliens.move(ac, (int) Math.round(oldX), (int) Math.round(oldY), ac.p.round().x, ac.p.round().y);
                 }
 
                 // need to go through all the rest to mark cell fresh for display,
@@ -433,6 +433,7 @@ public class SpaceGrid {
                 thisAlien.currentActionCode = Action.ActionCode.None;
                 thisAlien.currentActionPower = 0;
                 thisAlien.kill("Death for unhandled exception in getAction(): " + ex.toString());
+                //ex.printStackTrace();
             }
         }
     }

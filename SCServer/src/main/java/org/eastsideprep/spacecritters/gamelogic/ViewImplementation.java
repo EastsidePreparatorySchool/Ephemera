@@ -62,6 +62,8 @@ public class ViewImplementation implements View {
         LinkedList<AlienSpecies> as = new LinkedList<>();
 
         for (IntegerPosition p : new GridDisk(centerX, centerY, size)) {
+            p.x += centerX;
+            p.y += centerY;
             AlienCell acs = ag.getAliensAt(p);
             if (acs != null) {
                 as.addAll(acs.speciesMap.keySet());
@@ -102,17 +104,19 @@ public class ViewImplementation implements View {
         SpaceObject so = null;
 
         for (IntegerPosition p : new GridDisk(centerX, centerY, size, true)) {
+            p.x += centerX;
+            p.y += centerY;
             so = null;
             AlienCell acs = ag.getAliensAt(p);
             if (acs != null) {
                 if (acs.star != null) {
                     so = new SpaceObject("Star", acs.star.className, acs.star.position,
-                        acs.star.mass,
-                        acs.star.hillRadius);
+                            acs.star.mass,
+                            acs.star.hillRadius);
                 } else if (acs.planet != null) {
                     so = new SpaceObject("Planet", "", acs.planet.position,
-                        acs.planet.mass,
-                        acs.planet.hillRadius);
+                            acs.planet.mass,
+                            acs.planet.hillRadius);
                 }
             }
             if (so != null) {
@@ -130,6 +134,8 @@ public class ViewImplementation implements View {
 
         SortedGridDisk gd = new SortedGridDisk(centerX, centerY, size);
         for (IntegerPosition p : gd) {
+            p.x += centerX;
+            p.y += centerY;
             AlienCell acs = ag.getAliensAt(p);
             if (acs != null) {
                 as.addAll(acs.speciesMap.keySet());
@@ -159,6 +165,8 @@ public class ViewImplementation implements View {
 
         SortedGridDisk gd = new SortedGridDisk(centerX, centerY, size, true);
         for (IntegerPosition p : gd) {
+            p.x += centerX;
+            p.y += centerY;
             AlienCell acs = ag.getAliensAt(p);
             if (acs != null) {
 
@@ -194,6 +202,8 @@ public class ViewImplementation implements View {
 
         SortedGridDisk gd = new SortedGridDisk(centerX, centerY, size);
         for (IntegerPosition p : gd) {
+            p.x += centerX;
+            p.y += centerY;
             AlienCell acs = ag.getAliensAt(p);
             if (acs != null) {
                 LinkedList<AlienSpecies> bunch = acs.getAllSpeciesWithPredicateAndPosition((species) -> species != avoid, p);

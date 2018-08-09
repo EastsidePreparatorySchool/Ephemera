@@ -9,6 +9,7 @@ import org.eastsideprep.spacecritters.alieninterfaces.*;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameVisualizer;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import org.eastsideprep.spacecritters.alieninterfaces.Action.ActionCode;
 import org.eastsideprep.spacecritters.alieninterfaces.GridVector;
 import org.eastsideprep.spacecritters.orbit.DummyTrajectory;
 import org.eastsideprep.spacecritters.orbit.Orbitable;
@@ -431,9 +432,14 @@ public class AlienContainer {
     }
 
     // checked action
+    private static Action nullAction = new Action (ActionCode.Gain);
+    
     public void getAction() throws NotEnoughEnergyException, UnknownActionException {
         Action a = alien.getAction();
 
+        if (a == null) {
+            a = nullAction;
+        }
         this.currentAction = a;
         this.currentActionCode = a.code;
         this.currentActionPower = a.power;
