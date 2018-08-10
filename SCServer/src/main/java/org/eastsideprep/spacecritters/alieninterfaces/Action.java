@@ -37,10 +37,10 @@ public class Action {
                 this.deltaV = null;
     }
     
-public Action(ActionCode code, WorldVector deltaV, int power) {
+public Action(ActionCode code, WorldVector deltaV, int power, String message) {
         this.code = code;
         this.power = power;
-        this.message = null;
+        this.message = message;
         this.sellPrice = 0;
         this.buyPrice = 0;
         this.deltaV = deltaV;

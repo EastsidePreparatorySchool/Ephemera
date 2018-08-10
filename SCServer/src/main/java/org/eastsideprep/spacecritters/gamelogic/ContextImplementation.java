@@ -105,7 +105,8 @@ public class ContextImplementation implements ContextComplex {
     @Override
     public void debugOut(String s) {
         if (Constants.chatter) {
-            vis.debugOut(ac.getFullName() + ": " + s);
+            ac.getFullName();
+            vis.debugOut(ac.className + "("+ac.hashCode()+"): " + s);
         }
     }
 

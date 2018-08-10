@@ -8,6 +8,8 @@ package org.eastsideprep.spacecritters.stockelements;
  *
  * @author gmein@eastsideprep.org
  */
+import java.util.List;
+import java.util.stream.Collectors;
 import org.eastsideprep.spacecritters.alieninterfaces.*;
 //import com.interactivemesh.jfx.importer.stl.StlMeshImporter;
 import javafx.geometry.Point3D;
@@ -25,13 +27,29 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
     final double SPAWN_ENERGY = 200.0;
     final double MIN_TECH = 10.0;
     final int RESEARCH_PERCENT = 30;
+    final int COAST_TIME = 100000;
+    final boolean SPAWN = true;
+
+    final int PHASE_INVALID = -1;
+
+    final int PHASE_RECTIFY = 1;
+    final int PHASE_WIDEN_ACC_1 = 2;
+    final int PHASE_WIDEN_ACC_2 = 3;
+    final int PHASE_TARGET_ACC = 4;
+    final int PHASE_TARGET_TRIM = 5;
+    final int PHASE_TARGET_DEC = 6;
+    final int PHASE_SPAWN = 7;
+    final int PHASE_COAST = 8;
 
     ContextComplex ctx;
 
-    int startTurn;
+    int startCoastTurn;
+    SpaceObject origin;
     SpaceObject target = null;
     WorldVector targetWorldPosition = null;
     double radiusFrom = 0;
+    String targetList;
+    boolean acquired;
 
     int phase = 1;
 
@@ -43,9 +61,51 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
     public void initComplex(ContextComplex ctx, int id, int parentId, String message) {
         // hang on to the context object
         this.ctx = ctx;
-        this.startTurn = ctx.getGameTurn();
-        this.target = ctx.getSpaceObject("ProximaCentauri");
+        this.targetList = null;
+
+        if (parentId == 0) {
+            ctx.debugOut("Voyager " + id + " initial alien initializing ");
+
+            // get all objects
+            List<SpaceObject> lso = ctx.getAllSpaceObjects();
+            // stars only please
+            lso.removeIf((e) -> e.kind.equalsIgnoreCase("planet"));
+            // sort by who is closer to what we are orbiting right now
+            lso.sort((a, b) -> (int) (a.worldPosition.subtract(ctx.getFocus().worldPosition).magnitude()
+                    - b.worldPosition.subtract(ctx.getFocus().worldPosition).magnitude()));
+            // remove earth
+            lso.remove(0);
+            // make target list
+            this.targetList = lso.stream().map((e) -> e.name).collect(Collectors.joining(","));
+        } else {
+            ctx.debugOut("Voyager " + id + " child initializing with target list " + message);
+            this.targetList = message;
+        }
+
+        this.target = getNextTarget();
         this.targetWorldPosition = target.worldPosition;
+
+        if (this.target == null) {
+            ctx.debugOut("init: no target, floating");
+            phase = -1;
+            return;
+        }
+        ctx.debugOut("init: target set to " + this.target.name);
+        phase = PHASE_RECTIFY;
+    }
+
+    SpaceObject getNextTarget() {
+        if (this.targetList == null || this.targetList.length() == 0) {
+            return null;
+        }
+        String result = this.targetList.substring(0, this.targetList.indexOf(","));
+        if (result.length() == 0) {
+            return null;
+        }
+
+        this.targetList = targetList.substring(result.length() + 1);
+        return ctx.getSpaceObject(result);
+
     }
 
     @Override
@@ -61,7 +121,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
             if (ctx.getRandomInt(100) > (100 - RESEARCH_PERCENT)) {
                 return new Action(Action.ActionCode.Research);
             }
-            if (phase < 10 || ctx.getEnergy() < SPAWN_ENERGY) {
+            if (phase != PHASE_SPAWN || ctx.getEnergy() < SPAWN_ENERGY) {
                 return new Action(Action.ActionCode.Gain);
             }
             WorldVector deltaV = new WorldVector(ctx.getVelocity()
@@ -69,8 +129,12 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
                     .rotate(Math.PI / (ctx.getRandomInt(10) + 1) - Math.PI / 2));
             //System.out.println("  spawn v "+ctx.getVelocity());
             //System.out.println("  spawn acc " + deltaV);
-            return new Action(Action.ActionCode.Spawn, deltaV, 5);
-
+            ctx.debugOut("phase spawn, with list " + this.targetList);
+            Action a = new Action(Action.ActionCode.Spawn, deltaV, 5, this.targetList);
+            ctx.debugOut("phase coast");
+            this.startCoastTurn = ctx.getGameTurn();
+            phase = PHASE_COAST;
+            return SPAWN?a:null;
         } catch (Exception e) {
             ctx.debugOut("Something went wrong in getAction, " + ctx.getStateString());
         }
@@ -96,8 +160,10 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         WorldVector r2;
         double indicator;
         double vTransfer;
-        double radiusBigger = 1000000;
+        double radiusBigger = 700000;
         double radiusTo;
+        double normalAccuracy = 0.99;
+        double highAccuracy = 0.99999;
 
         // first, do we have energy and tech?
         if (ctx.getEnergy() < MIN_ENERGY || ctx.getTech() < MIN_TECH) {
@@ -111,86 +177,136 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         double mu = ctx.getOrbit().mu;
 
         switch (phase) {
-            case 1:
+            case PHASE_RECTIFY:
+                origin = so;
+                if (ctx.getOrbit().e == 1.0) {
+                    // already circular, no action needed
+                    phase = PHASE_WIDEN_ACC_1;
+                    return null;
+                }
                 // phase 1 - burn at aphelion make initial orbit cicular
                 r1 = ctx.getWorldPosition().subtract(ctx.getFocus().worldPosition);
                 r2 = new WorldVector(1, 0).rotate(ctx.getOrbit().rotation);
                 radiusFrom = ctx.getOrbit().a * (1 - ctx.getOrbit().e);
                 radiusTo = ctx.getOrbit().a * (1 + ctx.getOrbit().e);
                 indicator = r1.unit().dot(r2.unit());
-                if ((indicator < -0.9999)) {
-                    vTransfer = calculateHohmannTransferFrom(mu, radiusFrom, radiusTo);
+                if ((indicator < -normalAccuracy)) {
+                    vTransfer = calculateHohmannTransferAtPerigee(mu, radiusFrom, radiusTo);
                     WorldVector deltaV = v.scaleTo(vTransfer);
-                    System.out.println("--------------acc phase 1 " + deltaV + ", mag " + deltaV.magnitude());
+                    ctx.debugOut("phase rectify " + deltaV + ", mag " + deltaV.magnitude());
                     phase = 2;
                     return deltaV;
                 }
                 return null;
-            case 2:
+            case PHASE_WIDEN_ACC_1:
                 // phase 2 - widen orbit - burn at perihelion make orbit wider (1000000)
                 r1 = ctx.getWorldPosition().subtract(ctx.getFocus().worldPosition);
                 r2 = new WorldVector(1, 0).rotate(ctx.getOrbit().rotation);
                 radiusFrom = ctx.getOrbit().a * (1 - ctx.getOrbit().e);
                 indicator = r1.unit().dot(r2.unit());
-                if ((indicator > 0.9999)) {
-                    vTransfer = calculateHohmannTransferFrom(mu, radiusFrom, radiusBigger);
+                if ((indicator > normalAccuracy)) {
+                    vTransfer = calculateHohmannTransferAtPerigee(mu, radiusFrom, radiusBigger);
                     WorldVector deltaV = v.scaleTo(vTransfer);
-                    System.out.println("--------------acc phase 2 " + deltaV + ", mag " + deltaV.magnitude());
-                    phase = 3;
+                    ctx.debugOut("phase widen acc 1 " + deltaV + ", mag " + deltaV.magnitude());
+                    phase = PHASE_WIDEN_ACC_2;
                     return deltaV;
                 }
                 return null;
 
-            case 3:
+            case PHASE_WIDEN_ACC_2:
                 // phase 3 - burn at aphelion to get into widened orbit
                 r1 = ctx.getWorldPosition().subtract(ctx.getFocus().worldPosition);
                 r2 = new WorldVector(1, 0).rotate(ctx.getOrbit().rotation);
                 indicator = r1.unit().dot(r2.unit());
-                if ((indicator < -0.9999)) {
-                    vTransfer = calculateHohmannTransferTo(mu, radiusFrom, radiusBigger);
+                if ((indicator < -normalAccuracy)) {
+                    vTransfer = calculateHohmannTransferAtApogee(mu, radiusFrom, radiusBigger);
                     WorldVector deltaV = v.scaleTo(vTransfer);
-                    System.out.println("--------------acc phase 3 " + deltaV + ", mag " + deltaV.magnitude());
-                    phase = 4;
+                    ctx.debugOut("phase widen acc 2 " + deltaV + ", mag " + deltaV.magnitude());
+                    phase = PHASE_TARGET_ACC;
                     return deltaV;
                 }
                 return null;
 
-            case 4:
+            case PHASE_TARGET_ACC:
                 // accelerate at perihelion to get into elliptical orbit reaching close to target
                 if (this.target.name.equalsIgnoreCase(ctx.getFocus().name)) {
-                    System.out.println("Already there");
+                    ctx.debugOut("phase target acc: already there");
+                    phase = PHASE_TARGET_TRIM;
                     return null;
                 }
+
                 r1 = r.subtract(f);
                 radiusFrom = r1.magnitude();
                 r2 = this.targetWorldPosition.subtract(f);
                 indicator = r1.unit().dot(r2.unit());
-                if ((indicator < -0.99999)) {
-                    vTransfer = calculateHohmannTransferFrom(mu, radiusFrom, r2.magnitude() * 1.01);
+                if ((indicator < -normalAccuracy)) {
+                    vTransfer = calculateHohmannTransferAtPerigee(mu, radiusFrom, r2.magnitude()*1.2);
 
                     WorldVector deltaV = v.scaleTo(vTransfer);
-                    System.out.println("--------------acc phase 4 " + deltaV + ", mag " + deltaV.magnitude());
-                    phase = 5;
+                    ctx.debugOut("phase target acc" + deltaV + ", mag " + deltaV.magnitude());
+                    phase = PHASE_TARGET_TRIM;
+                    acquired = false;
+                    return deltaV;
+                } else {
+                    //ctx.debugOut("indicator: "+indicator);
+                }
+                return null;
+
+            case PHASE_TARGET_TRIM:
+                if (this.origin.name.equalsIgnoreCase(so.name)) {
+                    // we did not leave the origin star's orbit, continue floating
+                    return null;
+                }
+                // at this point, we might have arrived in some orbit, but perhaps not that of our target star
+                if (!this.acquired) {
+                    this.acquired = true;
+                    ctx.debugOut("acquired by "+so.name);
+                }
+                // check the perigee, if it is not tight enough, perform a 1% retro burn to fix that
+                // do that as often as necessary
+
+                double perihelion = ctx.getOrbit().a * (1 - ctx.getOrbit().e);
+                if (perihelion > radiusBigger / 2) {
+                    WorldVector deltaV = v.scaleTo(-v.magnitude() * 0.01);
+                    ctx.debugOut("phase trim dec " + deltaV + ", mag " + deltaV.magnitude());
+                    return deltaV;
+                }
+                phase = PHASE_TARGET_DEC;
+                return null;
+
+            case PHASE_TARGET_DEC:
+                // retrograde burn at perihelion to get into small circular orbit
+                r1 = r.subtract(f);
+                r2 = new WorldVector(1, 0).rotate(ctx.getOrbit().rotation);
+                double radiusSmall = ctx.getOrbit().a * (1 - ctx.getOrbit().e);
+                double radiusBig = ctx.getOrbit().a * (1 + ctx.getOrbit().e);
+
+                indicator = r1.unit().dot(r2.unit());
+                if ((indicator > normalAccuracy)) {
+                    // calculate transfer as if we wanted to grow orbit, then use negative
+                    vTransfer = calculateHohmannTransferAtPerigee(mu, radiusSmall, radiusBig);
+                    WorldVector deltaV = v.scaleTo(-vTransfer);
+                    ctx.debugOut("phase target dec " + deltaV + ", mag " + deltaV.magnitude());
+                    phase = PHASE_SPAWN;
                     return deltaV;
                 }
                 return null;
 
-            case 5:
-                // retrograde burn at perihelion to get into small circular orbit
-                r1 = r.subtract(f);
-                r2 = new WorldVector(1, 0).rotate(ctx.getOrbit().rotation);
-                radiusTo = ctx.getOrbit().a * (1 - ctx.getOrbit().e);
-                radiusFrom = ctx.getOrbit().a * (1 + ctx.getOrbit().e);
-     
-                indicator = r1.unit().dot(r2.unit());
-                if ((indicator > 0.9999)) {
-                    vTransfer = calculateHohmannTransferFrom(mu, radiusFrom, radiusTo);
+            case PHASE_SPAWN:
+                // will be advanced by spawning
+                return null;
 
-                    WorldVector deltaV = v.scaleTo(-vTransfer);
-                     deltaV = v.scaleTo(-1.8e-4);
-                    System.out.println("--------------dec phase 5 " + deltaV + ", mag " + deltaV.magnitude());
-                    phase = 6;
-                    return deltaV;
+            case PHASE_COAST:
+                // will stay in this phase for a while
+
+                if (ctx.getGameTurn() - this.startCoastTurn > COAST_TIME) {
+                    // a lot of turns have gone by. Go to next target, do it all again
+                    if (so.name.equals(this.target.name)) {
+                        this.target = getNextTarget();
+                    }
+                    this.targetWorldPosition = this.target.worldPosition;
+                    ctx.debugOut("continue: target set to " + this.target.name);
+                    phase = PHASE_RECTIFY;
                 }
                 return null;
 
@@ -199,16 +315,14 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         }
     }
 
-    double calculateHohmannTransferFrom(double mu, double radiusFrom, double radiusTo) {
+    double calculateHohmannTransferAtPerigee(double mu, double radiusFrom, double radiusTo) {
         double vTransfer = Math.sqrt(mu / radiusFrom) * (Math.sqrt(2 * radiusTo / (radiusFrom + radiusTo)) - 1);
         return vTransfer;
-
     }
 
-    double calculateHohmannTransferTo(double mu, double radiusFrom, double radiusTo) {
+    double calculateHohmannTransferAtApogee(double mu, double radiusFrom, double radiusTo) {
         double vTransfer = Math.sqrt(mu / radiusTo) * (1 - Math.sqrt(2 * radiusFrom / (radiusFrom + radiusTo)));
         return vTransfer;
-
     }
 
     @Override
