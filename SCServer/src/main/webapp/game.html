@@ -90,6 +90,7 @@
                     Log size:&nbsp;&nbsp;<span id="logsize"></span><br>
                     Sleep time:<span id="sleeptime"></span>ms<br>
                     Slow mode:&nbsp;<input type="checkbox" id ="slowmode" onclick="slowmode()">
+                    Debug:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id ="debug" onclick="debugMode()">
                 </p>
                 <form enctype="multipart/form-data"  onsubmit="return submitForm(this);" name="alienfileform">
                     Alien file: <input name="alienfile" type="file" />
@@ -111,7 +112,6 @@
         <script src="js/three.js"></script>
         <script src="js/OrbitControls.js"></script>
         <script src="js/Detector.js"></script>
-        <script>var debug = false;</script>
         <script src="js/sc.js"></script>
     </body>
 

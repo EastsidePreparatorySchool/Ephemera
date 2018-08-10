@@ -2,6 +2,7 @@
  SpaceCritters online - GM, QB, PM
  */
 
+var debug = false;
 
 var updateInterval = 50;
 var updateIntervalInactive = 1000;
@@ -29,6 +30,7 @@ var startpauseB = document.getElementById("startpause");
 var attachP = document.getElementById("attach");
 var adminP = document.getElementById("admin");
 var slowMode = document.getElementById("slowmode");
+var debugCheck = document.getElementById("debug");
 
 var aliens = {};
 var planets = {};
@@ -75,6 +77,9 @@ var autorotateTimeout = null;
 var trailMaterial = null;
 
 
+function debugMode() {
+    debug = debugCheck.checked;
+}
 
 // basic server calls in the absence of jquery
 
@@ -652,8 +657,8 @@ class Grid {
             cell = [];
             this.grid[x + this.halfWidth][y + this.halfHeight] = cell;
         }
-        assert(() => (alien.getX() === x));
-        assert(() => (alien.getY() === y));
+        assert(() => (Math.round(alien.getX()) === x));
+        assert(() => (Math.round(alien.getY()) === y));
         assert(() => (!cell.includes(alien)));
         var h;
         h = cell.length;
@@ -667,15 +672,15 @@ class Grid {
         x = Math.round(x);
         y = Math.round(y);
         var cell = this.grid[x + this.halfWidth][y + this.halfHeight];
-        assert(() => (alien.getX() === x));
-        assert(() => (alien.getY() === y));
+        assert(() => (Math.round(alien.getX()) === x));
+        assert(() => (Math.round(alien.getY()) === y));
         assert(() => (cell.includes(alien)));
         assert(() => (cell.length > alien.getHeight()), () => dumpAlienAndCell(alien, cell));
         var index = cell.indexOf(alien);
         if (index !== -1) {
             dprintln(" cell: removing at index: " + index + ", length before remove: " + cell.length);
             cell.splice(index, 1);
-            if (cell.length = 0) {
+            if (cell.length === 0) {
                 this.grid[x + this.halfWidth][y + this.halfHeight] = undefined;
             } else {
                 cell.forEach((a, i) => {

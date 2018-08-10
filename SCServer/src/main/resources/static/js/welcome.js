@@ -258,6 +258,11 @@ function killSplash() {
     splashDiv.style.display = "none";
 }
 
+function showCredits() {
+    splashDiv.style.display = "inline";
+    setTimeout(killSplash, 5000);
+}
+
 
 function init() {
     if (getClientID() === null) {

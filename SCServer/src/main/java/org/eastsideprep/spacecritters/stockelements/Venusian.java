@@ -41,7 +41,7 @@ public class Venusian implements Alien {
             List<AlienSpecies> nearestAliens = ctx.getView((int) ctx.getTech()).getClosestXenos(null);
             if (nearestAliens != null && nearestAliens.size() > 0) {
                 IntegerPosition nearest = nearestAliens.get(0).position;
-                System.out.println("Venusian at " + ctx.getStateString() + " sees alien at " + nearest);
+                //System.out.println("Venusian at " + ctx.getStateString() + " sees alien at " + nearest);
 
                 if (nearest.x > ctx.getPosition().x) {
                     x = -1;

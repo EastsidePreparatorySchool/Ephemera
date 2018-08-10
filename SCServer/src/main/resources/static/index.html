@@ -16,12 +16,14 @@
              color: gold;
              background-color: navy;
              line-height: 1.7;">
-            <div style="height:100%;width:50%;float:left">
-                <img id="splash" src ="splash.jpg" alt="" style="height:100%">
+            <div style="height:100%;width:100%;float:left">
+                <img id="splash" src ="splash.jpg" alt="" style="height:100%;width:100%;">
             </div>
-            <div id="credits" style ="width:50%;float:left;">
-                <br><br><br>
-                <h1>SpaceCritters<h1>
+            <div id="credits" style ="border-radius:25px; padding-left:2em;position:absolute; top:35%; left:65%;width:30%;height:60%;float:left;background: rgba(0, 0, 0, 0.5);">
+                <br>
+                <h1>
+                    SpaceCritters
+                </h1>
                 <h2>
                     An 
                     <a href="http://www.eastsideprep.org" style="color:gold;text-decoration:none;">
@@ -29,18 +31,19 @@
                     </a>
                     Project
                 </h2>
-                <h2>Code:</h2>
-                GM (main)<br>
-                GU (main)<br>
-                QB (orbital)<br>
-                PM (web)<br><br>
-                MM, SFK, TH, TE, AB, JB (game design, aliens)<br>
+                <ul>
+                    <li>GM (main)</li>
+                    <li>GU (main)</li>
+                    <li>QB (orbital)</li>
+                    <li>PM (web)<br></li>
+                    <li>MM, SFK, TH, TE, AB, JB (game design, aliens)</li>
+                </ul>
 
                 <a href="mailto:spacecritters@eastsideprep.org" style="color:gold;">
                     spacecritters@eastsideprep.org
                 </a><br>
                 <p id="info">
-                    
+
                 </p>
             </div>
         </div>
@@ -61,6 +64,7 @@
                 <input type="radio" name="view" value="observers" onclick="observersView()"> Observers<br>
                 <input type="radio" name="view" value="stats" onclick="statsView()"> Statistics
             </form><br>
+            <button onclick="showCredits()">About SpaceCritters</button>
             <!--<button id="adminbutton" onclick="toggleAdmin()">Show admin tools</button>-->
         </div>
 
