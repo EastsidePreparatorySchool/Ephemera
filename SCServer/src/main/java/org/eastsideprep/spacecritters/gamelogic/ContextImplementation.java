@@ -8,6 +8,7 @@ import org.eastsideprep.spacecritters.alieninterfaces.*;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameVisualizer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import org.eastsideprep.spacecritters.orbit.Orbitable;
 
@@ -232,13 +233,11 @@ public class ContextImplementation implements ContextComplex {
         return (null);
     }
 
- 
-
     @Override
     public Orbit getOrbit() {
         Orbit o = null;
         if (ac.trajectory != null) {
-             o = new Orbit();
+            o = new Orbit();
             o.focus = getFocus();
             o.e = ac.trajectory.conic.e;
             o.a = ac.trajectory.conic.p / (1 - o.e * o.e);
@@ -282,6 +281,21 @@ public class ContextImplementation implements ContextComplex {
             }
         }
         return null;
+    }
+
+    @Override
+    public List<SpaceObject> getAllSpaceObjects() {
+        List<SpaceObject> result = new LinkedList<>();
+        for (InternalSpaceObject iso : this.ac.grid.objects) {
+            if (iso instanceof Star) {
+                Star s = (Star) iso;
+                result.add(new SpaceObject("STAR", s.className, new Position(s.position), s.mass, s.hillRadius));
+            } else if (iso instanceof Planet) {
+                Planet p = (Planet) iso;
+                result.add(new SpaceObject("PLANET", p.className, new Position(p.position), p.mass, p.hillRadius));
+            }
+        }
+        return result;
     }
 
     @Override

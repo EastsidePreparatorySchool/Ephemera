@@ -28,13 +28,12 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
 
     ContextComplex ctx;
 
-    static TriangleMesh vger;
-    boolean tooComplex = false;
     int startTurn;
-    long tBurn = 0;
     SpaceObject target = null;
     WorldVector targetWorldPosition = null;
-    boolean accelerate;
+    double radiusFrom = 0;
+
+    int phase = 1;
 
     // don't do anything in the contructor, implicitly or explicitly!
     public Voyager() {
@@ -47,7 +46,6 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
         this.startTurn = ctx.getGameTurn();
         this.target = ctx.getSpaceObject("ProximaCentauri");
         this.targetWorldPosition = target.worldPosition;
-        this.accelerate = true;
     }
 
     @Override
@@ -63,7 +61,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
             if (ctx.getRandomInt(100) > (100 - RESEARCH_PERCENT)) {
                 return new Action(Action.ActionCode.Research);
             }
-            if (accelerate || ctx.getEnergy() < SPAWN_ENERGY) {
+            if (phase < 10 || ctx.getEnergy() < SPAWN_ENERGY) {
                 return new Action(Action.ActionCode.Gain);
             }
             WorldVector deltaV = new WorldVector(ctx.getVelocity()
@@ -94,53 +92,123 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
 
     @Override
     public WorldVector getAccelerate() {
+        WorldVector r1;
+        WorldVector r2;
+        double indicator;
+        double vTransfer;
+        double radiusBigger = 1000000;
+        double radiusTo;
+
+        // first, do we have energy and tech?
+        if (ctx.getEnergy() < MIN_ENERGY || ctx.getTech() < MIN_TECH) {
+            return null;
+        }
+
         WorldVector v = ctx.getVelocity();
-        WorldVector p = ctx.getWorldPosition();
+        WorldVector r = ctx.getWorldPosition();
         WorldVector f = ctx.getFocus().worldPosition;
-
-        // if we are orbiting anything else than SOL, lay off the gas pedal
-        // even if we later go back
         SpaceObject so = ctx.getFocus();
-        if (so != null) {
-            if (!so.name.equalsIgnoreCase("SOL")) {
-                accelerate = false;
-            }
-        }
+        double mu = ctx.getOrbit().mu;
 
-        if (accelerate) {
-            // first, do we have energy and tech?
-            if (ctx.getEnergy() < MIN_ENERGY || ctx.getTech() < MIN_TECH) {
+        switch (phase) {
+            case 1:
+                // phase 1 - burn at aphelion make initial orbit cicular
+                r1 = ctx.getWorldPosition().subtract(ctx.getFocus().worldPosition);
+                r2 = new WorldVector(1, 0).rotate(ctx.getOrbit().rotation);
+                radiusFrom = ctx.getOrbit().a * (1 - ctx.getOrbit().e);
+                radiusTo = ctx.getOrbit().a * (1 + ctx.getOrbit().e);
+                indicator = r1.unit().dot(r2.unit());
+                if ((indicator < -0.9999)) {
+                    vTransfer = calculateHohmannTransferFrom(mu, radiusFrom, radiusTo);
+                    WorldVector deltaV = v.scaleTo(vTransfer);
+                    System.out.println("--------------acc phase 1 " + deltaV + ", mag " + deltaV.magnitude());
+                    phase = 2;
+                    return deltaV;
+                }
                 return null;
-            }
+            case 2:
+                // phase 2 - widen orbit - burn at perihelion make orbit wider (1000000)
+                r1 = ctx.getWorldPosition().subtract(ctx.getFocus().worldPosition);
+                r2 = new WorldVector(1, 0).rotate(ctx.getOrbit().rotation);
+                radiusFrom = ctx.getOrbit().a * (1 - ctx.getOrbit().e);
+                indicator = r1.unit().dot(r2.unit());
+                if ((indicator > 0.9999)) {
+                    vTransfer = calculateHohmannTransferFrom(mu, radiusFrom, radiusBigger);
+                    WorldVector deltaV = v.scaleTo(vTransfer);
+                    System.out.println("--------------acc phase 2 " + deltaV + ", mag " + deltaV.magnitude());
+                    phase = 3;
+                    return deltaV;
+                }
+                return null;
 
-            // accelerate at the right time
-            Vector3 d1 = p.subtract(f);
-            Vector3 d2 = this.targetWorldPosition.subtract(f);
-            double indicator = d1.unit().dot(d2.unit());
-            if ((indicator < -0.999999) && tBurn == 0) {
-                tBurn = System.currentTimeMillis();
-                double mu = ctx.getOrbit().mu;
-                double vTransfer = calculateHohmannTranferDeltaV(mu, p, v, targetWorldPosition);
+            case 3:
+                // phase 3 - burn at aphelion to get into widened orbit
+                r1 = ctx.getWorldPosition().subtract(ctx.getFocus().worldPosition);
+                r2 = new WorldVector(1, 0).rotate(ctx.getOrbit().rotation);
+                indicator = r1.unit().dot(r2.unit());
+                if ((indicator < -0.9999)) {
+                    vTransfer = calculateHohmannTransferTo(mu, radiusFrom, radiusBigger);
+                    WorldVector deltaV = v.scaleTo(vTransfer);
+                    System.out.println("--------------acc phase 3 " + deltaV + ", mag " + deltaV.magnitude());
+                    phase = 4;
+                    return deltaV;
+                }
+                return null;
 
-                WorldVector deltaV = v.scaleTo(vTransfer);
-                System.out.println("--------------acc " + deltaV + ", mag " + deltaV.magnitude());
-                return deltaV;
-            }
+            case 4:
+                // accelerate at perihelion to get into elliptical orbit reaching close to target
+                if (this.target.name.equalsIgnoreCase(ctx.getFocus().name)) {
+                    System.out.println("Already there");
+                    return null;
+                }
+                r1 = r.subtract(f);
+                radiusFrom = r1.magnitude();
+                r2 = this.targetWorldPosition.subtract(f);
+                indicator = r1.unit().dot(r2.unit());
+                if ((indicator < -0.99999)) {
+                    vTransfer = calculateHohmannTransferFrom(mu, radiusFrom, r2.magnitude() * 1.01);
+
+                    WorldVector deltaV = v.scaleTo(vTransfer);
+                    System.out.println("--------------acc phase 4 " + deltaV + ", mag " + deltaV.magnitude());
+                    phase = 5;
+                    return deltaV;
+                }
+                return null;
+
+            case 5:
+                // retrograde burn at perihelion to get into small circular orbit
+                r1 = r.subtract(f);
+                r2 = new WorldVector(1, 0).rotate(ctx.getOrbit().rotation);
+                radiusTo = ctx.getOrbit().a * (1 - ctx.getOrbit().e);
+                radiusFrom = ctx.getOrbit().a * (1 + ctx.getOrbit().e);
+     
+                indicator = r1.unit().dot(r2.unit());
+                if ((indicator > 0.9999)) {
+                    vTransfer = calculateHohmannTransferFrom(mu, radiusFrom, radiusTo);
+
+                    WorldVector deltaV = v.scaleTo(-vTransfer);
+                     deltaV = v.scaleTo(-1.8e-4);
+                    System.out.println("--------------dec phase 5 " + deltaV + ", mag " + deltaV.magnitude());
+                    phase = 6;
+                    return deltaV;
+                }
+                return null;
+
+            default:
+                return null;
         }
-
-        return null;
     }
 
-    double calculateHohmannTranferDeltaV(double mu, WorldVector r, WorldVector v, WorldVector target) {
-        double vm = v.magnitude();
-        double rm = r.magnitude();
-        double d = target.magnitude();
-
-        double vTransfer = Math.sqrt(mu / rm) * (Math.sqrt(2 * d / (rm + d)) - 1);
-        
-        vTransfer *= 1.00; // because life is not perfect
-        
+    double calculateHohmannTransferFrom(double mu, double radiusFrom, double radiusTo) {
+        double vTransfer = Math.sqrt(mu / radiusFrom) * (Math.sqrt(2 * radiusTo / (radiusFrom + radiusTo)) - 1);
         return vTransfer;
+
+    }
+
+    double calculateHohmannTransferTo(double mu, double radiusFrom, double radiusTo) {
+        double vTransfer = Math.sqrt(mu / radiusTo) * (1 - Math.sqrt(2 * radiusFrom / (radiusFrom + radiusTo)));
+        return vTransfer;
+
     }
 
     @Override

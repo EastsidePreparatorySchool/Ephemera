@@ -22,6 +22,8 @@ public interface Context {
  
 
     SpaceObject getSpaceObject(String name);
+    
+    List<SpaceObject> getAllSpaceObjects();
 
     IntegerPosition getIntegerPosition();
 
