@@ -14,8 +14,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
+import org.eastsideprep.spacecritters.alieninterfaces.WorldVector;
+import org.eastsideprep.spacecritters.alieninterfaces.Position;
 import org.eastsideprep.spacecritters.orbit.Trajectory;
 
 /**
@@ -152,6 +153,11 @@ public class VisualizationGrid implements GameVisualizer {
     }
 
     @Override
+    public void showAcceleration(int id, Position p, WorldVector worldDirection) {
+           debugOut("ACC: ("+ id+") at " + p+ " direction " +worldDirection);
+ }
+
+    @Override
     public void showSpawn(AlienSpec as, double energyAtPos, Trajectory t) {
         debugOut("Engine reporting Spawn: " + as.getFullName() + " at " + as.getXYString() + " with TE: " + as.getTechEnergyString());
         AlienShapeFactory asf = speciesSet.addAlien(as.getFullSpeciesName(), as.speciesID);
@@ -168,7 +174,7 @@ public class VisualizationGrid implements GameVisualizer {
 
     @Override
     public void showGameOver() {
-        Utilities.runAndWait(()->gameShell.showGameOver());
+        Utilities.runAndWait(() -> gameShell.showGameOver());
         debugOut("Game Over");
         try {
             if (logFile != null) {

@@ -66,6 +66,6 @@ public class SCGameLogEntry extends GameLogEntry {
         public static final int STATECHANGE = 9;
         public static final int ORBIT = 10;
         public static final int FIGHT = 11;
-
+        public static final int BURN = 12;
     }
 }

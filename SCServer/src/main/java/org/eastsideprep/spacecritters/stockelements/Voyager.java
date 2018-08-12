@@ -50,6 +50,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
     double radiusFrom = 0;
     String targetList;
     boolean acquired;
+    int beenHere;
 
     int phase = 1;
 
@@ -134,7 +135,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
             ctx.debugOut("phase coast");
             this.startCoastTurn = ctx.getGameTurn();
             phase = PHASE_COAST;
-            return SPAWN?a:null;
+            return SPAWN ? a : null;
         } catch (Exception e) {
             ctx.debugOut("Something went wrong in getAction, " + ctx.getStateString());
         }
@@ -240,12 +241,13 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
                 r2 = this.targetWorldPosition.subtract(f);
                 indicator = r1.unit().dot(r2.unit());
                 if ((indicator < -normalAccuracy)) {
-                    vTransfer = calculateHohmannTransferAtPerigee(mu, radiusFrom, r2.magnitude()*1.2);
+                    vTransfer = calculateHohmannTransferAtPerigee(mu, radiusFrom, r2.magnitude() * 1.2);
 
                     WorldVector deltaV = v.scaleTo(vTransfer);
                     ctx.debugOut("phase target acc" + deltaV + ", mag " + deltaV.magnitude());
                     phase = PHASE_TARGET_TRIM;
                     acquired = false;
+                    this.beenHere = 0;
                     return deltaV;
                 } else {
                     //ctx.debugOut("indicator: "+indicator);
@@ -255,12 +257,17 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
             case PHASE_TARGET_TRIM:
                 if (this.origin.name.equalsIgnoreCase(so.name)) {
                     // we did not leave the origin star's orbit, continue floating
-                    return null;
+                    this.beenHere++;
+                    if (this.beenHere < 2000) {
+                        //keep coasting and hoping
+                        return null;
+                    }
+                    // ok accept it, we won't leave this orbit to get back into circular orbit and try again
                 }
                 // at this point, we might have arrived in some orbit, but perhaps not that of our target star
                 if (!this.acquired) {
                     this.acquired = true;
-                    ctx.debugOut("acquired by "+so.name);
+                    ctx.debugOut("acquired by " + so.name);
                 }
                 // check the perigee, if it is not tight enough, perform a 1% retro burn to fix that
                 // do that as often as necessary
@@ -287,7 +294,15 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
                     vTransfer = calculateHohmannTransferAtPerigee(mu, radiusSmall, radiusBig);
                     WorldVector deltaV = v.scaleTo(-vTransfer);
                     ctx.debugOut("phase target dec " + deltaV + ", mag " + deltaV.magnitude());
-                    phase = PHASE_SPAWN;
+
+                    if (this.target.name.equalsIgnoreCase(so.name)) {
+                        phase = PHASE_SPAWN;
+
+                    } else {
+                        // we did not arrive at target, go back to phase 1
+                        phase = PHASE_RECTIFY;
+
+                    }
                     return deltaV;
                 }
                 return null;

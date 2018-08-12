@@ -143,7 +143,7 @@ public class AlienContainer {
                     trajectory.currentFocus, //focus from the dummy trajectory
                     (grid.rand.nextDouble() * 2 + 10) * Constants.deltaX, //semi-latus rectum
                     0.01,//grid.rand.nextDouble() / 10 + 0.1, //Eccentricity
-                    grid.rand.nextInt(2) == 0? -1:1, //signum
+                    grid.rand.nextInt(2) == 0 ? -1 : 1, //signum
                     Vector2.normalizeAngle(grid.rand.nextDouble() * 2 * Math.PI), //rotation
                     grid);
         } else {
@@ -282,6 +282,14 @@ public class AlienContainer {
                 System.out.println("  exit velocity: " + v + " mag " + v.magnitude());
                 System.out.println("  entry velocity: " + v2 + " mag " + v2.magnitude());
             }
+
+            // call shell visualizer
+            // just make sure we don't blow up the alien because of an exception in the shell
+            try {
+                grid.vis.showAcceleration(alienHashCode, nextP, deltaV);
+            } catch (Exception e) {
+                grid.vis.debugOut("Unhandled exception in showAcceleration(): " + e);
+            }
         }
 
         /* DETERMINE CURRENT FOCUS */
@@ -320,7 +328,7 @@ public class AlienContainer {
         //if orbiting a planet and within that planet's hill sphere, you're staying there
         //if not, enter the parent star's orbit
         if (focus instanceof Planet) {
-            System.out.println("hill radius: "+focus.hillRadius());
+            System.out.println("hill radius: " + focus.hillRadius());
             if (focus.position(grid.getTime()).subtract(nextP).magnitude() <= focus.hillRadius()) {
                 return focus;
             } else {
@@ -432,8 +440,8 @@ public class AlienContainer {
     }
 
     // checked action
-    private static Action nullAction = new Action (ActionCode.Gain);
-    
+    private static Action nullAction = new Action(ActionCode.Gain);
+
     public void getAction() throws NotEnoughEnergyException, UnknownActionException {
         Action a = alien.getAction();
 

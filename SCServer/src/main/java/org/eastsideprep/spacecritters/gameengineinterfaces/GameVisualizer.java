@@ -38,6 +38,8 @@ public interface GameVisualizer {
 
     void showMove(AlienSpec as, double oldX, double oldY, double energyAtNewPosition, double energyAtOldPosition, boolean update, Trajectory t, double time); //[Q]
 
+    void showAcceleration(int id, Position p, WorldVector worldDirection);
+
     void showFight(int x, int y);
 
     void showSpawn(AlienSpec as, double energyAtPos, Trajectory t);

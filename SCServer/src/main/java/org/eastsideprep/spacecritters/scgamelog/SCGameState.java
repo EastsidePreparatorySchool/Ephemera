@@ -31,6 +31,7 @@ public class SCGameState implements GameLogState {
     private ArrayList<SCGameLogEntry> species = new ArrayList<>();
     private ArrayList<SCGameLogEntry> kills = new ArrayList<>();
     private ArrayList<SCGameLogEntry> fights = new ArrayList<>();
+    private ArrayList<SCGameLogEntry> burns = new ArrayList<>();
 
     // what the console uses initially, 
     // and what "copy" uses internally
@@ -73,7 +74,8 @@ public class SCGameState implements GameLogState {
         for (Entry<Integer, SCGameLogEntry> e : orbits.entrySet()) {
             sc.orbits.put(e.getKey(), new SCGameLogEntry(e.getValue()));
         }
-        sc.fights = new ArrayList<>();
+        sc.fights = new ArrayList<>(); // we don't record fights in compacted log for state or update
+        sc.burns = new ArrayList<>(); // ditto for burns
 
         if (lastTurn != null) {
             sc.lastTurn = new SCGameLogEntry(lastTurn);
@@ -197,11 +199,19 @@ public class SCGameState implements GameLogState {
                     aliens.remove(sge.id);
                 }
                 break;
+                
            case SCGameLogEntry.Type.FIGHT:
                 if (forUpdates) {
                         fights.add(sge);
                 } 
                 break;
+                
+           case SCGameLogEntry.Type.BURN:
+                if (forUpdates) {
+                        burns.add(sge);
+                } 
+                break;
+                
             default:
                 break;
         }
@@ -235,6 +245,7 @@ public class SCGameState implements GameLogState {
             fights.subList(0, fights.size()-100-1).clear();
         }
         result.addAll(fights);
+        result.addAll(burns);
         result.addAll(kills);
         result.addAll(orbits.values());
         

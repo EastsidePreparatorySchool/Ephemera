@@ -8,7 +8,11 @@ var updateInterval = 50;
 var updateIntervalInactive = 1000;
 var updateIntervalActive = 50;
 var fightLength = 10;
+var burnLength = 15;
 var trailLength = 15;
+var vMultiplier = 10000; // drawvelocity vector 10000 times bigger than they really are
+var aMultiplier = 30000; // draw burns (deltaV) 10000 times bigger than they really are
+var aSize = 3; // initial size of burn spheres
 
 var textarea = document.getElementById("output");
 var turnSpan = document.getElementById("turns");
@@ -38,6 +42,7 @@ var stars = [];
 var speciesMap = null;
 var grid = [];
 var fights = [];
+var burns = [];
 var observers = 0;
 var engineList = null;
 var attachedName = null;
@@ -57,6 +62,7 @@ const KILL = 8;
 const STATECHANGE = 9;
 const ORBIT = 10;
 const FIGHT = 11;
+const BURN = 12;
 
 var scene;
 var camera;
@@ -67,12 +73,13 @@ var height;
 var cubeGeo;
 var startGeo;
 var planetGeo;
+var sphereGeo;
 var gridHelper;
 var light;
 var size = 5001;
 var rotation = 0;
 var orbitMaterial = null;
-var fightMaterial;
+var fightMaterial = null;
 var autorotateTimeout = null;
 var trailMaterial = null;
 
@@ -211,6 +218,9 @@ function processUpdates(data) {
                 case FIGHT:
                     showFight(o.newX, o.newY);
                     break;
+                case BURN:
+                    showBurn(o.id, o.param1, o.param2, o.energy, o.tech);
+                    break;
                 case STATECHANGE:
                     //println("Alien id: "+o.id+" died.");
                     println("StateChange: " + (o.id === 0 ? "Paused" : "Running"));
@@ -269,12 +279,8 @@ function drawOrbit(id, focusX, focusY, e, p, rotation, vx, vy) {
 
 }
 
-function drawVelocity(alien, vx, vy) {
-    return drawLine(-alien.mesh.position.z, -alien.mesh.position.x,
-            -alien.mesh.position.z + vx, -alien.mesh.position.x + vy,
-            fightMaterial);
 
-}
+
 
 function drawEllipse(centerX, centerY, radiusX, radiusY, rotation) {
     var curve = new THREE.EllipseCurve(
@@ -291,6 +297,13 @@ function drawEllipse(centerX, centerY, radiusX, radiusY, rotation) {
     ellipse.rotation.x = Math.PI / 2;
     ellipse.position.y = 1.0;
     return ellipse;
+}
+
+function drawVelocity(alien, vx, vy) {
+    return drawLine(-alien.mesh.position.z, -alien.mesh.position.x,
+            -alien.mesh.position.z + vx * vMultiplier, -alien.mesh.position.x + vy * vMultiplier,
+            fightMaterial);
+
 }
 
 function drawLine(x1, y1, x2, y2, material) {
@@ -312,15 +325,64 @@ function showFight(x, y) {
     mesh.position.z = -x;
     mesh.position.y = 1;
     mesh.scale.set(5, 5, 5);
+    addMeshToFightList(mesh);
+}
+
+function test() {
+    //showBurn(0, 10, 5, 4e-4, 4e-4);
+
+}
+
+function showBurn(id, x, y, dvx, dvy) {
+    var mesh = new THREE.Mesh(sphereGeo, fightMaterial);
+    dvx *= -aMultiplier;
+    dvy *= -aMultiplier;
+
+    // from here task is to draw an ellipsoid of linear length with (dvx,dvy),
+    // from x, y on the grid in the direction pointed to by dvx, dvy
+
+//    x = 10;
+//    y = 10;
+//    dvx = 10;
+//    dvy = 10;
+
+    var size = Math.sqrt(dvx * dvx + dvy * dvy);
+
+    mesh.scale.set(aSize * size, aSize, aSize);
+    mesh.rotation.y = -Math.atan2(-dvx, -dvy);
+    //println("rot: " + mesh.rotation.y);
+
+
+    mesh.position.x = -(y - mesh.scale.x * Math.cos(-mesh.rotation.y));
+    mesh.position.z = -(x - mesh.scale.x * Math.sin(-mesh.rotation.y));
+    mesh.position.y = 1;
+
+    println("Burn, grid size: " + size + " at " + x + "," + y + "");
+//    scene.add(mesh);
+//    return;
+
+    addMeshToBurnList(mesh);
+}
+
+
+function addMeshToFightList(mesh) {
     scene.add(mesh);
     fights.push(mesh);
 
-    // no need to show more than 100 fights. If there are old ones in here, delete them.
+    // no need to show more than 100 fights/burns. If there are old ones in here, delete them.
     while (fights.length > 100) {
         scene.remove(fights.shift());
     }
 }
+function addMeshToBurnList(mesh) {
+    scene.add(mesh);
+    burns.push(mesh);
 
+    // no need to show more than 100 fights/burns. If there are old ones in here, delete them.
+    while (burns.length > 100) {
+        scene.remove(burns.shift());
+    }
+}
 function slowmode() {
     request({url: "protected/slowmode?"
                 + "clientID=" + getClientID()
@@ -1070,6 +1132,7 @@ function init() {
     renderer.setSize(width, height);
     centerDiv.appendChild(renderer.domElement);
     cubeGeo = new THREE.BoxGeometry(1.0, 1.0, 1.0);
+    sphereGeo = new THREE.SphereGeometry(1.0, 32, 32);
     starGeo = new THREE.SphereGeometry(1.0, 32, 32);
     planetGeo = new THREE.SphereGeometry(0.7, 32, 32);
     orbitMaterial = new THREE.LineBasicMaterial({color: "goldenrod"});
@@ -1090,7 +1153,7 @@ function init() {
     controls.minDistance = 10;
     controls.maxDistance = 6000;
     controls.maxPolarAngle = Math.PI / 2;
-    controls.autoRotate = true;
+    controls.autoRotate = false;
     controls.autoRotateSpeed = 1.0;
     // stop autorotate after the first interaction
     controls.addEventListener('start', function () {
@@ -1122,6 +1185,8 @@ function init() {
             attach(fields[1]);
         }
     }
+
+    test();
 }
 
 function onWindowResize() {
@@ -1140,6 +1205,7 @@ function animate() {
     requestAnimationFrame(animate);
     // required if controls.enableDamping or controls.autoRotate are set to true
     controls.update();
+
     var newFights = [];
     fights.forEach((f) => {
         var s = f.scale.x;
@@ -1151,6 +1217,28 @@ function animate() {
         }
     });
     fights = newFights;
+
+    var newBurns = [];
+    burns.forEach((b) => {
+        var s = b.scale.x;
+        if (s < 1) {
+            scene.remove(b);
+        } else {
+
+            b.position.x -= b.scale.x * Math.cos(-b.rotation.y);
+            b.position.z -= b.scale.x * Math.sin(-b.rotation.y);
+
+            var ratio = b.scale.y / b.scale.x;
+            var newx = s - (1 / burnLength);
+            b.scale.set(newx, newx * ratio, newx * ratio);
+
+            b.position.x += b.scale.x * Math.cos(-b.rotation.y);
+            b.position.z += b.scale.x * Math.sin(-b.rotation.y);
+            newBurns.push(b);
+        }
+    });
+    burns = newBurns;
+
     renderer.render(scene, camera);
     //println(" cam:("+camera.position.x+","+camera.position.y+","+camera.position.z+")");
 }

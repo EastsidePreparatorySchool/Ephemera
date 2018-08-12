@@ -11,11 +11,9 @@ import org.eastsideprep.spacecritters.gameengineinterfaces.GameVisualizer;
 import java.util.List;
 import org.eastsideprep.spacecritters.alieninterfaces.IntegerPosition;
 import org.eastsideprep.spacecritters.alieninterfaces.Position;
-import org.eastsideprep.spacecritters.alieninterfaces.Vector2;
 import org.eastsideprep.spacecritters.alieninterfaces.WorldVector;
 import org.eastsideprep.spacecritters.gamelog.GameLog;
 import org.eastsideprep.spacecritters.gamelogic.Constants;
-import org.eastsideprep.spacecritters.gamelogic.SpaceGrid;
 import org.eastsideprep.spacecritters.orbit.Trajectory;
 import org.eastsideprep.spacecritters.scgamelog.SCGameLogEntry;
 
@@ -104,6 +102,14 @@ public class LoggingVisualizer implements GameVisualizer {
     }
 
     @Override
+    public void showAcceleration(int id, Position p, WorldVector worldDirection) {
+        log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.BURN,
+                0, 0, p.x, p.y,
+                null, null, id, -1,
+                worldDirection.x, worldDirection.y));
+    }
+
+    @Override
     public void showMove(AlienSpec as, double oldX, double oldY, double energyAtNewPosition, double energyAtOldPosition, boolean update, Trajectory t, double time) { //[Q]
         //System.out.println("LOGDEBUG: MOVE" + as.hashCode);
         if (!as.isResident) {
@@ -114,13 +120,13 @@ public class LoggingVisualizer implements GameVisualizer {
                 Position pf = t.currentFocus.position(time);
                 Position p = new Position(t.getWorldPositionAtTime(time));
                 WorldVector v = t.getVelocityAtTime(time);
-                
-                 log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.MOVE,
+
+                log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.MOVE,
                         p.x, p.y, oldX, oldY,
                         null, null, as.hashCode, as.speciesID,
                         0.0, 0.0));
-                 log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ORBIT,
-                        pf.x, pf.y, (int) (v.x * 10000), (int) (v.y * 10000),
+                log.addLogEntry(new SCGameLogEntry(SCGameLogEntry.Type.ORBIT,
+                        pf.x, pf.y, v.x, v.y,
                         Double.toString(t.conic.rotation), null, as.hashCode, as.speciesID,
                         t.conic.e, t.conic.p / Constants.deltaX));
             } else {
@@ -184,7 +190,7 @@ public class LoggingVisualizer implements GameVisualizer {
 
     @Override
     public void debugOut(String s) {
-        System.out.println("LV debug out: "+s);
+        System.out.println("LV debug out: " + s);
     }
 
     @Override

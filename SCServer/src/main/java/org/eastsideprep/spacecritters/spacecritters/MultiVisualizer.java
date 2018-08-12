@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import org.eastsideprep.spacecritters.alieninterfaces.WorldVector;
+import org.eastsideprep.spacecritters.alieninterfaces.Position;
 import org.eastsideprep.spacecritters.orbit.Trajectory;
 
 /**
@@ -157,7 +159,17 @@ public class MultiVisualizer implements GameVisualizer {
             }
         });
     }
-
+        @Override
+    public void showAcceleration(int id, Position p, WorldVector worldDirection) {
+        cgv.forEach(e -> {
+            try {
+                e.showAcceleration(id, p, worldDirection);
+            } catch (UnsupportedOperationException ex) {
+                System.err.println("multivis: " + ex.getMessage());
+                ex.printStackTrace(System.err);
+            }
+        });
+    }
     @Override
     public void showSpawn(AlienSpec as, double energyAtPos, Trajectory t) {
         cgv.forEach(e -> {
