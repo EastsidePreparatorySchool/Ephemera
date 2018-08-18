@@ -118,7 +118,7 @@ public class ContextImplementation implements ContextComplex {
     // messsaging API: record that this alien wants to send, and whether to receive
     @Override
     public void broadcastAndListen(String message, int power, boolean listen)
-            throws NotEnoughTechException, NotEnoughEnergyException { //[Q]
+            throws NotEnoughTechException, NotEnoughEnergyException {
 
         if (power > ac.tech) {
             throw new NotEnoughTechException();
@@ -141,7 +141,7 @@ public class ContextImplementation implements ContextComplex {
     }
 
     // communicate phase 2: deliver messages to gridpoints
-    public void routeMessages() { //[Q]
+    public void routeMessages() {
         // poke around our current position,
         // tracing an imaginary square of increasing size,
         // in 8 line segments, hopefully without overlap
@@ -151,7 +151,7 @@ public class ContextImplementation implements ContextComplex {
     }
 
     // put a message at one grid point ONLY if someone is listening
-    public void depositMessageAt(IntegerPosition p, String message) { //[Q]
+    public void depositMessageAt(IntegerPosition p, String message) {
         int x = p.x;
         int y = p.y;
 
@@ -223,7 +223,8 @@ public class ContextImplementation implements ContextComplex {
 
     @Override
     public AlienSpecies getMyAlienSpecies() {
-        return new AlienSpecies(ac.domainName, ac.packageName, ac.className, ac.speciesID, ac.p.round().x, ac.p.round().y); //[kludge]
+        IntegerPosition p = ac.p.round();
+        return new AlienSpecies(ac.domainName, ac.packageName, ac.className, ac.speciesID, p.x, p.y); //[kludge]
     }
 
     @Override
@@ -241,6 +242,7 @@ public class ContextImplementation implements ContextComplex {
             o = new Orbit();
             o.focus = getFocus();
             o.e = ac.trajectory.conic.e;
+            o.p = ac.trajectory.conic.p;
             o.a = ac.trajectory.conic.p / (1 - o.e * o.e);
             o.rotation = ac.trajectory.conic.rotation;
             o.signum = ac.trajectory.conic.signum;

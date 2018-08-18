@@ -49,6 +49,16 @@ public class MainApp implements SparkApplication {
 
     // desktop initialization
     public static void main(String[] args) {
+        
+        
+        //run code in the testing class
+        Testing.run();
+        
+        
+        
+        
+        
+        
         System.out.println("SC main() (scserver) " + getDateString());
         String userDir = System.getProperty("user.dir");
 

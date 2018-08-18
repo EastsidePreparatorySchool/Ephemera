@@ -13,10 +13,11 @@ package org.eastsideprep.spacecritters.alieninterfaces;
 public class Orbit {
 
     public SpaceObject focus;   // star or planet
-    public double a;            // semi-major axis
+    public double p;            // semi-latus rectum
+    public double a;            // semi-major axis -- this will be undefined for parabolas
     public double e;            // eccentricity
     public double rotation;     // 
     public double signum;       // 1.0 = counter-clockwise
     public double mu;           // G*M
-    public double h;
+    public double h;            // angular momentum
 }

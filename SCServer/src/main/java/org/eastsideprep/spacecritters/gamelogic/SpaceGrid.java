@@ -735,9 +735,10 @@ public class SpaceGrid {
                     );
                     newAliens.add(spec);
                     Trajectory t = thisAlien.trajectory;
+                    WorldVector deltaV = thisAlien.currentAction.deltaV;
                     if (t != null) {
                         t = t.clone();
-                        t.accelerate(thisAlien.currentAction.deltaV, getTime());
+                        t.accelerate(deltaV != null ? deltaV : new WorldVector(0,0), getTime());
                     }
                     trajectories.put(spec, t);
 

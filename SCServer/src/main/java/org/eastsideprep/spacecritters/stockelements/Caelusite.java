@@ -13,21 +13,21 @@ import org.eastsideprep.spacecritters.alieninterfaces.*;
 public class Caelusite implements Alien, AlienComplex {
 
     Context ctx;
+    int id,
+        parent;
+    String pastWisdom;
 
     public Caelusite() {}
 
     @Override
     public void initComplex(ContextComplex game_ctx, int id, int parent, String message) {
         ctx = game_ctx;
-        
+        this.id = id;
+        this.parent = parent;
+        pastWisdom = message;
     }
 
-    // Obsolete but needs to exist
-    @Override
-    public Vector2 getMove() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
+    
     @Override
     public Action getAction() {
         
@@ -35,19 +35,8 @@ public class Caelusite implements Alien, AlienComplex {
         View view = null;
         try {
             view = ctx.getView(ctx.getTech());
-        } catch (Exception e){
-        }
+        } catch (Exception e){}
         
-        
-        if (view != null) try {
-            int neighbors = view.getAliensAtPos(ctx.getPosition()).size();
-            if (neighbors < ctx.getEnergy() * 3 && neighbors > 0 && ctx.getEnergy() > 20) return new Action(Action.ActionCode.Fight, (int) ctx.getEnergy()/3);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        
-        
-
         if(ctx.getEnergy() > 80) {
             if (ctx.getRandomInt(2) == 1) return new Action(Action.ActionCode.Spawn, 5);
             return new Action(Action.ActionCode.Research);
@@ -58,32 +47,38 @@ public class Caelusite implements Alien, AlienComplex {
         return new Action(Action.ActionCode.Gain);
     }
 
+    
+
+    @Override
+    public WorldVector getAccelerate() {
+        if (ctx.getGameTurn() % 15 == 0) {
+            return new WorldVector(1,0);
+        }
+        return null; 
+    }
+    
     @Override
     public void communicate() {
-        
     }
 
     @Override
     public void receive(String[] messages) {
-        
     }
 
     @Override
     public void processResults() {
     }
+    
 
-    @Override
-    public WorldVector getAccelerate() {
-        
-        
-        if (ctx.getGameTurn() % 15 == 0) {
-            return new WorldVector(1,0);
-        }
-        return new WorldVector(0,0); 
-    }
-
+    
+    // Obsolete but needs to exist
     @Override
     public void init(Context ctx, int id, int parent, String message) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+    @Override
+    public Vector2 getMove() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

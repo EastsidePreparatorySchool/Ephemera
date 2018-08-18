@@ -74,7 +74,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
             // sort by who is closer to what we are orbiting right now
             lso.sort((a, b) -> (int) (a.worldPosition.subtract(ctx.getFocus().worldPosition).magnitude()
                     - b.worldPosition.subtract(ctx.getFocus().worldPosition).magnitude()));
-            // remove earth
+            // remove earth  -- isnt earth a planet? should that not be removed in line 73
             lso.remove(0);
             // make target list
             this.targetList = lso.stream().map((e) -> e.name).collect(Collectors.joining(","));
@@ -173,8 +173,9 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
 
         WorldVector v = ctx.getVelocity();
         WorldVector r = ctx.getWorldPosition();
-        WorldVector f = ctx.getFocus().worldPosition;
         SpaceObject so = ctx.getFocus();
+        WorldVector f = so.worldPosition;
+        
         double mu = ctx.getOrbit().mu;
 
         switch (phase) {
@@ -186,11 +187,11 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
                     return null;
                 }
                 // phase 1 - burn at aphelion make initial orbit cicular
-                r1 = ctx.getWorldPosition().subtract(ctx.getFocus().worldPosition);
-                r2 = new WorldVector(1, 0).rotate(ctx.getOrbit().rotation);
-                radiusFrom = ctx.getOrbit().a * (1 - ctx.getOrbit().e);
+                r1 = ctx.getWorldPosition().subtract(ctx.getFocus().worldPosition); //vector from focus to alien
+                r2 = new WorldVector(1, 0).rotate(ctx.getOrbit().rotation);         //unit vector, points towards periapse
+                radiusFrom = ctx.getOrbit().a * (1 - ctx.getOrbit().e);             
                 radiusTo = ctx.getOrbit().a * (1 + ctx.getOrbit().e);
-                indicator = r1.unit().dot(r2.unit());
+                indicator = r1.unit().dot(r2.unit()); //how far away are the vectors are -- am I at apoapse
                 if ((indicator < -normalAccuracy)) {
                     vTransfer = calculateHohmannTransferAtPerigee(mu, radiusFrom, radiusTo);
                     WorldVector deltaV = v.scaleTo(vTransfer);
