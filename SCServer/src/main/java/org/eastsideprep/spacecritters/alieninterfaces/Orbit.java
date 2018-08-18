@@ -14,7 +14,7 @@ public class Orbit {
 
     public SpaceObject focus;   // star or planet
     public double p;            // semi-latus rectum
-    public double a;            // semi-major axis -- this will be undefined for parabolas
+    //public double a;            // semi-major axis -- this will be undefined for parabolas
     public double e;            // eccentricity
     public double rotation;     // 
     public double signum;       // 1.0 = counter-clockwise

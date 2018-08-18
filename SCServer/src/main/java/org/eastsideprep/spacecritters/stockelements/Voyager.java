@@ -157,6 +157,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
 
     @Override
     public WorldVector getAccelerate() {
+        Orbit orbit = ctx.getOrbit();
         WorldVector r1;
         WorldVector r2;
         double indicator;
@@ -187,10 +188,10 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
                     return null;
                 }
                 // phase 1 - burn at aphelion make initial orbit cicular
-                r1 = ctx.getWorldPosition().subtract(ctx.getFocus().worldPosition); //vector from focus to alien
+                r1 = r.subtract(f); //vector from focus to alien
                 r2 = new WorldVector(1, 0).rotate(ctx.getOrbit().rotation);         //unit vector, points towards periapse
-                radiusFrom = ctx.getOrbit().a * (1 - ctx.getOrbit().e);             
-                radiusTo = ctx.getOrbit().a * (1 + ctx.getOrbit().e);
+                radiusFrom = orbit.p / (1+orbit.e);//ctx.getOrbit().a * (1 - ctx.getOrbit().e);   -- periapse now calculated with semi-latus rectum, instead semi major axis
+                radiusTo = orbit.p / (1-orbit.e);  //ctx.getOrbit().a * (1 + ctx.getOrbit().e);   -- ditto for apoapse
                 indicator = r1.unit().dot(r2.unit()); //how far away are the vectors are -- am I at apoapse
                 if ((indicator < -normalAccuracy)) {
                     vTransfer = calculateHohmannTransferAtPerigee(mu, radiusFrom, radiusTo);
@@ -204,7 +205,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
                 // phase 2 - widen orbit - burn at perihelion make orbit wider (1000000)
                 r1 = ctx.getWorldPosition().subtract(ctx.getFocus().worldPosition);
                 r2 = new WorldVector(1, 0).rotate(ctx.getOrbit().rotation);
-                radiusFrom = ctx.getOrbit().a * (1 - ctx.getOrbit().e);
+                radiusFrom = orbit.p / (1+orbit.e); //ctx.getOrbit().a * (1 - ctx.getOrbit().e);
                 indicator = r1.unit().dot(r2.unit());
                 if ((indicator > normalAccuracy)) {
                     vTransfer = calculateHohmannTransferAtPerigee(mu, radiusFrom, radiusBigger);
@@ -273,7 +274,7 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
                 // check the perigee, if it is not tight enough, perform a 1% retro burn to fix that
                 // do that as often as necessary
 
-                double perihelion = ctx.getOrbit().a * (1 - ctx.getOrbit().e);
+                double perihelion = orbit.p / (1+orbit.e); //ctx.getOrbit().a * (1 - ctx.getOrbit().e);
                 if (perihelion > radiusBigger / 2) {
                     WorldVector deltaV = v.scaleTo(-v.magnitude() * 0.01);
                     ctx.debugOut("phase trim dec " + deltaV + ", mag " + deltaV.magnitude());
@@ -286,8 +287,8 @@ public class Voyager implements Alien, AlienComplex /*, AlienShapeFactory*/ {
                 // retrograde burn at perihelion to get into small circular orbit
                 r1 = r.subtract(f);
                 r2 = new WorldVector(1, 0).rotate(ctx.getOrbit().rotation);
-                double radiusSmall = ctx.getOrbit().a * (1 - ctx.getOrbit().e);
-                double radiusBig = ctx.getOrbit().a * (1 + ctx.getOrbit().e);
+                double radiusSmall = orbit.p / (1+orbit.e); //ctx.getOrbit().a * (1 - ctx.getOrbit().e);
+                double radiusBig = orbit.p / (1-orbit.e); //ctx.getOrbit().a * (1 + ctx.getOrbit().e);
 
                 indicator = r1.unit().dot(r2.unit());
                 if ((indicator > normalAccuracy)) {

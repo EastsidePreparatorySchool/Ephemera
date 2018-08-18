@@ -52,7 +52,7 @@ public class Caelusite implements Alien, AlienComplex {
     @Override
     public WorldVector getAccelerate() {
         if (ctx.getGameTurn() % 15 == 0) {
-            return new WorldVector(1,0);
+            return new WorldVector(0.00001,0);
         }
         return null; 
     }
