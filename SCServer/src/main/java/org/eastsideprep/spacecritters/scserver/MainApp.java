@@ -136,9 +136,30 @@ public class MainApp implements SparkApplication {
 //    	before((request, response) -> {
 //    	  System.out.println("Spark request: "+request.url());
 //    	});
-        WebSocketHandler wsh = new WebSocketHandler();
-        webSocket("/ws/updates", wsh);
+        
+        
+        
+        
+        MainApp.engines = new Governor();
+        MainApp.engines.init();
 
+        if (MainApp.createServerEngine) {
+            MainApp.geMain = MainApp.createServerGameEngine("main");
+
+            if (MainApp.geMain == null) {
+                System.out.println("Could not create initial server game engine");
+                return;
+            }
+        }
+
+        MainApp.engines.put("main", MainApp.geMain);
+        
+        
+        
+        WebSocketHandler wsh = new WebSocketHandler(engines.get("main").log.webSocketObserver);
+        webSocket("/ws/main/updates", wsh);
+                
+        
         get("/protected/start", "application/json", (req, res) -> doStart(req), new JSONRT());
         get("/protected/pause", "application/json", (req, res) -> doPause(req), new JSONRT());
         get("/protected/listengines", "application/json", (req, res) -> doListEngines(req), new JSONRT());
@@ -157,25 +178,11 @@ public class MainApp implements SparkApplication {
         get("/protected/slowmode", (req, res) -> doSlowMode(req));
         post("/protected/upload", (req, res) -> uploadFile(req, res));
         
-        
-        
-        
-        MainApp.engines = new Governor();
-        MainApp.engines.init();
-
-        if (MainApp.createServerEngine) {
-            MainApp.geMain = MainApp.createServerGameEngine("main");
-
-            if (MainApp.geMain == null) {
-                System.out.println("Could not create initial server game engine");
-                return;
-            }
-        }
-
-        MainApp.engines.put("main", MainApp.geMain);
+        wsh.beginUpdateLoop();
     }
 
     // context helper
+    // every client has one context, every context has one client?
     private static ServerContext getCtx(Request req) {
         HashMap<String, ServerContext> ctxMap = req.session().attribute("ServerContexts");
         if (req.session().isNew() || ctxMap == null) {

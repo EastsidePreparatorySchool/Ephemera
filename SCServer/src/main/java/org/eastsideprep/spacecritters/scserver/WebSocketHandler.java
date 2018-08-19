@@ -16,20 +16,32 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.eastsideprep.spacecritters.gamelog.GameLogEntry;
+import org.eastsideprep.spacecritters.gamelog.GameLogObserver;
+import com.google.gson.Gson;
 
 @WebSocket
 public class WebSocketHandler {
     //stored list of observers
     private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
-
+    public GameLogObserver observer;
+    public Thread updateLoop;
+    private JSONRT jsonConverter = new JSONRT();
+    
+    public WebSocketHandler(GameLogObserver observer) {
+        this.observer = observer;
+        //beginUpdateLoop();
+    }
+    
     @OnWebSocketConnect
     public void connected(Session session) {
         sessions.add(session);
-        send(session, "Hello new person!");
+        //send(session, "Hello new person!");
     }
 
     @OnWebSocketClose
     public void closed(Session session, int statusCode, String reason) {
+        System.out.println("Lost connection to a client");
         sessions.remove(session);
     }
 
@@ -48,7 +60,27 @@ public class WebSocketHandler {
         try {
             session.getRemote().sendString(message);
         } catch (IOException ex) {
-            Logger.getLogger(WebSocketHandler.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Exception in websocket send:");
+            System.out.println(ex);
         }
+    }
+    
+    
+    public void beginUpdateLoop() {
+        updateLoop = new Thread(() -> {
+            update();
+        });
+        updateLoop.run();
+    }
+    public void update() {
+        List<GameLogEntry> list = observer.getNewItems();
+        broadcastJSONString(jsonConverter.render(list));
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException ex) {
+            System.out.println("Exception in update loop:");
+            System.out.println(ex);
+        }
+        update();
     }
 }

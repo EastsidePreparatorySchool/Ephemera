@@ -128,13 +128,20 @@ function attach(engine) {
 
 //Alternative:
 
-let socket = new WebSocket('ws://' + location.hostname + ':' + location.port + '/ws/updates');
+let socket = new WebSocket('ws://' + location.hostname + ':' + location.port + '/ws/main/updates');
 socket.onclose = () => {
-  alert('connection to server lost');
+  console.log('lost connection to server');
+  //alert('connection to server lost');
 };
 socket.onmessage = (message) => {
-  console.log('recieved socket message: ');
-  console.log(message);
+  //console.log('recieved socket message: ');
+  let data = JSON.parse(message.data);
+  console.log(data);
+  try {
+      processUpdates(data);
+  } catch (err) {
+      println("updates: error in processUpdates, " + err);
+  }
 };
 
 
@@ -196,7 +203,7 @@ function processUpdates(data) {
         for (var i = 0; i < data.length; i++) {
 // if 50% processed, file another request for updates
             if (i > (data.length * 0.5) && !requested) {
-                setTimeout(updates, updateInterval);
+                //setTimeout(updates, updateInterval);
                 requested = true;
                 //println ("Requested updates in processUpdates");
             }
@@ -254,7 +261,7 @@ function processUpdates(data) {
         renderer.render(scene, camera);
     }
     if (!requested) {
-        setTimeout(updates, updateInterval);
+        //setTimeout(updates, updateInterval);
         requested = true;
         //println ("Requested delayed updates at the end of processUpdates");
     }
@@ -568,7 +575,7 @@ function start() {
                 if (data !== null) {
                     println("  Response: " + data);
                 }
-                //updates();
+                updates();
                 //println ("Requested updates in start");
             })
             .catch(error => {
@@ -861,6 +868,7 @@ function addStar(content) {
 
 
 function addPlanet(content) {
+    console.log('adding planet: ' + content.id + ':' + content.name);
     planets[content.id] = new Planet(content.newX, content.newY, content.id);
 }
 

@@ -30,12 +30,15 @@ public class GameLog {
     private int minRead = 0;
     private final int COLLAPSE_THRESHOLD = 1000;
     public int turnsCompleted = 0;
+    public GameLogObserver webSocketObserver;
 
     public GameLog(GameLogState state) {
         rlock = rwl.readLock();
         wlock = rwl.writeLock();
         this.state = state;
         state.setLog(this);
+        
+        webSocketObserver = addObserver("local:websocket");
     }
 
     public void addLogEntry(GameLogEntry item) {
