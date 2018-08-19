@@ -1,5 +1,3 @@
-console.log("changes applied and saved");
-
 /*
  SpaceCritters online - GM, QB, PM
  */
@@ -124,8 +122,28 @@ function attach(engine) {
             .catch(error => {
                 println("Error: " + error);
             });
-    ;
 }
+
+
+
+//Alternative:
+
+let socket = new WebSocket('ws://' + location.hostname + ':' + location.port + '/ws/updates');
+socket.onclose = () => {
+  alert('connection to server lost');
+};
+socket.onmessage = (message) => {
+  console.log('recieved socket message: ');
+  console.log(message);
+};
+
+
+
+
+
+
+
+
 
 
 function updates() {
@@ -817,7 +835,7 @@ class Star {
     }
 
 }
-;
+
 // planet class, use this to make aliens
 class Planet {
     constructor(x, z, id) {
@@ -836,7 +854,7 @@ class Planet {
         this.mesh.position.z = -x;
     }
 }
-;
+
 function addStar(content) {
     stars.push(new Star(content.newX, content.newY, content.param1));
 }

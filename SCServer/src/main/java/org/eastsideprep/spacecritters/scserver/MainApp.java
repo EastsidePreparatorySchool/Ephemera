@@ -136,6 +136,9 @@ public class MainApp implements SparkApplication {
 //    	before((request, response) -> {
 //    	  System.out.println("Spark request: "+request.url());
 //    	});
+        WebSocketHandler wsh = new WebSocketHandler();
+        webSocket("/ws/updates", wsh);
+
         get("/protected/start", "application/json", (req, res) -> doStart(req), new JSONRT());
         get("/protected/pause", "application/json", (req, res) -> doPause(req), new JSONRT());
         get("/protected/listengines", "application/json", (req, res) -> doListEngines(req), new JSONRT());
@@ -153,7 +156,10 @@ public class MainApp implements SparkApplication {
         get("/protected/serverlog", (req, res) -> getServerLogFile(req, res));
         get("/protected/slowmode", (req, res) -> doSlowMode(req));
         post("/protected/upload", (req, res) -> uploadFile(req, res));
-
+        
+        
+        
+        
         MainApp.engines = new Governor();
         MainApp.engines.init();
 
