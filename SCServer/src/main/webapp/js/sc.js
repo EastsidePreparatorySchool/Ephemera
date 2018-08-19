@@ -1,3 +1,5 @@
+console.log("changes applied and saved");
+
 /*
  SpaceCritters online - GM, QB, PM
  */
@@ -1085,11 +1087,11 @@ function processCheck(id) {
 
 //   public void buildTrajectory(Trajectory t, Color c) {
 //        Iterator<Vector2> positions = t.toDraw(100);
-//        
+//
 //        Vector2 past = positions.next();
 //        past.x = Scene3D.xFromX(past.x);
 //        past.y = Scene3D.zFromY(past.y);
-//        
+//
 //        PhongMaterial mat = new PhongMaterial(c);
 //        getChildren().remove(lines);
 //        lines = new Group();
@@ -1097,21 +1099,21 @@ function processCheck(id) {
 //            Vector2 next = positions.next();
 //            next.x = Scene3D.xFromX(next.x);
 //            next.y = Scene3D.zFromY(next.y);
-//            
+//
 //            Box line = new BoxLine(past, next);
 //            line.setMaterial(mat);
 //            lines.getChildren().add(line);
-//            
+//
 //            past = next;
 //        }
-//        
+//
 //        Vector2 offset = t.positionOfFocus();
 //        offset.x = Scene3D.xFromX(offset.x);
 //        offset.y = Scene3D.zFromY(offset.y);
 //        lines.getTransforms().add(new Translate(offset.x, 0, offset.y));
-//        
+//
 //        getChildren().add(lines);
-//        
+//
 //    }
 
 
@@ -1269,7 +1271,7 @@ function submitForm(form) {
 }
 
 
-// 
+//
 function makeClientID() {
     window.sessionStorage.setItem("clientID", "" + ((new Date()).getTime()) % 100000);
 }
@@ -1328,4 +1330,3 @@ function  dumpAlienAndCell(alien, cell) {
 
 
 println("parsed");
-
