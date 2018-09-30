@@ -5,7 +5,6 @@
 package org.eastsideprep.spacecritters.spacecritters;
 
 import com.google.gson.JsonSyntaxException;
-import org.eastsideprep.spacecritters.scserver.LoggingVisualizer;
 import org.eastsideprep.spacecritters.gameengineimplementation.GameEngineV2;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameCommand;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameCommandCode;
@@ -131,8 +130,7 @@ public class SpaceCritters extends Application {
             this.fieldGrid.initField(this, engine, consolePane, species, logPath, width, height);
 
             // make logging vis (for web clients)
-            this.streamer = new LoggingVisualizer(engine.log);
-
+            
             // make multiviz with both
             this.field = new MultiVisualizer(new GameVisualizer[]{this.fieldGrid, this.streamer});
             this.field.init(); // calls init on all

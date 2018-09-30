@@ -9,6 +9,7 @@ import org.eastsideprep.spacecritters.alieninterfaces.Vector2;
 import org.eastsideprep.spacecritters.gamelogic.SpaceGrid;
 import java.util.ArrayList;
 import java.util.Iterator;
+import org.eastsideprep.spacecritters.alieninterfaces.Orbit;
 import org.eastsideprep.spacecritters.alieninterfaces.Position;
 import org.eastsideprep.spacecritters.alieninterfaces.WorldVector;
 
@@ -119,5 +120,10 @@ public class Trajectory {
 
     public Position positionOfFocus() {
         return currentFocus.position(sg.getTime());
+    }
+    
+    
+    public Orbit orbit() {
+        return conic.orbit();
     }
 }

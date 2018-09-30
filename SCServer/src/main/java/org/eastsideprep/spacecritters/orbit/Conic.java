@@ -5,6 +5,8 @@
  */
 package org.eastsideprep.spacecritters.orbit;
 
+import org.eastsideprep.spacecritters.alieninterfaces.Orbit;
+import org.eastsideprep.spacecritters.alieninterfaces.SpaceObject;
 import org.eastsideprep.spacecritters.alieninterfaces.Vector2;
 import org.eastsideprep.spacecritters.alieninterfaces.Vector3;
 import org.eastsideprep.spacecritters.alieninterfaces.WorldVector;
@@ -235,5 +237,17 @@ public abstract class Conic {
 
     public double partialHillRadius() {
         return p * (1 - e) / ((1 - e * e) * Math.pow(focus.mass(), 1f / 3));
+    }
+    
+    public Orbit orbit() {
+        Orbit orbit = new Orbit();
+        orbit.e = e;
+        orbit.focus = (SpaceObject) focus; //I DONT LIKE THIS
+        orbit.h = h;
+        orbit.mu = mu;
+        orbit.p = p;
+        orbit.rotation = rotation;
+        orbit.signum = signum;
+        return orbit;
     }
 }

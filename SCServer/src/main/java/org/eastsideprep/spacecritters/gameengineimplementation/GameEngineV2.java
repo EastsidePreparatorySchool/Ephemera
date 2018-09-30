@@ -23,8 +23,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
 import java.security.CodeSource;
-import org.eastsideprep.spacecritters.gamelog.GameLog;
-import org.eastsideprep.spacecritters.scgamelog.SCGameState;
 
 /**
  *
@@ -40,8 +38,6 @@ public class GameEngineV2 implements GameEngine {
     public String gamePath;
     public String alienPath;
     Gson gson;
-    public SCGameState state;
-    public GameLog log;
     public String name;
     private boolean dead = false;
     public long timeOfDeath;
@@ -53,8 +49,6 @@ public class GameEngineV2 implements GameEngine {
     public GameEngineV2(String name) {
         this.gson = new Gson();
         this.queue = new ConcurrentLinkedQueue<>();
-        this.state = new SCGameState(0, 0);
-        this.log = new GameLog(state);
         this.name = name;
     }
 
@@ -229,7 +223,6 @@ public class GameEngineV2 implements GameEngine {
         grid = null;
 //        vis = null; // leave this alive to allow the dying thread to post messages
         System.gc();
-        log.onDeath();
     }
 
     //

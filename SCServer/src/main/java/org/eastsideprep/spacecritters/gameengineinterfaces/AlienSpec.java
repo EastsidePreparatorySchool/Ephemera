@@ -6,8 +6,6 @@ package org.eastsideprep.spacecritters.gameengineinterfaces;
 
 import org.eastsideprep.spacecritters.alieninterfaces.AlienSpecies;
 import org.eastsideprep.spacecritters.gamelogic.AlienContainer;
-import org.eastsideprep.spacecritters.orbit.Conic;
-import org.eastsideprep.spacecritters.orbit.Trajectory;
 
 /**
  *

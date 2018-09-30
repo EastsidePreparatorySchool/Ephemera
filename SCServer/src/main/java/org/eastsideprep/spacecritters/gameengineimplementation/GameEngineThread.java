@@ -107,15 +107,11 @@ public class GameEngineThread extends Thread {
                     if (engine.slow) {
                         this.sleepTime = 1000;
                     } else {
-                        this.sleepTime = this.engine.log.getLogSize() / 50;
                         this.sleepTime = Math.min(this.sleepTime, 5000);
                         this.sleepTime = Math.max(this.sleepTime, 20);
                     }
                     // now sleep, and keep sleeping if the log is greater than 10000 entries
-                    do {
-                        Thread.sleep(this.sleepTime);
-                    } while (this.engine.log.getLogSize() > 10000);
-
+                    Thread.sleep(this.sleepTime);
                 } catch (Exception e) {
                     e.printStackTrace();
                     engine.vis.debugErr("GameThread: Unknown exception: " + e.getMessage());

@@ -16,20 +16,18 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.eastsideprep.spacecritters.gamelog.GameLogEntry;
-import org.eastsideprep.spacecritters.gamelog.GameLogObserver;
 import com.google.gson.Gson;
 
 @WebSocket
 public class WebSocketHandler {
-    //stored list of observers
     private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
-    public GameLogObserver observer;
     public Thread updateLoop;
-    private JSONRT jsonConverter = new JSONRT();
+    private final JSONRT jsonConverter = new JSONRT();
+    private WebVisualizer webVisualizer;
     
-    public WebSocketHandler(GameLogObserver observer) {
-        this.observer = observer;
+    
+    public WebSocketHandler() {
+        
         //beginUpdateLoop();
     }
     
@@ -50,11 +48,14 @@ public class WebSocketHandler {
         System.out.println("Got: " + message);
     }
     
-    public void broadcastJSONString(String json) {
+    public void broadcastString(String json) {
         sessions.forEach((session) -> {
             send(session, json);
         });
     }
+    
+    public void broadcastJSON(Object o) { broadcastString(jsonConverter.render(o)); }
+    public void broadcastJSON(Object[] o) { broadcastString(jsonConverter.render(o)); }
     
     public void send(Session session, String message) {
         try {
@@ -66,15 +67,13 @@ public class WebSocketHandler {
     }
     
     
-    public void beginUpdateLoop() {
-        updateLoop = new Thread(() -> {
-            update();
-        });
+    /*public void beginUpdateLoop() {
+        updateLoop = new Thread(() -> { update(); });
         updateLoop.run();
     }
     public void update() {
-        List<GameLogEntry> list = observer.getNewItems();
-        broadcastJSONString(jsonConverter.render(list));
+        //List<GameLogEntry> list = observer.getNewItems();
+        //broadcastJSONString(jsonConverter.render(list));
         try {
             Thread.sleep(50);
         } catch (InterruptedException ex) {
@@ -82,5 +81,5 @@ public class WebSocketHandler {
             System.out.println(ex);
         }
         update();
-    }
+    }*/
 }
