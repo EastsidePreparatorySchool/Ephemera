@@ -5,6 +5,8 @@
  */
 package org.eastsideprep.spacecritters.alieninterfaces;
 
+import org.eastsideprep.spacecritters.gamelogic.InternalSpaceObject;
+
 /**
  *
  * @author gunnar

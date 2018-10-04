@@ -127,7 +127,7 @@ public class MainApp implements SparkApplication {
         
         
         
-        
+        System.out.println("Make Game Engine");
         if (MainApp.createServerEngine) {
             MainApp.geMain = MainApp.createServerGameEngine("main");
 
@@ -136,7 +136,7 @@ public class MainApp implements SparkApplication {
                 return;
             }
         }
-
+        System.out.println("Finished Making Game Engine");
         
         
         
@@ -163,7 +163,7 @@ public class MainApp implements SparkApplication {
         get("/protected/slowmode", (req, res) -> doSlowMode(req));
         post("/protected/upload", (req, res) -> uploadFile(req, res));
         */
-        wsh.beginUpdateLoop();
+        port(8000);
     }
 
 

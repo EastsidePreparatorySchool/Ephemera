@@ -575,7 +575,7 @@ function start() {
                 if (data !== null) {
                     println("  Response: " + data);
                 }
-                updates();
+                //updates();
                 //println ("Requested updates in start");
             })
             .catch(error => {
@@ -868,7 +868,6 @@ function addStar(content) {
 
 
 function addPlanet(content) {
-    console.log('adding planet: ' + content.id + ':' + content.name);
     planets[content.id] = new Planet(content.newX, content.newY, content.id);
 }
 
@@ -1356,3 +1355,4 @@ function  dumpAlienAndCell(alien, cell) {
 
 
 println("parsed");
+updates();

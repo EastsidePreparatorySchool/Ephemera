@@ -17,6 +17,8 @@ import org.eastsideprep.spacecritters.alieninterfaces.WorldVector;
 import org.eastsideprep.spacecritters.gameengineinterfaces.AlienSpec;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameState;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameVisualizer;
+import org.eastsideprep.spacecritters.orbit.Conic;
+import org.eastsideprep.spacecritters.orbit.DummyTrajectory;
 import org.eastsideprep.spacecritters.orbit.Trajectory;
 
 /**
@@ -27,8 +29,8 @@ public class WebVisualizer implements GameVisualizer {
     WebSocketHandler webSocket = new WebSocketHandler();
     
     
-    HashMap<String, ObjectRecord> objectState = new HashMap<>();
-    ArrayList<SpeciesRecord> speciesState
+    HashMap<String, ObjectRecord> objectMap = new HashMap<>();
+    ArrayList<ObjectRecord> objectState = new ArrayList<>();
     ArrayList<AlienSpec> alienState = new ArrayList<>();
     ArrayList<EnergyRecord> energyState = new ArrayList<>();
     ArrayList<SpeciesRecord> speciesState = new ArrayList<>(); 
@@ -54,15 +56,15 @@ public class WebVisualizer implements GameVisualizer {
         }
     }
     public class StarRecord extends ObjectRecord {
-        String type = "StarRecord";
         double luminosity;
         StarRecord(double x, double y, String name, int index, double luminosity, double mass) {
             super(x,y,name,index,mass);
             this.luminosity = luminosity;
+            
+            type = "StarRecord";
         }
     }
     public class PlanetRecord extends ObjectRecord {
-        String type = "PlanetRecord";
         int tech;
         double energy;
         OrbitRecord orbit;
@@ -71,10 +73,12 @@ public class WebVisualizer implements GameVisualizer {
             this.tech = tech;
             this.energy = energy;
             this.orbit = new OrbitRecord(t.orbit());
+            
+            type = "PlanetRecord";
         }
     }
     
-    public class OrbitRecord {
+    public class OrbitRecord extends Record {
         public ObjectRecord focus;  // star or planet
         public double p;            // semi-latus rectum
         public double e;            // eccentricity
@@ -82,7 +86,7 @@ public class WebVisualizer implements GameVisualizer {
         public double signum;       // 1.0 = counter-clockwise
         public double mu;           // G*M
         public double h;            // angular momentum
-        OrbitRecord(Orbit orbit){
+        OrbitRecord(Conic.Orbit orbit){
             this.p = orbit.p;
             this.e = orbit.e;
             this.rotation = orbit.rotation;
@@ -90,58 +94,69 @@ public class WebVisualizer implements GameVisualizer {
             this.mu = orbit.mu;
             this.h = orbit.h;
             
-            String name = orbit.focus.name;
-            ObjectRecord o = objectState.get(name);
+            String name = orbit.focus.getFullName();
+            ObjectRecord o = objectMap.get(name);
             this.focus = o;
+            
+            type = "OrbitRecord";
         }
     }
     
     public class SpeciesRecord extends Record {
-        String type = "SpeciesRecord";
         
         
         SpeciesRecord() {
             
+            type = "SpeciesRecord";
         }
     }
     public class AlienRecord extends Record {
-        String type = "AlienRecord";
+        AlienRecord() {
+            type = "AlienRecord";
+        }
         
     }
     public class FightRecord extends Record {
-        String type = "FightRecord";
         int x, y;
         FightRecord(int x, int y) {
             this.x = x;
             this.y = y;
+            
+            type = "FightRecord";
         }
     }
     public class SpawnRecord extends Record {
-        String type = "SpawnRecord";
+        SpawnRecord() {
+            
+            type = "SpawnRecord";
+        }
         
     }
     public class MoveRecord extends Record {
-        String type = "MoveRecord";
         MoveRecord() {
             
+            type = "MoveRecord";
         }
     }
     public class KillRecord extends Record {
-        String type = "KillRecord";
+        KillRecord() {
+            
+            type = "KillRecord";
+        }
         
     }
     public class EnergyRecord extends Record {
-        String type = "EnergyRecord";
         int x, y;
         double energy;
         EnergyRecord(int x, int y, double energy) {
             this.x = x;
             this.y = y;
             this.energy = energy;
+            
+            type = "EnergyRecord";
         }
     }
     public class TurnRecord extends Record {
-        String type = "TurnRecord";
         int totalTurns, numAliens;
         long timeTaken;
         double avgTime;
@@ -150,6 +165,8 @@ public class WebVisualizer implements GameVisualizer {
             this.numAliens = numAliens;
             this.timeTaken = timeTaken;
             this.avgTime = avgTime;
+            
+            type = "TurnRecord";
         }
     }
     
@@ -207,12 +224,16 @@ public class WebVisualizer implements GameVisualizer {
     @Override
     public void registerStar(int x, int y, String name, int index, double luminosity, double mass) {
         //add star to state
-        objectState.put(name, new StarRecord(x,y,name, index, luminosity, mass));
+        StarRecord r = new StarRecord(x,y,name, index, luminosity, mass);
+        objectMap.put(name, r);
+        objectState.add(r);
     }
     @Override
     public void registerPlanet(int x, int y, String name, int index, double energy, int tech, double mass, Trajectory t) {
         //add planet to state
-        objectState.put(name, new PlanetRecord(x,y,name,index,energy,tech,mass,t));
+        PlanetRecord r = new PlanetRecord(x,y,name,index,energy,tech,mass,t);
+        objectMap.put(name, r);
+        objectState.add(r);
     }
     
     
@@ -239,11 +260,19 @@ public class WebVisualizer implements GameVisualizer {
     
     @Override
     public void showReady() {
-        //what does this need?
+        System.out.println("objects: " + objectState.size());
+        webSocket.broadcastJSON(objectState.toArray());
+        System.out.println("species: " + speciesState.size());
+        webSocket.broadcastJSON(speciesState.toArray());
+        System.out.println("energy: " + energyState.size());
+        webSocket.broadcastJSON(energyState.toArray());
+        System.out.println("alien: " + alienState.size());
+        webSocket.broadcastJSON(alienState.toArray());
     }
 
     @Override
     public void showCompletedTurn(int totalTurns, int numAliens, long timeTaken, double avgTech) {
+        System.out.println("Does anyone do this?");
         //add turnrecord to queue
         updates.push( new TurnRecord(totalTurns, numAliens, timeTaken, avgTech) );
         webSocket.broadcastJSON(updates.toArray());

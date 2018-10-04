@@ -123,7 +123,7 @@ public class Trajectory {
     }
     
     
-    public Orbit orbit() {
+    public Conic.Orbit orbit() {
         return conic.orbit();
     }
 }

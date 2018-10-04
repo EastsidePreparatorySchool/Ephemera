@@ -27,14 +27,12 @@ public class WebSocketHandler {
     
     
     public WebSocketHandler() {
-        
-        //beginUpdateLoop();
     }
     
     @OnWebSocketConnect
     public void connected(Session session) {
         sessions.add(session);
-        //send(session, "Hello new person!");
+        send(session, "Hello new person!");
     }
 
     @OnWebSocketClose
@@ -46,6 +44,14 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void message(Session session, String message) throws IOException {
         System.out.println("Got: " + message);
+        switch(message) {
+            case "GETSTATE":
+                send(session, webVisualizer.objectState.toArray());
+                send(session, webVisualizer.speciesState.toArray());
+                send(session, webVisualizer.energyState.toArray());
+                send(session, webVisualizer.alienState.toArray());
+                break;
+        }
     }
     
     public void broadcastString(String json) {
@@ -54,8 +60,12 @@ public class WebSocketHandler {
         });
     }
     
-    public void broadcastJSON(Object o) { broadcastString(jsonConverter.render(o)); }
-    public void broadcastJSON(Object[] o) { broadcastString(jsonConverter.render(o)); }
+    public void broadcastJSON(Object o) {
+        broadcastString(jsonConverter.render(o));
+    }
+    public void broadcastJSON(Object[] o) {
+        broadcastString(jsonConverter.render(o));
+    }
     
     public void send(Session session, String message) {
         try {
@@ -64,6 +74,12 @@ public class WebSocketHandler {
             System.out.println("Exception in websocket send:");
             System.out.println(ex);
         }
+    }
+    public void send(Session session, Object o) {
+        send(session, jsonConverter.render(o));
+    }
+    public void send(Session session, Object[] o) {
+        send(session, jsonConverter.render(o));
     }
     
     
