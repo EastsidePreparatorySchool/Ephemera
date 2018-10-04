@@ -31,9 +31,10 @@ public class WebVisualizer implements GameVisualizer {
     
     HashMap<String, ObjectRecord> objectMap = new HashMap<>();
     ArrayList<ObjectRecord> objectState = new ArrayList<>();
+    HashMap<String, ObjectRecord> objectState = new HashMap<>();
+    ArrayList<SpeciesRecord> speciesState = new ArrayList<>();
     ArrayList<AlienSpec> alienState = new ArrayList<>();
     ArrayList<EnergyRecord> energyState = new ArrayList<>();
-    ArrayList<SpeciesRecord> speciesState = new ArrayList<>(); 
     
     Stack<Record> updates = new Stack<>();
     
@@ -41,8 +42,6 @@ public class WebVisualizer implements GameVisualizer {
     public class Record {
         String type;
     }
-    
-    
     public abstract class ObjectRecord extends Record {
         double x, y, mass;
         String name;
@@ -79,6 +78,13 @@ public class WebVisualizer implements GameVisualizer {
     }
     
     public class OrbitRecord extends Record {
+    public class PlanetUpdate extends PlanetRecord {
+        PlanetUpdate(double x, double y, String name, int index, double energy, int tech) {
+            super(x, y, name, index, energy, tech, 0, null);
+            
+        }
+    }
+    public class OrbitRecord {
         public ObjectRecord focus;  // star or planet
         public double p;            // semi-latus rectum
         public double e;            // eccentricity
@@ -101,7 +107,6 @@ public class WebVisualizer implements GameVisualizer {
             type = "OrbitRecord";
         }
     }
-    
     public class SpeciesRecord extends Record {
         
         
@@ -115,6 +120,23 @@ public class WebVisualizer implements GameVisualizer {
             type = "AlienRecord";
         }
         
+    }
+        String type = "SpeciesRecord";
+        String domainName;
+        String packageName;
+        String className;
+        int speciesID;
+        String fullName;
+        String speciesName;
+        
+        SpeciesRecord(AlienSpec as, AlienShapeFactory asf, boolean instantiate) {
+            domainName = as.domainName;
+            packageName = as.packageName;
+            className = as.className;
+            speciesID = as.speciesID;
+            fullName = as.fullName;
+            speciesName = as.speciesName;
+        }
     }
     public class FightRecord extends Record {
         int x, y;
@@ -169,18 +191,41 @@ public class WebVisualizer implements GameVisualizer {
             type = "TurnRecord";
         }
     }
+    public class AlienRecord extends Record {
+        String type = "AlienRecord";
+        AlienRecord() {
+            
+        }
+    }
+    
+    public class SpawnRecord extends Record {
+        String type = "SpawnRecord";
+        SpawnRecord() {
+            
+        }
+    }
+    public class MoveRecord extends Record {
+        String type = "MoveRecord";
+        MoveRecord() {
+            
+        }
+    }
+    public class KillRecord extends Record {
+        String type = "KillRecord";
+        KillRecord() {
+            
+        }
+    }
+    
     
     
     
     //Record generators:
-    @Override
-    public void registerSpecies(AlienSpec as, AlienShapeFactory asf, boolean instantiate) {
-        //Tell all clients to create new species
-        
-    }
+    
     @Override
     public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech, double time) {
         //make a new objectrecord, throw in there
+        new PlanetUpdate(x, y, name, index, energy, tech);
         
     }
     
@@ -211,15 +256,15 @@ public class WebVisualizer implements GameVisualizer {
     
     
     //DONE
+    
+    //STATE CHANGES
     @Override
-    public void showFight(int x, int y) {
-        updates.push(new FightRecord(x,y));
+    public void registerSpecies(AlienSpec as, AlienShapeFactory asf, boolean instantiate) {
+        speciesState.add(new SpeciesRecord(as, asf, instantiate));
     }
     @Override
     public void mapEnergy(int x, int y, double energy) {
-        EnergyRecord r = new EnergyRecord(x,y,energy);
-        energyState.add(r);
-        updates.push(r);
+        energyState.add(new EnergyRecord(x,y,energy));
     }
     @Override
     public void registerStar(int x, int y, String name, int index, double luminosity, double mass) {
@@ -236,8 +281,11 @@ public class WebVisualizer implements GameVisualizer {
         objectState.add(r);
     }
     
-    
-    
+    //UPDATES
+    @Override
+    public void showFight(int x, int y) {
+        updates.push(new FightRecord(x,y));
+    }
     
     
     
