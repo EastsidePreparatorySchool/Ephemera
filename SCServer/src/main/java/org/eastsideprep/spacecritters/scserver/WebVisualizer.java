@@ -179,7 +179,7 @@ public class WebVisualizer implements GameVisualizer {
     @Override
     public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech, double time) {
         //make a new objectrecord, throw in there
-        PlanetUpdate(x, y, name, index, energy, tech, 0, t);
+        new PlanetUpdate(x, y, name, index, energy, tech);
         
     }
     
