@@ -43,12 +43,12 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void message(Session session, String message) throws IOException {
-        System.out.println("Got: " + message);
+        System.out.println("\n\n\n\nGot: " + message);
         switch(message) {
             case "GETSTATE":
                 send(session, webVisualizer.objectState.toArray());
                 send(session, webVisualizer.speciesState.toArray());
-                send(session, webVisualizer.energyState.toArray());
+                //send(session, webVisualizer.energyState.toArray());
                 send(session, webVisualizer.alienState.toArray());
                 break;
         }

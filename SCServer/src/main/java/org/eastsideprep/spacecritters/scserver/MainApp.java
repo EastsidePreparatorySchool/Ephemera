@@ -55,22 +55,6 @@ public class MainApp implements SparkApplication {
         if (args.length == 0 || !args[0].equalsIgnoreCase("desktoponly")) {
             MainApp.app = new MainApp();
 
-            if (userDir.toLowerCase().contains("ephemera")) {
-                userDir += System.getProperty("file.separator") + "target";
-            }
-            userDir += System.getProperty("file.separator") + "static";
-
-            String port = System.getenv("PORT");
-            if (port != null) {
-                System.out.println("SC: environment prescribes using port " + port);
-                port(Integer.parseInt(port));
-            } else {
-                System.out.println("SC: listening on port 8080");
-                port(8080);
-            }
-//            staticFiles.externalLocation(userDir);
-            staticFiles.location("/static");
-
             if (!(args.length == 0 || args[0].equalsIgnoreCase("serveronly"))) {
                 MainApp.createServerEngine = false; // will cause init() to not create server engine, default running mode
             }
@@ -119,11 +103,35 @@ public class MainApp implements SparkApplication {
         for (String s : cp.split(";")) {
             System.out.println("   " + s);
         }
-
-//    	before((request, response) -> {
-//    	  System.out.println("Spark request: "+request.url());
-//    	});
         
+        
+        
+        
+        /*if (userDir.toLowerCase().contains("ephemera")) {
+            userDir += System.getProperty("file.separator") + "target";
+        }
+        userDir += System.getProperty("file.separator") + "static";*/
+
+        /*String port = System.getenv("PORT");
+        if (port != null) {
+            System.out.println("SC: environment prescribes using port " + port);
+            port(Integer.parseInt(port));
+        } else {
+            System.out.println("SC: listening on port 8080");
+            port(8080);
+        }*/
+        
+        port(8000);
+        
+        
+        //SETUP WEB SERVER
+        WebSocketHandler wsh = new WebSocketHandler();
+        webSocket("/ws/main/updates", wsh);
+        
+        System.out.println("\n\n\n\n\n\n" + userDir + "\n\n\n\n\n");
+        staticFiles.externalLocation(userDir);
+        //staticFiles.location("/static");
+        //staticFiles.location("../../webapp");
         
         
         
@@ -139,10 +147,9 @@ public class MainApp implements SparkApplication {
         System.out.println("Finished Making Game Engine");
         
         
-        
-        WebSocketHandler wsh = new WebSocketHandler();
-        webSocket("/ws/main/updates", wsh);
-                
+    	before((request, response) -> {
+    	  System.out.println("Spark request: "+request.url());
+    	});
         
         /*
         get("/protected/start", "application/json", (req, res) -> doStart(req), new JSONRT());
@@ -163,7 +170,10 @@ public class MainApp implements SparkApplication {
         get("/protected/slowmode", (req, res) -> doSlowMode(req));
         post("/protected/upload", (req, res) -> uploadFile(req, res));
         */
-        port(8000);
+        
+        
+        System.out.println("\n\n\n\nListening on port 8000");
+        
     }
 
 
