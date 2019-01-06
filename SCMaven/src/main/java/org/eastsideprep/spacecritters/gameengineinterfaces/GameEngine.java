@@ -10,7 +10,10 @@ package org.eastsideprep.spacecritters.gameengineinterfaces;
  */
 public interface GameEngine {
 
-    void init(GameVisualizer v, String gamePath, String alienPath);
+    void init(String gamePath, String alienPath);
+    
+    void attachVisualizer(GameVisualizer v);
+    void detachVisualizer(GameVisualizer v);
 
     GameElementSpec[] readConfigFile(String fileName);
 

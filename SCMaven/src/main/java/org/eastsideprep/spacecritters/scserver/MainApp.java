@@ -39,6 +39,7 @@ public class MainApp implements SparkApplication {
 
     //static GameEngineV2 geMain;
     static ArrayList<GameEngineV2> engines = new ArrayList<>();
+    static WebSocketHandler webSocketHandler;
     static MainApp app;
     static Thread mainThread;
     static boolean createServerEngine = true;
@@ -119,29 +120,19 @@ public class MainApp implements SparkApplication {
         
         
         staticFiles.location("/static");
-        //staticFiles.location("../../webapp");
         
         port(8000);
         
         //SETUP WEB SERVER
-        WebSocketHandler wsh = new WebSocketHandler();
-        webSocket("/socket", wsh);
+        webSocketHandler = new WebSocketHandler();
+        webSocket("/socket", webSocketHandler);
         
         
         
         
         
         
-        System.out.println("Make Game Engine");
-        if (MainApp.createServerEngine) {
-            MainApp.engines.add( MainApp.createServerGameEngine("main") );
-            
-            if (MainApp.engines.get(0) == null) {
-                System.out.println("Could not create initial server game engine");
-                return;
-            }
-        }
-        System.out.println("Finished Making Game Engine");
+        
         
         
     	before((request, response) -> {
@@ -149,13 +140,15 @@ public class MainApp implements SparkApplication {
     	});
         
         get("/listengines", "application/json", (req, res) -> {
-            //String[] names = new String[MainApp.engines.size()];
+            
             ArrayList<String> names2 = new ArrayList<>();
             MainApp.engines.forEach((GameEngineV2 e) -> {
                 names2.add(e.name);
             });
             return names2.toArray();
         }, new JSONRT());
+        
+        System.out.println("\n\n\n\nListening on port 8000");
         
         /*
         get("/protected/start", "application/json", (req, res) -> doStart(req), new JSONRT());
@@ -178,7 +171,20 @@ public class MainApp implements SparkApplication {
         */
         
         
-        System.out.println("\n\n\n\nListening on port 8000");
+        
+        
+        
+        
+        System.out.println("Make Game Engine");
+        if (MainApp.createServerEngine) {
+            MainApp.engines.add( MainApp.createServerGameEngine("main") );
+            
+            if (MainApp.engines.get(0) == null) {
+                System.out.println("Could not create initial server game engine");
+                return;
+            }
+        }
+        System.out.println("Finished Making Game Engine");
         
     }
 
@@ -303,12 +309,9 @@ public class MainApp implements SparkApplication {
         //
         // test: viz streamer for web version
         //
-        WebVisualizer streamer = new WebVisualizer();
-        streamer.init();
-        System.out.println("createServerEngine: initialized streamer log");
-
+        webSocketHandler.addEngine(engine);
         // and engine
-        engine.init(streamer, gamePath, alienPath);
+        engine.init(gamePath, alienPath);
         System.out.println("createServerEngine: initialized game engine");
 
         // read config

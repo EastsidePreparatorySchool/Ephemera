@@ -4,6 +4,7 @@
  */
 package org.eastsideprep.spacecritters.gameengineimplementation;
 
+import org.eastsideprep.spacecritters.gameengineinterfaces.MultiVisualizer;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameState;
 import org.eastsideprep.spacecritters.gamelogic.*;
 import org.eastsideprep.spacecritters.gameengineinterfaces.*;
@@ -31,7 +32,7 @@ import java.security.CodeSource;
 public class GameEngineV2 implements GameEngine {
 
     public SpaceGrid grid;
-    GameVisualizer vis;
+    MultiVisualizer vis = new MultiVisualizer();;
     final Queue<GameCommand> queue;
     public GameEngineThread gameThread;
     GameState gameState;
@@ -67,14 +68,13 @@ public class GameEngineV2 implements GameEngine {
     }
 
     @Override
-    public void init(GameVisualizer vis, String gamePath, String alienPath) {
+    public void init(String gamePath, String alienPath) {
 
         // 
         // save the visualizer (how we report status)
         // create a new Spacegrid (the game board)
         // set up a transfer queue that we will use to post commands to the game thread
         //
-        this.vis = vis;
         gameState = GameState.Paused;
         this.gamePath = gamePath;
         this.alienPath = alienPath;
@@ -88,6 +88,15 @@ public class GameEngineV2 implements GameEngine {
         vis.debugOut("GameEngine: Starting thread");
         this.gameThread = new GameEngineThread(this);
         this.gameThread.start();
+    }
+    
+    @Override
+    public void attachVisualizer(GameVisualizer v) {
+        vis.attachVisualizer(v);
+    }
+    @Override
+    public void detachVisualizer(GameVisualizer v) {
+        vis.detachVisualizer(v);
     }
 
     @Override

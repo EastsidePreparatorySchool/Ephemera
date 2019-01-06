@@ -52,13 +52,11 @@ public class WebVisualizer implements GameVisualizer {
     ArrayList<AlienSpec> alienState = new ArrayList<>();
     ArrayList<EnergyRecord> energyState = new ArrayList<>();
     
-    Stack<Record> updates = new Stack<>();
+    Stack<WebSocketHandler.Record> updates = new Stack<>();
     
     
-    public class Record {
-        String type;
-    }
-    public abstract class ObjectRecord extends Record {
+    
+    public abstract class ObjectRecord extends WebSocketHandler.Record {
         double x, y, mass;
         String name;
         int index; //independent among all objects
@@ -101,7 +99,7 @@ public class WebVisualizer implements GameVisualizer {
     }
     
     
-    public class OrbitRecord extends Record {
+    public class OrbitRecord extends WebSocketHandler.Record {
         public ObjectRecord focus;  // star or planet
         public double p;            // semi-latus rectum
         public double e;            // eccentricity
@@ -128,7 +126,7 @@ public class WebVisualizer implements GameVisualizer {
     
     
     
-    public class AlienRecord extends Record {//needs fixing
+    public class AlienRecord extends WebSocketHandler.Record {//needs fixing
         AlienRecord() {
             
             type = "AlienRecord";
@@ -136,7 +134,7 @@ public class WebVisualizer implements GameVisualizer {
         
     }
     
-    public class SpeciesRecord extends Record {
+    public class SpeciesRecord extends WebSocketHandler.Record {
         String domainName;
         String packageName;
         String className;
@@ -158,7 +156,7 @@ public class WebVisualizer implements GameVisualizer {
             type = "SpeciesRecord";
         }
     }
-    public class FightRecord extends Record {
+    public class FightRecord extends WebSocketHandler.Record {
         int x, y;
         FightRecord(int x, int y) {
             this.x = x;
@@ -167,27 +165,27 @@ public class WebVisualizer implements GameVisualizer {
             type = "FightRecord";
         }
     }
-    public class SpawnRecord extends Record { //need fixing
+    public class SpawnRecord extends WebSocketHandler.Record { //need fixing
         SpawnRecord() {
             
             type = "SpawnRecord";
         }
         
     }
-    public class MoveRecord extends Record { //need fixing
+    public class MoveRecord extends WebSocketHandler.Record { //need fixing
         MoveRecord() {
             
             type = "MoveRecord";
         }
     }
-    public class KillRecord extends Record { //need fixing
+    public class KillRecord extends WebSocketHandler.Record { //need fixing
         KillRecord() {
             
             type = "KillRecord";
         }
         
     }
-    public class EnergyRecord extends Record {
+    public class EnergyRecord extends WebSocketHandler.Record {
         int x, y;
         double energy;
         EnergyRecord(int x, int y, double energy) {
@@ -198,7 +196,7 @@ public class WebVisualizer implements GameVisualizer {
             type = "EnergyRecord";
         }
     }
-    public class TurnRecord extends Record {
+    public class TurnRecord extends WebSocketHandler.Record {
         int totalTurns, numAliens;
         long timeTaken;
         double avgTime;
@@ -304,19 +302,19 @@ public class WebVisualizer implements GameVisualizer {
 
     @Override
     public void shutdown() {
-        webSocket.broadcastString("SHUTDOWN");
+        webSocket.broadcastJSON(new WebSocketHandler.MessageRecord("SHUTDOWN"), this);
     }
     
     @Override
     public void showReady() {
         System.out.println("objects: " + objectState.size());
-        webSocket.broadcastJSON(objectState.toArray());
+        webSocket.broadcastJSON(objectState.toArray(), this);
         System.out.println("species: " + speciesState.size());
-        webSocket.broadcastJSON(speciesState.toArray());
+        webSocket.broadcastJSON(speciesState.toArray(), this);
         //System.out.println("energy: " + energyState.size());
         //webSocket.broadcastJSON(energyState.toArray());       //NO. TOO MANY ENTRIES
         System.out.println("aliens: " + alienState.size());
-        webSocket.broadcastJSON(alienState.toArray());
+        webSocket.broadcastJSON(alienState.toArray(), this);
     }
 
     @Override
@@ -324,7 +322,7 @@ public class WebVisualizer implements GameVisualizer {
         System.out.println("Does anyone do this?");
         //add turnrecord to queue
         updates.push( new TurnRecord(totalTurns, numAliens, timeTaken, avgTech) );
-        webSocket.broadcastJSON(updates.toArray());
+        webSocket.broadcastJSON(updates.toArray(), this);
         updates.clear();
     }
 
@@ -350,17 +348,17 @@ public class WebVisualizer implements GameVisualizer {
 
     @Override
     public void showGameOver() {
-        webSocket.broadcastString("GAMEOVER");
+        webSocket.broadcastJSON(new WebSocketHandler.MessageRecord("GAMEOVER"), this);
     }
 
     @Override
     public void debugOut(String s) {
-        webSocket.broadcastString("DEBUG: " + s);
+        webSocket.broadcastJSON(new WebSocketHandler.MessageRecord("DEBUG:" + s), this);
     }
 
     @Override
     public void debugErr(String s) {
-        webSocket.broadcastString("DEBUGERR: " + s);
+        webSocket.broadcastJSON(new WebSocketHandler.MessageRecord("DEBUGERR:" + s), this);
     }
 
     @Override

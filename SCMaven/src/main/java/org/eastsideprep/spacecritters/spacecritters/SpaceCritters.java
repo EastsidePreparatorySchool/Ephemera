@@ -4,6 +4,7 @@
  */
 package org.eastsideprep.spacecritters.spacecritters;
 
+import org.eastsideprep.spacecritters.gameengineinterfaces.MultiVisualizer;
 import com.google.gson.JsonSyntaxException;
 import org.eastsideprep.spacecritters.gameengineimplementation.GameEngineV2;
 import org.eastsideprep.spacecritters.gameengineinterfaces.GameCommand;
@@ -136,7 +137,8 @@ public class SpaceCritters extends Application {
             this.field.init(); // calls init on all
 
             // and engine
-            engine.init(field, gamePath, alienPath);
+            engine.attachVisualizer(field);
+            engine.init(gamePath, alienPath);
             elements = engine.readConfigFile("sc_config.json");
             engine.processGameElements(elements);
             // load a game and process it

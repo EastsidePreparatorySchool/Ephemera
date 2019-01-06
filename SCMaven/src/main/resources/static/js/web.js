@@ -55,19 +55,22 @@ function request(obj) {
 
 
 let comm = {
+  sessionIdentifier: '',
   open: () => {
     let socket = new WebSocket('ws://' + location.hostname + ':' + location.port + '/socket');
 
     socket.onclose = () => {
       console.log('lost connection to server');
+      setTimeout(comm.open, 2000);
     }
     socket.onmessage = (message) => {
-      console.log('recieved socket message: ');
       try {
         let data = JSON.parse(message.data);
-        console.log(data);
+        comm.process(data);
       } catch (err) {
-        println("raw: " + message);
+        println(err);
+        console.log(err);
+        console.log("raw: " + message);
       }
     }
 
@@ -78,26 +81,66 @@ let comm = {
   },
   attach: (engine) => {
     comm.send("ATTACH:" + engine);
+  },
+  process: (data) => {
+    switch(data.type) {
+      case undefined: //an array of records
+        for(let i = 0; i<data.length; i++) comm.process(data[i]);
+        break;
+      case 'MessageRecord':
+        comm.processMessage(data);
+        break;
+      case 'StarRecord':
+        comm.processStar(data);
+        break;
+      case 'PlanetRecord':
+        comm.processPlanet(data);
+        break;
+      case 'SpeciesRecord':
+        comm.processSpecies(data);
+        break;
+      default:
+        println('recieved unknown json');
+        break;
+    }
+  },
+  processSpecies: (data) => {
+    println('SpeciesRecord recieved!');
+  },
+  processPlanet: (data) => {
+    println('PlanetRecord recieved!');
+  },
+  processStar: (data) => {
+    println('Star Record recieved!');
+  },
+  processMessage: (data) => {
+    //console.log('Recieved a message!');
+    let action = data.content.split(':')[0],
+        parameter = data.content.substr(action.length+1);
+
+    console.log(data.content.split(':')[0]);
+    switch(action) {
+      case 'HANDSHAKE':
+        comm.sessionIdentifier = parameter;
+        println('HANDSHAKE: connected to websocket');
+        break;
+      case 'ATTACHED':
+        println('ATTACHED: connected to engine ' + parameter);
+        comm.send('GETSTATE');
+        break;
+      case 'DEBUG': case 'DEBUGERR':
+        println(data.content);
+        break;
+      default:
+        println('recieved un-parsed message: ' + data.content);
+    }
   }
 };
 
 
  function attach(engine) {
      if (engine === undefined) engine = engines.value;
-
      comm.attach(engine);
-
-     //makeClientID();
-
-     /*request({url: "protected/attach?engine=" + engine + "&clientID=" + getClientID()})
-             .then(data => {
-                 data = JSON.parse(data);
-                 attachedName = engine;
-                 uiStateChange(true, undefined, data);
-             })
-             .catch(error => {
-                 println("Error: " + error);
-             });*/
  }
 
  function detach() {

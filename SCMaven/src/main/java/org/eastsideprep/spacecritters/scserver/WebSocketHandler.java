@@ -17,61 +17,46 @@ import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.google.gson.Gson;
+import org.eastsideprep.spacecritters.gameengineimplementation.GameEngineV2;
 
 @WebSocket
 public class WebSocketHandler {
-    private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
-    private static final Map<Session, WebVisualizer> sessionMap = new ConcurrentHashMap<>();
-    //public Thread updateLoop;
-    private final JSONRT jsonConverter = new JSONRT();
-   // private WebVisualizer webVisualizer;
-    
-    
-    public WebSocketHandler() {
+    public static class Record {
+        String type;
     }
-    
-    @OnWebSocketConnect
-    public void connected(Session session) {
-        sessions.add(session);
+    public static class MessageRecord extends Record {
+        String content;
+        MessageRecord(String s) {
+            content = s;
+            type = "MessageRecord";
+        }
     }
-
-    @OnWebSocketClose
-    public void closed(Session session, int statusCode, String reason) {
-        System.out.println("Lost connection to a client");
-        sessions.remove(session);
-        sessionMap.remove(session);
-    }
-
-    @OnWebSocketMessage
-    public void message(Session session, String message) throws IOException {
-        System.out.println("Socket Got: " + message);
-        
-        WebVisualizer webVisualizer = sessionMap.get(session);
-        String action = message.split(":")[0];
-        
-        switch(action) {
-            case "GETSTATE":
-                send(session, webVisualizer.objectState.toArray());
-                send(session, webVisualizer.speciesState.toArray());
-                //send(session, webVisualizer.energyState.toArray());
-                send(session, webVisualizer.alienState.toArray());
-                break;
-            case "ATTACH":
-                attach(session, message);
+    public static class SocketError extends Throwable {
+        String content;
+        SocketError(String s) {
+            content = s;
         }
     }
     
-    public void broadcastString(String json) {
-        sessions.forEach((session) -> {
-            send(session, json);
+    
+    
+    private static final Map<String, WebVisualizer> visMap = new ConcurrentHashMap<>();
+    private static final Map<WebVisualizer, Queue<SocketClient>> clientsFromVis = new ConcurrentHashMap<>();
+    private final JSONRT jsonConverter = new JSONRT();
+    
+    
+    public WebSocketHandler() {}
+    public void broadcastString(String json, WebVisualizer vis) {
+        clientsFromVis.get(vis).forEach((SocketClient client) -> {
+            send(client.session, json);
         });
     }
     
-    public void broadcastJSON(Object o) {
-        broadcastString(jsonConverter.render(o));
+    public void broadcastJSON(Object o, WebVisualizer vis) {
+        broadcastString(jsonConverter.render(o), vis);
     }
-    public void broadcastJSON(Object[] o) {
-        broadcastString(jsonConverter.render(o));
+    public void broadcastJSON(Object[] o, WebVisualizer vis) {
+        broadcastString(jsonConverter.render(o), vis);
     }
     
     public void send(Session session, String message) {
@@ -90,13 +75,102 @@ public class WebSocketHandler {
     }
     
     
-    private void attach(Session session, String message) {
-        String[] args = message.split(":");
-        if (args.length < 1) {
-            send(session, new Error("Invalid Command"));
-            return;
-        }
-        String engineName = args[1];
-        
+    
+    
+    
+    
+    
+    @OnWebSocketConnect
+    public void connected(Session session) {
+        SocketClient client = new SocketClient(session);
+        SocketClient.map.put(session, client);
+        send(session, new MessageRecord("HANDSHAKE:" + client.identifier));
     }
+
+    @OnWebSocketClose
+    public void closed(Session session, int statusCode, String reason) {
+        System.out.println("Lost connection to a client: " + reason);
+        
+        SocketClient client = SocketClient.map.get(session);
+        
+        SocketClient.map.remove( session );
+        if (client.engine != null) {
+            try {
+                WebVisualizer vis = visMap.get(client.engine);
+                clientsFromVis.get(vis).remove(client);
+            } catch (Exception e) {}
+        }
+    }
+
+    @OnWebSocketMessage
+    public void message(Session session, String message) throws IOException {
+        System.out.println("Socket Got: " + message);
+        String action = message.split(":")[0];
+        
+        SocketClient client = SocketClient.map.get(session);
+         try {
+            switch(action) {
+                case "GETSTATE":
+                    sendState(client);
+                    break;
+                case "ATTACH":
+                    attach(client, message);
+                    break;
+            }
+        } catch (SocketError e) {
+            send(client.session, new MessageRecord("ERROR:" + e.content));
+        }
+    }
+    
+    
+    private void sendState(SocketClient client) throws SocketError {
+        String engine = client.engine;
+        try {
+            WebVisualizer webVisualizer = visMap.get(engine);
+            
+            send(client.session, webVisualizer.objectState.toArray());
+            send(client.session, webVisualizer.speciesState.toArray());
+            //send(session, webVisualizer.energyState.toArray());
+            send(client.session, webVisualizer.alienState.toArray());
+        } catch (Exception e) {
+            throw new SocketError("Cannot Get State: Not Connected");
+        }
+    }
+    
+    private void attach(SocketClient client, String message) throws SocketError {
+        String[] args = message.split(":");
+        try {
+            
+            String engineName = args[1];
+            client.engine = engineName;
+            WebVisualizer vis = visMap.get(engineName);
+            clientsFromVis.get(vis).add(client);
+            
+            send(client.session, new WebSocketHandler.MessageRecord("ATTACHED:" + engineName));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new SocketError("Invalid Command");
+        }
+    }
+    
+    
+    public void addEngine(GameEngineV2 engine) {
+        //create visualizer, connect to engine
+        WebVisualizer webVisualizer = new WebVisualizer();
+        webVisualizer.init();
+        engine.attachVisualizer(webVisualizer);
+        
+        
+        visMap.put(engine.name, webVisualizer);
+        clientsFromVis.put(webVisualizer, new ConcurrentLinkedQueue<SocketClient>());
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
