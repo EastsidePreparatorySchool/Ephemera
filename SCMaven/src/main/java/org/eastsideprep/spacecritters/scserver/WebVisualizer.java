@@ -66,6 +66,8 @@ public class WebVisualizer implements GameVisualizer {
             this.mass = mass;
             this.index = index;
             this.name = name;
+            
+            objectMap.put(name, this);
         }
     }
     public class StarRecord extends ObjectRecord {
@@ -115,8 +117,8 @@ public class WebVisualizer implements GameVisualizer {
             this.mu = orbit.mu;
             this.h = orbit.h;
             
-            String name = orbit.focus.getFullName(); 
-            this.focus = objectMap.get(name);;
+            String name = orbit.focus.className; 
+            this.focus = objectMap.get(name);
             
             type = "OrbitRecord";
         }

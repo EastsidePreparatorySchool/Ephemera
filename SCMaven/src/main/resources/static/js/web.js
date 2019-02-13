@@ -105,13 +105,13 @@ let comm = {
     }
   },
   processSpecies: (data) => {
-    println('SpeciesRecord recieved!');
+    addSpecies(data);
   },
   processPlanet: (data) => {
-    println('PlanetRecord recieved!');
+    addPlanet(data);
   },
   processStar: (data) => {
-    println('Star Record recieved!');
+    addStar(data);
   },
   processMessage: (data) => {
     //console.log('Recieved a message!');
@@ -122,6 +122,9 @@ let comm = {
     switch(action) {
       case 'HANDSHAKE':
         comm.sessionIdentifier = parameter;
+
+        //TODO - don't re-init if we already have the data
+        initGame();
         println('HANDSHAKE: connected to websocket');
         break;
       case 'ATTACHED':

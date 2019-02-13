@@ -156,7 +156,6 @@ class Planet {
     }
 }
 
-
 class SpeciesMap {
     constructor() {
         this.map = {};
@@ -208,7 +207,11 @@ class SpeciesMap {
         return color;
     }
 
-    registerSpecies(name, id, instantiate) {
+    registerSpecies(content) {
+        let name = content.speciesName,
+            id = content.speciesId,
+            instantiate = content.param2;
+
         let color = this.colors[this.count % this.colors.length];
         this.map[name] = color;
         this.mat[name] = new THREE.MeshBasicMaterial({color: color, wireframe: false});
@@ -275,6 +278,10 @@ class SpeciesMap {
 
 
 
+function initGame() {
+  speciesMap = new SpeciesMap();
+  grid = new Grid(size, size);
+}
 
 function processUpdates(data) {
     if (!attached) {
@@ -349,12 +356,13 @@ function processUpdates(data) {
 
 
 function addStar(content) {
-    stars.push(new Star(content.newX, content.newY, content.param1));
+  stars.push(new Star(content.x, content.y, content.luminosity));
 }
 
 
 function addPlanet(content) {
-    planets[content.id] = new Planet(content.newX, content.newY, content.id);
+  planets[content.index] = new Planet(content.x, content.y, content.index);
+  drawOrbit(content);
 }
 
 function movePlanet(content) {
@@ -410,5 +418,5 @@ function killAlien(content) {
 }
 
 function addSpecies(content) {
-    speciesMap.registerSpecies(content.speciesName, content.speciesId, content.param2);
+    speciesMap.registerSpecies(content);
 }

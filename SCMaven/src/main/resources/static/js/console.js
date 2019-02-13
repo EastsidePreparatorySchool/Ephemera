@@ -47,9 +47,8 @@ function uiStateChange(attachState, runState, data) {
       statusP.innerHTML = "Attached to<br>&nbsp;Game:&nbsp&nbsp&nbsp" + data.engine
               + "<br>&nbsp;Observer:&nbsp" + data.observer;
       attachP.style.display = "none";
-      speciesMap = new SpeciesMap();
-      grid = new Grid(size, size);
-      updateInterval = updateIntervalActive;
+      
+      //updateInterval = updateIntervalActive;
       getStatus();
       queryAdmin();
       updates();

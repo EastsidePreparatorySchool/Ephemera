@@ -40,7 +40,7 @@ let aSize = 3; // initial size of burn spheres
  function init() {
      width = $('#center').width();
      height = $('#center').height();
-     camera = new THREE.PerspectiveCamera(100, width / height, 0.1, 5000);
+     camera = new THREE.PerspectiveCamera(100, width / height, 1, 8000);
      camera.position.set(50, 50, 0);
      camera.rotation.x = -Math.PI / 4;
      renderer = new THREE.WebGLRenderer();
@@ -152,44 +152,50 @@ let aSize = 3; // initial size of burn spheres
      //println(" cam:("+camera.position.x+","+camera.position.y+","+camera.position.z+")");
  }
 
- function drawOrbit(id, focusX, focusY, e, p, rotation, vx, vy) {
-     //println("Orbit: (" + focusX + "," + focusY + "), ecc:" + e + ", p:" + p + ", rot:" + rotation);
-     let a = p / (1 - e * e);
-     let b = a * Math.sqrt(1 - e * e);
-     let cf = Math.sqrt(a * a - b * b);
-     let focus = new THREE.Vector2(focusX, focusY);
-     let offset = new THREE.Vector2(cf, 0).rotateAround(new THREE.Vector2(0, 0), rotation);
-     let center = focus.sub(offset);
+function drawOrbit(content) {
+  let focusX = content.orbit.focus.x,
+      focusY = content.orbit.focus.y,
+      e = content.orbit.e,
+      p = content.orbit.p / 5e4, //TODO: needs to get this value from the server. Could change in Constants
+      rotation = content.orbit.rotation,
+      id = content.index;
+  let a = p / (1 - e * e);
+  let b = a * Math.sqrt(1 - e * e);
+  let cf = Math.sqrt(a * a - b * b);
+  let focus = new THREE.Vector2(focusX, focusY);
+  let offset = new THREE.Vector2(cf, 0).rotateAround(new THREE.Vector2(0, 0), rotation);
+  let center = focus.sub(offset);
 
-     let mesh = drawEllipse(center.x, center.y, a, b, -rotation);
+  let mesh = drawEllipse(center.x, center.y, a, b, -rotation);
+  scene.add(mesh);
 
-     if (id > 0) {
-         // alien
-         let al = aliens[id];
-         if (al !== undefined) {
-             if (al.orbit !== null) {
-                 scene.remove(al.orbit);
-             }
-             if (al.vector !== null) {
-                 scene.remove(al.vector);
-             }
-             if (vx !== undefined && vy !== undefined) {
-                 al.vector = drawVelocity(al, vx, vy);
-             } else {
-                 al.vector = null;
-             }
-             al.orbit = mesh;
-             scene.add(al.vector);
-             scene.add(al.orbit);
+
+  if (id > 0) {
+     // alien
+     let al = aliens[id];
+     if (al !== undefined) {
+         if (al.orbit !== null) {
+             scene.remove(al.orbit);
          }
-     } else {
-         // planet
-         let pl = planets[id];
-         pl.orbit = mesh;
-         scene.add(pl.orbit);
+         if (al.vector !== null) {
+             scene.remove(al.vector);
+         }
+         if (vx !== undefined && vy !== undefined) {
+             al.vector = drawVelocity(al, vx, vy);
+         } else {
+             al.vector = null;
+         }
+         al.orbit = mesh;
+         scene.add(al.vector);
+         scene.add(al.orbit);
      }
-
- }
+  } else {
+     // planet
+     let pl = planets[id];
+     pl.orbit = mesh;
+     scene.add(pl.orbit);
+  }
+}
 
  function drawEllipse(centerX, centerY, radiusX, radiusY, rotation) {
      let curve = new THREE.EllipseCurve(
