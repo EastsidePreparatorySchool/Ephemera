@@ -1,0 +1,67 @@
+[
+  {
+    "Name": "Into the World",
+    "Requirement": "Exit the same zone.",
+    "flag": "ExitSafeZone"
+  },
+  {
+    "Name": "Science!",
+    "Requirement": "Perform research for the first time.",
+    "tech": 1,
+  },
+  {
+    "Name": "Merchant",
+    "Requirement": "Perform a trade.",
+    "flag": "SuccessfulTrade"
+  },
+  {
+    "Name": "1.21 Jigawatts",
+    "Requirement": "Obtain 121 energy.",
+    "energy": 121,
+  },
+  {
+    "Name": "Overpowered",
+    "Requirement": "Hit the energy limit.",
+    "energy": 1000,
+  },
+  {
+    "Name": "Dealbreaker",
+    "Requirement": "Respond to an alien's trade offer by fighting.",
+    "flag": "TradeDenied"
+  },
+  {
+    "Name": "Break out the big guns",
+    "Requirement": "Kill an alien of another species.",
+    "flag": "AlienKilledByFighting"
+  },
+  {
+    "Name": "No place like home",
+    "Requirement": "Land on a planet.",
+    "flag": "LandOnPlanet"
+  },
+  {
+    "Name": "Einstein",
+    "Requirement": "Surpass the research cap.",
+    "tech": 31,
+  },
+  {
+    "Name": "Duplication",
+    "Requirement": "Spawn another alien.",
+    "aliens": 2,
+  },
+  {
+    "Name": "Anyone out there?",
+    "Requirement": "Broadcast a message to the world",
+    "broadcast": 1,
+  },
+  {
+    "Name": "Megaphone",
+    "Requirement": "Broadcast a message across the universe",
+    "broadcast": 250,
+  },
+  {
+    "Name": "High-tech death ray",
+    "Requirement": "Spend more than 35 energy on a single fight with a single alien",
+    "fightenergy": 36,
+  }
+]

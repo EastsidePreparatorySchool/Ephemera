@@ -13,14 +13,8 @@ import alieninterfaces.Action.ActionCode;
  */
 public class Achievement {
     AchievementReq[] reqs;
-    
-    public Achievement(int reqNum) {
-        reqs = new AchievementReq[reqNum];
-    }
-    
-    public void addReq(AchievementReq req, int position) {
-        reqs[position] = req;
-    }
+    String name;
+    String desc;
     
     public boolean checkFlag(AchievementFlag flag) {
         return checkFullAlien(null, flag, -1, -1);

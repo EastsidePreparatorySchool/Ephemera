@@ -14,16 +14,16 @@ import gameengineinterfaces.*;
 
 
 public class AchievementReq {
-    Requirement numReq;
-    double amount;
-    AchievementFlag flagReq;
+    public Requirement numReq;
+    public double amount;
+    public AchievementFlag flagReq;
 
-    public AchievementReq(AchievementFlag flagReq) {
-        this.flagReq = flagReq;
+    public AchievementReq(String flagReq) {
+        this.flagReq = AchievementFlag.valueOf(flagReq.trim().toUpperCase());
     }
     
-    public AchievementReq(Requirement req, double amount) {
-        this.numReq = req;
+    public AchievementReq(String req, double amount) {
+        this.numReq = Requirement.valueOf(req.trim().toUpperCase());
         this.amount = amount;
     }
 }

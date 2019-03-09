@@ -1,0 +1,12 @@
+[
+  {
+    "Name": "Science!",
+    "Requirement": "Perform research for the first time.",
+    "tech": 1,
+  },
+  {
+    "Name": "Merchant",
+    "Requirement": "Perform a trade.",
+    "flag": "SuccessfulTrade"
+  }
+]

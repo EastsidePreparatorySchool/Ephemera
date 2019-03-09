@@ -23,6 +23,7 @@ public class GameElementSpec {
     public double tech;
 
     public GameElementSpec(String kindString) {
+        System.out.println("Made a GES with kindString " + kindString);
         try {
             this.kind = GameElementKind.valueOf(kindString.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
@@ -31,6 +32,7 @@ public class GameElementSpec {
     }
 
     public GameElementSpec(String kindString, String domainName, String packageName, String className, String state) {
+        System.out.println("Made a GES with kindString ");
         try {
             this.kind = GameElementKind.valueOf(kindString.trim().toUpperCase());
             this.domainName = domainName;

@@ -61,9 +61,11 @@ public class GameEngineV1 implements GameEngine {
 
     @Override
     public GameElementSpec[] readConfigFile(String fileName) {
+        return (GameElementSpec[]) readCustomConfigFile(fileName, GameElementSpec.class);
+    }
+    public Object readCustomConfigFile(String fileName, Class c) {
         //ArrayList<GameElementSpec> elements = new ArrayList<>(100);
-        GameElementSpec[] elements;
-        GameElementSpec element;
+        Object elements;
         //
         // Every line has kind, package, class, state in csv format
         //
@@ -74,7 +76,7 @@ public class GameEngineV1 implements GameEngine {
             char[] buffer = new char[65000];
             int n = in.read(buffer);
             String s = new String(buffer).trim();
-            elements = gson.fromJson(s, GameElementSpec[].class);
+            elements = gson.fromJson(s, c);
             in.close();
         }catch (JsonSyntaxException e) {
             vis.debugErr("GameEngineV1:init:File parse error");
@@ -87,9 +89,12 @@ public class GameEngineV1 implements GameEngine {
         }
         return elements;
     }
+    
+    /*public Achievement[] readAchievements(String filename) {*/
 
     @Override
     public void processGameElements(GameElementSpec[] elements) {
+        System.out.println("Processing game elements!");
         //
         // queue every game element
         //
@@ -114,6 +119,9 @@ public class GameEngineV1 implements GameEngine {
 
     }
 
+    public void processAchievements(Achievement[] achievements) {
+        
+    }
     @Override
     public void queueCommand(GameCommand gc) {
         //

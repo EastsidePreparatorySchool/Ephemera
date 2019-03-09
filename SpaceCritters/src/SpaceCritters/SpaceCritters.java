@@ -8,6 +8,7 @@ import gameengineV1.GameEngineV1;
 import gameengineinterfaces.GameCommand;
 import gameengineinterfaces.GameCommandCode;
 import gameengineinterfaces.GameElementSpec;
+import gamelogic.Achievement;
 import gamelogic.Constants;
 import java.io.File;
 import java.io.IOException;
@@ -133,6 +134,11 @@ public class SpaceCritters extends Application {
             // load a game and process it
             elements  = engine.readConfigFile(Constants.gameMode);
             engine.processGameElements(elements);
+            
+            // load achievements
+            Achievement[] achievements = (Achievement[]) engine.
+                    readCustomConfigFile("achievements.json", Achievement[].class);
+            engine.processAchievements(achievements);
             
 
             // need field to be alive before constructing this
