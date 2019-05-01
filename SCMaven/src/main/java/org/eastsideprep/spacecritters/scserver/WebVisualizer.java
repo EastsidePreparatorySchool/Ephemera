@@ -46,16 +46,16 @@ public class WebVisualizer implements GameVisualizer {
     WebSocketHandler webSocket = new WebSocketHandler();
     
     
-    HashMap<String, ObjectRecord> objectMap = new HashMap<>();
-    ArrayList<ObjectRecord> objectState = new ArrayList<>();
-    ArrayList<SpeciesRecord> speciesState = new ArrayList<>();
-    ArrayList<AlienSpec> alienState = new ArrayList<>();
-    ArrayList<EnergyRecord> energyState = new ArrayList<>();
+    ArrayList<ObjectRecord>     objectState = new ArrayList<>();
+    ArrayList<SpeciesRecord>    speciesState = new ArrayList<>();
+    ArrayList<AlienSpec>        alienState = new ArrayList<>();
+    ArrayList<EnergyRecord>     energyState = new ArrayList<>();
+    
     
     Stack<WebSocketHandler.Record> updates = new Stack<>();
     
     
-    
+    HashMap<String, ObjectRecord> objectMap = new HashMap<>();
     public abstract class ObjectRecord extends WebSocketHandler.Record {
         double x, y, mass;
         String name;
@@ -129,6 +129,8 @@ public class WebVisualizer implements GameVisualizer {
     
     
     public class AlienRecord extends WebSocketHandler.Record {//needs fixing
+        public int ID;
+        public String species;
         AlienRecord() {
             
             type = "AlienRecord";
@@ -185,7 +187,6 @@ public class WebVisualizer implements GameVisualizer {
             
             type = "KillRecord";
         }
-        
     }
     public class EnergyRecord extends WebSocketHandler.Record {
         int x, y;
@@ -222,7 +223,7 @@ public class WebVisualizer implements GameVisualizer {
     @Override
     public void showPlanetMove(int oldx, int oldy, int x, int y, String name, int index, double energy, int tech, double time) {
         //make a new objectrecord, throw in there
-        //new PlanetUpdate(x, y, name, index, energy, tech);
+        new PlanetUpdate(x, y, name, index, energy, tech);
         
     }
     
