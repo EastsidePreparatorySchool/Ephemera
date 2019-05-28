@@ -1,0 +1,13 @@
+AlienGame Spec V0 – Discussion on 2/9/2016
+
+BTW we seriously need a better name for this.
+
+Concepts:
+-	The main program is the visualizer.
+-	The visualizer instantiates the GameBoard, and provides a “Visualizer” callback interface for visualizations. The Visualizer handles queueing to the main thread and the main program handles all visual updates. Cancel and pause requests are communicated through the visualizer as well.
+-	The GameBoard creates the space array, and populates it with objects (subclasses of Alien) encapsulated in  AlienContainers.
+-	AlienContainers maintain external properties – not under control of the individual alien. Examples are Energy (amount) and Technology (level)
+
+Energy:
+-	Initial allocation, perhaps 50 for 100 turns?
+-	

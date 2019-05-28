@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.eastsideprep.spacecritters</groupId>
+    <artifactId>sc</artifactId>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+
+    <name>SCServer</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mainClass>org.eastsideprep.spacecritters.scserver/MainApp</mainClass>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+    </properties>
+
+    <organization>
+        <name>Eastside Preparatory School</name>
+    </organization>
+    
+  
+
+    <build>
+        <finalName>root</finalName>
+        <plugins>
+            
+            <!--            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>unpack-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <excludeScope>system</excludeScope>
+                            <excludeGroupIds>junit,org.mockito,org.hamcrest</excludeGroupIds>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
+            
+            <plugin>
+                <!--Build an executable JAR--> 
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>org.eastsideprep.spacecritters.scserver/MainApp</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+               
+            </plugin> 
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <id>default-cli</id>
+                        <goals>
+                            <goal>exec</goal>                            
+                        </goals>
+                        <configuration>
+                            <executable>${java.home}/bin/java</executable>
+                            <commandlineArgs>-Xmx400M -jar ${basedir}/target/${project.build.finalName}.jar serveronly </commandlineArgs>
+                        </configuration>
+                    </execution>
+                </executions>  
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>10</source>
+                    <target>10</target>
+                    <compilerArgs>
+                        <arg>-Xlint:all,-options,-path</arg>
+                    </compilerArgs>
+                    <compilerArguments>
+                        <bootclasspath>${sun.boot.class.path}${path.separator}${java.home}/lib/jfxrt.jar</bootclasspath>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+ 
+            
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+                </configuration>
+            </plugin>
+            
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>copy1</id>
+                        <phase>compile</phase>
+                        <configuration>
+                            <target>
+                                <echo>ANT TASK - copying files....</echo>
+                                      
+                                <copy todir="${basedir}/src/main/resources/static/" overwrite="true">
+                                    <fileset dir="${basedir}/src/main/webapp">
+                                        <include name="*.html"/>
+                                    </fileset>
+                                </copy>
+                                
+                                <copy todir="${basedir}/src/main/resources/static/" overwrite="true">
+                                    <fileset dir="${basedir}/src/main/webapp">
+                                        <include name="*.jpg" />
+                                    </fileset>
+                                </copy>
+                                
+                                <copy todir="${basedir}/src/main/resources/static/js" overwrite="true">
+                                    <fileset dir="${basedir}/src/main/webapp/js">
+                                        <include name="*.js"/>
+                                    </fileset>
+                                </copy>                            
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution> 
+                    <execution>
+                        <id>copy2</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <echo>ANT TASK - copying files....</echo>
+                                <copy todir="${user.home}/documents/github/SpaceCritters/webapps" overwrite="true" flatten="true">
+                                    <fileset dir="${basedir}">
+                                        <include name="target/*.war" />
+                                    </fileset>
+                                </copy>       
+                                <copy todir="${basedir}/target/static/" overwrite="true">
+                                    <fileset dir="${basedir}/src/main/webapp">
+                                        <include name="*.html"/>
+                                    </fileset>
+                                </copy>
+                                
+                                <copy todir="${basedir}/target/static/" overwrite="true">
+                                    <fileset dir="${basedir}/src/main/webapp">
+                                        <include name="*.jpg" />
+                                    </fileset>
+                                </copy>
+                                
+                                <copy todir="${basedir}/target/static/js" overwrite="true">
+                                    <fileset dir="${basedir}/src/main/webapp/js">
+                                        <include name="*.js"/>
+                                    </fileset>
+                                </copy>                            
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+        </plugins>
+    </build>
+   
+    
+   
+    
+    <dependencies>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.2</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.sparkjava</groupId>
+            <artifactId>spark-core</artifactId>
+            <version>2.5.5</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.21</version>
+            <type>jar</type>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.xbean/xbean-classloader -->
+        <dependency>
+            <groupId>org.apache.xbean</groupId>
+            <artifactId>xbean-classloader</artifactId>
+            <version>4.12</version>
+        </dependency>
+
+
+        
+     
+
+    </dependencies>
+   
+</project>

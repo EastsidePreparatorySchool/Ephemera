@@ -1,5 +1,0 @@
-[  
-    {"kind":"CONSTANT","domainName":"","packageName":"","className":"perSpeciesCap","state":"10000","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
-    {"kind":"CONSTANT","domainName":"","packageName":"","className":"perSpeciesSpawnCap","state":"10000","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0},
-    {"kind":"CONSTANT","domainName":"","packageName":"","className":"safeZoneRadius","state":"10","parent":"","x":0,"y":0,"energy":0.0,"tech":0.0}
-]
