@@ -98,7 +98,7 @@ public class GameEngineV2 implements GameEngine {
     }
 
     @Override
-    public GameElementSpec[] readConfigFile(String fileName) {
+    public GameElementSpec[] readConfigFile(String path, String fileName) {
         //ArrayList<GameElementSpec> elements = new ArrayList<>(100);
         GameElementSpec[] elements;
         GameElementSpec element;
@@ -109,13 +109,13 @@ public class GameEngineV2 implements GameEngine {
         String config = null;
 
         try {
-            FileReader in = new FileReader(this.gamePath + fileName);
+            FileReader in = new FileReader(path + fileName);
             char[] buffer = new char[65000];
             in.read(buffer);
             config = new String(buffer).trim();
             in.close();
         } catch (FileNotFoundException e) {
-            System.out.println("readConfigFile: could not read main config file " + fileName + ", trying resource ...");
+            System.out.println("readConfigFile: could not read main config file " + path+ fileName + ", trying resource ...");
 
             try {
                 byte[] buffer = new byte[65000];

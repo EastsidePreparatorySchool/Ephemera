@@ -566,10 +566,10 @@ public class MainApp implements SparkApplication {
         System.out.println("createServerEngine: initialized game engine");
 
         // read config
-        GameElementSpec[] elements = engine.readConfigFile("sc_config.json");
+        GameElementSpec[] elements = engine.readConfigFile(gamePath, "sc_config.json");
         engine.processGameElements(elements);
         // load a game and process it
-        elements = engine.readConfigFile(Constants.gameMode);
+        elements = engine.readConfigFile(gamePath, Constants.gameMode);
         engine.processGameElements(elements);
         System.out.println("createServerEngine: processing configuration files");
 

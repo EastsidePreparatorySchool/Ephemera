@@ -23,18 +23,18 @@ public class AggressiveAlien implements Alien/*, AlienShapeFactory */{
     @Override
     public void init(Context game_ctx, int id, int parent, String message) {
         ctx = game_ctx;
-        ctx.debugOut("Initialized at "
-                + ctx.getPosition().toString()
-                + " E: " + Double.toString(ctx.getEnergy())
-                + " T: " + Double.toString(ctx.getTech()));
+//        ctx.debugOut("Initialized at "
+//                + ctx.getPosition().toString()
+//                + " E: " + Double.toString(ctx.getEnergy())
+//                + " T: " + Double.toString(ctx.getTech()));
     }
 
     // Martians move left, right, left, right
     @Override
     public Vector2 getMove() {
 
-        ctx.debugOut("Move requested,"
-                + ctx.getStateString());
+//        ctx.debugOut("Move requested,"
+//                + ctx.getStateString());
         int move_energy;
 
         // don't move more than you have tech
@@ -67,7 +67,7 @@ public class AggressiveAlien implements Alien/*, AlienShapeFactory */{
         try {
             if (ctx.getView(move_energy).getSpaceObjectAtPos(ctx.getPosition().add(dir).round()) != null) {
                 // don't be a dumbass, don't move into a star
-                ctx.debugOut("Avoiding Star at " + ctx.getPosition().add(dir).toString());
+//                ctx.debugOut("Avoiding Star at " + ctx.getPosition().add(dir).toString());
                 dir = new IntegerDirection(-dir.x, -dir.y);
             }
         } catch (Exception e) {
@@ -76,63 +76,63 @@ public class AggressiveAlien implements Alien/*, AlienShapeFactory */{
             dir = new IntegerDirection(1, 1);
         }
 
-        ctx.debugOut("Moving to " + ctx.getPosition().add(dir).toString() + ctx.getStateString());
+//        ctx.debugOut("Moving to " + ctx.getPosition().add(dir).toString() + ctx.getStateString());
         return dir.v2();
     }
 
     @Override
     public Action getAction() {
 
-        ctx.debugOut("Action requested," + ctx.getStateString());
+//        ctx.debugOut("Action requested," + ctx.getStateString());
 
         // catch any shenanigans
         if (ctx.getEnergy() > 100) {
             try {
                 View view = ctx.getView((int) ctx.getTech());
                 if (view.getAliensAtPos(ctx.getPosition()).size() > 1) {
-                    ctx.debugOut("Uh-oh.There is someone else here."
-                            + ctx.getStateString());
+//                    ctx.debugOut("Uh-oh.There is someone else here."
+//                            + ctx.getStateString());
                 }
 
                 // do we have enough energy?
                 if (ctx.getEnergy() < 10) {
                     // no, charge
-                    ctx.debugOut("Choosing to gain energy,"
-                            + ctx.getStateString());
+//                    ctx.debugOut("Choosing to gain energy,"
+//                            + ctx.getStateString());
                     return new Action(Action.ActionCode.Gain);
                 }
 
                 // do we have enough tech?
                 if (ctx.getTech() < 30 && ctx.getEnergy() > ctx.getTech()) {
                     // no, research
-                    ctx.debugOut("Choosing to research"
-                            + ctx.getStateString());
+//                    ctx.debugOut("Choosing to research"
+//                            + ctx.getStateString());
                     return new Action(Action.ActionCode.Research);
                 }
 
                 // is there another alien on our position?
                 if (view.getAliensAtPos(ctx.getPosition()).size() > 1
                         && ctx.getEnergy() > ctx.getFightingCost() + 2) {
-                    ctx.debugOut("EXTERMINATE!!!!!"
-                            + ctx.getStateString());
+//                    ctx.debugOut("EXTERMINATE!!!!!"
+//                            + ctx.getStateString());
 
                     return new Action(Action.ActionCode.Fight, (int) ctx.getEnergy() - 2 - ctx.getFightingCost());
                 }
 
                 if (ctx.getEnergy() > (ctx.getSpawningCost() + 10)) {
                     // no other aliens here, have enough stuff, spawn!
-                    ctx.debugOut("AAs RULE SUPREME! SPAWNING!"
-                            + ctx.getStateString());
+//                    ctx.debugOut("AAs RULE SUPREME! SPAWNING!"
+//                            + ctx.getStateString());
 
                     return new Action(Action.ActionCode.Spawn, 5);
                 }
             } catch (Exception e) {
                 // do something here to deal with errors
-                ctx.debugOut("EXPLAIN?????? " + e.toString());
+//                ctx.debugOut("EXPLAIN?????? " + e.toString());
             }
         }
-        ctx.debugOut("Gaining energy"
-                + ctx.getStateString());
+//        ctx.debugOut("Gaining energy"
+//                + ctx.getStateString());
         return new Action(Action.ActionCode.Gain);
     }
 
@@ -141,7 +141,7 @@ public class AggressiveAlien implements Alien/*, AlienShapeFactory */{
         if (ctx.getEnergy() > 100) {
             try {
                 if (ctx.getGameTurn() % 20 == 0) {
-                    ctx.broadcastAndListen("I say: AAs rule supreme!!!!!", 1, true);
+//                    ctx.broadcastAndListen("I say: AAs rule supreme!!!!!", 1, true);
                 }
             } catch (Exception e) {
             }

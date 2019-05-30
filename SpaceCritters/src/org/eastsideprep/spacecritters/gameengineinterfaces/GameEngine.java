@@ -12,7 +12,7 @@ public interface GameEngine {
 
     void init(GameVisualizer v, String gamePath, String alienPath);
 
-    GameElementSpec[] readConfigFile(String fileName);
+    GameElementSpec[] readConfigFile(String path, String fileName);
 
     void processGameElements(GameElementSpec[] elements);
 

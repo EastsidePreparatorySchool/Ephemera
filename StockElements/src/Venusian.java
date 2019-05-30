@@ -23,8 +23,8 @@ public class Venusian implements Alien {
     @Override
     public void init(Context game_ctx, int id, int parent, String message) {
         ctx = game_ctx;
-        ctx.debugOut("Initialized at "
-                + ctx.getStateString());
+//        ctx.debugOut("Initialized at "
+//                + ctx.getStateString());
 
     }
 
@@ -110,7 +110,7 @@ public class Venusian implements Alien {
                 }
 
                 // or, hit really hard then run again
-                ctx.debugOut("Fighting");
+//                ctx.debugOut("Fighting");
                 return new Action(Action.ActionCode.Fight, (int) ctx.getEnergy() - 10);
             }
         } catch (Exception e) {
@@ -127,11 +127,11 @@ public class Venusian implements Alien {
                 // TODO: Assumption: spawning cost will never be greater than 20
                 if (ctx.getEnergy() > ctx.getSpawningCost() + 10) {
                     //should spawn fast at the beggining,
-                    ctx.debugOut("Spawning");
+//                    ctx.debugOut("Spawning");
                     return new Action(Action.ActionCode.Spawn, 5);
                 }
                 if (ctx.getTech() < 30) {
-                    ctx.debugOut("Researching");
+//                    ctx.debugOut("Researching");
                     return new Action(Action.ActionCode.Research);
                 }
             }
@@ -139,12 +139,11 @@ public class Venusian implements Alien {
             System.out.println("Venusian:"+e);
             e.printStackTrace();
         }
-        ctx.debugOut("Gaining");
+//        ctx.debugOut("Gaining");
 
         return new Action(Action.ActionCode.Gain);
         } catch (Exception e){
-           System.out.println("Venusian:"+e);
-            e.printStackTrace();   
+//           System.out.println("Venusian:"+e);
         }
         return null;
     }

@@ -754,7 +754,7 @@ public class SpaceGrid {
         }
     }
 
-    InternalAlienSpecies addSpecies(GameElementSpec element, boolean msgs) {
+    InternalAlienSpecies addSpecies(GameElementSpec element, boolean msgs, boolean forceEnable) {
         String speciesName = element.domainName + ":" + element.packageName + ":" + element.className;
         int oldCounter = speciesCounter;
         InternalAlienSpecies result = null;
@@ -763,7 +763,6 @@ public class SpaceGrid {
             // add species if necessary
             InternalAlienSpecies as = speciesMap.get(speciesName);
             if (as == null) {
-
                 as = new InternalAlienSpecies(element.domainName, element.packageName, element.className, speciesCounter, speciesMap.getAchievementCount(), element.state.equals("true"));
                 speciesMap.put(speciesName, as);
                 speciesCounter++;
@@ -789,6 +788,9 @@ public class SpaceGrid {
 
                 if (!element.className.toLowerCase().endsWith("resident")) {
 //                    System.out.println("2 " + element.className);
+                    if (forceEnable) {
+                        as.instantiate = true;
+                    }
                     vis.registerSpecies(new AlienSpec(as), as.instantiate);
                 }
                 result = as;
@@ -907,7 +909,7 @@ public class SpaceGrid {
             return;
         }
 
-        InternalAlienSpecies as = addSpecies(element, false);
+        InternalAlienSpecies as = addSpecies(element, false, false);
         if (as == null) {
             return;
         }
@@ -982,7 +984,7 @@ public class SpaceGrid {
                             addCustomAliensInJAVA(element.domainName, f);
                         }
                     } else {
-                        addSpecies(element, true);
+                        addSpecies(element, true, false);
                     }
                     break;
                 case PLANET:
@@ -1118,7 +1120,7 @@ public class SpaceGrid {
                             packageName,
                             className,
                             ""),
-                            false);
+                            false, true);
                 }
             }
         } catch (Exception e) {
@@ -1138,7 +1140,7 @@ public class SpaceGrid {
                     packageName,
                     className,
                     ""),
-                    false);
+                    false, true);
 
         } catch (Exception e) {
             System.out.println("addCustomAliensInCLASS: " + e.getMessage());

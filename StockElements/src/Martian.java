@@ -32,9 +32,9 @@ public class Martian implements Alien {
     @Override
     public void init(Context ctx, int id, int parent, String message) {
         this.ctx = ctx;
-        ctx.debugOut("Initialized at "
-                + ctx.getStateString());
-        ctx.debugOut("Pancakes taste like styrofoam");
+//        ctx.debugOut("Initialized at "
+//                + ctx.getStateString());
+//        ctx.debugOut("Pancakes taste like styrofoam");
 
     }
 
@@ -113,22 +113,22 @@ public class Martian implements Alien {
         //checks if alien is on the same position, if so, then fights with the priorly designated amount of energy
         try {
             if (ctx.getView((int) ctx.getTech()).getAliensAtPos(ctx.getPosition()).size() > 1) {
-                ctx.debugOut("Fighting");
+//                ctx.debugOut("Fighting");
                 return new Action(Action.ActionCode.Fight, (fightStrength));
             }
         } catch (Exception e) {
-            ctx.debugOut("Fighting");
+//            ctx.debugOut("Fighting");
             return new Action(Action.ActionCode.Fight, fightStrength);
         }
         //if it doesnt fight, it chooses a item to do depending on how much energy it has.
         if (ctx.getEnergy() < 2) {
-            ctx.debugOut("Gaining");
+//            ctx.debugOut("Gaining");
             return new Action(Action.ActionCode.Gain);
         } else if (ctx.getEnergy() < 3 && ctx.getEnergy() > ctx.getTech() && ctx.getTech() < 30) {
-            ctx.debugOut("Researching");
+//            ctx.debugOut("Researching");
             return new Action(Action.ActionCode.Research);
         } else if (ctx.getEnergy() > ctx.getSpawningCost() + 2) {
-            ctx.debugOut("Spawning");
+//            ctx.debugOut("Spawning");
             return new Action(Action.ActionCode.Spawn, 2);
         }
 
