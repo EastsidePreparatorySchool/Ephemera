@@ -45,16 +45,18 @@ public class GameEngineV2 implements GameEngine {
     private boolean dead = false;
     public long timeOfDeath;
     public boolean slow = false;
+    public static String projectPath = null;
 
     static private URLClassLoader classLoader;
     static private Method addURL;
 
-    public GameEngineV2(String name) {
+    public GameEngineV2(String name, String projectPath) {
         this.gson = new Gson();
         this.queue = new ConcurrentLinkedQueue<>();
         this.state = new SCGameState(0, 0);
         this.log = new GameLog(state);
         this.name = name;
+        GameEngineV2.projectPath = projectPath;
     }
 
     @Override
@@ -235,22 +237,31 @@ public class GameEngineV2 implements GameEngine {
     // Dynamic class loader (.jar files)
     // stolen from StackOverflow, considered dark voodoo magic
     //
-    public Constructor<?> loadConstructor(String domainName, String packageName, String className) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    public Constructor<?> loadConstructor(String domainName, String packageName, String className, boolean msgs) throws IOException, SecurityException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Constructor<?> cs = null;
         String fullName = "";
-        File file;
+        File file = null;
         //System.out.println("EngineV2:loadConstructor: " + domainName + ":" + packageName + ":" + className);
 
         if (domainName.equalsIgnoreCase("org.eastsideprep.spacecritters")) {
-            domainName = "lib"+ System.getProperty("file.separator")+"stockelements.jar";
+            if (GameEngineV2.projectPath != null) {
+                domainName = GameEngineV2.projectPath
+                        + "stockelements"
+                        + System.getProperty("file.separator")
+                        + "dist"
+                        + System.getProperty("file.separator")
+                        + "stockelements.jar";
+            } else {
+                domainName = "lib" + System.getProperty("file.separator") + "stockelements.jar";
+            }
         }
-        
+
         fullName = domainName;
         if (fullName.toLowerCase().endsWith(".class")) {
             fullName = Paths.get(fullName).getParent().toString();
         }
-        
-        System.out.println("EngineV2:loadConstructor: full name " + fullName);
+
+        //System.out.println("EngineV2:loadConstructor: full name " + fullName);
         String fullClassName = null;
         try {
             file = new File(fullName);
@@ -259,15 +270,18 @@ public class GameEngineV2 implements GameEngine {
             //GameEngineV2.addURL.invoke(GameEngineV2.classLoader, (Object[]) new URL[]{file.toURI().toURL()});
             // Creating an instance of URLClassloader using the above URL and parent classloader 
             URL url = file.toURI().toURL();
-            System.out.println("Trying to obtain class loader for URL " + url);
-            System.out.println("Read privileges: " + file.canRead());
+            //System.out.println("Trying to obtain class loader for URL " + url);
+            //System.out.println("Read privileges: " + file.canRead());
             GameEngineV2.classLoader = URLClassLoader.newInstance(new URL[]{url}, GameEngineV2.class.getClassLoader());
 //            Class<?> alienClass = Class.forName(className, true, GameEngineV2.classLoader);
             Class<?> alienClass = GameEngineV2.classLoader.loadClass(className);
             cs = alienClass.getConstructor();
         } catch (Exception e) {
-            System.out.println("EngineV2: Could not get constructor: " + e.getMessage());
-            System.out.println(e.toString());
+            if (msgs) {
+                System.out.println("EngineV2: Could not get constructor: " + e.getMessage());
+                System.out.println("EngineV2: Looked in file: " + file.getPath());
+                System.out.println(e.toString());
+            }
             throw e;
         }
         return cs;

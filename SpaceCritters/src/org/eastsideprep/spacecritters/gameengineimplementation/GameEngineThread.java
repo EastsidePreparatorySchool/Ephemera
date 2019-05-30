@@ -66,7 +66,7 @@ public class GameEngineThread extends Thread {
                                     engine.queue.wait();
                                 }
                             } catch (InterruptedException e) {
-                                System.err.println("GEThread interrupted: " + e.getMessage());
+                                System.out.println("GEThread interrupted: " + e.getMessage());
                                 //e.printStackTrace(System.err);
                             }
                         }

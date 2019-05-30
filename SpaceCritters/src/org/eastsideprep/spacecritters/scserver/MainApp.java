@@ -521,13 +521,16 @@ public class MainApp implements SparkApplication {
         // construct path to important game folders
         String gamePath = System.getProperty("user.dir");
         gamePath = gamePath.toLowerCase();
+        String projectPath = null;
 
-        if (gamePath.contains("ephemera" + System.getProperty("file.separator") + "scserver")) {
-            // probably started from netbeans
-            gamePath = gamePath.substring(0, gamePath.toLowerCase().indexOf("scserver"));
+        if (gamePath.contains("ephemera" + System.getProperty("file.separator") + "spacecritters")) {
+            // probably started from 
+            
+            gamePath = gamePath.substring(0, gamePath.toLowerCase().indexOf("spacecritters"));
             //TODO: Can't rely on constants before reading config file
             // read config files earlier.Read constants first, then game constants, then init, then read stock elements, game elements
             Constants.searchProjectForAliens = false;
+            projectPath = gamePath;
         } else {
             // probably started from other folder
             gamePath = System.getProperty("user.dir");
@@ -549,7 +552,7 @@ public class MainApp implements SparkApplication {
         // initialize Ephemera game engine and visualizer
         //
         //get some objects created (not initialized, nothing important happens here)
-        GameEngineV2 engine = new GameEngineV2(name);
+        GameEngineV2 engine = new GameEngineV2(name, projectPath);
         System.out.println("createServerEngine: created game engine");
         //
         // test: viz streamer for web version

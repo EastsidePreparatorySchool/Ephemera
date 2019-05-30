@@ -67,8 +67,8 @@ public class Position extends GridVector {
             return new Position(x, y);
 
         } catch (Exception e) {
-            System.err.println("Position: " + e.getMessage());
-            e.printStackTrace(System.err);
+            //System.err.println("Position: " + e.getMessage());
+            //e.printStackTrace(System.err);
         }
 
         return null;

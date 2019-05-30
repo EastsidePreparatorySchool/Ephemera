@@ -754,7 +754,7 @@ public class SpaceGrid {
         }
     }
 
-    InternalAlienSpecies addSpecies(GameElementSpec element) {
+    InternalAlienSpecies addSpecies(GameElementSpec element, boolean msgs) {
         String speciesName = element.domainName + ":" + element.packageName + ":" + element.className;
         int oldCounter = speciesCounter;
         InternalAlienSpecies result = null;
@@ -770,7 +770,7 @@ public class SpaceGrid {
 
                 if (as.cns == null) {
                     try {
-                        as.cns = engine.loadConstructor(element.domainName, element.packageName, element.className);
+                        as.cns = engine.loadConstructor(element.domainName, element.packageName, element.className, true);
                     } catch (Exception e) {
                         System.out.println("sg.addSpecies: Error loading contructor for " + speciesName);
                         e.printStackTrace(System.out);
@@ -865,10 +865,10 @@ public class SpaceGrid {
         }
         if (soParent != null) {
             try {
-                Constructor<?> cs = engine.loadConstructor(element.domainName, element.packageName, element.className);
+                Constructor<?> cs = engine.loadConstructor(element.domainName, element.packageName, element.className, false);
                 pb = (PlanetBehavior) cs.newInstance();
             } catch (Exception e) {
-                vis.debugOut("sg.addPlanet: behavior not found: " + element.className);
+                //vis.debugOut("sg.addPlanet: behavior not found: " + element.className);
             }
 
             Planet p = new Planet(this, soParent,
@@ -907,7 +907,7 @@ public class SpaceGrid {
             return;
         }
 
-        InternalAlienSpecies as = addSpecies(element);
+        InternalAlienSpecies as = addSpecies(element, false);
         if (as == null) {
             return;
         }
@@ -982,7 +982,7 @@ public class SpaceGrid {
                             addCustomAliensInJAVA(element.domainName, f);
                         }
                     } else {
-                        addSpecies(element);
+                        addSpecies(element, true);
                     }
                     break;
                 case PLANET:
@@ -1070,14 +1070,13 @@ public class SpaceGrid {
                 if (f.isDirectory()) {
                     // recurse
                     addCustomAliens(folder + f.getName() + System.getProperty("file.separator"), domain + f.getName() + System.getProperty("file.separator"));
-                } 
-                /*else if ((f.getName().toLowerCase().endsWith(".jar"))
+                } /*else if ((f.getName().toLowerCase().endsWith(".jar"))
                         && !f.getName().toLowerCase().endsWith("stockelements.jar")) {
                     addCustomAliensInJAR(domain, f);
-                } */else if ((f.getName().toLowerCase().endsWith("alien.class"))
-                        /*&& !Files.exists(Paths.get(f.getPath().toLowerCase().replace(".class", ".java")))*/) {
+                } */ else if ((f.getName().toLowerCase().endsWith("alien.class")) /*&& !Files.exists(Paths.get(f.getPath().toLowerCase().replace(".class", ".java")))*/) {
                     addCustomAliensInCLASS(domain, f);
-                } /*else if ((f.getName().toLowerCase().endsWith("alien.java"))) {
+                }
+                /*else if ((f.getName().toLowerCase().endsWith("alien.java"))) {
                     addCustomAliensInJAVA(domain, f);
                 }*/
             }
@@ -1115,16 +1114,16 @@ public class SpaceGrid {
                     }
 
                     addSpecies(new GameElementSpec("SPECIES",
-                            domain +f.getName(),
+                            domain + f.getName(),
                             packageName,
                             className,
-                            "")
-                    );
+                            ""),
+                            false);
                 }
             }
         } catch (Exception e) {
-            System.err.println("addCustomAliensInJAR: " + e.getMessage());
-            e.printStackTrace(System.err);
+            System.out.println("addCustomAliensInJAR: " + e.getMessage());
+            e.printStackTrace(System.out);
         }
     }
 
@@ -1138,12 +1137,12 @@ public class SpaceGrid {
                     domain + f.getName(),
                     packageName,
                     className,
-                    "")
-            );
+                    ""),
+                    false);
 
         } catch (Exception e) {
-            System.err.println("addCustomAliensInCLASS: " + e.getMessage());
-            e.printStackTrace(System.err);
+            System.out.println("addCustomAliensInCLASS: " + e.getMessage());
+            e.printStackTrace(System.out);
         }
     }
 
@@ -1170,8 +1169,8 @@ public class SpaceGrid {
             }
             addCustomAliensInCLASS(domain, new File(f.getPath().replace(".java", ".class")));
         } catch (Exception e) {
-            System.err.println("addCustomAliensInJAVA: " + e.getMessage());
-            e.printStackTrace(System.err);
+            System.out.println("addCustomAliensInJAVA: " + e.getMessage());
+            e.printStackTrace(System.out);
         }
     }
 }

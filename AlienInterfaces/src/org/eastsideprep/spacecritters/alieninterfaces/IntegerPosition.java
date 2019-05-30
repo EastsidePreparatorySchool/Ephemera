@@ -58,8 +58,8 @@ public class IntegerPosition extends IntegerVector2 {
             return new IntegerPosition(x, y);
 
         } catch (Exception e) {
-            System.err.println("IntegerPosition: " + e.getMessage());
-            e.printStackTrace(System.err);
+            //System.err.println("IntegerPosition: " + e.getMessage());
+            //e.printStackTrace(System.err);
         }
 
         return null;
